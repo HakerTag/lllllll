@@ -30,61 +30,26 @@ class TypefaceCompatApi24Impl extends TypefaceCompatBaseImpl {
     }
 
     static {
-        Method addFontMethod;
-        Constructor fontFamilyCtor;
-        Class fontFamilyClass;
-        Method createFromFamiliesWithDefaultMethod;
+        Method method;
+        Method method2;
+        Class<?> cls;
+        Constructor<?> constructor = null;
         try {
-            fontFamilyClass = Class.forName(FONT_FAMILY_CLASS);
-            try {
-                fontFamilyCtor = fontFamilyClass.getConstructor(new Class[0]);
-                try {
-                    addFontMethod = fontFamilyClass.getMethod(ADD_FONT_WEIGHT_STYLE_METHOD, ByteBuffer.class, Integer.TYPE, List.class, Integer.TYPE, Boolean.TYPE);
-                    try {
-                        createFromFamiliesWithDefaultMethod = Typeface.class.getMethod(CREATE_FROM_FAMILIES_WITH_DEFAULT_METHOD, Array.newInstance(fontFamilyClass, 1).getClass());
-                    } catch (ClassNotFoundException | NoSuchMethodException e) {
-                        e = e;
-                    }
-                } catch (ClassNotFoundException | NoSuchMethodException e2) {
-                    e = e2;
-                    Log.e(TAG, e.getClass().getName(), e);
-                    fontFamilyClass = null;
-                    fontFamilyCtor = null;
-                    addFontMethod = null;
-                    createFromFamiliesWithDefaultMethod = null;
-                    sFontFamilyCtor = fontFamilyCtor;
-                    sFontFamily = fontFamilyClass;
-                    sAddFontWeightStyle = addFontMethod;
-                    sCreateFromFamiliesWithDefault = createFromFamiliesWithDefaultMethod;
-                }
-            } catch (ClassNotFoundException | NoSuchMethodException e3) {
-                e = e3;
-                Log.e(TAG, e.getClass().getName(), e);
-                fontFamilyClass = null;
-                fontFamilyCtor = null;
-                addFontMethod = null;
-                createFromFamiliesWithDefaultMethod = null;
-                sFontFamilyCtor = fontFamilyCtor;
-                sFontFamily = fontFamilyClass;
-                sAddFontWeightStyle = addFontMethod;
-                sCreateFromFamiliesWithDefault = createFromFamiliesWithDefaultMethod;
-            }
-        } catch (ClassNotFoundException | NoSuchMethodException e4) {
-            e = e4;
+            cls = Class.forName(FONT_FAMILY_CLASS);
+            Constructor<?> constructor2 = cls.getConstructor(new Class[0]);
+            method = cls.getMethod(ADD_FONT_WEIGHT_STYLE_METHOD, ByteBuffer.class, Integer.TYPE, List.class, Integer.TYPE, Boolean.TYPE);
+            method2 = Typeface.class.getMethod(CREATE_FROM_FAMILIES_WITH_DEFAULT_METHOD, Array.newInstance(cls, 1).getClass());
+            constructor = constructor2;
+        } catch (ClassNotFoundException | NoSuchMethodException e) {
             Log.e(TAG, e.getClass().getName(), e);
-            fontFamilyClass = null;
-            fontFamilyCtor = null;
-            addFontMethod = null;
-            createFromFamiliesWithDefaultMethod = null;
-            sFontFamilyCtor = fontFamilyCtor;
-            sFontFamily = fontFamilyClass;
-            sAddFontWeightStyle = addFontMethod;
-            sCreateFromFamiliesWithDefault = createFromFamiliesWithDefaultMethod;
+            cls = null;
+            method2 = null;
+            method = null;
         }
-        sFontFamilyCtor = fontFamilyCtor;
-        sFontFamily = fontFamilyClass;
-        sAddFontWeightStyle = addFontMethod;
-        sCreateFromFamiliesWithDefault = createFromFamiliesWithDefaultMethod;
+        sFontFamilyCtor = constructor;
+        sFontFamily = cls;
+        sAddFontWeightStyle = method;
+        sCreateFromFamiliesWithDefault = method2;
     }
 
     public static boolean isUsable() {
@@ -102,52 +67,52 @@ class TypefaceCompatApi24Impl extends TypefaceCompatBaseImpl {
         }
     }
 
-    private static boolean addFontWeightStyle(Object family, ByteBuffer buffer, int ttcIndex, int weight, boolean style) {
+    private static boolean addFontWeightStyle(Object obj, ByteBuffer byteBuffer, int i, int i2, boolean z) {
         try {
-            return ((Boolean) sAddFontWeightStyle.invoke(family, buffer, Integer.valueOf(ttcIndex), null, Integer.valueOf(weight), Boolean.valueOf(style))).booleanValue();
+            return ((Boolean) sAddFontWeightStyle.invoke(obj, byteBuffer, Integer.valueOf(i), null, Integer.valueOf(i2), Boolean.valueOf(z))).booleanValue();
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static Typeface createFromFamiliesWithDefault(Object family) {
+    private static Typeface createFromFamiliesWithDefault(Object obj) {
         try {
-            Object familyArray = Array.newInstance(sFontFamily, 1);
-            Array.set(familyArray, 0, family);
-            return (Typeface) sCreateFromFamiliesWithDefault.invoke(null, familyArray);
+            Object newInstance = Array.newInstance(sFontFamily, 1);
+            Array.set(newInstance, 0, obj);
+            return (Typeface) sCreateFromFamiliesWithDefault.invoke(null, newInstance);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override // android.support.v4.graphics.TypefaceCompat.TypefaceCompatImpl, android.support.v4.graphics.TypefaceCompatBaseImpl
-    public Typeface createFromFontInfo(Context context, CancellationSignal cancellationSignal, FontsContractCompat.FontInfo[] fonts, int style) {
-        Object family = newFamily();
-        SimpleArrayMap<Uri, ByteBuffer> bufferCache = new SimpleArrayMap<>();
-        for (FontsContractCompat.FontInfo font : fonts) {
-            Uri uri = font.getUri();
-            ByteBuffer buffer = bufferCache.get(uri);
-            if (buffer == null) {
-                buffer = TypefaceCompatUtil.mmap(context, cancellationSignal, uri);
-                bufferCache.put(uri, buffer);
+    public Typeface createFromFontInfo(Context context, CancellationSignal cancellationSignal, FontsContractCompat.FontInfo[] fontInfoArr, int i) {
+        Object newFamily = newFamily();
+        SimpleArrayMap simpleArrayMap = new SimpleArrayMap();
+        for (FontsContractCompat.FontInfo fontInfo : fontInfoArr) {
+            Uri uri = fontInfo.getUri();
+            ByteBuffer byteBuffer = (ByteBuffer) simpleArrayMap.get(uri);
+            if (byteBuffer == null) {
+                byteBuffer = TypefaceCompatUtil.mmap(context, cancellationSignal, uri);
+                simpleArrayMap.put(uri, byteBuffer);
             }
-            if (!addFontWeightStyle(family, buffer, font.getTtcIndex(), font.getWeight(), font.isItalic())) {
+            if (!addFontWeightStyle(newFamily, byteBuffer, fontInfo.getTtcIndex(), fontInfo.getWeight(), fontInfo.isItalic())) {
                 return null;
             }
         }
-        return Typeface.create(createFromFamiliesWithDefault(family), style);
+        return Typeface.create(createFromFamiliesWithDefault(newFamily), i);
     }
 
     @Override // android.support.v4.graphics.TypefaceCompat.TypefaceCompatImpl, android.support.v4.graphics.TypefaceCompatBaseImpl
-    public Typeface createFromFontFamilyFilesResourceEntry(Context context, FontResourcesParserCompat.FontFamilyFilesResourceEntry entry, Resources resources, int style) {
-        Object family = newFamily();
-        FontResourcesParserCompat.FontFileResourceEntry[] entries = entry.getEntries();
-        for (FontResourcesParserCompat.FontFileResourceEntry e : entries) {
-            ByteBuffer buffer = TypefaceCompatUtil.copyToDirectBuffer(context, resources, e.getResourceId());
-            if (buffer == null || !addFontWeightStyle(family, buffer, 0, e.getWeight(), e.isItalic())) {
+    public Typeface createFromFontFamilyFilesResourceEntry(Context context, FontResourcesParserCompat.FontFamilyFilesResourceEntry fontFamilyFilesResourceEntry, Resources resources, int i) {
+        Object newFamily = newFamily();
+        FontResourcesParserCompat.FontFileResourceEntry[] entries = fontFamilyFilesResourceEntry.getEntries();
+        for (FontResourcesParserCompat.FontFileResourceEntry fontFileResourceEntry : entries) {
+            ByteBuffer copyToDirectBuffer = TypefaceCompatUtil.copyToDirectBuffer(context, resources, fontFileResourceEntry.getResourceId());
+            if (copyToDirectBuffer == null || !addFontWeightStyle(newFamily, copyToDirectBuffer, 0, fontFileResourceEntry.getWeight(), fontFileResourceEntry.isItalic())) {
                 return null;
             }
         }
-        return createFromFamiliesWithDefault(family);
+        return createFromFamiliesWithDefault(newFamily);
     }
 }

@@ -8,24 +8,24 @@ public final class DatabaseUtilsCompat {
     }
 
     @Deprecated
-    public static String concatenateWhere(String a, String b) {
-        if (TextUtils.isEmpty(a)) {
-            return b;
+    public static String concatenateWhere(String str, String str2) {
+        if (TextUtils.isEmpty(str)) {
+            return str2;
         }
-        if (TextUtils.isEmpty(b)) {
-            return a;
+        if (TextUtils.isEmpty(str2)) {
+            return str;
         }
-        return "(" + a + ") AND (" + b + ")";
+        return "(" + str + ") AND (" + str2 + ")";
     }
 
     @Deprecated
-    public static String[] appendSelectionArgs(String[] originalValues, String[] newValues) {
-        if (originalValues == null || originalValues.length == 0) {
-            return newValues;
+    public static String[] appendSelectionArgs(String[] strArr, String[] strArr2) {
+        if (strArr == null || strArr.length == 0) {
+            return strArr2;
         }
-        String[] result = new String[(originalValues.length + newValues.length)];
-        System.arraycopy(originalValues, 0, result, 0, originalValues.length);
-        System.arraycopy(newValues, 0, result, originalValues.length, newValues.length);
-        return result;
+        String[] strArr3 = new String[(strArr.length + strArr2.length)];
+        System.arraycopy(strArr, 0, strArr3, 0, strArr.length);
+        System.arraycopy(strArr2, 0, strArr3, strArr.length, strArr2.length);
+        return strArr3;
     }
 }

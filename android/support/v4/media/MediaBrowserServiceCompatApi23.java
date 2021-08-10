@@ -15,18 +15,18 @@ class MediaBrowserServiceCompatApi23 {
     MediaBrowserServiceCompatApi23() {
     }
 
-    public static Object createService(Context context, ServiceCompatProxy serviceProxy) {
-        return new MediaBrowserServiceAdaptor(context, serviceProxy);
+    public static Object createService(Context context, ServiceCompatProxy serviceCompatProxy) {
+        return new MediaBrowserServiceAdaptor(context, serviceCompatProxy);
     }
 
     static class MediaBrowserServiceAdaptor extends MediaBrowserServiceCompatApi21.MediaBrowserServiceAdaptor {
-        MediaBrowserServiceAdaptor(Context context, ServiceCompatProxy serviceWrapper) {
-            super(context, serviceWrapper);
+        MediaBrowserServiceAdaptor(Context context, ServiceCompatProxy serviceCompatProxy) {
+            super(context, serviceCompatProxy);
         }
 
         @Override // android.service.media.MediaBrowserService
-        public void onLoadItem(String itemId, MediaBrowserService.Result<MediaBrowser.MediaItem> result) {
-            ((ServiceCompatProxy) this.mServiceProxy).onLoadItem(itemId, new MediaBrowserServiceCompatApi21.ResultWrapper<>(result));
+        public void onLoadItem(String str, MediaBrowserService.Result<MediaBrowser.MediaItem> result) {
+            ((ServiceCompatProxy) this.mServiceProxy).onLoadItem(str, new MediaBrowserServiceCompatApi21.ResultWrapper<>(result));
         }
     }
 }

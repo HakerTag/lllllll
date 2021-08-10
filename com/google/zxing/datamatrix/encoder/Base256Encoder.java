@@ -4,55 +4,52 @@ import android.support.v4.view.InputDeviceCompat;
 
 /* access modifiers changed from: package-private */
 public final class Base256Encoder implements Encoder {
-    Base256Encoder() {
-    }
-
     @Override // com.google.zxing.datamatrix.encoder.Encoder
     public int getEncodingMode() {
         return 5;
     }
 
+    Base256Encoder() {
+    }
+
     @Override // com.google.zxing.datamatrix.encoder.Encoder
-    public void encode(EncoderContext context) {
-        StringBuilder buffer = new StringBuilder();
-        buffer.append((char) 0);
+    public void encode(EncoderContext encoderContext) {
+        StringBuilder sb = new StringBuilder();
+        sb.append((char) 0);
         while (true) {
-            if (!context.hasMoreCharacters()) {
+            if (!encoderContext.hasMoreCharacters()) {
                 break;
             }
-            buffer.append(context.getCurrentChar());
-            context.pos++;
-            int newMode = HighLevelEncoder.lookAheadTest(context.getMessage(), context.pos, getEncodingMode());
-            if (newMode != getEncodingMode()) {
-                context.signalEncoderChange(newMode);
+            sb.append(encoderContext.getCurrentChar());
+            encoderContext.pos++;
+            int lookAheadTest = HighLevelEncoder.lookAheadTest(encoderContext.getMessage(), encoderContext.pos, getEncodingMode());
+            if (lookAheadTest != getEncodingMode()) {
+                encoderContext.signalEncoderChange(lookAheadTest);
                 break;
             }
         }
-        int dataCount = buffer.length() - 1;
-        int currentSize = context.getCodewordCount() + dataCount + 1;
-        context.updateSymbolInfo(currentSize);
-        boolean mustPad = context.getSymbolInfo().getDataCapacity() - currentSize > 0;
-        if (context.hasMoreCharacters() || mustPad) {
-            if (dataCount <= 249) {
-                buffer.setCharAt(0, (char) dataCount);
-            } else if (dataCount <= 1555) {
-                buffer.setCharAt(0, (char) ((dataCount / 250) + 249));
-                buffer.insert(1, (char) (dataCount % 250));
+        int length = sb.length() - 1;
+        int codewordCount = encoderContext.getCodewordCount() + length + 1;
+        encoderContext.updateSymbolInfo(codewordCount);
+        boolean z = encoderContext.getSymbolInfo().getDataCapacity() - codewordCount > 0;
+        if (encoderContext.hasMoreCharacters() || z) {
+            if (length <= 249) {
+                sb.setCharAt(0, (char) length);
+            } else if (length <= 1555) {
+                sb.setCharAt(0, (char) ((length / 250) + 249));
+                sb.insert(1, (char) (length % 250));
             } else {
-                throw new IllegalStateException("Message length not in valid ranges: " + dataCount);
+                throw new IllegalStateException("Message length not in valid ranges: " + length);
             }
         }
-        int c = buffer.length();
-        for (int i = 0; i < c; i++) {
-            context.writeCodeword(randomize255State(buffer.charAt(i), context.getCodewordCount() + 1));
+        int length2 = sb.length();
+        for (int i = 0; i < length2; i++) {
+            encoderContext.writeCodeword(randomize255State(sb.charAt(i), encoderContext.getCodewordCount() + 1));
         }
     }
 
-    private static char randomize255State(char ch, int codewordPosition) {
-        int tempVariable = ch + ((codewordPosition * 149) % 255) + 1;
-        if (tempVariable <= 255) {
-            return (char) tempVariable;
-        }
-        return (char) (tempVariable + InputDeviceCompat.SOURCE_ANY);
+    private static char randomize255State(char c, int i) {
+        int i2 = c + ((i * 149) % 255) + 1;
+        return i2 <= 255 ? (char) i2 : (char) (i2 + InputDeviceCompat.SOURCE_ANY);
     }
 }

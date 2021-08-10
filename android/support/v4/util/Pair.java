@@ -4,24 +4,24 @@ public class Pair<F, S> {
     public final F first;
     public final S second;
 
-    public Pair(F first2, S second2) {
-        this.first = first2;
-        this.second = second2;
+    public Pair(F f, S s) {
+        this.first = f;
+        this.second = s;
     }
 
-    public boolean equals(Object o) {
-        if (!(o instanceof Pair)) {
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Pair)) {
             return false;
         }
-        Pair<?, ?> p = (Pair) o;
-        if (!objectsEqual(p.first, this.first) || !objectsEqual(p.second, this.second)) {
+        Pair pair = (Pair) obj;
+        if (!objectsEqual(pair.first, this.first) || !objectsEqual(pair.second, this.second)) {
             return false;
         }
         return true;
     }
 
-    private static boolean objectsEqual(Object a, Object b) {
-        return a == b || (a != null && a.equals(b));
+    private static boolean objectsEqual(Object obj, Object obj2) {
+        return obj == obj2 || (obj != null && obj.equals(obj2));
     }
 
     public int hashCode() {

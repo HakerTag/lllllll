@@ -8,11 +8,11 @@ public final class OpenCamera {
     private final int index;
     private final int orientation;
 
-    public OpenCamera(int index2, Camera camera2, CameraFacing facing2, int orientation2) {
-        this.index = index2;
+    public OpenCamera(int i, Camera camera2, CameraFacing cameraFacing, int i2) {
+        this.index = i;
         this.camera = camera2;
-        this.facing = facing2;
-        this.orientation = orientation2;
+        this.facing = cameraFacing;
+        this.orientation = i2;
     }
 
     public Camera getCamera() {

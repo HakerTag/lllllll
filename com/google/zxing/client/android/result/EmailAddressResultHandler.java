@@ -8,8 +8,8 @@ import com.google.zxing.client.result.ParsedResult;
 public final class EmailAddressResultHandler extends ResultHandler {
     private static final int[] buttons = {R.string.button_email, R.string.button_add_contact};
 
-    public EmailAddressResultHandler(Activity activity, ParsedResult result) {
-        super(activity, result);
+    public EmailAddressResultHandler(Activity activity, ParsedResult parsedResult) {
+        super(activity, parsedResult);
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler
@@ -18,17 +18,17 @@ public final class EmailAddressResultHandler extends ResultHandler {
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler
-    public int getButtonText(int index) {
-        return buttons[index];
+    public int getButtonText(int i) {
+        return buttons[i];
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler
-    public void handleButtonPress(int index) {
-        EmailAddressParsedResult emailResult = (EmailAddressParsedResult) getResult();
-        if (index == 0) {
-            sendEmail(emailResult.getTos(), emailResult.getCCs(), emailResult.getBCCs(), emailResult.getSubject(), emailResult.getBody());
-        } else if (index == 1) {
-            addEmailOnlyContact(emailResult.getTos(), null);
+    public void handleButtonPress(int i) {
+        EmailAddressParsedResult emailAddressParsedResult = (EmailAddressParsedResult) getResult();
+        if (i == 0) {
+            sendEmail(emailAddressParsedResult.getTos(), emailAddressParsedResult.getCCs(), emailAddressParsedResult.getBCCs(), emailAddressParsedResult.getSubject(), emailAddressParsedResult.getBody());
+        } else if (i == 1) {
+            addEmailOnlyContact(emailAddressParsedResult.getTos(), null);
         }
     }
 

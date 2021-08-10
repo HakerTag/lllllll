@@ -8,41 +8,41 @@ final class LocaleHelper {
 
     static Locale forLanguageTag(String str) {
         if (str.contains("-")) {
-            String[] args = str.split("-");
-            if (args.length > 2) {
-                return new Locale(args[0], args[1], args[2]);
+            String[] split = str.split("-");
+            if (split.length > 2) {
+                return new Locale(split[0], split[1], split[2]);
             }
-            if (args.length > 1) {
-                return new Locale(args[0], args[1]);
+            if (split.length > 1) {
+                return new Locale(split[0], split[1]);
             }
-            if (args.length == 1) {
-                return new Locale(args[0]);
+            if (split.length == 1) {
+                return new Locale(split[0]);
             }
         } else if (!str.contains("_")) {
             return new Locale(str);
         } else {
-            String[] args2 = str.split("_");
-            if (args2.length > 2) {
-                return new Locale(args2[0], args2[1], args2[2]);
+            String[] split2 = str.split("_");
+            if (split2.length > 2) {
+                return new Locale(split2[0], split2[1], split2[2]);
             }
-            if (args2.length > 1) {
-                return new Locale(args2[0], args2[1]);
+            if (split2.length > 1) {
+                return new Locale(split2[0], split2[1]);
             }
-            if (args2.length == 1) {
-                return new Locale(args2[0]);
+            if (split2.length == 1) {
+                return new Locale(split2[0]);
             }
         }
         throw new IllegalArgumentException("Can not parse language tag: [" + str + "]");
     }
 
     static String toLanguageTag(Locale locale) {
-        StringBuilder buf = new StringBuilder();
-        buf.append(locale.getLanguage());
+        StringBuilder sb = new StringBuilder();
+        sb.append(locale.getLanguage());
         String country = locale.getCountry();
         if (country != null && !country.isEmpty()) {
-            buf.append("-");
-            buf.append(locale.getCountry());
+            sb.append("-");
+            sb.append(locale.getCountry());
         }
-        return buf.toString();
+        return sb.toString();
     }
 }

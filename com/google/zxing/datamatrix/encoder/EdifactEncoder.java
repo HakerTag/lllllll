@@ -2,75 +2,75 @@ package com.google.zxing.datamatrix.encoder;
 
 /* access modifiers changed from: package-private */
 public final class EdifactEncoder implements Encoder {
-    EdifactEncoder() {
-    }
-
     @Override // com.google.zxing.datamatrix.encoder.Encoder
     public int getEncodingMode() {
         return 4;
     }
 
+    EdifactEncoder() {
+    }
+
     @Override // com.google.zxing.datamatrix.encoder.Encoder
-    public void encode(EncoderContext context) {
-        StringBuilder buffer = new StringBuilder();
+    public void encode(EncoderContext encoderContext) {
+        StringBuilder sb = new StringBuilder();
         while (true) {
-            if (!context.hasMoreCharacters()) {
+            if (!encoderContext.hasMoreCharacters()) {
                 break;
             }
-            encodeChar(context.getCurrentChar(), buffer);
-            context.pos++;
-            if (buffer.length() >= 4) {
-                context.writeCodewords(encodeToCodewords(buffer, 0));
-                buffer.delete(0, 4);
-                if (HighLevelEncoder.lookAheadTest(context.getMessage(), context.pos, getEncodingMode()) != getEncodingMode()) {
-                    context.signalEncoderChange(0);
+            encodeChar(encoderContext.getCurrentChar(), sb);
+            encoderContext.pos++;
+            if (sb.length() >= 4) {
+                encoderContext.writeCodewords(encodeToCodewords(sb, 0));
+                sb.delete(0, 4);
+                if (HighLevelEncoder.lookAheadTest(encoderContext.getMessage(), encoderContext.pos, getEncodingMode()) != getEncodingMode()) {
+                    encoderContext.signalEncoderChange(0);
                     break;
                 }
             }
         }
-        buffer.append((char) 31);
-        handleEOD(context, buffer);
+        sb.append((char) 31);
+        handleEOD(encoderContext, sb);
     }
 
-    private static void handleEOD(EncoderContext context, CharSequence buffer) {
+    private static void handleEOD(EncoderContext encoderContext, CharSequence charSequence) {
         try {
-            int count = buffer.length();
-            if (count != 0) {
-                boolean restInAscii = true;
-                if (count == 1) {
-                    context.updateSymbolInfo();
-                    int available = context.getSymbolInfo().getDataCapacity() - context.getCodewordCount();
-                    if (context.getRemainingCharacters() == 0 && available <= 2) {
-                        context.signalEncoderChange(0);
+            int length = charSequence.length();
+            if (length != 0) {
+                boolean z = true;
+                if (length == 1) {
+                    encoderContext.updateSymbolInfo();
+                    int dataCapacity = encoderContext.getSymbolInfo().getDataCapacity() - encoderContext.getCodewordCount();
+                    if (encoderContext.getRemainingCharacters() == 0 && dataCapacity <= 2) {
+                        encoderContext.signalEncoderChange(0);
                         return;
                     }
                 }
-                if (count <= 4) {
-                    int restChars = count - 1;
-                    String encoded = encodeToCodewords(buffer, 0);
-                    if (!(!context.hasMoreCharacters()) || restChars > 2) {
-                        restInAscii = false;
+                if (length <= 4) {
+                    int i = length - 1;
+                    String encodeToCodewords = encodeToCodewords(charSequence, 0);
+                    if (!(!encoderContext.hasMoreCharacters()) || i > 2) {
+                        z = false;
                     }
-                    if (restChars <= 2) {
-                        context.updateSymbolInfo(context.getCodewordCount() + restChars);
-                        if (context.getSymbolInfo().getDataCapacity() - context.getCodewordCount() >= 3) {
-                            restInAscii = false;
-                            context.updateSymbolInfo(context.getCodewordCount() + encoded.length());
+                    if (i <= 2) {
+                        encoderContext.updateSymbolInfo(encoderContext.getCodewordCount() + i);
+                        if (encoderContext.getSymbolInfo().getDataCapacity() - encoderContext.getCodewordCount() >= 3) {
+                            encoderContext.updateSymbolInfo(encoderContext.getCodewordCount() + encodeToCodewords.length());
+                            z = false;
                         }
                     }
-                    if (restInAscii) {
-                        context.resetSymbolInfo();
-                        context.pos -= restChars;
+                    if (z) {
+                        encoderContext.resetSymbolInfo();
+                        encoderContext.pos -= i;
                     } else {
-                        context.writeCodewords(encoded);
+                        encoderContext.writeCodewords(encodeToCodewords);
                     }
-                    context.signalEncoderChange(0);
+                    encoderContext.signalEncoderChange(0);
                     return;
                 }
                 throw new IllegalStateException("Count must not exceed 4");
             }
         } finally {
-            context.signalEncoderChange(0);
+            encoderContext.signalEncoderChange(0);
         }
     }
 
@@ -84,28 +84,28 @@ public final class EdifactEncoder implements Encoder {
         }
     }
 
-    private static String encodeToCodewords(CharSequence sb, int startPos) {
-        int len = sb.length() - startPos;
-        if (len != 0) {
-            char c1 = sb.charAt(startPos);
-            char c4 = 0;
-            char c2 = len >= 2 ? sb.charAt(startPos + 1) : 0;
-            char c3 = len >= 3 ? sb.charAt(startPos + 2) : 0;
-            if (len >= 4) {
-                c4 = sb.charAt(startPos + 3);
+    private static String encodeToCodewords(CharSequence charSequence, int i) {
+        int length = charSequence.length() - i;
+        if (length != 0) {
+            char charAt = charSequence.charAt(i);
+            char c = 0;
+            char charAt2 = length >= 2 ? charSequence.charAt(i + 1) : 0;
+            char charAt3 = length >= 3 ? charSequence.charAt(i + 2) : 0;
+            if (length >= 4) {
+                c = charSequence.charAt(i + 3);
             }
-            int v = (c1 << 18) + (c2 << '\f') + (c3 << 6) + c4;
-            char cw2 = (char) ((v >> 8) & 255);
-            char cw3 = (char) (v & 255);
-            StringBuilder res = new StringBuilder(3);
-            res.append((char) ((v >> 16) & 255));
-            if (len >= 2) {
-                res.append(cw2);
+            int i2 = (charAt << 18) + (charAt2 << '\f') + (charAt3 << 6) + c;
+            char c2 = (char) ((i2 >> 8) & 255);
+            char c3 = (char) (i2 & 255);
+            StringBuilder sb = new StringBuilder(3);
+            sb.append((char) ((i2 >> 16) & 255));
+            if (length >= 2) {
+                sb.append(c2);
             }
-            if (len >= 3) {
-                res.append(cw3);
+            if (length >= 3) {
+                sb.append(c3);
             }
-            return res.toString();
+            return sb.toString();
         }
         throw new IllegalStateException("StringBuilder must not be empty");
     }

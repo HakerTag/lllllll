@@ -17,108 +17,99 @@ final class DecodeHintManager {
     private DecodeHintManager() {
     }
 
-    private static Map<String, String> splitQuery(String query) {
-        String text;
-        String name;
-        Map<String, String> map = new HashMap<>();
-        int pos = 0;
-        while (true) {
-            if (pos >= query.length()) {
-                break;
-            } else if (query.charAt(pos) == '&') {
-                pos++;
-            } else {
-                int amp = query.indexOf(38, pos);
-                int equ = query.indexOf(61, pos);
-                if (amp < 0) {
-                    if (equ < 0) {
-                        name = Uri.decode(query.substring(pos).replace('+', ' '));
-                        text = "";
-                    } else {
-                        String name2 = Uri.decode(query.substring(pos, equ).replace('+', ' '));
-                        text = Uri.decode(query.substring(equ + 1).replace('+', ' '));
-                        name = name2;
-                    }
-                    if (!map.containsKey(name)) {
-                        map.put(name, text);
-                    }
-                } else if (equ < 0 || equ > amp) {
-                    String name3 = Uri.decode(query.substring(pos, amp).replace('+', ' '));
-                    if (!map.containsKey(name3)) {
-                        map.put(name3, "");
-                    }
-                    pos = amp + 1;
-                } else {
-                    String name4 = Uri.decode(query.substring(pos, equ).replace('+', ' '));
-                    String text2 = Uri.decode(query.substring(equ + 1, amp).replace('+', ' '));
-                    if (!map.containsKey(name4)) {
-                        map.put(name4, text2);
-                    }
-                    pos = amp + 1;
-                }
-            }
-        }
-        return map;
-    }
-
-    static Map<DecodeHintType, ?> parseDecodeHints(Uri inputUri) {
-        String parameterText;
-        String parameterText2;
-        String query = inputUri.getEncodedQuery();
-        if (query == null || query.isEmpty()) {
-            return null;
-        }
-        Map<String, String> parameters = splitQuery(query);
-        Map<DecodeHintType, Object> hints = new EnumMap<>(DecodeHintType.class);
-        DecodeHintType[] values = DecodeHintType.values();
-        int length = values.length;
+    private static Map<String, String> splitQuery(String str) {
+        String str2;
+        HashMap hashMap = new HashMap();
         int i = 0;
-        int i2 = 0;
-        while (i2 < length) {
-            DecodeHintType hintType = values[i2];
-            if (!(hintType == DecodeHintType.CHARACTER_SET || hintType == DecodeHintType.NEED_RESULT_POINT_CALLBACK || hintType == DecodeHintType.POSSIBLE_FORMATS || (parameterText = parameters.get(hintType.name())) == null)) {
-                if (hintType.getValueType().equals(Object.class)) {
-                    hints.put(hintType, parameterText);
-                } else if (hintType.getValueType().equals(Void.class)) {
-                    hints.put(hintType, Boolean.TRUE);
-                } else if (hintType.getValueType().equals(String.class)) {
-                    hints.put(hintType, parameterText);
-                } else if (hintType.getValueType().equals(Boolean.class)) {
-                    if (parameterText.isEmpty()) {
-                        hints.put(hintType, Boolean.TRUE);
-                    } else if ("0".equals(parameterText) || "false".equalsIgnoreCase(parameterText) || "no".equalsIgnoreCase(parameterText)) {
-                        hints.put(hintType, Boolean.FALSE);
+        while (true) {
+            if (i >= str.length()) {
+                break;
+            } else if (str.charAt(i) == '&') {
+                i++;
+            } else {
+                int indexOf = str.indexOf(38, i);
+                int indexOf2 = str.indexOf(61, i);
+                String str3 = "";
+                if (indexOf < 0) {
+                    if (indexOf2 < 0) {
+                        str2 = Uri.decode(str.substring(i).replace('+', ' '));
                     } else {
-                        hints.put(hintType, Boolean.TRUE);
+                        String decode = Uri.decode(str.substring(i, indexOf2).replace('+', ' '));
+                        str3 = Uri.decode(str.substring(indexOf2 + 1).replace('+', ' '));
+                        str2 = decode;
                     }
-                } else if (hintType.getValueType().equals(int[].class)) {
-                    if (parameterText.isEmpty() || parameterText.charAt(parameterText.length() - 1) != ',') {
-                        parameterText2 = parameterText;
+                    if (!hashMap.containsKey(str2)) {
+                        hashMap.put(str2, str3);
+                    }
+                } else {
+                    if (indexOf2 < 0 || indexOf2 > indexOf) {
+                        String decode2 = Uri.decode(str.substring(i, indexOf).replace('+', ' '));
+                        if (!hashMap.containsKey(decode2)) {
+                            hashMap.put(decode2, str3);
+                        }
                     } else {
-                        parameterText2 = parameterText.substring(i, parameterText.length() - 1);
-                    }
-                    String[] values2 = COMMA.split(parameterText2);
-                    int[] array = new int[values2.length];
-                    for (int i3 = 0; i3 < values2.length; i3++) {
-                        try {
-                            array[i3] = Integer.parseInt(values2[i3]);
-                        } catch (NumberFormatException e) {
-                            Log.w(TAG, "Skipping array of integers hint " + hintType + " due to invalid numeric value: '" + values2[i3] + '\'');
-                            array = null;
+                        String decode3 = Uri.decode(str.substring(i, indexOf2).replace('+', ' '));
+                        String decode4 = Uri.decode(str.substring(indexOf2 + 1, indexOf).replace('+', ' '));
+                        if (!hashMap.containsKey(decode3)) {
+                            hashMap.put(decode3, decode4);
                         }
                     }
-                    if (array != null) {
-                        hints.put(hintType, array);
-                    }
-                } else {
-                    Log.w(TAG, "Unsupported hint type '" + hintType + "' of type " + hintType.getValueType());
+                    i = indexOf + 1;
                 }
             }
-            i2++;
-            i = 0;
         }
-        Log.i(TAG, "Hints from the URI: " + hints);
-        return hints;
+        return hashMap;
+    }
+
+    static Map<DecodeHintType, ?> parseDecodeHints(Uri uri) {
+        String str;
+        String encodedQuery = uri.getEncodedQuery();
+        if (encodedQuery == null || encodedQuery.isEmpty()) {
+            return null;
+        }
+        Map<String, String> splitQuery = splitQuery(encodedQuery);
+        EnumMap enumMap = new EnumMap(DecodeHintType.class);
+        DecodeHintType[] values = DecodeHintType.values();
+        for (DecodeHintType decodeHintType : values) {
+            if (!(decodeHintType == DecodeHintType.CHARACTER_SET || decodeHintType == DecodeHintType.NEED_RESULT_POINT_CALLBACK || decodeHintType == DecodeHintType.POSSIBLE_FORMATS || (str = splitQuery.get(decodeHintType.name())) == null)) {
+                if (decodeHintType.getValueType().equals(Object.class)) {
+                    enumMap.put((Object) decodeHintType, (Object) str);
+                } else if (decodeHintType.getValueType().equals(Void.class)) {
+                    enumMap.put((Object) decodeHintType, (Object) Boolean.TRUE);
+                } else if (decodeHintType.getValueType().equals(String.class)) {
+                    enumMap.put((Object) decodeHintType, (Object) str);
+                } else if (decodeHintType.getValueType().equals(Boolean.class)) {
+                    if (str.isEmpty()) {
+                        enumMap.put((Object) decodeHintType, (Object) Boolean.TRUE);
+                    } else if ("0".equals(str) || "false".equalsIgnoreCase(str) || "no".equalsIgnoreCase(str)) {
+                        enumMap.put((Object) decodeHintType, (Object) Boolean.FALSE);
+                    } else {
+                        enumMap.put((Object) decodeHintType, (Object) Boolean.TRUE);
+                    }
+                } else if (decodeHintType.getValueType().equals(int[].class)) {
+                    if (!str.isEmpty() && str.charAt(str.length() - 1) == ',') {
+                        str = str.substring(0, str.length() - 1);
+                    }
+                    String[] split = COMMA.split(str);
+                    int[] iArr = new int[split.length];
+                    for (int i = 0; i < split.length; i++) {
+                        try {
+                            iArr[i] = Integer.parseInt(split[i]);
+                        } catch (NumberFormatException unused) {
+                            Log.w(TAG, "Skipping array of integers hint " + decodeHintType + " due to invalid numeric value: '" + split[i] + '\'');
+                            iArr = null;
+                        }
+                    }
+                    if (iArr != null) {
+                        enumMap.put((Object) decodeHintType, (Object) iArr);
+                    }
+                } else {
+                    Log.w(TAG, "Unsupported hint type '" + decodeHintType + "' of type " + decodeHintType.getValueType());
+                }
+            }
+        }
+        Log.i(TAG, "Hints from the URI: " + enumMap);
+        return enumMap;
     }
 
     static Map<DecodeHintType, Object> parseDecodeHints(Intent intent) {
@@ -126,26 +117,26 @@ final class DecodeHintManager {
         if (extras == null || extras.isEmpty()) {
             return null;
         }
-        Map<DecodeHintType, Object> hints = new EnumMap<>(DecodeHintType.class);
+        EnumMap enumMap = new EnumMap(DecodeHintType.class);
         DecodeHintType[] values = DecodeHintType.values();
-        for (DecodeHintType hintType : values) {
-            if (!(hintType == DecodeHintType.CHARACTER_SET || hintType == DecodeHintType.NEED_RESULT_POINT_CALLBACK || hintType == DecodeHintType.POSSIBLE_FORMATS)) {
-                String hintName = hintType.name();
-                if (extras.containsKey(hintName)) {
-                    if (hintType.getValueType().equals(Void.class)) {
-                        hints.put(hintType, Boolean.TRUE);
+        for (DecodeHintType decodeHintType : values) {
+            if (!(decodeHintType == DecodeHintType.CHARACTER_SET || decodeHintType == DecodeHintType.NEED_RESULT_POINT_CALLBACK || decodeHintType == DecodeHintType.POSSIBLE_FORMATS)) {
+                String name = decodeHintType.name();
+                if (extras.containsKey(name)) {
+                    if (decodeHintType.getValueType().equals(Void.class)) {
+                        enumMap.put((Object) decodeHintType, (Object) Boolean.TRUE);
                     } else {
-                        Object hintData = extras.get(hintName);
-                        if (hintType.getValueType().isInstance(hintData)) {
-                            hints.put(hintType, hintData);
+                        Object obj = extras.get(name);
+                        if (decodeHintType.getValueType().isInstance(obj)) {
+                            enumMap.put((Object) decodeHintType, obj);
                         } else {
-                            Log.w(TAG, "Ignoring hint " + hintType + " because it is not assignable from " + hintData);
+                            Log.w(TAG, "Ignoring hint " + decodeHintType + " because it is not assignable from " + obj);
                         }
                     }
                 }
             }
         }
-        Log.i(TAG, "Hints from the Intent: " + hints);
-        return hints;
+        Log.i(TAG, "Hints from the Intent: " + enumMap);
+        return enumMap;
     }
 }

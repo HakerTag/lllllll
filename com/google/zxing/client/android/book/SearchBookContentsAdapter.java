@@ -10,20 +10,25 @@ import java.util.List;
 
 /* access modifiers changed from: package-private */
 public final class SearchBookContentsAdapter extends ArrayAdapter<SearchBookContentsResult> {
-    SearchBookContentsAdapter(Context context, List<SearchBookContentsResult> items) {
-        super(context, R.layout.search_book_contents_list_item, 0, items);
+    SearchBookContentsAdapter(Context context, List<SearchBookContentsResult> list) {
+        super(context, R.layout.search_book_contents_list_item, 0, list);
     }
 
-    public View getView(int position, View view, ViewGroup viewGroup) {
-        SearchBookContentsListItem listItem;
+    public View getView(int i, View view, ViewGroup viewGroup) {
+        SearchBookContentsListItem searchBookContentsListItem;
+        SearchBookContentsListItem searchBookContentsListItem2;
         if (view == null) {
-            listItem = (SearchBookContentsListItem) LayoutInflater.from(getContext()).inflate(R.layout.search_book_contents_list_item, viewGroup, false);
-        } else if (!(view instanceof SearchBookContentsListItem)) {
-            return view;
+            searchBookContentsListItem2 = (SearchBookContentsListItem) LayoutInflater.from(getContext()).inflate(R.layout.search_book_contents_list_item, viewGroup, false);
         } else {
-            listItem = (SearchBookContentsListItem) view;
+            boolean z = view instanceof SearchBookContentsListItem;
+            searchBookContentsListItem = view;
+            if (z) {
+                searchBookContentsListItem2 = (SearchBookContentsListItem) view;
+            }
+            return searchBookContentsListItem;
         }
-        listItem.set((SearchBookContentsResult) getItem(position));
-        return listItem;
+        searchBookContentsListItem2.set((SearchBookContentsResult) getItem(i));
+        searchBookContentsListItem = searchBookContentsListItem2;
+        return searchBookContentsListItem;
     }
 }

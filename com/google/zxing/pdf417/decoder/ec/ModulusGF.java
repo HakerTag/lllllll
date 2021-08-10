@@ -10,17 +10,17 @@ public final class ModulusGF {
     private final ModulusPoly one;
     private final ModulusPoly zero;
 
-    private ModulusGF(int modulus2, int generator) {
-        this.modulus = modulus2;
-        this.expTable = new int[modulus2];
-        this.logTable = new int[modulus2];
-        int x = 1;
-        for (int i = 0; i < modulus2; i++) {
-            this.expTable[i] = x;
-            x = (x * generator) % modulus2;
+    private ModulusGF(int i, int i2) {
+        this.modulus = i;
+        this.expTable = new int[i];
+        this.logTable = new int[i];
+        int i3 = 1;
+        for (int i4 = 0; i4 < i; i4++) {
+            this.expTable[i4] = i3;
+            i3 = (i3 * i2) % i;
         }
-        for (int i2 = 0; i2 < modulus2 - 1; i2++) {
-            this.logTable[this.expTable[i2]] = i2;
+        for (int i5 = 0; i5 < i - 1; i5++) {
+            this.logTable[this.expTable[i5]] = i5;
         }
         this.zero = new ModulusPoly(this, new int[]{0});
         this.one = new ModulusPoly(this, new int[]{1});
@@ -37,58 +37,58 @@ public final class ModulusGF {
     }
 
     /* access modifiers changed from: package-private */
-    public ModulusPoly buildMonomial(int degree, int coefficient) {
-        if (degree < 0) {
+    public ModulusPoly buildMonomial(int i, int i2) {
+        if (i < 0) {
             throw new IllegalArgumentException();
-        } else if (coefficient == 0) {
+        } else if (i2 == 0) {
             return this.zero;
         } else {
-            int[] coefficients = new int[(degree + 1)];
-            coefficients[0] = coefficient;
-            return new ModulusPoly(this, coefficients);
+            int[] iArr = new int[(i + 1)];
+            iArr[0] = i2;
+            return new ModulusPoly(this, iArr);
         }
     }
 
     /* access modifiers changed from: package-private */
-    public int add(int a, int b) {
-        return (a + b) % this.modulus;
+    public int add(int i, int i2) {
+        return (i + i2) % this.modulus;
     }
 
     /* access modifiers changed from: package-private */
-    public int subtract(int a, int b) {
-        int i = this.modulus;
-        return ((i + a) - b) % i;
+    public int subtract(int i, int i2) {
+        int i3 = this.modulus;
+        return ((i + i3) - i2) % i3;
     }
 
     /* access modifiers changed from: package-private */
-    public int exp(int a) {
-        return this.expTable[a];
+    public int exp(int i) {
+        return this.expTable[i];
     }
 
     /* access modifiers changed from: package-private */
-    public int log(int a) {
-        if (a != 0) {
-            return this.logTable[a];
+    public int log(int i) {
+        if (i != 0) {
+            return this.logTable[i];
         }
         throw new IllegalArgumentException();
     }
 
     /* access modifiers changed from: package-private */
-    public int inverse(int a) {
-        if (a != 0) {
-            return this.expTable[(this.modulus - this.logTable[a]) - 1];
+    public int inverse(int i) {
+        if (i != 0) {
+            return this.expTable[(this.modulus - this.logTable[i]) - 1];
         }
         throw new ArithmeticException();
     }
 
     /* access modifiers changed from: package-private */
-    public int multiply(int a, int b) {
-        if (a == 0 || b == 0) {
+    public int multiply(int i, int i2) {
+        if (i == 0 || i2 == 0) {
             return 0;
         }
         int[] iArr = this.expTable;
         int[] iArr2 = this.logTable;
-        return iArr[(iArr2[a] + iArr2[b]) % (this.modulus - 1)];
+        return iArr[(iArr2[i] + iArr2[i2]) % (this.modulus - 1)];
     }
 
     /* access modifiers changed from: package-private */

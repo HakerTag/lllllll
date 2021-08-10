@@ -10,11 +10,11 @@ public final class ExpandedPair {
     private final boolean mayBeLast;
     private final DataCharacter rightChar;
 
-    ExpandedPair(DataCharacter leftChar2, DataCharacter rightChar2, FinderPattern finderPattern2, boolean mayBeLast2) {
-        this.leftChar = leftChar2;
-        this.rightChar = rightChar2;
+    ExpandedPair(DataCharacter dataCharacter, DataCharacter dataCharacter2, FinderPattern finderPattern2, boolean z) {
+        this.leftChar = dataCharacter;
+        this.rightChar = dataCharacter2;
         this.finderPattern = finderPattern2;
-        this.mayBeLast = mayBeLast2;
+        this.mayBeLast = z;
     }
 
     /* access modifiers changed from: package-private */
@@ -60,32 +60,32 @@ public final class ExpandedPair {
         return sb.toString();
     }
 
-    public boolean equals(Object o) {
-        if (!(o instanceof ExpandedPair)) {
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ExpandedPair)) {
             return false;
         }
-        ExpandedPair that = (ExpandedPair) o;
-        if (!equalsOrNull(this.leftChar, that.leftChar) || !equalsOrNull(this.rightChar, that.rightChar) || !equalsOrNull(this.finderPattern, that.finderPattern)) {
+        ExpandedPair expandedPair = (ExpandedPair) obj;
+        if (!equalsOrNull(this.leftChar, expandedPair.leftChar) || !equalsOrNull(this.rightChar, expandedPair.rightChar) || !equalsOrNull(this.finderPattern, expandedPair.finderPattern)) {
             return false;
         }
         return true;
     }
 
-    private static boolean equalsOrNull(Object o1, Object o2) {
-        if (o1 == null) {
-            return o2 == null;
+    private static boolean equalsOrNull(Object obj, Object obj2) {
+        if (obj == null) {
+            return obj2 == null;
         }
-        return o1.equals(o2);
+        return obj.equals(obj2);
     }
 
     public int hashCode() {
         return (hashNotNull(this.leftChar) ^ hashNotNull(this.rightChar)) ^ hashNotNull(this.finderPattern);
     }
 
-    private static int hashNotNull(Object o) {
-        if (o == null) {
+    private static int hashNotNull(Object obj) {
+        if (obj == null) {
             return 0;
         }
-        return o.hashCode();
+        return obj.hashCode();
     }
 }

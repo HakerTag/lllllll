@@ -42,24 +42,24 @@ public abstract class DocumentFile {
 
     public abstract boolean renameTo(String str);
 
-    DocumentFile(DocumentFile parent) {
-        this.mParent = parent;
+    DocumentFile(DocumentFile documentFile) {
+        this.mParent = documentFile;
     }
 
     public static DocumentFile fromFile(File file) {
         return new RawDocumentFile(null, file);
     }
 
-    public static DocumentFile fromSingleUri(Context context, Uri singleUri) {
+    public static DocumentFile fromSingleUri(Context context, Uri uri) {
         if (Build.VERSION.SDK_INT >= 19) {
-            return new SingleDocumentFile(null, context, singleUri);
+            return new SingleDocumentFile(null, context, uri);
         }
         return null;
     }
 
-    public static DocumentFile fromTreeUri(Context context, Uri treeUri) {
+    public static DocumentFile fromTreeUri(Context context, Uri uri) {
         if (Build.VERSION.SDK_INT >= 21) {
-            return new TreeDocumentFile(null, context, DocumentsContract.buildDocumentUriUsingTree(treeUri, DocumentsContract.getTreeDocumentId(treeUri)));
+            return new TreeDocumentFile(null, context, DocumentsContract.buildDocumentUriUsingTree(uri, DocumentsContract.getTreeDocumentId(uri)));
         }
         return null;
     }
@@ -75,11 +75,11 @@ public abstract class DocumentFile {
         return this.mParent;
     }
 
-    public DocumentFile findFile(String displayName) {
+    public DocumentFile findFile(String str) {
         DocumentFile[] listFiles = listFiles();
-        for (DocumentFile doc : listFiles) {
-            if (displayName.equals(doc.getName())) {
-                return doc;
+        for (DocumentFile documentFile : listFiles) {
+            if (str.equals(documentFile.getName())) {
+                return documentFile;
             }
         }
         return null;

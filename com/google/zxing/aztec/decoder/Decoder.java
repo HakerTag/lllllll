@@ -27,88 +27,91 @@ public final class Decoder {
         BINARY
     }
 
-    public DecoderResult decode(AztecDetectorResult detectorResult) throws FormatException {
-        this.ddata = detectorResult;
-        boolean[] correctedBits = correctBits(extractBits(detectorResult.getBits()));
-        DecoderResult decoderResult = new DecoderResult(convertBoolArrayToByteArray(correctedBits), getEncodedData(correctedBits), null, null);
-        decoderResult.setNumBits(correctedBits.length);
+    private static int totalBitsInLayer(int i, boolean z) {
+        return ((z ? 88 : 112) + (i * 16)) * i;
+    }
+
+    public DecoderResult decode(AztecDetectorResult aztecDetectorResult) throws FormatException {
+        this.ddata = aztecDetectorResult;
+        boolean[] correctBits = correctBits(extractBits(aztecDetectorResult.getBits()));
+        DecoderResult decoderResult = new DecoderResult(convertBoolArrayToByteArray(correctBits), getEncodedData(correctBits), null, null);
+        decoderResult.setNumBits(correctBits.length);
         return decoderResult;
     }
 
-    public static String highLevelDecode(boolean[] correctedBits) {
-        return getEncodedData(correctedBits);
+    public static String highLevelDecode(boolean[] zArr) {
+        return getEncodedData(zArr);
     }
 
-    private static String getEncodedData(boolean[] correctedBits) {
-        int endIndex = correctedBits.length;
-        Table latchTable = Table.UPPER;
-        Table shiftTable = Table.UPPER;
-        StringBuilder result = new StringBuilder(20);
-        int index = 0;
-        while (index < endIndex) {
-            if (shiftTable != Table.BINARY) {
-                int size = shiftTable == Table.DIGIT ? 4 : 5;
-                if (endIndex - index < size) {
+    private static String getEncodedData(boolean[] zArr) {
+        int length = zArr.length;
+        Table table = Table.UPPER;
+        Table table2 = Table.UPPER;
+        StringBuilder sb = new StringBuilder(20);
+        int i = 0;
+        while (i < length) {
+            if (table2 != Table.BINARY) {
+                int i2 = table2 == Table.DIGIT ? 4 : 5;
+                if (length - i < i2) {
                     break;
                 }
-                int code = readCode(correctedBits, index, size);
-                index += size;
-                String str = getCharacter(shiftTable, code);
-                if (str.startsWith("CTRL_")) {
-                    latchTable = shiftTable;
-                    shiftTable = getTable(str.charAt(5));
-                    if (str.charAt(6) == 'L') {
-                        latchTable = shiftTable;
+                int readCode = readCode(zArr, i, i2);
+                i += i2;
+                String character = getCharacter(table2, readCode);
+                if (character.startsWith("CTRL_")) {
+                    table = getTable(character.charAt(5));
+                    if (character.charAt(6) != 'L') {
+                        table2 = table;
+                        table = table2;
                     }
                 } else {
-                    result.append(str);
-                    shiftTable = latchTable;
+                    sb.append(character);
                 }
-            } else if (endIndex - index < 5) {
+            } else if (length - i < 5) {
                 break;
             } else {
-                int length = readCode(correctedBits, index, 5);
-                index += 5;
-                if (length == 0) {
-                    if (endIndex - index < 11) {
+                int readCode2 = readCode(zArr, i, 5);
+                i += 5;
+                if (readCode2 == 0) {
+                    if (length - i < 11) {
                         break;
                     }
-                    length = readCode(correctedBits, index, 11) + 31;
-                    index += 11;
+                    readCode2 = readCode(zArr, i, 11) + 31;
+                    i += 11;
                 }
-                int charCount = 0;
+                int i3 = 0;
                 while (true) {
-                    if (charCount >= length) {
+                    if (i3 >= readCode2) {
                         break;
-                    } else if (endIndex - index < 8) {
-                        index = endIndex;
+                    } else if (length - i < 8) {
+                        i = length;
                         break;
                     } else {
-                        result.append((char) readCode(correctedBits, index, 8));
-                        index += 8;
-                        charCount++;
+                        sb.append((char) readCode(zArr, i, 8));
+                        i += 8;
+                        i3++;
                     }
                 }
-                shiftTable = latchTable;
             }
+            table2 = table;
         }
-        return result.toString();
+        return sb.toString();
     }
 
-    private static Table getTable(char t) {
-        if (t == 'B') {
+    private static Table getTable(char c) {
+        if (c == 'B') {
             return Table.BINARY;
         }
-        if (t == 'D') {
+        if (c == 'D') {
             return Table.DIGIT;
         }
-        if (t == 'P') {
+        if (c == 'P') {
             return Table.PUNCT;
         }
-        if (t == 'L') {
+        if (c == 'L') {
             return Table.LOWER;
         }
-        if (t != 'M') {
+        if (c != 'M') {
             return Table.UPPER;
         }
         return Table.MIXED;
@@ -119,211 +122,223 @@ public final class Decoder {
     public static /* synthetic */ class AnonymousClass1 {
         static final /* synthetic */ int[] $SwitchMap$com$google$zxing$aztec$decoder$Decoder$Table;
 
+        /* JADX WARNING: Can't wrap try/catch for region: R(12:0|1|2|3|4|5|6|7|8|9|10|12) */
+        /* JADX WARNING: Code restructure failed: missing block: B:13:?, code lost:
+            return;
+         */
+        /* JADX WARNING: Failed to process nested try/catch */
+        /* JADX WARNING: Missing exception handler attribute for start block: B:3:0x0012 */
+        /* JADX WARNING: Missing exception handler attribute for start block: B:5:0x001d */
+        /* JADX WARNING: Missing exception handler attribute for start block: B:7:0x0028 */
+        /* JADX WARNING: Missing exception handler attribute for start block: B:9:0x0033 */
         static {
-            int[] iArr = new int[Table.values().length];
-            $SwitchMap$com$google$zxing$aztec$decoder$Decoder$Table = iArr;
-            try {
-                iArr[Table.UPPER.ordinal()] = 1;
-            } catch (NoSuchFieldError e) {
-            }
-            try {
-                $SwitchMap$com$google$zxing$aztec$decoder$Decoder$Table[Table.LOWER.ordinal()] = 2;
-            } catch (NoSuchFieldError e2) {
-            }
-            try {
-                $SwitchMap$com$google$zxing$aztec$decoder$Decoder$Table[Table.MIXED.ordinal()] = 3;
-            } catch (NoSuchFieldError e3) {
-            }
-            try {
-                $SwitchMap$com$google$zxing$aztec$decoder$Decoder$Table[Table.PUNCT.ordinal()] = 4;
-            } catch (NoSuchFieldError e4) {
-            }
-            try {
-                $SwitchMap$com$google$zxing$aztec$decoder$Decoder$Table[Table.DIGIT.ordinal()] = 5;
-            } catch (NoSuchFieldError e5) {
-            }
+            /*
+                com.google.zxing.aztec.decoder.Decoder$Table[] r0 = com.google.zxing.aztec.decoder.Decoder.Table.values()
+                int r0 = r0.length
+                int[] r0 = new int[r0]
+                com.google.zxing.aztec.decoder.Decoder.AnonymousClass1.$SwitchMap$com$google$zxing$aztec$decoder$Decoder$Table = r0
+                com.google.zxing.aztec.decoder.Decoder$Table r1 = com.google.zxing.aztec.decoder.Decoder.Table.UPPER     // Catch:{ NoSuchFieldError -> 0x0012 }
+                int r1 = r1.ordinal()     // Catch:{ NoSuchFieldError -> 0x0012 }
+                r2 = 1
+                r0[r1] = r2     // Catch:{ NoSuchFieldError -> 0x0012 }
+            L_0x0012:
+                int[] r0 = com.google.zxing.aztec.decoder.Decoder.AnonymousClass1.$SwitchMap$com$google$zxing$aztec$decoder$Decoder$Table     // Catch:{ NoSuchFieldError -> 0x001d }
+                com.google.zxing.aztec.decoder.Decoder$Table r1 = com.google.zxing.aztec.decoder.Decoder.Table.LOWER     // Catch:{ NoSuchFieldError -> 0x001d }
+                int r1 = r1.ordinal()     // Catch:{ NoSuchFieldError -> 0x001d }
+                r2 = 2
+                r0[r1] = r2     // Catch:{ NoSuchFieldError -> 0x001d }
+            L_0x001d:
+                int[] r0 = com.google.zxing.aztec.decoder.Decoder.AnonymousClass1.$SwitchMap$com$google$zxing$aztec$decoder$Decoder$Table     // Catch:{ NoSuchFieldError -> 0x0028 }
+                com.google.zxing.aztec.decoder.Decoder$Table r1 = com.google.zxing.aztec.decoder.Decoder.Table.MIXED     // Catch:{ NoSuchFieldError -> 0x0028 }
+                int r1 = r1.ordinal()     // Catch:{ NoSuchFieldError -> 0x0028 }
+                r2 = 3
+                r0[r1] = r2     // Catch:{ NoSuchFieldError -> 0x0028 }
+            L_0x0028:
+                int[] r0 = com.google.zxing.aztec.decoder.Decoder.AnonymousClass1.$SwitchMap$com$google$zxing$aztec$decoder$Decoder$Table     // Catch:{ NoSuchFieldError -> 0x0033 }
+                com.google.zxing.aztec.decoder.Decoder$Table r1 = com.google.zxing.aztec.decoder.Decoder.Table.PUNCT     // Catch:{ NoSuchFieldError -> 0x0033 }
+                int r1 = r1.ordinal()     // Catch:{ NoSuchFieldError -> 0x0033 }
+                r2 = 4
+                r0[r1] = r2     // Catch:{ NoSuchFieldError -> 0x0033 }
+            L_0x0033:
+                int[] r0 = com.google.zxing.aztec.decoder.Decoder.AnonymousClass1.$SwitchMap$com$google$zxing$aztec$decoder$Decoder$Table     // Catch:{ NoSuchFieldError -> 0x003e }
+                com.google.zxing.aztec.decoder.Decoder$Table r1 = com.google.zxing.aztec.decoder.Decoder.Table.DIGIT     // Catch:{ NoSuchFieldError -> 0x003e }
+                int r1 = r1.ordinal()     // Catch:{ NoSuchFieldError -> 0x003e }
+                r2 = 5
+                r0[r1] = r2     // Catch:{ NoSuchFieldError -> 0x003e }
+            L_0x003e:
+                return
+            */
+            throw new UnsupportedOperationException("Method not decompiled: com.google.zxing.aztec.decoder.Decoder.AnonymousClass1.<clinit>():void");
         }
     }
 
-    private static String getCharacter(Table table, int code) {
-        int i = AnonymousClass1.$SwitchMap$com$google$zxing$aztec$decoder$Decoder$Table[table.ordinal()];
-        if (i == 1) {
-            return UPPER_TABLE[code];
+    private static String getCharacter(Table table, int i) {
+        int i2 = AnonymousClass1.$SwitchMap$com$google$zxing$aztec$decoder$Decoder$Table[table.ordinal()];
+        if (i2 == 1) {
+            return UPPER_TABLE[i];
         }
-        if (i == 2) {
-            return LOWER_TABLE[code];
+        if (i2 == 2) {
+            return LOWER_TABLE[i];
         }
-        if (i == 3) {
-            return MIXED_TABLE[code];
+        if (i2 == 3) {
+            return MIXED_TABLE[i];
         }
-        if (i == 4) {
-            return PUNCT_TABLE[code];
+        if (i2 == 4) {
+            return PUNCT_TABLE[i];
         }
-        if (i == 5) {
-            return DIGIT_TABLE[code];
+        if (i2 == 5) {
+            return DIGIT_TABLE[i];
         }
         throw new IllegalStateException("Bad table");
     }
 
-    /* JADX DEBUG: Multi-variable search result rejected for r0v11, resolved type: int */
-    /* JADX DEBUG: Multi-variable search result rejected for r0v12, resolved type: int */
-    /* JADX DEBUG: Multi-variable search result rejected for r0v13, resolved type: int */
-    /* JADX DEBUG: Multi-variable search result rejected for r0v14, resolved type: boolean */
-    /* JADX DEBUG: Multi-variable search result rejected for r0v16, resolved type: boolean */
-    /* JADX DEBUG: Multi-variable search result rejected for r0v23, resolved type: boolean */
-    /* JADX WARN: Multi-variable type inference failed */
-    private boolean[] correctBits(boolean[] rawbits) throws FormatException {
-        GenericGF gf;
-        int codewordSize;
+    private boolean[] correctBits(boolean[] zArr) throws FormatException {
+        GenericGF genericGF;
+        int i = 8;
         if (this.ddata.getNbLayers() <= 2) {
-            gf = GenericGF.AZTEC_DATA_6;
-            codewordSize = 6;
+            i = 6;
+            genericGF = GenericGF.AZTEC_DATA_6;
         } else if (this.ddata.getNbLayers() <= 8) {
-            gf = GenericGF.AZTEC_DATA_8;
-            codewordSize = 8;
+            genericGF = GenericGF.AZTEC_DATA_8;
         } else if (this.ddata.getNbLayers() <= 22) {
-            gf = GenericGF.AZTEC_DATA_10;
-            codewordSize = 10;
+            i = 10;
+            genericGF = GenericGF.AZTEC_DATA_10;
         } else {
-            gf = GenericGF.AZTEC_DATA_12;
-            codewordSize = 12;
+            i = 12;
+            genericGF = GenericGF.AZTEC_DATA_12;
         }
-        int numDataCodewords = this.ddata.getNbDatablocks();
-        int numCodewords = rawbits.length / codewordSize;
-        if (numCodewords >= numDataCodewords) {
-            int[] dataWords = new int[numCodewords];
-            int offset = rawbits.length % codewordSize;
-            int i = 0;
-            while (i < numCodewords) {
-                dataWords[i] = readCode(rawbits, offset, codewordSize);
-                i++;
-                offset += codewordSize;
+        int nbDatablocks = this.ddata.getNbDatablocks();
+        int length = zArr.length / i;
+        if (length >= nbDatablocks) {
+            int length2 = zArr.length % i;
+            int[] iArr = new int[length];
+            int i2 = 0;
+            while (i2 < length) {
+                iArr[i2] = readCode(zArr, length2, i);
+                i2++;
+                length2 += i;
             }
             try {
-                new ReedSolomonDecoder(gf).decode(dataWords, numCodewords - numDataCodewords);
-                int i2 = 1;
-                int mask = (1 << codewordSize) - 1;
-                int stuffedBits = 0;
-                for (int i3 = 0; i3 < numDataCodewords; i3++) {
-                    int dataWord = dataWords[i3];
-                    if (dataWord == 0 || dataWord == mask) {
+                new ReedSolomonDecoder(genericGF).decode(iArr, length - nbDatablocks);
+                int i3 = (1 << i) - 1;
+                int i4 = 0;
+                for (int i5 = 0; i5 < nbDatablocks; i5++) {
+                    int i6 = iArr[i5];
+                    if (i6 == 0 || i6 == i3) {
                         throw FormatException.getFormatInstance();
                     }
-                    if (dataWord == 1 || dataWord == mask - 1) {
-                        stuffedBits++;
+                    if (i6 == 1 || i6 == i3 - 1) {
+                        i4++;
                     }
                 }
-                boolean[] correctedBits = new boolean[((numDataCodewords * codewordSize) - stuffedBits)];
-                int index = 0;
-                int i4 = 0;
-                while (i4 < numDataCodewords) {
-                    int dataWord2 = dataWords[i4];
-                    if (dataWord2 == i2 || dataWord2 == mask - 1) {
-                        int i5 = (index + codewordSize) - i2;
-                        boolean z = i2;
-                        if (dataWord2 <= i2) {
-                            z = 0;
-                        }
-                        Arrays.fill(correctedBits, index, i5, z);
-                        index += codewordSize - 1;
+                boolean[] zArr2 = new boolean[((nbDatablocks * i) - i4)];
+                int i7 = 0;
+                for (int i8 = 0; i8 < nbDatablocks; i8++) {
+                    int i9 = iArr[i8];
+                    if (i9 == 1 || i9 == i3 - 1) {
+                        Arrays.fill(zArr2, i7, (i7 + i) - 1, i9 > 1);
+                        i7 += i - 1;
                     } else {
-                        int bit = codewordSize - 1;
-                        while (bit >= 0) {
-                            int index2 = index + 1;
-                            correctedBits[index] = (dataWord2 & (i2 << bit)) != 0;
-                            bit--;
-                            index = index2;
+                        int i10 = i - 1;
+                        while (i10 >= 0) {
+                            int i11 = i7 + 1;
+                            zArr2[i7] = ((1 << i10) & i9) != 0;
+                            i10--;
+                            i7 = i11;
                         }
                     }
-                    i4++;
-                    i2 = 1;
                 }
-                return correctedBits;
-            } catch (ReedSolomonException ex) {
-                throw FormatException.getFormatInstance(ex);
+                return zArr2;
+            } catch (ReedSolomonException e) {
+                throw FormatException.getFormatInstance(e);
             }
         } else {
             throw FormatException.getFormatInstance();
         }
     }
 
-    private boolean[] extractBits(BitMatrix matrix) {
-        boolean compact = this.ddata.isCompact();
-        int layers = this.ddata.getNbLayers();
-        int baseMatrixSize = (compact ? 11 : 14) + (layers * 4);
-        int[] alignmentMap = new int[baseMatrixSize];
-        boolean[] rawbits = new boolean[totalBitsInLayer(layers, compact)];
-        int i = 2;
-        if (compact) {
-            for (int i2 = 0; i2 < alignmentMap.length; i2++) {
-                alignmentMap[i2] = i2;
+    private boolean[] extractBits(BitMatrix bitMatrix) {
+        boolean isCompact = this.ddata.isCompact();
+        int nbLayers = this.ddata.getNbLayers();
+        int i = (isCompact ? 11 : 14) + (nbLayers * 4);
+        int[] iArr = new int[i];
+        boolean[] zArr = new boolean[totalBitsInLayer(nbLayers, isCompact)];
+        int i2 = 2;
+        if (isCompact) {
+            for (int i3 = 0; i3 < i; i3++) {
+                iArr[i3] = i3;
             }
         } else {
-            int origCenter = baseMatrixSize / 2;
-            int center = ((baseMatrixSize + 1) + ((((baseMatrixSize / 2) - 1) / 15) * 2)) / 2;
-            for (int i3 = 0; i3 < origCenter; i3++) {
-                int newOffset = (i3 / 15) + i3;
-                alignmentMap[(origCenter - i3) - 1] = (center - newOffset) - 1;
-                alignmentMap[origCenter + i3] = center + newOffset + 1;
+            int i4 = i / 2;
+            int i5 = ((i + 1) + (((i4 - 1) / 15) * 2)) / 2;
+            for (int i6 = 0; i6 < i4; i6++) {
+                int i7 = (i6 / 15) + i6;
+                iArr[(i4 - i6) - 1] = (i5 - i7) - 1;
+                iArr[i4 + i6] = i7 + i5 + 1;
             }
         }
-        int i4 = 0;
-        int rowOffset = 0;
-        while (i4 < layers) {
-            int rowSize = ((layers - i4) * 4) + (compact ? 9 : 12);
-            int low = i4 * 2;
-            int high = (baseMatrixSize - 1) - low;
-            int j = 0;
-            while (j < rowSize) {
-                int columnOffset = j * 2;
-                int k = 0;
-                while (k < i) {
-                    rawbits[rowOffset + columnOffset + k] = matrix.get(alignmentMap[low + k], alignmentMap[low + j]);
-                    rawbits[(rowSize * 2) + rowOffset + columnOffset + k] = matrix.get(alignmentMap[low + j], alignmentMap[high - k]);
-                    rawbits[(rowSize * 4) + rowOffset + columnOffset + k] = matrix.get(alignmentMap[high - k], alignmentMap[high - j]);
-                    rawbits[(rowSize * 6) + rowOffset + columnOffset + k] = matrix.get(alignmentMap[high - j], alignmentMap[low + k]);
-                    k++;
-                    i = 2;
-                    compact = compact;
+        int i8 = 0;
+        int i9 = 0;
+        while (i8 < nbLayers) {
+            int i10 = ((nbLayers - i8) * 4) + (isCompact ? 9 : 12);
+            int i11 = i8 * 2;
+            int i12 = (i - 1) - i11;
+            int i13 = 0;
+            while (i13 < i10) {
+                int i14 = i13 * 2;
+                int i15 = 0;
+                while (i15 < i2) {
+                    int i16 = i11 + i15;
+                    int i17 = i11 + i13;
+                    zArr[i9 + i14 + i15] = bitMatrix.get(iArr[i16], iArr[i17]);
+                    int i18 = i12 - i15;
+                    zArr[(i10 * 2) + i9 + i14 + i15] = bitMatrix.get(iArr[i17], iArr[i18]);
+                    int i19 = i12 - i13;
+                    zArr[(i10 * 4) + i9 + i14 + i15] = bitMatrix.get(iArr[i18], iArr[i19]);
+                    zArr[(i10 * 6) + i9 + i14 + i15] = bitMatrix.get(iArr[i19], iArr[i16]);
+                    i15++;
+                    nbLayers = nbLayers;
+                    isCompact = isCompact;
+                    i2 = 2;
                 }
-                j++;
-                i = 2;
+                i13++;
+                i2 = 2;
             }
-            rowOffset += rowSize * 8;
-            i4++;
-            i = 2;
+            i9 += i10 * 8;
+            i8++;
+            i2 = 2;
         }
-        return rawbits;
+        return zArr;
     }
 
-    private static int readCode(boolean[] rawbits, int startIndex, int length) {
-        int res = 0;
-        for (int i = startIndex; i < startIndex + length; i++) {
-            res <<= 1;
-            if (rawbits[i]) {
-                res |= 1;
+    private static int readCode(boolean[] zArr, int i, int i2) {
+        int i3 = 0;
+        for (int i4 = i; i4 < i + i2; i4++) {
+            i3 <<= 1;
+            if (zArr[i4]) {
+                i3 |= 1;
             }
         }
-        return res;
+        return i3;
     }
 
-    private static byte readByte(boolean[] rawbits, int startIndex) {
-        int n = rawbits.length - startIndex;
-        if (n >= 8) {
-            return (byte) readCode(rawbits, startIndex, 8);
+    private static byte readByte(boolean[] zArr, int i) {
+        int readCode;
+        int length = zArr.length - i;
+        if (length >= 8) {
+            readCode = readCode(zArr, i, 8);
+        } else {
+            readCode = readCode(zArr, i, length) << (8 - length);
         }
-        return (byte) (readCode(rawbits, startIndex, n) << (8 - n));
+        return (byte) readCode;
     }
 
-    static byte[] convertBoolArrayToByteArray(boolean[] boolArr) {
-        byte[] byteArr = new byte[((boolArr.length + 7) / 8)];
-        for (int i = 0; i < byteArr.length; i++) {
-            byteArr[i] = readByte(boolArr, i * 8);
+    static byte[] convertBoolArrayToByteArray(boolean[] zArr) {
+        int length = (zArr.length + 7) / 8;
+        byte[] bArr = new byte[length];
+        for (int i = 0; i < length; i++) {
+            bArr[i] = readByte(zArr, i * 8);
         }
-        return byteArr;
-    }
-
-    private static int totalBitsInLayer(int layers, boolean compact) {
-        return ((compact ? 88 : 112) + (layers * 16)) * layers;
+        return bArr;
     }
 }

@@ -22,46 +22,45 @@ public final class MaxiCodeReader implements Reader {
     private final Decoder decoder = new Decoder();
 
     @Override // com.google.zxing.Reader
-    public Result decode(BinaryBitmap image) throws NotFoundException, ChecksumException, FormatException {
-        return decode(image, null);
+    public void reset() {
     }
 
-    /* JADX INFO: Multiple debug info for r0v5 com.google.zxing.common.DecoderResult: [D('bits' com.google.zxing.common.BitMatrix), D('decoderResult' com.google.zxing.common.DecoderResult)] */
     @Override // com.google.zxing.Reader
-    public Result decode(BinaryBitmap image, Map<DecodeHintType, ?> hints) throws NotFoundException, ChecksumException, FormatException {
-        if (hints == null || !hints.containsKey(DecodeHintType.PURE_BARCODE)) {
+    public Result decode(BinaryBitmap binaryBitmap) throws NotFoundException, ChecksumException, FormatException {
+        return decode(binaryBitmap, null);
+    }
+
+    @Override // com.google.zxing.Reader
+    public Result decode(BinaryBitmap binaryBitmap, Map<DecodeHintType, ?> map) throws NotFoundException, ChecksumException, FormatException {
+        if (map == null || !map.containsKey(DecodeHintType.PURE_BARCODE)) {
             throw NotFoundException.getNotFoundInstance();
         }
-        DecoderResult decoderResult = this.decoder.decode(extractPureBits(image.getBlackMatrix()), hints);
-        Result result = new Result(decoderResult.getText(), decoderResult.getRawBytes(), NO_POINTS, BarcodeFormat.MAXICODE);
-        String ecLevel = decoderResult.getECLevel();
-        if (ecLevel != null) {
-            result.putMetadata(ResultMetadataType.ERROR_CORRECTION_LEVEL, ecLevel);
+        DecoderResult decode = this.decoder.decode(extractPureBits(binaryBitmap.getBlackMatrix()), map);
+        Result result = new Result(decode.getText(), decode.getRawBytes(), NO_POINTS, BarcodeFormat.MAXICODE);
+        String eCLevel = decode.getECLevel();
+        if (eCLevel != null) {
+            result.putMetadata(ResultMetadataType.ERROR_CORRECTION_LEVEL, eCLevel);
         }
         return result;
     }
 
-    @Override // com.google.zxing.Reader
-    public void reset() {
-    }
-
-    private static BitMatrix extractPureBits(BitMatrix image) throws NotFoundException {
-        int[] enclosingRectangle = image.getEnclosingRectangle();
+    private static BitMatrix extractPureBits(BitMatrix bitMatrix) throws NotFoundException {
+        int[] enclosingRectangle = bitMatrix.getEnclosingRectangle();
         if (enclosingRectangle != null) {
-            int left = enclosingRectangle[0];
-            int top = enclosingRectangle[1];
-            int width = enclosingRectangle[2];
-            int height = enclosingRectangle[3];
-            BitMatrix bits = new BitMatrix(MATRIX_WIDTH, 33);
-            for (int y = 0; y < 33; y++) {
-                int iy = (((y * height) + (height / 2)) / 33) + top;
-                for (int x = 0; x < MATRIX_WIDTH; x++) {
-                    if (image.get(((((x * width) + (width / 2)) + (((y & 1) * width) / 2)) / MATRIX_WIDTH) + left, iy)) {
-                        bits.set(x, y);
+            int i = enclosingRectangle[0];
+            int i2 = enclosingRectangle[1];
+            int i3 = enclosingRectangle[2];
+            int i4 = enclosingRectangle[3];
+            BitMatrix bitMatrix2 = new BitMatrix(MATRIX_WIDTH, 33);
+            for (int i5 = 0; i5 < 33; i5++) {
+                int i6 = (((i5 * i4) + (i4 / 2)) / 33) + i2;
+                for (int i7 = 0; i7 < MATRIX_WIDTH; i7++) {
+                    if (bitMatrix.get(((((i7 * i3) + (i3 / 2)) + (((i5 & 1) * i3) / 2)) / MATRIX_WIDTH) + i, i6)) {
+                        bitMatrix2.set(i7, i5);
                     }
                 }
             }
-            return bits;
+            return bitMatrix2;
         }
         throw NotFoundException.getNotFoundInstance();
     }

@@ -62,20 +62,20 @@ public class MediaSessionCompatApi21 {
     MediaSessionCompatApi21() {
     }
 
-    public static Object createSession(Context context, String tag) {
-        return new MediaSession(context, tag);
+    public static Object createSession(Context context, String str) {
+        return new MediaSession(context, str);
     }
 
-    public static Object verifySession(Object mediaSession) {
-        if (mediaSession instanceof MediaSession) {
-            return mediaSession;
+    public static Object verifySession(Object obj) {
+        if (obj instanceof MediaSession) {
+            return obj;
         }
         throw new IllegalArgumentException("mediaSession is not a valid MediaSession object");
     }
 
-    public static Object verifyToken(Object token) {
-        if (token instanceof MediaSession.Token) {
-            return token;
+    public static Object verifyToken(Object obj) {
+        if (obj instanceof MediaSession.Token) {
+            return obj;
         }
         throw new IllegalArgumentException("token is not a valid MediaSession.Token object");
     }
@@ -84,92 +84,92 @@ public class MediaSessionCompatApi21 {
         return new CallbackProxy(callback);
     }
 
-    public static void setCallback(Object sessionObj, Object callbackObj, Handler handler) {
-        ((MediaSession) sessionObj).setCallback((MediaSession.Callback) callbackObj, handler);
+    public static void setCallback(Object obj, Object obj2, Handler handler) {
+        ((MediaSession) obj).setCallback((MediaSession.Callback) obj2, handler);
     }
 
-    public static void setFlags(Object sessionObj, int flags) {
-        ((MediaSession) sessionObj).setFlags(flags);
+    public static void setFlags(Object obj, int i) {
+        ((MediaSession) obj).setFlags(i);
     }
 
-    public static void setPlaybackToLocal(Object sessionObj, int stream) {
-        AudioAttributes.Builder bob = new AudioAttributes.Builder();
-        bob.setLegacyStreamType(stream);
-        ((MediaSession) sessionObj).setPlaybackToLocal(bob.build());
+    public static void setPlaybackToLocal(Object obj, int i) {
+        AudioAttributes.Builder builder = new AudioAttributes.Builder();
+        builder.setLegacyStreamType(i);
+        ((MediaSession) obj).setPlaybackToLocal(builder.build());
     }
 
-    public static void setPlaybackToRemote(Object sessionObj, Object volumeProviderObj) {
-        ((MediaSession) sessionObj).setPlaybackToRemote((VolumeProvider) volumeProviderObj);
+    public static void setPlaybackToRemote(Object obj, Object obj2) {
+        ((MediaSession) obj).setPlaybackToRemote((VolumeProvider) obj2);
     }
 
-    public static void setActive(Object sessionObj, boolean active) {
-        ((MediaSession) sessionObj).setActive(active);
+    public static void setActive(Object obj, boolean z) {
+        ((MediaSession) obj).setActive(z);
     }
 
-    public static boolean isActive(Object sessionObj) {
-        return ((MediaSession) sessionObj).isActive();
+    public static boolean isActive(Object obj) {
+        return ((MediaSession) obj).isActive();
     }
 
-    public static void sendSessionEvent(Object sessionObj, String event, Bundle extras) {
-        ((MediaSession) sessionObj).sendSessionEvent(event, extras);
+    public static void sendSessionEvent(Object obj, String str, Bundle bundle) {
+        ((MediaSession) obj).sendSessionEvent(str, bundle);
     }
 
-    public static void release(Object sessionObj) {
-        ((MediaSession) sessionObj).release();
+    public static void release(Object obj) {
+        ((MediaSession) obj).release();
     }
 
-    public static Parcelable getSessionToken(Object sessionObj) {
-        return ((MediaSession) sessionObj).getSessionToken();
+    public static Parcelable getSessionToken(Object obj) {
+        return ((MediaSession) obj).getSessionToken();
     }
 
-    public static void setPlaybackState(Object sessionObj, Object stateObj) {
-        ((MediaSession) sessionObj).setPlaybackState((PlaybackState) stateObj);
+    public static void setPlaybackState(Object obj, Object obj2) {
+        ((MediaSession) obj).setPlaybackState((PlaybackState) obj2);
     }
 
-    public static void setMetadata(Object sessionObj, Object metadataObj) {
-        ((MediaSession) sessionObj).setMetadata((MediaMetadata) metadataObj);
+    public static void setMetadata(Object obj, Object obj2) {
+        ((MediaSession) obj).setMetadata((MediaMetadata) obj2);
     }
 
-    public static void setSessionActivity(Object sessionObj, PendingIntent pi) {
-        ((MediaSession) sessionObj).setSessionActivity(pi);
+    public static void setSessionActivity(Object obj, PendingIntent pendingIntent) {
+        ((MediaSession) obj).setSessionActivity(pendingIntent);
     }
 
-    public static void setMediaButtonReceiver(Object sessionObj, PendingIntent pi) {
-        ((MediaSession) sessionObj).setMediaButtonReceiver(pi);
+    public static void setMediaButtonReceiver(Object obj, PendingIntent pendingIntent) {
+        ((MediaSession) obj).setMediaButtonReceiver(pendingIntent);
     }
 
-    public static void setQueue(Object sessionObj, List<Object> queueObjs) {
-        if (queueObjs == null) {
-            ((MediaSession) sessionObj).setQueue(null);
+    public static void setQueue(Object obj, List<Object> list) {
+        if (list == null) {
+            ((MediaSession) obj).setQueue(null);
             return;
         }
-        ArrayList<MediaSession.QueueItem> queue = new ArrayList<>();
-        Iterator<Object> it = queueObjs.iterator();
+        ArrayList arrayList = new ArrayList();
+        Iterator<Object> it = list.iterator();
         while (it.hasNext()) {
-            queue.add((MediaSession.QueueItem) it.next());
+            arrayList.add((MediaSession.QueueItem) it.next());
         }
-        ((MediaSession) sessionObj).setQueue(queue);
+        ((MediaSession) obj).setQueue(arrayList);
     }
 
-    public static void setQueueTitle(Object sessionObj, CharSequence title) {
-        ((MediaSession) sessionObj).setQueueTitle(title);
+    public static void setQueueTitle(Object obj, CharSequence charSequence) {
+        ((MediaSession) obj).setQueueTitle(charSequence);
     }
 
-    public static void setExtras(Object sessionObj, Bundle extras) {
-        ((MediaSession) sessionObj).setExtras(extras);
+    public static void setExtras(Object obj, Bundle bundle) {
+        ((MediaSession) obj).setExtras(bundle);
     }
 
-    public static boolean hasCallback(Object sessionObj) {
+    public static boolean hasCallback(Object obj) {
         try {
-            Field callbackField = sessionObj.getClass().getDeclaredField("mCallback");
-            if (callbackField != null) {
-                callbackField.setAccessible(true);
-                if (callbackField.get(sessionObj) != null) {
+            Field declaredField = obj.getClass().getDeclaredField("mCallback");
+            if (declaredField != null) {
+                declaredField.setAccessible(true);
+                if (declaredField.get(obj) != null) {
                     return true;
                 }
                 return false;
             }
-        } catch (IllegalAccessException | NoSuchFieldException e) {
+        } catch (IllegalAccessException | NoSuchFieldException unused) {
             Log.w(TAG, "Failed to get mCallback object.");
         }
         return false;
@@ -179,32 +179,32 @@ public class MediaSessionCompatApi21 {
     public static class CallbackProxy<T extends Callback> extends MediaSession.Callback {
         protected final T mCallback;
 
-        public CallbackProxy(T callback) {
-            this.mCallback = callback;
+        public CallbackProxy(T t) {
+            this.mCallback = t;
         }
 
-        public void onCommand(String command, Bundle args, ResultReceiver cb) {
-            this.mCallback.onCommand(command, args, cb);
+        public void onCommand(String str, Bundle bundle, ResultReceiver resultReceiver) {
+            this.mCallback.onCommand(str, bundle, resultReceiver);
         }
 
-        public boolean onMediaButtonEvent(Intent mediaButtonIntent) {
-            return this.mCallback.onMediaButtonEvent(mediaButtonIntent) || super.onMediaButtonEvent(mediaButtonIntent);
+        public boolean onMediaButtonEvent(Intent intent) {
+            return this.mCallback.onMediaButtonEvent(intent) || super.onMediaButtonEvent(intent);
         }
 
         public void onPlay() {
             this.mCallback.onPlay();
         }
 
-        public void onPlayFromMediaId(String mediaId, Bundle extras) {
-            this.mCallback.onPlayFromMediaId(mediaId, extras);
+        public void onPlayFromMediaId(String str, Bundle bundle) {
+            this.mCallback.onPlayFromMediaId(str, bundle);
         }
 
-        public void onPlayFromSearch(String search, Bundle extras) {
-            this.mCallback.onPlayFromSearch(search, extras);
+        public void onPlayFromSearch(String str, Bundle bundle) {
+            this.mCallback.onPlayFromSearch(str, bundle);
         }
 
-        public void onSkipToQueueItem(long id) {
-            this.mCallback.onSkipToQueueItem(id);
+        public void onSkipToQueueItem(long j) {
+            this.mCallback.onSkipToQueueItem(j);
         }
 
         public void onPause() {
@@ -231,16 +231,16 @@ public class MediaSessionCompatApi21 {
             this.mCallback.onStop();
         }
 
-        public void onSeekTo(long pos) {
-            this.mCallback.onSeekTo(pos);
+        public void onSeekTo(long j) {
+            this.mCallback.onSeekTo(j);
         }
 
         public void onSetRating(Rating rating) {
             this.mCallback.onSetRating(rating);
         }
 
-        public void onCustomAction(String action, Bundle extras) {
-            this.mCallback.onCustomAction(action, extras);
+        public void onCustomAction(String str, Bundle bundle) {
+            this.mCallback.onCustomAction(str, bundle);
         }
     }
 
@@ -249,16 +249,16 @@ public class MediaSessionCompatApi21 {
         QueueItem() {
         }
 
-        public static Object createItem(Object mediaDescription, long id) {
-            return new MediaSession.QueueItem((MediaDescription) mediaDescription, id);
+        public static Object createItem(Object obj, long j) {
+            return new MediaSession.QueueItem((MediaDescription) obj, j);
         }
 
-        public static Object getDescription(Object queueItem) {
-            return ((MediaSession.QueueItem) queueItem).getDescription();
+        public static Object getDescription(Object obj) {
+            return ((MediaSession.QueueItem) obj).getDescription();
         }
 
-        public static long getQueueId(Object queueItem) {
-            return ((MediaSession.QueueItem) queueItem).getQueueId();
+        public static long getQueueId(Object obj) {
+            return ((MediaSession.QueueItem) obj).getQueueId();
         }
     }
 }

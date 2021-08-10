@@ -6,23 +6,23 @@ import org.json.JSONException;
 public class PermissionHelper {
     private static final String LOG_TAG = "CordovaPermissionHelper";
 
-    public static void requestPermission(CordovaPlugin plugin, int requestCode, String permission) {
-        requestPermissions(plugin, requestCode, new String[]{permission});
+    public static void requestPermission(CordovaPlugin cordovaPlugin, int i, String str) {
+        requestPermissions(cordovaPlugin, i, new String[]{str});
     }
 
-    public static void requestPermissions(CordovaPlugin plugin, int requestCode, String[] permissions) {
-        plugin.cordova.requestPermissions(plugin, requestCode, permissions);
+    public static void requestPermissions(CordovaPlugin cordovaPlugin, int i, String[] strArr) {
+        cordovaPlugin.cordova.requestPermissions(cordovaPlugin, i, strArr);
     }
 
-    public static boolean hasPermission(CordovaPlugin plugin, String permission) {
-        return plugin.cordova.hasPermission(permission);
+    public static boolean hasPermission(CordovaPlugin cordovaPlugin, String str) {
+        return cordovaPlugin.cordova.hasPermission(str);
     }
 
-    private static void deliverPermissionResult(CordovaPlugin plugin, int requestCode, String[] permissions) {
-        int[] requestResults = new int[permissions.length];
-        Arrays.fill(requestResults, 0);
+    private static void deliverPermissionResult(CordovaPlugin cordovaPlugin, int i, String[] strArr) {
+        int[] iArr = new int[strArr.length];
+        Arrays.fill(iArr, 0);
         try {
-            plugin.onRequestPermissionResult(requestCode, permissions, requestResults);
+            cordovaPlugin.onRequestPermissionResult(i, strArr, iArr);
         } catch (JSONException e) {
             LOG.e(LOG_TAG, "JSONException when delivering permissions results", e);
         }

@@ -30,20 +30,20 @@ public class CursorLoader extends AsyncTaskLoader<Cursor> {
             }
         }
         try {
-            Cursor cursor = ContentResolverCompat.query(getContext().getContentResolver(), this.mUri, this.mProjection, this.mSelection, this.mSelectionArgs, this.mSortOrder, this.mCancellationSignal);
-            if (cursor != null) {
+            Cursor query = ContentResolverCompat.query(getContext().getContentResolver(), this.mUri, this.mProjection, this.mSelection, this.mSelectionArgs, this.mSortOrder, this.mCancellationSignal);
+            if (query != null) {
                 try {
-                    cursor.getCount();
-                    cursor.registerContentObserver(this.mObserver);
-                } catch (RuntimeException ex) {
-                    cursor.close();
-                    throw ex;
+                    query.getCount();
+                    query.registerContentObserver(this.mObserver);
+                } catch (RuntimeException e) {
+                    query.close();
+                    throw e;
                 }
             }
             synchronized (this) {
                 this.mCancellationSignal = null;
             }
-            return cursor;
+            return query;
         } catch (Throwable th) {
             synchronized (this) {
                 this.mCancellationSignal = null;
@@ -64,13 +64,13 @@ public class CursorLoader extends AsyncTaskLoader<Cursor> {
 
     public void deliverResult(Cursor cursor) {
         if (!isReset()) {
-            Cursor oldCursor = this.mCursor;
+            Cursor cursor2 = this.mCursor;
             this.mCursor = cursor;
             if (isStarted()) {
                 super.deliverResult((Object) cursor);
             }
-            if (oldCursor != null && oldCursor != cursor && !oldCursor.isClosed()) {
-                oldCursor.close();
+            if (cursor2 != null && cursor2 != cursor && !cursor2.isClosed()) {
+                cursor2.close();
             }
         } else if (cursor != null) {
             cursor.close();
@@ -81,13 +81,13 @@ public class CursorLoader extends AsyncTaskLoader<Cursor> {
         super(context);
     }
 
-    public CursorLoader(Context context, Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+    public CursorLoader(Context context, Uri uri, String[] strArr, String str, String[] strArr2, String str2) {
         super(context);
         this.mUri = uri;
-        this.mProjection = projection;
-        this.mSelection = selection;
-        this.mSelectionArgs = selectionArgs;
-        this.mSortOrder = sortOrder;
+        this.mProjection = strArr;
+        this.mSelection = str;
+        this.mSelectionArgs = strArr2;
+        this.mSortOrder = str2;
     }
 
     /* access modifiers changed from: protected */
@@ -138,57 +138,57 @@ public class CursorLoader extends AsyncTaskLoader<Cursor> {
         return this.mProjection;
     }
 
-    public void setProjection(String[] projection) {
-        this.mProjection = projection;
+    public void setProjection(String[] strArr) {
+        this.mProjection = strArr;
     }
 
     public String getSelection() {
         return this.mSelection;
     }
 
-    public void setSelection(String selection) {
-        this.mSelection = selection;
+    public void setSelection(String str) {
+        this.mSelection = str;
     }
 
     public String[] getSelectionArgs() {
         return this.mSelectionArgs;
     }
 
-    public void setSelectionArgs(String[] selectionArgs) {
-        this.mSelectionArgs = selectionArgs;
+    public void setSelectionArgs(String[] strArr) {
+        this.mSelectionArgs = strArr;
     }
 
     public String getSortOrder() {
         return this.mSortOrder;
     }
 
-    public void setSortOrder(String sortOrder) {
-        this.mSortOrder = sortOrder;
+    public void setSortOrder(String str) {
+        this.mSortOrder = str;
     }
 
     @Override // android.support.v4.content.Loader, android.support.v4.content.AsyncTaskLoader
-    public void dump(String prefix, FileDescriptor fd, PrintWriter writer, String[] args) {
-        super.dump(prefix, fd, writer, args);
-        writer.print(prefix);
-        writer.print("mUri=");
-        writer.println(this.mUri);
-        writer.print(prefix);
-        writer.print("mProjection=");
-        writer.println(Arrays.toString(this.mProjection));
-        writer.print(prefix);
-        writer.print("mSelection=");
-        writer.println(this.mSelection);
-        writer.print(prefix);
-        writer.print("mSelectionArgs=");
-        writer.println(Arrays.toString(this.mSelectionArgs));
-        writer.print(prefix);
-        writer.print("mSortOrder=");
-        writer.println(this.mSortOrder);
-        writer.print(prefix);
-        writer.print("mCursor=");
-        writer.println(this.mCursor);
-        writer.print(prefix);
-        writer.print("mContentChanged=");
-        writer.println(this.mContentChanged);
+    public void dump(String str, FileDescriptor fileDescriptor, PrintWriter printWriter, String[] strArr) {
+        super.dump(str, fileDescriptor, printWriter, strArr);
+        printWriter.print(str);
+        printWriter.print("mUri=");
+        printWriter.println(this.mUri);
+        printWriter.print(str);
+        printWriter.print("mProjection=");
+        printWriter.println(Arrays.toString(this.mProjection));
+        printWriter.print(str);
+        printWriter.print("mSelection=");
+        printWriter.println(this.mSelection);
+        printWriter.print(str);
+        printWriter.print("mSelectionArgs=");
+        printWriter.println(Arrays.toString(this.mSelectionArgs));
+        printWriter.print(str);
+        printWriter.print("mSortOrder=");
+        printWriter.println(this.mSortOrder);
+        printWriter.print(str);
+        printWriter.print("mCursor=");
+        printWriter.println(this.mCursor);
+        printWriter.print(str);
+        printWriter.print("mContentChanged=");
+        printWriter.println(this.mContentChanged);
     }
 }

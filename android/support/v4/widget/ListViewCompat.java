@@ -5,36 +5,36 @@ import android.view.View;
 import android.widget.ListView;
 
 public final class ListViewCompat {
-    public static void scrollListBy(ListView listView, int y) {
-        View firstView;
+    public static void scrollListBy(ListView listView, int i) {
+        View childAt;
         if (Build.VERSION.SDK_INT >= 19) {
-            listView.scrollListBy(y);
+            listView.scrollListBy(i);
             return;
         }
-        int firstPosition = listView.getFirstVisiblePosition();
-        if (firstPosition != -1 && (firstView = listView.getChildAt(0)) != null) {
-            listView.setSelectionFromTop(firstPosition, firstView.getTop() - y);
+        int firstVisiblePosition = listView.getFirstVisiblePosition();
+        if (firstVisiblePosition != -1 && (childAt = listView.getChildAt(0)) != null) {
+            listView.setSelectionFromTop(firstVisiblePosition, childAt.getTop() - i);
         }
     }
 
-    public static boolean canScrollList(ListView listView, int direction) {
+    public static boolean canScrollList(ListView listView, int i) {
         if (Build.VERSION.SDK_INT >= 19) {
-            return listView.canScrollList(direction);
+            return listView.canScrollList(i);
         }
         int childCount = listView.getChildCount();
         if (childCount == 0) {
             return false;
         }
-        int firstPosition = listView.getFirstVisiblePosition();
-        if (direction > 0) {
-            int lastBottom = listView.getChildAt(childCount - 1).getBottom();
-            if (firstPosition + childCount < listView.getCount() || lastBottom > listView.getHeight() - listView.getListPaddingBottom()) {
+        int firstVisiblePosition = listView.getFirstVisiblePosition();
+        if (i > 0) {
+            int bottom = listView.getChildAt(childCount - 1).getBottom();
+            if (firstVisiblePosition + childCount < listView.getCount() || bottom > listView.getHeight() - listView.getListPaddingBottom()) {
                 return true;
             }
             return false;
         }
-        int firstTop = listView.getChildAt(0).getTop();
-        if (firstPosition > 0 || firstTop < listView.getListPaddingTop()) {
+        int top = listView.getChildAt(0).getTop();
+        if (firstVisiblePosition > 0 || top < listView.getListPaddingTop()) {
             return true;
         }
         return false;

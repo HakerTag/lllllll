@@ -5,43 +5,47 @@ import com.google.zxing.common.BitArray;
 abstract class AI01decoder extends AbstractExpandedDecoder {
     static final int GTIN_SIZE = 40;
 
-    AI01decoder(BitArray information) {
-        super(information);
+    AI01decoder(BitArray bitArray) {
+        super(bitArray);
     }
 
     /* access modifiers changed from: package-private */
-    public final void encodeCompressedGtin(StringBuilder buf, int currentPos) {
-        buf.append("(01)");
-        int initialPosition = buf.length();
-        buf.append('9');
-        encodeCompressedGtinWithoutAI(buf, currentPos, initialPosition);
+    public final void encodeCompressedGtin(StringBuilder sb, int i) {
+        sb.append("(01)");
+        int length = sb.length();
+        sb.append('9');
+        encodeCompressedGtinWithoutAI(sb, i, length);
     }
 
     /* access modifiers changed from: package-private */
-    public final void encodeCompressedGtinWithoutAI(StringBuilder buf, int currentPos, int initialBufferPosition) {
-        for (int i = 0; i < 4; i++) {
-            int currentBlock = getGeneralDecoder().extractNumericValueFromBitArray((i * 10) + currentPos, 10);
-            if (currentBlock / 100 == 0) {
-                buf.append('0');
+    public final void encodeCompressedGtinWithoutAI(StringBuilder sb, int i, int i2) {
+        for (int i3 = 0; i3 < 4; i3++) {
+            int extractNumericValueFromBitArray = getGeneralDecoder().extractNumericValueFromBitArray((i3 * 10) + i, 10);
+            if (extractNumericValueFromBitArray / 100 == 0) {
+                sb.append('0');
             }
-            if (currentBlock / 10 == 0) {
-                buf.append('0');
+            if (extractNumericValueFromBitArray / 10 == 0) {
+                sb.append('0');
             }
-            buf.append(currentBlock);
+            sb.append(extractNumericValueFromBitArray);
         }
-        appendCheckDigit(buf, initialBufferPosition);
+        appendCheckDigit(sb, i2);
     }
 
-    private static void appendCheckDigit(StringBuilder buf, int currentPos) {
-        int checkDigit = 0;
-        for (int i = 0; i < 13; i++) {
-            int digit = buf.charAt(i + currentPos) - '0';
-            checkDigit += (i & 1) == 0 ? digit * 3 : digit;
+    private static void appendCheckDigit(StringBuilder sb, int i) {
+        int i2 = 0;
+        int i3 = 0;
+        for (int i4 = 0; i4 < 13; i4++) {
+            int charAt = sb.charAt(i4 + i) - '0';
+            if ((i4 & 1) == 0) {
+                charAt *= 3;
+            }
+            i3 += charAt;
         }
-        int checkDigit2 = 10 - (checkDigit % 10);
-        if (checkDigit2 == 10) {
-            checkDigit2 = 0;
+        int i5 = 10 - (i3 % 10);
+        if (i5 != 10) {
+            i2 = i5;
         }
-        buf.append(checkDigit2);
+        sb.append(i2);
     }
 }

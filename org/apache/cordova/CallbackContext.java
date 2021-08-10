@@ -11,9 +11,9 @@ public class CallbackContext {
     protected boolean finished;
     private CordovaWebView webView;
 
-    public CallbackContext(String callbackId2, CordovaWebView webView2) {
-        this.callbackId = callbackId2;
-        this.webView = webView2;
+    public CallbackContext(String str, CordovaWebView cordovaWebView) {
+        this.callbackId = str;
+        this.webView = cordovaWebView;
     }
 
     public boolean isFinished() {
@@ -39,39 +39,39 @@ public class CallbackContext {
         }
     }
 
-    public void success(JSONObject message) {
-        sendPluginResult(new PluginResult(PluginResult.Status.OK, message));
+    public void success(JSONObject jSONObject) {
+        sendPluginResult(new PluginResult(PluginResult.Status.OK, jSONObject));
     }
 
-    public void success(String message) {
-        sendPluginResult(new PluginResult(PluginResult.Status.OK, message));
+    public void success(String str) {
+        sendPluginResult(new PluginResult(PluginResult.Status.OK, str));
     }
 
-    public void success(JSONArray message) {
-        sendPluginResult(new PluginResult(PluginResult.Status.OK, message));
+    public void success(JSONArray jSONArray) {
+        sendPluginResult(new PluginResult(PluginResult.Status.OK, jSONArray));
     }
 
-    public void success(byte[] message) {
-        sendPluginResult(new PluginResult(PluginResult.Status.OK, message));
+    public void success(byte[] bArr) {
+        sendPluginResult(new PluginResult(PluginResult.Status.OK, bArr));
     }
 
-    public void success(int message) {
-        sendPluginResult(new PluginResult(PluginResult.Status.OK, message));
+    public void success(int i) {
+        sendPluginResult(new PluginResult(PluginResult.Status.OK, i));
     }
 
     public void success() {
         sendPluginResult(new PluginResult(PluginResult.Status.OK));
     }
 
-    public void error(JSONObject message) {
-        sendPluginResult(new PluginResult(PluginResult.Status.ERROR, message));
+    public void error(JSONObject jSONObject) {
+        sendPluginResult(new PluginResult(PluginResult.Status.ERROR, jSONObject));
     }
 
-    public void error(String message) {
-        sendPluginResult(new PluginResult(PluginResult.Status.ERROR, message));
+    public void error(String str) {
+        sendPluginResult(new PluginResult(PluginResult.Status.ERROR, str));
     }
 
-    public void error(int message) {
-        sendPluginResult(new PluginResult(PluginResult.Status.ERROR, message));
+    public void error(int i) {
+        sendPluginResult(new PluginResult(PluginResult.Status.ERROR, i));
     }
 }

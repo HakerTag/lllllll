@@ -11,51 +11,67 @@ public class AccessibilityNodeProviderCompat {
     public static final int HOST_VIEW_ID = -1;
     private final Object mProvider;
 
+    public AccessibilityNodeInfoCompat createAccessibilityNodeInfo(int i) {
+        return null;
+    }
+
+    public List<AccessibilityNodeInfoCompat> findAccessibilityNodeInfosByText(String str, int i) {
+        return null;
+    }
+
+    public AccessibilityNodeInfoCompat findFocus(int i) {
+        return null;
+    }
+
+    public boolean performAction(int i, int i2, Bundle bundle) {
+        return false;
+    }
+
     static class AccessibilityNodeProviderApi16 extends AccessibilityNodeProvider {
         final AccessibilityNodeProviderCompat mCompat;
 
-        AccessibilityNodeProviderApi16(AccessibilityNodeProviderCompat compat) {
-            this.mCompat = compat;
+        AccessibilityNodeProviderApi16(AccessibilityNodeProviderCompat accessibilityNodeProviderCompat) {
+            this.mCompat = accessibilityNodeProviderCompat;
         }
 
-        public AccessibilityNodeInfo createAccessibilityNodeInfo(int virtualViewId) {
-            AccessibilityNodeInfoCompat compatInfo = this.mCompat.createAccessibilityNodeInfo(virtualViewId);
-            if (compatInfo == null) {
+        public AccessibilityNodeInfo createAccessibilityNodeInfo(int i) {
+            AccessibilityNodeInfoCompat createAccessibilityNodeInfo = this.mCompat.createAccessibilityNodeInfo(i);
+            if (createAccessibilityNodeInfo == null) {
                 return null;
             }
-            return compatInfo.unwrap();
+            return createAccessibilityNodeInfo.unwrap();
         }
 
         @Override // android.view.accessibility.AccessibilityNodeProvider
-        public List<AccessibilityNodeInfo> findAccessibilityNodeInfosByText(String text, int virtualViewId) {
-            List<AccessibilityNodeInfoCompat> compatInfos = this.mCompat.findAccessibilityNodeInfosByText(text, virtualViewId);
-            if (compatInfos == null) {
+        public List<AccessibilityNodeInfo> findAccessibilityNodeInfosByText(String str, int i) {
+            List<AccessibilityNodeInfoCompat> findAccessibilityNodeInfosByText = this.mCompat.findAccessibilityNodeInfosByText(str, i);
+            if (findAccessibilityNodeInfosByText == null) {
                 return null;
             }
-            List<AccessibilityNodeInfo> infoList = new ArrayList<>();
-            int infoCount = compatInfos.size();
-            for (int i = 0; i < infoCount; i++) {
-                infoList.add(compatInfos.get(i).unwrap());
+            ArrayList arrayList = new ArrayList();
+            int size = findAccessibilityNodeInfosByText.size();
+            for (int i2 = 0; i2 < size; i2++) {
+                arrayList.add(findAccessibilityNodeInfosByText.get(i2).unwrap());
             }
-            return infoList;
+            return arrayList;
         }
 
-        public boolean performAction(int virtualViewId, int action, Bundle arguments) {
-            return this.mCompat.performAction(virtualViewId, action, arguments);
+        public boolean performAction(int i, int i2, Bundle bundle) {
+            return this.mCompat.performAction(i, i2, bundle);
         }
     }
 
     static class AccessibilityNodeProviderApi19 extends AccessibilityNodeProviderApi16 {
-        AccessibilityNodeProviderApi19(AccessibilityNodeProviderCompat compat) {
-            super(compat);
+        AccessibilityNodeProviderApi19(AccessibilityNodeProviderCompat accessibilityNodeProviderCompat) {
+            super(accessibilityNodeProviderCompat);
         }
 
-        public AccessibilityNodeInfo findFocus(int focus) {
-            AccessibilityNodeInfoCompat compatInfo = this.mCompat.findFocus(focus);
-            if (compatInfo == null) {
+        public AccessibilityNodeInfo findFocus(int i) {
+            AccessibilityNodeInfoCompat findFocus = this.mCompat.findFocus(i);
+            if (findFocus == null) {
                 return null;
             }
-            return compatInfo.unwrap();
+            return findFocus.unwrap();
         }
     }
 
@@ -69,27 +85,11 @@ public class AccessibilityNodeProviderCompat {
         }
     }
 
-    public AccessibilityNodeProviderCompat(Object provider) {
-        this.mProvider = provider;
+    public AccessibilityNodeProviderCompat(Object obj) {
+        this.mProvider = obj;
     }
 
     public Object getProvider() {
         return this.mProvider;
-    }
-
-    public AccessibilityNodeInfoCompat createAccessibilityNodeInfo(int virtualViewId) {
-        return null;
-    }
-
-    public boolean performAction(int virtualViewId, int action, Bundle arguments) {
-        return false;
-    }
-
-    public List<AccessibilityNodeInfoCompat> findAccessibilityNodeInfosByText(String text, int virtualViewId) {
-        return null;
-    }
-
-    public AccessibilityNodeInfoCompat findFocus(int focus) {
-        return null;
     }
 }

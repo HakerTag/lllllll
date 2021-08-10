@@ -9,37 +9,33 @@ public final class GeoResultParser extends ResultParser {
 
     @Override // com.google.zxing.client.result.ResultParser
     public GeoParsedResult parse(Result result) {
-        double altitude;
         Matcher matcher = GEO_URL_PATTERN.matcher(getMassagedText(result));
         if (!matcher.matches()) {
             return null;
         }
-        String query = matcher.group(4);
+        String group = matcher.group(4);
         try {
-            double latitude = Double.parseDouble(matcher.group(1));
-            if (latitude <= 90.0d) {
-                if (latitude >= -90.0d) {
-                    double longitude = Double.parseDouble(matcher.group(2));
-                    if (longitude <= 180.0d) {
-                        if (longitude >= -180.0d) {
-                            if (matcher.group(3) == null) {
-                                altitude = 0.0d;
-                            } else {
-                                double altitude2 = Double.parseDouble(matcher.group(3));
-                                if (altitude2 < 0.0d) {
+            double parseDouble = Double.parseDouble(matcher.group(1));
+            if (parseDouble <= 90.0d) {
+                if (parseDouble >= -90.0d) {
+                    double parseDouble2 = Double.parseDouble(matcher.group(2));
+                    if (parseDouble2 <= 180.0d) {
+                        if (parseDouble2 >= -180.0d) {
+                            double d = 0.0d;
+                            if (matcher.group(3) != null) {
+                                double parseDouble3 = Double.parseDouble(matcher.group(3));
+                                if (parseDouble3 < 0.0d) {
                                     return null;
                                 }
-                                altitude = altitude2;
+                                d = parseDouble3;
                             }
-                            return new GeoParsedResult(latitude, longitude, altitude, query);
+                            return new GeoParsedResult(parseDouble, parseDouble2, d, group);
                         }
                     }
-                    return null;
                 }
             }
-            return null;
-        } catch (NumberFormatException e) {
-            return null;
+        } catch (NumberFormatException unused) {
         }
+        return null;
     }
 }

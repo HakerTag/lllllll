@@ -11,29 +11,29 @@ public final class HelpActivity extends Activity {
     private WebView webView;
 
     /* access modifiers changed from: protected */
-    public void onCreate(Bundle icicle) {
-        super.onCreate(icicle);
+    public void onCreate(Bundle bundle) {
+        super.onCreate(bundle);
         setContentView(R.layout.help);
         WebView webView2 = (WebView) findViewById(R.id.help_contents);
         this.webView = webView2;
-        if (icicle == null) {
+        if (bundle == null) {
             webView2.loadUrl(BASE_URL + "index.html");
             return;
         }
-        webView2.restoreState(icicle);
+        webView2.restoreState(bundle);
     }
 
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode != 4 || !this.webView.canGoBack()) {
-            return super.onKeyDown(keyCode, event);
+    public boolean onKeyDown(int i, KeyEvent keyEvent) {
+        if (i != 4 || !this.webView.canGoBack()) {
+            return super.onKeyDown(i, keyEvent);
         }
         this.webView.goBack();
         return true;
     }
 
     /* access modifiers changed from: protected */
-    public void onSaveInstanceState(Bundle icicle) {
-        super.onSaveInstanceState(icicle);
-        this.webView.saveState(icicle);
+    public void onSaveInstanceState(Bundle bundle) {
+        super.onSaveInstanceState(bundle);
+        this.webView.saveState(bundle);
     }
 }

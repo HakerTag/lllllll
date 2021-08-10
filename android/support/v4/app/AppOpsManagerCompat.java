@@ -13,37 +13,37 @@ public final class AppOpsManagerCompat {
     private AppOpsManagerCompat() {
     }
 
-    public static String permissionToOp(String permission) {
+    public static String permissionToOp(String str) {
         if (Build.VERSION.SDK_INT >= 23) {
-            return AppOpsManager.permissionToOp(permission);
+            return AppOpsManager.permissionToOp(str);
         }
         return null;
     }
 
-    public static int noteOp(Context context, String op, int uid, String packageName) {
+    public static int noteOp(Context context, String str, int i, String str2) {
         if (Build.VERSION.SDK_INT >= 19) {
-            return ((AppOpsManager) context.getSystemService("appops")).noteOp(op, uid, packageName);
+            return ((AppOpsManager) context.getSystemService("appops")).noteOp(str, i, str2);
         }
         return 1;
     }
 
-    public static int noteOpNoThrow(Context context, String op, int uid, String packageName) {
+    public static int noteOpNoThrow(Context context, String str, int i, String str2) {
         if (Build.VERSION.SDK_INT >= 19) {
-            return ((AppOpsManager) context.getSystemService("appops")).noteOpNoThrow(op, uid, packageName);
+            return ((AppOpsManager) context.getSystemService("appops")).noteOpNoThrow(str, i, str2);
         }
         return 1;
     }
 
-    public static int noteProxyOp(Context context, String op, String proxiedPackageName) {
+    public static int noteProxyOp(Context context, String str, String str2) {
         if (Build.VERSION.SDK_INT >= 23) {
-            return ((AppOpsManager) context.getSystemService(AppOpsManager.class)).noteProxyOp(op, proxiedPackageName);
+            return ((AppOpsManager) context.getSystemService(AppOpsManager.class)).noteProxyOp(str, str2);
         }
         return 1;
     }
 
-    public static int noteProxyOpNoThrow(Context context, String op, String proxiedPackageName) {
+    public static int noteProxyOpNoThrow(Context context, String str, String str2) {
         if (Build.VERSION.SDK_INT >= 23) {
-            return ((AppOpsManager) context.getSystemService(AppOpsManager.class)).noteProxyOpNoThrow(op, proxiedPackageName);
+            return ((AppOpsManager) context.getSystemService(AppOpsManager.class)).noteProxyOpNoThrow(str, str2);
         }
         return 1;
     }

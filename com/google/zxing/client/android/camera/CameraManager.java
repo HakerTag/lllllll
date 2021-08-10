@@ -41,46 +41,51 @@ public final class CameraManager {
         this.windowManager = (WindowManager) this.context.getSystemService("window");
     }
 
-    public synchronized void openDriver(SurfaceHolder holder) throws IOException {
-        OpenCamera theCamera = this.camera;
-        if (theCamera == null) {
-            theCamera = OpenCameraInterface.open(this.requestedCameraId);
-            if (theCamera != null) {
-                this.camera = theCamera;
+    public synchronized void openDriver(SurfaceHolder surfaceHolder) throws IOException {
+        String str;
+        OpenCamera openCamera = this.camera;
+        if (openCamera == null) {
+            openCamera = OpenCameraInterface.open(this.requestedCameraId);
+            if (openCamera != null) {
+                this.camera = openCamera;
             } else {
                 throw new IOException("Camera.open() failed to return object from driver");
             }
         }
         if (!this.initialized) {
             this.initialized = true;
-            this.configManager.initFromCameraParameters(theCamera);
+            this.configManager.initFromCameraParameters(openCamera);
             if (this.requestedFramingRectWidth > 0 && this.requestedFramingRectHeight > 0) {
                 setManualFramingRect(this.requestedFramingRectWidth, this.requestedFramingRectHeight);
                 this.requestedFramingRectWidth = 0;
                 this.requestedFramingRectHeight = 0;
             }
         }
-        Camera cameraObject = theCamera.getCamera();
-        Camera.Parameters parameters = cameraObject.getParameters();
-        String parametersFlattened = parameters == null ? null : parameters.flatten();
+        Camera camera2 = openCamera.getCamera();
+        Camera.Parameters parameters = camera2.getParameters();
+        if (parameters == null) {
+            str = null;
+        } else {
+            str = parameters.flatten();
+        }
         try {
-            this.configManager.setDesiredCameraParameters(theCamera, false);
-        } catch (RuntimeException e) {
+            this.configManager.setDesiredCameraParameters(openCamera, false);
+        } catch (RuntimeException unused) {
             Log.w(TAG, "Camera rejected parameters. Setting only minimal safe-mode parameters");
-            String str = TAG;
-            Log.i(str, "Resetting to saved camera params: " + parametersFlattened);
-            if (parametersFlattened != null) {
-                Camera.Parameters parameters2 = cameraObject.getParameters();
-                parameters2.unflatten(parametersFlattened);
+            String str2 = TAG;
+            Log.i(str2, "Resetting to saved camera params: " + str);
+            if (str != null) {
+                Camera.Parameters parameters2 = camera2.getParameters();
+                parameters2.unflatten(str);
                 try {
-                    cameraObject.setParameters(parameters2);
-                    this.configManager.setDesiredCameraParameters(theCamera, true);
-                } catch (RuntimeException e2) {
+                    camera2.setParameters(parameters2);
+                    this.configManager.setDesiredCameraParameters(openCamera, true);
+                } catch (RuntimeException unused2) {
                     Log.w(TAG, "Camera rejected even safe-mode parameters! No configuration");
                 }
             }
         }
-        cameraObject.setPreviewDisplay(holder);
+        camera2.setPreviewDisplay(surfaceHolder);
         if (this.torchInitiallyOn) {
             setTorch(true);
         }
@@ -100,11 +105,11 @@ public final class CameraManager {
     }
 
     public synchronized void startPreview() {
-        OpenCamera theCamera = this.camera;
-        if (theCamera != null && !this.previewing) {
-            theCamera.getCamera().startPreview();
+        OpenCamera openCamera = this.camera;
+        if (openCamera != null && !this.previewing) {
+            openCamera.getCamera().startPreview();
             this.previewing = true;
-            this.autoFocusManager = new AutoFocusManager(this.context, theCamera.getCamera());
+            this.autoFocusManager = new AutoFocusManager(this.context, openCamera.getCamera());
         }
     }
 
@@ -124,28 +129,28 @@ public final class CameraManager {
         return this.camera != null && this.configManager.getTorchState(this.camera.getCamera());
     }
 
-    public synchronized void setTorch(boolean newSetting) {
-        OpenCamera theCamera = this.camera;
-        if (!(theCamera == null || newSetting == this.configManager.getTorchState(theCamera.getCamera()))) {
-            boolean wasAutoFocusManager = this.autoFocusManager != null;
-            if (wasAutoFocusManager) {
+    public synchronized void setTorch(boolean z) {
+        OpenCamera openCamera = this.camera;
+        if (!(openCamera == null || z == this.configManager.getTorchState(openCamera.getCamera()))) {
+            boolean z2 = this.autoFocusManager != null;
+            if (z2) {
                 this.autoFocusManager.stop();
                 this.autoFocusManager = null;
             }
-            this.configManager.setTorch(theCamera.getCamera(), newSetting);
-            if (wasAutoFocusManager) {
-                AutoFocusManager autoFocusManager2 = new AutoFocusManager(this.context, theCamera.getCamera());
+            this.configManager.setTorch(openCamera.getCamera(), z);
+            if (z2) {
+                AutoFocusManager autoFocusManager2 = new AutoFocusManager(this.context, openCamera.getCamera());
                 this.autoFocusManager = autoFocusManager2;
                 autoFocusManager2.start();
             }
         }
     }
 
-    public synchronized void requestPreviewFrame(Handler handler, int message) {
-        OpenCamera theCamera = this.camera;
-        if (theCamera != null && this.previewing) {
-            this.previewCallback.setHandler(handler, message);
-            theCamera.getCamera().setOneShotPreviewCallback(this.previewCallback);
+    public synchronized void requestPreviewFrame(Handler handler, int i) {
+        OpenCamera openCamera = this.camera;
+        if (openCamera != null && this.previewing) {
+            this.previewCallback.setHandler(handler, i);
+            openCamera.getCamera().setOneShotPreviewCallback(this.previewCallback);
         }
     }
 
@@ -158,26 +163,23 @@ public final class CameraManager {
             if (screenResolution == null) {
                 return null;
             }
-            int width = findDesiredDimensionInRange(screenResolution.x, 240, MAX_FRAME_WIDTH);
-            int height = findDesiredDimensionInRange(screenResolution.y, 240, MAX_FRAME_HEIGHT);
-            int leftOffset = (screenResolution.x - width) / 2;
-            int topOffset = (screenResolution.y - height) / 2;
-            this.framingRect = new Rect(leftOffset, topOffset, leftOffset + width, topOffset + height);
+            int findDesiredDimensionInRange = findDesiredDimensionInRange(screenResolution.x, 240, MAX_FRAME_WIDTH);
+            int findDesiredDimensionInRange2 = findDesiredDimensionInRange(screenResolution.y, 240, MAX_FRAME_HEIGHT);
+            int i = (screenResolution.x - findDesiredDimensionInRange) / 2;
+            int i2 = (screenResolution.y - findDesiredDimensionInRange2) / 2;
+            this.framingRect = new Rect(i, i2, findDesiredDimensionInRange + i, findDesiredDimensionInRange2 + i2);
             String str = TAG;
             Log.d(str, "Calculated framing rect: " + this.framingRect);
         }
         return this.framingRect;
     }
 
-    private static int findDesiredDimensionInRange(int resolution, int hardMin, int hardMax) {
-        int dim = (resolution * 5) / 8;
-        if (dim < hardMin) {
-            return hardMin;
+    private static int findDesiredDimensionInRange(int i, int i2, int i3) {
+        int i4 = (i * 5) / 8;
+        if (i4 < i2) {
+            return i2;
         }
-        if (dim > hardMax) {
-            return hardMax;
-        }
-        return dim;
+        return i4 > i3 ? i3 : i4;
     }
 
     public synchronized Rect getFramingRectInPreview() {
@@ -208,46 +210,48 @@ public final class CameraManager {
         return this.framingRectInPreview;
     }
 
-    public synchronized void setManualCameraId(int cameraId) {
-        this.requestedCameraId = cameraId;
+    public synchronized void setManualCameraId(int i) {
+        this.requestedCameraId = i;
     }
 
-    public synchronized void setTorchInitiallyOn(boolean on) {
-        this.torchInitiallyOn = on;
+    public synchronized void setTorchInitiallyOn(boolean z) {
+        this.torchInitiallyOn = z;
     }
 
-    public synchronized void setManualFramingRect(int width, int height) {
+    public synchronized void setManualFramingRect(int i, int i2) {
         if (this.initialized) {
             this.framingRect = getFramingRect();
             String str = TAG;
             Log.d(str, "Calculated manual framing rect: " + this.framingRect);
             this.framingRectInPreview = null;
         } else {
-            this.requestedFramingRectWidth = width;
-            this.requestedFramingRectHeight = height;
+            this.requestedFramingRectWidth = i;
+            this.requestedFramingRectHeight = i2;
         }
     }
 
-    public PlanarYUVLuminanceSource buildLuminanceSource(byte[] data, int width, int height) {
-        int width2 = width;
-        int height2 = height;
-        byte[] rotatedData = new byte[data.length];
-        int rotation = this.context.getApplicationContext().getResources().getConfiguration().orientation;
-        if (rotation == 1) {
-            for (int y = 0; y < height2; y++) {
-                for (int x = 0; x < width2; x++) {
-                    rotatedData[(((x * height2) + height2) - y) - 1] = data[(y * width2) + x];
+    public PlanarYUVLuminanceSource buildLuminanceSource(byte[] bArr, int i, int i2) {
+        int i3;
+        int i4;
+        byte[] bArr2 = new byte[bArr.length];
+        int i5 = this.context.getApplicationContext().getResources().getConfiguration().orientation;
+        if (i5 == 1) {
+            for (int i6 = 0; i6 < i2; i6++) {
+                for (int i7 = 0; i7 < i; i7++) {
+                    bArr2[(((i7 * i2) + i2) - i6) - 1] = bArr[(i6 * i) + i7];
                 }
             }
-            width2 = height;
-            height2 = width;
+            i3 = i;
+            i4 = i2;
         } else {
-            rotatedData = null;
+            i4 = i;
+            i3 = i2;
+            bArr2 = null;
         }
-        Rect rect = getFramingRectInPreview();
-        if (rect == null) {
+        Rect framingRectInPreview2 = getFramingRectInPreview();
+        if (framingRectInPreview2 == null) {
             return null;
         }
-        return new PlanarYUVLuminanceSource(rotation == 1 ? rotatedData : data, width2, height2, rect.left, rect.top, rect.width(), rect.height(), false);
+        return new PlanarYUVLuminanceSource(i5 == 1 ? bArr2 : bArr, i4, i3, framingRectInPreview2.left, framingRectInPreview2.top, framingRectInPreview2.width(), framingRectInPreview2.height(), false);
     }
 }

@@ -20,7 +20,26 @@ public abstract class ActionProvider {
         void onActionProviderVisibilityChanged(boolean z);
     }
 
+    public boolean hasSubMenu() {
+        return false;
+    }
+
+    public boolean isVisible() {
+        return true;
+    }
+
     public abstract View onCreateActionView();
+
+    public boolean onPerformDefaultAction() {
+        return false;
+    }
+
+    public void onPrepareSubMenu(SubMenu subMenu) {
+    }
+
+    public boolean overridesItemVisibility() {
+        return false;
+    }
 
     public ActionProvider(Context context) {
         this.mContext = context;
@@ -30,16 +49,8 @@ public abstract class ActionProvider {
         return this.mContext;
     }
 
-    public View onCreateActionView(MenuItem forItem) {
+    public View onCreateActionView(MenuItem menuItem) {
         return onCreateActionView();
-    }
-
-    public boolean overridesItemVisibility() {
-        return false;
-    }
-
-    public boolean isVisible() {
-        return true;
     }
 
     public void refreshVisibility() {
@@ -48,33 +59,22 @@ public abstract class ActionProvider {
         }
     }
 
-    public boolean onPerformDefaultAction() {
-        return false;
-    }
-
-    public boolean hasSubMenu() {
-        return false;
-    }
-
-    public void onPrepareSubMenu(SubMenu subMenu) {
-    }
-
-    public void subUiVisibilityChanged(boolean isVisible) {
+    public void subUiVisibilityChanged(boolean z) {
         SubUiVisibilityListener subUiVisibilityListener = this.mSubUiVisibilityListener;
         if (subUiVisibilityListener != null) {
-            subUiVisibilityListener.onSubUiVisibilityChanged(isVisible);
+            subUiVisibilityListener.onSubUiVisibilityChanged(z);
         }
     }
 
-    public void setSubUiVisibilityListener(SubUiVisibilityListener listener) {
-        this.mSubUiVisibilityListener = listener;
+    public void setSubUiVisibilityListener(SubUiVisibilityListener subUiVisibilityListener) {
+        this.mSubUiVisibilityListener = subUiVisibilityListener;
     }
 
-    public void setVisibilityListener(VisibilityListener listener) {
-        if (!(this.mVisibilityListener == null || listener == null)) {
+    public void setVisibilityListener(VisibilityListener visibilityListener) {
+        if (!(this.mVisibilityListener == null || visibilityListener == null)) {
             Log.w(TAG, "setVisibilityListener: Setting a new ActionProvider.VisibilityListener when one is already set. Are you reusing this " + getClass().getSimpleName() + " instance while it is still in use somewhere else?");
         }
-        this.mVisibilityListener = listener;
+        this.mVisibilityListener = visibilityListener;
     }
 
     public void reset() {

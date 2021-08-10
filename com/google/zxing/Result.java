@@ -12,23 +12,23 @@ public final class Result {
     private final String text;
     private final long timestamp;
 
-    public Result(String text2, byte[] rawBytes2, ResultPoint[] resultPoints2, BarcodeFormat format2) {
-        this(text2, rawBytes2, resultPoints2, format2, System.currentTimeMillis());
+    public Result(String str, byte[] bArr, ResultPoint[] resultPointArr, BarcodeFormat barcodeFormat) {
+        this(str, bArr, resultPointArr, barcodeFormat, System.currentTimeMillis());
     }
 
     /* JADX INFO: this call moved to the top of the method (can break code semantics) */
-    public Result(String text2, byte[] rawBytes2, ResultPoint[] resultPoints2, BarcodeFormat format2, long timestamp2) {
-        this(text2, rawBytes2, rawBytes2 == null ? 0 : rawBytes2.length * 8, resultPoints2, format2, timestamp2);
+    public Result(String str, byte[] bArr, ResultPoint[] resultPointArr, BarcodeFormat barcodeFormat, long j) {
+        this(str, bArr, bArr == null ? 0 : bArr.length * 8, resultPointArr, barcodeFormat, j);
     }
 
-    public Result(String text2, byte[] rawBytes2, int numBits2, ResultPoint[] resultPoints2, BarcodeFormat format2, long timestamp2) {
-        this.text = text2;
-        this.rawBytes = rawBytes2;
-        this.numBits = numBits2;
-        this.resultPoints = resultPoints2;
-        this.format = format2;
+    public Result(String str, byte[] bArr, int i, ResultPoint[] resultPointArr, BarcodeFormat barcodeFormat, long j) {
+        this.text = str;
+        this.rawBytes = bArr;
+        this.numBits = i;
+        this.resultPoints = resultPointArr;
+        this.format = barcodeFormat;
         this.resultMetadata = null;
-        this.timestamp = timestamp2;
+        this.timestamp = j;
     }
 
     public String getText() {
@@ -55,33 +55,33 @@ public final class Result {
         return this.resultMetadata;
     }
 
-    public void putMetadata(ResultMetadataType type, Object value) {
+    public void putMetadata(ResultMetadataType resultMetadataType, Object obj) {
         if (this.resultMetadata == null) {
             this.resultMetadata = new EnumMap(ResultMetadataType.class);
         }
-        this.resultMetadata.put(type, value);
+        this.resultMetadata.put(resultMetadataType, obj);
     }
 
-    public void putAllMetadata(Map<ResultMetadataType, Object> metadata) {
-        if (metadata != null) {
-            Map<ResultMetadataType, Object> map = this.resultMetadata;
-            if (map == null) {
-                this.resultMetadata = metadata;
+    public void putAllMetadata(Map<ResultMetadataType, Object> map) {
+        if (map != null) {
+            Map<ResultMetadataType, Object> map2 = this.resultMetadata;
+            if (map2 == null) {
+                this.resultMetadata = map;
             } else {
-                map.putAll(metadata);
+                map2.putAll(map);
             }
         }
     }
 
-    public void addResultPoints(ResultPoint[] newPoints) {
-        ResultPoint[] oldPoints = this.resultPoints;
-        if (oldPoints == null) {
-            this.resultPoints = newPoints;
-        } else if (newPoints != null && newPoints.length > 0) {
-            ResultPoint[] allPoints = new ResultPoint[(oldPoints.length + newPoints.length)];
-            System.arraycopy(oldPoints, 0, allPoints, 0, oldPoints.length);
-            System.arraycopy(newPoints, 0, allPoints, oldPoints.length, newPoints.length);
-            this.resultPoints = allPoints;
+    public void addResultPoints(ResultPoint[] resultPointArr) {
+        ResultPoint[] resultPointArr2 = this.resultPoints;
+        if (resultPointArr2 == null) {
+            this.resultPoints = resultPointArr;
+        } else if (resultPointArr != null && resultPointArr.length > 0) {
+            ResultPoint[] resultPointArr3 = new ResultPoint[(resultPointArr2.length + resultPointArr.length)];
+            System.arraycopy(resultPointArr2, 0, resultPointArr3, 0, resultPointArr2.length);
+            System.arraycopy(resultPointArr, 0, resultPointArr3, resultPointArr2.length, resultPointArr.length);
+            this.resultPoints = resultPointArr3;
         }
     }
 

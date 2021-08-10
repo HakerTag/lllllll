@@ -5,25 +5,25 @@ import com.google.zxing.ResultPoint;
 public final class AlignmentPattern extends ResultPoint {
     private final float estimatedModuleSize;
 
-    AlignmentPattern(float posX, float posY, float estimatedModuleSize2) {
-        super(posX, posY);
-        this.estimatedModuleSize = estimatedModuleSize2;
+    AlignmentPattern(float f, float f2, float f3) {
+        super(f, f2);
+        this.estimatedModuleSize = f3;
     }
 
     /* access modifiers changed from: package-private */
-    public boolean aboutEquals(float moduleSize, float i, float j) {
-        if (Math.abs(i - getY()) > moduleSize || Math.abs(j - getX()) > moduleSize) {
+    public boolean aboutEquals(float f, float f2, float f3) {
+        if (Math.abs(f2 - getY()) > f || Math.abs(f3 - getX()) > f) {
             return false;
         }
-        float moduleSizeDiff = Math.abs(moduleSize - this.estimatedModuleSize);
-        if (moduleSizeDiff <= 1.0f || moduleSizeDiff <= this.estimatedModuleSize) {
+        float abs = Math.abs(f - this.estimatedModuleSize);
+        if (abs <= 1.0f || abs <= this.estimatedModuleSize) {
             return true;
         }
         return false;
     }
 
     /* access modifiers changed from: package-private */
-    public AlignmentPattern combineEstimate(float i, float j, float newModuleSize) {
-        return new AlignmentPattern((getX() + j) / 2.0f, (getY() + i) / 2.0f, (this.estimatedModuleSize + newModuleSize) / 2.0f);
+    public AlignmentPattern combineEstimate(float f, float f2, float f3) {
+        return new AlignmentPattern((getX() + f2) / 2.0f, (getY() + f) / 2.0f, (this.estimatedModuleSize + f3) / 2.0f);
     }
 }

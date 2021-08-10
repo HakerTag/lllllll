@@ -14,23 +14,23 @@ public final class UPCAReader extends UPCEANReader {
     private final UPCEANReader ean13Reader = new EAN13Reader();
 
     @Override // com.google.zxing.oned.UPCEANReader
-    public Result decodeRow(int rowNumber, BitArray row, int[] startGuardRange, Map<DecodeHintType, ?> hints) throws NotFoundException, FormatException, ChecksumException {
-        return maybeReturnResult(this.ean13Reader.decodeRow(rowNumber, row, startGuardRange, hints));
+    public Result decodeRow(int i, BitArray bitArray, int[] iArr, Map<DecodeHintType, ?> map) throws NotFoundException, FormatException, ChecksumException {
+        return maybeReturnResult(this.ean13Reader.decodeRow(i, bitArray, iArr, map));
     }
 
     @Override // com.google.zxing.oned.OneDReader, com.google.zxing.oned.UPCEANReader
-    public Result decodeRow(int rowNumber, BitArray row, Map<DecodeHintType, ?> hints) throws NotFoundException, FormatException, ChecksumException {
-        return maybeReturnResult(this.ean13Reader.decodeRow(rowNumber, row, hints));
+    public Result decodeRow(int i, BitArray bitArray, Map<DecodeHintType, ?> map) throws NotFoundException, FormatException, ChecksumException {
+        return maybeReturnResult(this.ean13Reader.decodeRow(i, bitArray, map));
     }
 
     @Override // com.google.zxing.Reader, com.google.zxing.oned.OneDReader
-    public Result decode(BinaryBitmap image) throws NotFoundException, FormatException {
-        return maybeReturnResult(this.ean13Reader.decode(image));
+    public Result decode(BinaryBitmap binaryBitmap) throws NotFoundException, FormatException {
+        return maybeReturnResult(this.ean13Reader.decode(binaryBitmap));
     }
 
     @Override // com.google.zxing.Reader, com.google.zxing.oned.OneDReader
-    public Result decode(BinaryBitmap image, Map<DecodeHintType, ?> hints) throws NotFoundException, FormatException {
-        return maybeReturnResult(this.ean13Reader.decode(image, hints));
+    public Result decode(BinaryBitmap binaryBitmap, Map<DecodeHintType, ?> map) throws NotFoundException, FormatException {
+        return maybeReturnResult(this.ean13Reader.decode(binaryBitmap, map));
     }
 
     /* access modifiers changed from: package-private */
@@ -41,8 +41,8 @@ public final class UPCAReader extends UPCEANReader {
 
     /* access modifiers changed from: protected */
     @Override // com.google.zxing.oned.UPCEANReader
-    public int decodeMiddle(BitArray row, int[] startRange, StringBuilder resultString) throws NotFoundException {
-        return this.ean13Reader.decodeMiddle(row, startRange, resultString);
+    public int decodeMiddle(BitArray bitArray, int[] iArr, StringBuilder sb) throws NotFoundException {
+        return this.ean13Reader.decodeMiddle(bitArray, iArr, sb);
     }
 
     private static Result maybeReturnResult(Result result) throws FormatException {

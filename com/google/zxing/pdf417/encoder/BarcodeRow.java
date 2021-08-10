@@ -5,34 +5,35 @@ public final class BarcodeRow {
     private int currentLocation = 0;
     private final byte[] row;
 
-    BarcodeRow(int width) {
-        this.row = new byte[width];
+    BarcodeRow(int i) {
+        this.row = new byte[i];
     }
 
     /* access modifiers changed from: package-private */
-    public void set(int x, byte value) {
-        this.row[x] = value;
+    public void set(int i, byte b) {
+        this.row[i] = b;
     }
 
-    private void set(int x, boolean black) {
-        this.row[x] = black ? (byte) 1 : 0;
+    private void set(int i, boolean z) {
+        this.row[i] = z ? (byte) 1 : 0;
     }
 
     /* access modifiers changed from: package-private */
-    public void addBar(boolean black, int width) {
-        for (int ii = 0; ii < width; ii++) {
-            int i = this.currentLocation;
-            this.currentLocation = i + 1;
-            set(i, black);
+    public void addBar(boolean z, int i) {
+        for (int i2 = 0; i2 < i; i2++) {
+            int i3 = this.currentLocation;
+            this.currentLocation = i3 + 1;
+            set(i3, z);
         }
     }
 
     /* access modifiers changed from: package-private */
-    public byte[] getScaledRow(int scale) {
-        byte[] output = new byte[(this.row.length * scale)];
-        for (int i = 0; i < output.length; i++) {
-            output[i] = this.row[i / scale];
+    public byte[] getScaledRow(int i) {
+        int length = this.row.length * i;
+        byte[] bArr = new byte[length];
+        for (int i2 = 0; i2 < length; i2++) {
+            bArr[i2] = this.row[i2 / i];
         }
-        return output;
+        return bArr;
     }
 }

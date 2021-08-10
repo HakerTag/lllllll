@@ -6,14 +6,14 @@ public final class FinderPattern extends ResultPoint {
     private final int count;
     private final float estimatedModuleSize;
 
-    FinderPattern(float posX, float posY, float estimatedModuleSize2) {
-        this(posX, posY, estimatedModuleSize2, 1);
+    FinderPattern(float f, float f2, float f3) {
+        this(f, f2, f3, 1);
     }
 
-    private FinderPattern(float posX, float posY, float estimatedModuleSize2, int count2) {
-        super(posX, posY);
-        this.estimatedModuleSize = estimatedModuleSize2;
-        this.count = count2;
+    private FinderPattern(float f, float f2, float f3, int i) {
+        super(f, f2);
+        this.estimatedModuleSize = f3;
+        this.count = i;
     }
 
     public float getEstimatedModuleSize() {
@@ -26,21 +26,23 @@ public final class FinderPattern extends ResultPoint {
     }
 
     /* access modifiers changed from: package-private */
-    public boolean aboutEquals(float moduleSize, float i, float j) {
-        if (Math.abs(i - getY()) > moduleSize || Math.abs(j - getX()) > moduleSize) {
+    public boolean aboutEquals(float f, float f2, float f3) {
+        if (Math.abs(f2 - getY()) > f || Math.abs(f3 - getX()) > f) {
             return false;
         }
-        float moduleSizeDiff = Math.abs(moduleSize - this.estimatedModuleSize);
-        if (moduleSizeDiff <= 1.0f || moduleSizeDiff <= this.estimatedModuleSize) {
+        float abs = Math.abs(f - this.estimatedModuleSize);
+        if (abs <= 1.0f || abs <= this.estimatedModuleSize) {
             return true;
         }
         return false;
     }
 
     /* access modifiers changed from: package-private */
-    public FinderPattern combineEstimate(float i, float j, float newModuleSize) {
-        int i2 = this.count;
-        int combinedCount = i2 + 1;
-        return new FinderPattern(((((float) i2) * getX()) + j) / ((float) combinedCount), ((((float) this.count) * getY()) + i) / ((float) combinedCount), ((((float) this.count) * this.estimatedModuleSize) + newModuleSize) / ((float) combinedCount), combinedCount);
+    public FinderPattern combineEstimate(float f, float f2, float f3) {
+        int i = this.count;
+        int i2 = i + 1;
+        float x = (((float) i) * getX()) + f2;
+        float f4 = (float) i2;
+        return new FinderPattern(x / f4, ((((float) this.count) * getY()) + f) / f4, ((((float) this.count) * this.estimatedModuleSize) + f3) / f4, i2);
     }
 }

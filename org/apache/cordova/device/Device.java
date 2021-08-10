@@ -20,33 +20,30 @@ public class Device extends CordovaPlugin {
     public static String uuid;
 
     @Override // org.apache.cordova.CordovaPlugin
-    public void initialize(CordovaInterface cordova, CordovaWebView webView) {
-        super.initialize(cordova, webView);
+    public void initialize(CordovaInterface cordovaInterface, CordovaWebView cordovaWebView) {
+        super.initialize(cordovaInterface, cordovaWebView);
         uuid = getUuid();
     }
 
     @Override // org.apache.cordova.CordovaPlugin
-    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        if (!"getDeviceInfo".equals(action)) {
+    public boolean execute(String str, JSONArray jSONArray, CallbackContext callbackContext) throws JSONException {
+        if (!"getDeviceInfo".equals(str)) {
             return false;
         }
-        JSONObject r = new JSONObject();
-        r.put("uuid", uuid);
-        r.put("version", getOSVersion());
-        r.put("platform", getPlatform());
-        r.put("model", getModel());
-        r.put("manufacturer", getManufacturer());
-        r.put("isVirtual", isVirtual());
-        r.put("serial", getSerialNumber());
-        callbackContext.success(r);
+        JSONObject jSONObject = new JSONObject();
+        jSONObject.put("uuid", uuid);
+        jSONObject.put("version", getOSVersion());
+        jSONObject.put("platform", getPlatform());
+        jSONObject.put("model", getModel());
+        jSONObject.put("manufacturer", getManufacturer());
+        jSONObject.put("isVirtual", isVirtual());
+        jSONObject.put("serial", getSerialNumber());
+        callbackContext.success(jSONObject);
         return true;
     }
 
     public String getPlatform() {
-        if (isAmazonDevice()) {
-            return AMAZON_PLATFORM;
-        }
-        return ANDROID_PLATFORM;
+        return isAmazonDevice() ? AMAZON_PLATFORM : ANDROID_PLATFORM;
     }
 
     public String getUuid() {
@@ -82,10 +79,7 @@ public class Device extends CordovaPlugin {
     }
 
     public boolean isAmazonDevice() {
-        if (Build.MANUFACTURER.equals(AMAZON_DEVICE)) {
-            return true;
-        }
-        return false;
+        return Build.MANUFACTURER.equals(AMAZON_DEVICE);
     }
 
     public boolean isVirtual() {

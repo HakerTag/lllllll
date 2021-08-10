@@ -22,24 +22,24 @@ class MediaBrowserServiceCompatApi21 {
     MediaBrowserServiceCompatApi21() {
     }
 
-    public static Object createService(Context context, ServiceCompatProxy serviceProxy) {
-        return new MediaBrowserServiceAdaptor(context, serviceProxy);
+    public static Object createService(Context context, ServiceCompatProxy serviceCompatProxy) {
+        return new MediaBrowserServiceAdaptor(context, serviceCompatProxy);
     }
 
-    public static void onCreate(Object serviceObj) {
-        ((MediaBrowserService) serviceObj).onCreate();
+    public static void onCreate(Object obj) {
+        ((MediaBrowserService) obj).onCreate();
     }
 
-    public static IBinder onBind(Object serviceObj, Intent intent) {
-        return ((MediaBrowserService) serviceObj).onBind(intent);
+    public static IBinder onBind(Object obj, Intent intent) {
+        return ((MediaBrowserService) obj).onBind(intent);
     }
 
-    public static void setSessionToken(Object serviceObj, Object token) {
-        ((MediaBrowserService) serviceObj).setSessionToken((MediaSession.Token) token);
+    public static void setSessionToken(Object obj, Object obj2) {
+        ((MediaBrowserService) obj).setSessionToken((MediaSession.Token) obj2);
     }
 
-    public static void notifyChildrenChanged(Object serviceObj, String parentId) {
-        ((MediaBrowserService) serviceObj).notifyChildrenChanged(parentId);
+    public static void notifyChildrenChanged(Object obj, String str) {
+        ((MediaBrowserService) obj).notifyChildrenChanged(str);
     }
 
     static class ResultWrapper<T> {
@@ -49,17 +49,17 @@ class MediaBrowserServiceCompatApi21 {
             this.mResultObj = result;
         }
 
-        /* JADX DEBUG: Multi-variable search result rejected for r1v2, resolved type: android.service.media.MediaBrowserService$Result */
+        /* JADX DEBUG: Multi-variable search result rejected for r0v4, resolved type: android.service.media.MediaBrowserService$Result */
         /* JADX DEBUG: Multi-variable search result rejected for r0v5, resolved type: android.service.media.MediaBrowserService$Result */
         /* JADX WARN: Multi-variable type inference failed */
-        public void sendResult(T result) {
-            if (result instanceof List) {
-                this.mResultObj.sendResult(parcelListToItemList(result));
-            } else if (result instanceof Parcel) {
-                T parcel = result;
-                parcel.setDataPosition(0);
-                this.mResultObj.sendResult(MediaBrowser.MediaItem.CREATOR.createFromParcel(parcel));
-                parcel.recycle();
+        public void sendResult(T t) {
+            if (t instanceof List) {
+                this.mResultObj.sendResult(parcelListToItemList(t));
+            } else if (t instanceof Parcel) {
+                T t2 = t;
+                t2.setDataPosition(0);
+                this.mResultObj.sendResult(MediaBrowser.MediaItem.CREATOR.createFromParcel(t2));
+                t2.recycle();
             } else {
                 this.mResultObj.sendResult(null);
             }
@@ -70,12 +70,12 @@ class MediaBrowserServiceCompatApi21 {
         }
 
         /* access modifiers changed from: package-private */
-        public List<MediaBrowser.MediaItem> parcelListToItemList(List<Parcel> parcelList) {
-            if (parcelList == null) {
+        public List<MediaBrowser.MediaItem> parcelListToItemList(List<Parcel> list) {
+            if (list == null) {
                 return null;
             }
             ArrayList arrayList = new ArrayList();
-            for (Parcel parcel : parcelList) {
+            for (Parcel parcel : list) {
                 parcel.setDataPosition(0);
                 arrayList.add(MediaBrowser.MediaItem.CREATOR.createFromParcel(parcel));
                 parcel.recycle();
@@ -88,31 +88,31 @@ class MediaBrowserServiceCompatApi21 {
         final Bundle mExtras;
         final String mRootId;
 
-        BrowserRoot(String rootId, Bundle extras) {
-            this.mRootId = rootId;
-            this.mExtras = extras;
+        BrowserRoot(String str, Bundle bundle) {
+            this.mRootId = str;
+            this.mExtras = bundle;
         }
     }
 
     static class MediaBrowserServiceAdaptor extends MediaBrowserService {
         final ServiceCompatProxy mServiceProxy;
 
-        MediaBrowserServiceAdaptor(Context context, ServiceCompatProxy serviceWrapper) {
+        MediaBrowserServiceAdaptor(Context context, ServiceCompatProxy serviceCompatProxy) {
             attachBaseContext(context);
-            this.mServiceProxy = serviceWrapper;
+            this.mServiceProxy = serviceCompatProxy;
         }
 
-        public MediaBrowserService.BrowserRoot onGetRoot(String clientPackageName, int clientUid, Bundle rootHints) {
-            BrowserRoot browserRoot = this.mServiceProxy.onGetRoot(clientPackageName, clientUid, rootHints == null ? null : new Bundle(rootHints));
-            if (browserRoot == null) {
+        public MediaBrowserService.BrowserRoot onGetRoot(String str, int i, Bundle bundle) {
+            BrowserRoot onGetRoot = this.mServiceProxy.onGetRoot(str, i, bundle == null ? null : new Bundle(bundle));
+            if (onGetRoot == null) {
                 return null;
             }
-            return new MediaBrowserService.BrowserRoot(browserRoot.mRootId, browserRoot.mExtras);
+            return new MediaBrowserService.BrowserRoot(onGetRoot.mRootId, onGetRoot.mExtras);
         }
 
         @Override // android.service.media.MediaBrowserService
-        public void onLoadChildren(String parentId, MediaBrowserService.Result<List<MediaBrowser.MediaItem>> result) {
-            this.mServiceProxy.onLoadChildren(parentId, new ResultWrapper<>(result));
+        public void onLoadChildren(String str, MediaBrowserService.Result<List<MediaBrowser.MediaItem>> result) {
+            this.mServiceProxy.onLoadChildren(str, new ResultWrapper<>(result));
         }
     }
 }

@@ -8,13 +8,13 @@ public final class ErrorCorrection {
     private static final int MODULO_VALUE = 301;
 
     static {
-        int p = 1;
-        for (int i = 0; i < 255; i++) {
-            ALOG[i] = p;
-            LOG[p] = i;
-            p *= 2;
-            if (p >= 256) {
-                p ^= MODULO_VALUE;
+        int i = 1;
+        for (int i2 = 0; i2 < 255; i2++) {
+            ALOG[i2] = i;
+            LOG[i] = i2;
+            i *= 2;
+            if (i >= 256) {
+                i ^= MODULO_VALUE;
             }
         }
     }
@@ -22,38 +22,41 @@ public final class ErrorCorrection {
     private ErrorCorrection() {
     }
 
-    public static String encodeECC200(String codewords, SymbolInfo symbolInfo) {
-        if (codewords.length() == symbolInfo.getDataCapacity()) {
+    public static String encodeECC200(String str, SymbolInfo symbolInfo) {
+        if (str.length() == symbolInfo.getDataCapacity()) {
             StringBuilder sb = new StringBuilder(symbolInfo.getDataCapacity() + symbolInfo.getErrorCodewords());
-            sb.append(codewords);
-            int blockCount = symbolInfo.getInterleavedBlockCount();
-            if (blockCount == 1) {
-                sb.append(createECCBlock(codewords, symbolInfo.getErrorCodewords()));
+            sb.append(str);
+            int interleavedBlockCount = symbolInfo.getInterleavedBlockCount();
+            if (interleavedBlockCount == 1) {
+                sb.append(createECCBlock(str, symbolInfo.getErrorCodewords()));
             } else {
                 sb.setLength(sb.capacity());
-                int[] dataSizes = new int[blockCount];
-                int[] errorSizes = new int[blockCount];
-                int[] startPos = new int[blockCount];
-                for (int i = 0; i < blockCount; i++) {
-                    dataSizes[i] = symbolInfo.getDataLengthForInterleavedBlock(i + 1);
-                    errorSizes[i] = symbolInfo.getErrorLengthForInterleavedBlock(i + 1);
-                    startPos[i] = 0;
+                int[] iArr = new int[interleavedBlockCount];
+                int[] iArr2 = new int[interleavedBlockCount];
+                int[] iArr3 = new int[interleavedBlockCount];
+                int i = 0;
+                while (i < interleavedBlockCount) {
+                    int i2 = i + 1;
+                    iArr[i] = symbolInfo.getDataLengthForInterleavedBlock(i2);
+                    iArr2[i] = symbolInfo.getErrorLengthForInterleavedBlock(i2);
+                    iArr3[i] = 0;
                     if (i > 0) {
-                        startPos[i] = startPos[i - 1] + dataSizes[i];
+                        iArr3[i] = iArr3[i - 1] + iArr[i];
                     }
+                    i = i2;
                 }
-                for (int block = 0; block < blockCount; block++) {
-                    StringBuilder temp = new StringBuilder(dataSizes[block]);
-                    for (int d = block; d < symbolInfo.getDataCapacity(); d += blockCount) {
-                        temp.append(codewords.charAt(d));
+                for (int i3 = 0; i3 < interleavedBlockCount; i3++) {
+                    StringBuilder sb2 = new StringBuilder(iArr[i3]);
+                    for (int i4 = i3; i4 < symbolInfo.getDataCapacity(); i4 += interleavedBlockCount) {
+                        sb2.append(str.charAt(i4));
                     }
-                    String ecc = createECCBlock(temp.toString(), errorSizes[block]);
-                    int pos = 0;
-                    int e = block;
-                    while (e < errorSizes[block] * blockCount) {
-                        sb.setCharAt(symbolInfo.getDataCapacity() + e, ecc.charAt(pos));
-                        e += blockCount;
-                        pos++;
+                    String createECCBlock = createECCBlock(sb2.toString(), iArr2[i3]);
+                    int i5 = i3;
+                    int i6 = 0;
+                    while (i5 < iArr2[i3] * interleavedBlockCount) {
+                        sb.setCharAt(symbolInfo.getDataCapacity() + i5, createECCBlock.charAt(i6));
+                        i5 += interleavedBlockCount;
+                        i6++;
                     }
                 }
             }
@@ -62,57 +65,57 @@ public final class ErrorCorrection {
         throw new IllegalArgumentException("The number of codewords does not match the selected symbol");
     }
 
-    private static String createECCBlock(CharSequence codewords, int numECWords) {
-        return createECCBlock(codewords, 0, codewords.length(), numECWords);
+    private static String createECCBlock(CharSequence charSequence, int i) {
+        return createECCBlock(charSequence, 0, charSequence.length(), i);
     }
 
-    /* JADX INFO: Multiple debug info for r3v6 char[]: [D('i' int), D('eccReversed' char[])] */
-    private static String createECCBlock(CharSequence codewords, int start, int len, int numECWords) {
-        int table = -1;
-        int i = 0;
+    private static String createECCBlock(CharSequence charSequence, int i, int i2, int i3) {
+        int i4 = 0;
         while (true) {
             int[] iArr = FACTOR_SETS;
-            if (i >= iArr.length) {
+            if (i4 >= iArr.length) {
+                i4 = -1;
                 break;
-            } else if (iArr[i] == numECWords) {
-                table = i;
+            } else if (iArr[i4] == i3) {
                 break;
             } else {
-                i++;
+                i4++;
             }
         }
-        if (table >= 0) {
-            int[] poly = FACTORS[table];
-            char[] ecc = new char[numECWords];
-            for (int i2 = 0; i2 < numECWords; i2++) {
-                ecc[i2] = 0;
+        if (i4 >= 0) {
+            int[] iArr2 = FACTORS[i4];
+            char[] cArr = new char[i3];
+            for (int i5 = 0; i5 < i3; i5++) {
+                cArr[i5] = 0;
             }
-            for (int i3 = start; i3 < start + len; i3++) {
-                int m = ecc[numECWords - 1] ^ codewords.charAt(i3);
-                for (int k = numECWords - 1; k > 0; k--) {
-                    if (m == 0 || poly[k] == 0) {
-                        ecc[k] = ecc[k - 1];
+            for (int i6 = i; i6 < i + i2; i6++) {
+                int i7 = i3 - 1;
+                int charAt = cArr[i7] ^ charSequence.charAt(i6);
+                while (i7 > 0) {
+                    if (charAt == 0 || iArr2[i7] == 0) {
+                        cArr[i7] = cArr[i7 - 1];
                     } else {
-                        char c = ecc[k - 1];
-                        int[] iArr2 = ALOG;
-                        int[] iArr3 = LOG;
-                        ecc[k] = (char) (c ^ iArr2[(iArr3[m] + iArr3[poly[k]]) % 255]);
+                        char c = cArr[i7 - 1];
+                        int[] iArr3 = ALOG;
+                        int[] iArr4 = LOG;
+                        cArr[i7] = (char) (c ^ iArr3[(iArr4[charAt] + iArr4[iArr2[i7]]) % 255]);
                     }
+                    i7--;
                 }
-                if (m == 0 || poly[0] == 0) {
-                    ecc[0] = 0;
+                if (charAt == 0 || iArr2[0] == 0) {
+                    cArr[0] = 0;
                 } else {
-                    int[] iArr4 = ALOG;
-                    int[] iArr5 = LOG;
-                    ecc[0] = (char) iArr4[(iArr5[m] + iArr5[poly[0]]) % 255];
+                    int[] iArr5 = ALOG;
+                    int[] iArr6 = LOG;
+                    cArr[0] = (char) iArr5[(iArr6[charAt] + iArr6[iArr2[0]]) % 255];
                 }
             }
-            char[] eccReversed = new char[numECWords];
-            for (int i4 = 0; i4 < numECWords; i4++) {
-                eccReversed[i4] = ecc[(numECWords - i4) - 1];
+            char[] cArr2 = new char[i3];
+            for (int i8 = 0; i8 < i3; i8++) {
+                cArr2[i8] = cArr[(i3 - i8) - 1];
             }
-            return String.valueOf(eccReversed);
+            return String.valueOf(cArr2);
         }
-        throw new IllegalArgumentException("Illegal number of error correction codewords specified: " + numECWords);
+        throw new IllegalArgumentException("Illegal number of error correction codewords specified: " + i3);
     }
 }

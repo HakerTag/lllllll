@@ -5,32 +5,26 @@ import com.google.zxing.Result;
 public final class AddressBookDoCoMoResultParser extends AbstractDoCoMoResultParser {
     @Override // com.google.zxing.client.result.ResultParser
     public AddressBookParsedResult parse(Result result) {
-        String[] rawName;
-        String birthday;
-        String rawText = getMassagedText(result);
-        if (!rawText.startsWith("MECARD:") || (rawName = matchDoCoMoPrefixedField("N:", rawText, true)) == null) {
+        String[] matchDoCoMoPrefixedField;
+        String massagedText = getMassagedText(result);
+        if (!massagedText.startsWith("MECARD:") || (matchDoCoMoPrefixedField = matchDoCoMoPrefixedField("N:", massagedText, true)) == null) {
             return null;
         }
-        String name = parseName(rawName[0]);
-        String pronunciation = matchSingleDoCoMoPrefixedField("SOUND:", rawText, true);
-        String[] phoneNumbers = matchDoCoMoPrefixedField("TEL:", rawText, true);
-        String[] emails = matchDoCoMoPrefixedField("EMAIL:", rawText, true);
-        String note = matchSingleDoCoMoPrefixedField("NOTE:", rawText, false);
-        String[] addresses = matchDoCoMoPrefixedField("ADR:", rawText, true);
-        String birthday2 = matchSingleDoCoMoPrefixedField("BDAY:", rawText, true);
-        if (!isStringOfDigits(birthday2, 8)) {
-            birthday = null;
-        } else {
-            birthday = birthday2;
-        }
-        return new AddressBookParsedResult(maybeWrap(name), null, pronunciation, phoneNumbers, null, emails, null, null, note, addresses, null, matchSingleDoCoMoPrefixedField("ORG:", rawText, true), birthday, null, matchDoCoMoPrefixedField("URL:", rawText, true), null);
+        String parseName = parseName(matchDoCoMoPrefixedField[0]);
+        String matchSingleDoCoMoPrefixedField = matchSingleDoCoMoPrefixedField("SOUND:", massagedText, true);
+        String[] matchDoCoMoPrefixedField2 = matchDoCoMoPrefixedField("TEL:", massagedText, true);
+        String[] matchDoCoMoPrefixedField3 = matchDoCoMoPrefixedField("EMAIL:", massagedText, true);
+        String matchSingleDoCoMoPrefixedField2 = matchSingleDoCoMoPrefixedField("NOTE:", massagedText, false);
+        String[] matchDoCoMoPrefixedField4 = matchDoCoMoPrefixedField("ADR:", massagedText, true);
+        String matchSingleDoCoMoPrefixedField3 = matchSingleDoCoMoPrefixedField("BDAY:", massagedText, true);
+        return new AddressBookParsedResult(maybeWrap(parseName), null, matchSingleDoCoMoPrefixedField, matchDoCoMoPrefixedField2, null, matchDoCoMoPrefixedField3, null, null, matchSingleDoCoMoPrefixedField2, matchDoCoMoPrefixedField4, null, matchSingleDoCoMoPrefixedField("ORG:", massagedText, true), !isStringOfDigits(matchSingleDoCoMoPrefixedField3, 8) ? null : matchSingleDoCoMoPrefixedField3, null, matchDoCoMoPrefixedField("URL:", massagedText, true), null);
     }
 
-    private static String parseName(String name) {
-        int comma = name.indexOf(44);
-        if (comma < 0) {
-            return name;
+    private static String parseName(String str) {
+        int indexOf = str.indexOf(44);
+        if (indexOf < 0) {
+            return str;
         }
-        return name.substring(comma + 1) + ' ' + name.substring(0, comma);
+        return str.substring(indexOf + 1) + ' ' + str.substring(0, indexOf);
     }
 }

@@ -24,46 +24,42 @@ public class SimpleCursorAdapter extends ResourceCursorAdapter {
     }
 
     @Deprecated
-    public SimpleCursorAdapter(Context context, int layout, Cursor c, String[] from, int[] to) {
-        super(context, layout, c);
-        this.mTo = to;
-        this.mOriginalFrom = from;
-        findColumns(c, from);
+    public SimpleCursorAdapter(Context context, int i, Cursor cursor, String[] strArr, int[] iArr) {
+        super(context, i, cursor);
+        this.mTo = iArr;
+        this.mOriginalFrom = strArr;
+        findColumns(cursor, strArr);
     }
 
-    public SimpleCursorAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
-        super(context, layout, c, flags);
-        this.mTo = to;
-        this.mOriginalFrom = from;
-        findColumns(c, from);
+    public SimpleCursorAdapter(Context context, int i, Cursor cursor, String[] strArr, int[] iArr, int i2) {
+        super(context, i, cursor, i2);
+        this.mTo = iArr;
+        this.mOriginalFrom = strArr;
+        findColumns(cursor, strArr);
     }
 
     @Override // android.support.v4.widget.CursorAdapter
     public void bindView(View view, Context context, Cursor cursor) {
-        ViewBinder binder = this.mViewBinder;
-        int count = this.mTo.length;
-        int[] from = this.mFrom;
-        int[] to = this.mTo;
-        for (int i = 0; i < count; i++) {
-            View v = view.findViewById(to[i]);
-            if (v != null) {
-                boolean bound = false;
-                if (binder != null) {
-                    bound = binder.setViewValue(v, cursor, from[i]);
-                }
-                if (bound) {
+        ViewBinder viewBinder = this.mViewBinder;
+        int[] iArr = this.mTo;
+        int length = iArr.length;
+        int[] iArr2 = this.mFrom;
+        for (int i = 0; i < length; i++) {
+            View findViewById = view.findViewById(iArr[i]);
+            if (findViewById != null) {
+                if (viewBinder != null ? viewBinder.setViewValue(findViewById, cursor, iArr2[i]) : false) {
                     continue;
                 } else {
-                    String text = cursor.getString(from[i]);
-                    if (text == null) {
-                        text = "";
+                    String string = cursor.getString(iArr2[i]);
+                    if (string == null) {
+                        string = "";
                     }
-                    if (v instanceof TextView) {
-                        setViewText((TextView) v, text);
-                    } else if (v instanceof ImageView) {
-                        setViewImage((ImageView) v, text);
+                    if (findViewById instanceof TextView) {
+                        setViewText((TextView) findViewById, string);
+                    } else if (findViewById instanceof ImageView) {
+                        setViewImage((ImageView) findViewById, string);
                     } else {
-                        throw new IllegalStateException(v.getClass().getName() + " is not a " + " view that can be bounds by this SimpleCursorAdapter");
+                        throw new IllegalStateException(findViewById.getClass().getName() + " is not a " + " view that can be bounds by this SimpleCursorAdapter");
                     }
                 }
             }
@@ -78,24 +74,24 @@ public class SimpleCursorAdapter extends ResourceCursorAdapter {
         this.mViewBinder = viewBinder;
     }
 
-    public void setViewImage(ImageView v, String value) {
+    public void setViewImage(ImageView imageView, String str) {
         try {
-            v.setImageResource(Integer.parseInt(value));
-        } catch (NumberFormatException e) {
-            v.setImageURI(Uri.parse(value));
+            imageView.setImageResource(Integer.parseInt(str));
+        } catch (NumberFormatException unused) {
+            imageView.setImageURI(Uri.parse(str));
         }
     }
 
-    public void setViewText(TextView v, String text) {
-        v.setText(text);
+    public void setViewText(TextView textView, String str) {
+        textView.setText(str);
     }
 
     public int getStringConversionColumn() {
         return this.mStringConversionColumn;
     }
 
-    public void setStringConversionColumn(int stringConversionColumn) {
-        this.mStringConversionColumn = stringConversionColumn;
+    public void setStringConversionColumn(int i) {
+        this.mStringConversionColumn = i;
     }
 
     public CursorToStringConverter getCursorToStringConverter() {
@@ -119,15 +115,15 @@ public class SimpleCursorAdapter extends ResourceCursorAdapter {
         return super.convertToString(cursor);
     }
 
-    private void findColumns(Cursor c, String[] from) {
-        if (c != null) {
-            int count = from.length;
+    private void findColumns(Cursor cursor, String[] strArr) {
+        if (cursor != null) {
+            int length = strArr.length;
             int[] iArr = this.mFrom;
-            if (iArr == null || iArr.length != count) {
-                this.mFrom = new int[count];
+            if (iArr == null || iArr.length != length) {
+                this.mFrom = new int[length];
             }
-            for (int i = 0; i < count; i++) {
-                this.mFrom[i] = c.getColumnIndexOrThrow(from[i]);
+            for (int i = 0; i < length; i++) {
+                this.mFrom[i] = cursor.getColumnIndexOrThrow(strArr[i]);
             }
             return;
         }
@@ -135,15 +131,15 @@ public class SimpleCursorAdapter extends ResourceCursorAdapter {
     }
 
     @Override // android.support.v4.widget.CursorAdapter
-    public Cursor swapCursor(Cursor c) {
-        findColumns(c, this.mOriginalFrom);
-        return super.swapCursor(c);
+    public Cursor swapCursor(Cursor cursor) {
+        findColumns(cursor, this.mOriginalFrom);
+        return super.swapCursor(cursor);
     }
 
-    public void changeCursorAndColumns(Cursor c, String[] from, int[] to) {
-        this.mOriginalFrom = from;
-        this.mTo = to;
-        findColumns(c, from);
-        super.changeCursor(c);
+    public void changeCursorAndColumns(Cursor cursor, String[] strArr, int[] iArr) {
+        this.mOriginalFrom = strArr;
+        this.mTo = iArr;
+        findColumns(cursor, strArr);
+        super.changeCursor(cursor);
     }
 }

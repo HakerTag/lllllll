@@ -9,8 +9,8 @@ import com.google.zxing.client.result.ParsedResult;
 public final class ISBNResultHandler extends ResultHandler {
     private static final int[] buttons = {R.string.button_product_search, R.string.button_book_search, R.string.button_search_book_contents, R.string.button_custom_product_search};
 
-    public ISBNResultHandler(Activity activity, ParsedResult result, Result rawResult) {
-        super(activity, result, rawResult);
+    public ISBNResultHandler(Activity activity, ParsedResult parsedResult, Result result) {
+        super(activity, parsedResult, result);
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler
@@ -19,21 +19,21 @@ public final class ISBNResultHandler extends ResultHandler {
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler
-    public int getButtonText(int index) {
-        return buttons[index];
+    public int getButtonText(int i) {
+        return buttons[i];
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler
-    public void handleButtonPress(int index) {
-        ISBNParsedResult isbnResult = (ISBNParsedResult) getResult();
-        if (index == 0) {
-            openProductSearch(isbnResult.getISBN());
-        } else if (index == 1) {
-            openBookSearch(isbnResult.getISBN());
-        } else if (index == 2) {
-            searchBookContents(isbnResult.getISBN());
-        } else if (index == 3) {
-            openURL(fillInCustomSearchURL(isbnResult.getISBN()));
+    public void handleButtonPress(int i) {
+        ISBNParsedResult iSBNParsedResult = (ISBNParsedResult) getResult();
+        if (i == 0) {
+            openProductSearch(iSBNParsedResult.getISBN());
+        } else if (i == 1) {
+            openBookSearch(iSBNParsedResult.getISBN());
+        } else if (i == 2) {
+            searchBookContents(iSBNParsedResult.getISBN());
+        } else if (i == 3) {
+            openURL(fillInCustomSearchURL(iSBNParsedResult.getISBN()));
         }
     }
 

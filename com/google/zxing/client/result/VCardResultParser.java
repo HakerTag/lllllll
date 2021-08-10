@@ -25,207 +25,208 @@ public final class VCardResultParser extends ResultParser {
 
     @Override // com.google.zxing.client.result.ResultParser
     public AddressBookParsedResult parse(Result result) {
-        List<String> birthday;
-        String rawText = getMassagedText(result);
-        Matcher m = BEGIN_VCARD.matcher(rawText);
-        String[] geo = null;
-        if (!m.find() || m.start() != 0) {
+        String[] strArr;
+        String[] strArr2;
+        String massagedText = getMassagedText(result);
+        Matcher matcher = BEGIN_VCARD.matcher(massagedText);
+        if (!matcher.find() || matcher.start() != 0) {
             return null;
         }
-        List<List<String>> names = matchVCardPrefixedField("FN", rawText, true, false);
-        if (names == null) {
-            names = matchVCardPrefixedField("N", rawText, true, false);
-            formatNames(names);
+        List<List<String>> matchVCardPrefixedField = matchVCardPrefixedField("FN", massagedText, true, false);
+        if (matchVCardPrefixedField == null) {
+            matchVCardPrefixedField = matchVCardPrefixedField("N", massagedText, true, false);
+            formatNames(matchVCardPrefixedField);
         }
-        List<String> nicknameString = matchSingleVCardPrefixedField("NICKNAME", rawText, true, false);
-        String[] nicknames = nicknameString == null ? null : COMMA.split(nicknameString.get(0));
-        List<List<String>> phoneNumbers = matchVCardPrefixedField("TEL", rawText, true, false);
-        List<List<String>> emails = matchVCardPrefixedField("EMAIL", rawText, true, false);
-        List<String> note = matchSingleVCardPrefixedField("NOTE", rawText, false, false);
-        List<List<String>> addresses = matchVCardPrefixedField("ADR", rawText, true, true);
-        List<String> org2 = matchSingleVCardPrefixedField("ORG", rawText, true, true);
-        List<String> birthday2 = matchSingleVCardPrefixedField("BDAY", rawText, true, false);
-        if (birthday2 == null || isLikeVCardDate(birthday2.get(0))) {
-            birthday = birthday2;
+        List<String> matchSingleVCardPrefixedField = matchSingleVCardPrefixedField("NICKNAME", massagedText, true, false);
+        if (matchSingleVCardPrefixedField == null) {
+            strArr = null;
         } else {
-            birthday = null;
+            strArr = COMMA.split(matchSingleVCardPrefixedField.get(0));
         }
-        List<String> title = matchSingleVCardPrefixedField("TITLE", rawText, true, false);
-        List<List<String>> urls = matchVCardPrefixedField("URL", rawText, true, false);
-        List<String> instantMessenger = matchSingleVCardPrefixedField("IMPP", rawText, true, false);
-        List<String> geoString = matchSingleVCardPrefixedField("GEO", rawText, true, false);
-        if (geoString != null) {
-            geo = SEMICOLON_OR_COMMA.split(geoString.get(0));
+        List<List<String>> matchVCardPrefixedField2 = matchVCardPrefixedField("TEL", massagedText, true, false);
+        List<List<String>> matchVCardPrefixedField3 = matchVCardPrefixedField("EMAIL", massagedText, true, false);
+        List<String> matchSingleVCardPrefixedField2 = matchSingleVCardPrefixedField("NOTE", massagedText, false, false);
+        List<List<String>> matchVCardPrefixedField4 = matchVCardPrefixedField("ADR", massagedText, true, true);
+        List<String> matchSingleVCardPrefixedField3 = matchSingleVCardPrefixedField("ORG", massagedText, true, true);
+        List<String> matchSingleVCardPrefixedField4 = matchSingleVCardPrefixedField("BDAY", massagedText, true, false);
+        List<String> list = (matchSingleVCardPrefixedField4 == null || isLikeVCardDate(matchSingleVCardPrefixedField4.get(0))) ? matchSingleVCardPrefixedField4 : null;
+        List<String> matchSingleVCardPrefixedField5 = matchSingleVCardPrefixedField("TITLE", massagedText, true, false);
+        List<List<String>> matchVCardPrefixedField5 = matchVCardPrefixedField("URL", massagedText, true, false);
+        List<String> matchSingleVCardPrefixedField6 = matchSingleVCardPrefixedField("IMPP", massagedText, true, false);
+        List<String> matchSingleVCardPrefixedField7 = matchSingleVCardPrefixedField("GEO", massagedText, true, false);
+        if (matchSingleVCardPrefixedField7 == null) {
+            strArr2 = null;
+        } else {
+            strArr2 = SEMICOLON_OR_COMMA.split(matchSingleVCardPrefixedField7.get(0));
         }
-        if (!(geo == null || geo.length == 2)) {
-            geo = null;
-        }
-        return new AddressBookParsedResult(toPrimaryValues(names), nicknames, null, toPrimaryValues(phoneNumbers), toTypes(phoneNumbers), toPrimaryValues(emails), toTypes(emails), toPrimaryValue(instantMessenger), toPrimaryValue(note), toPrimaryValues(addresses), toTypes(addresses), toPrimaryValue(org2), toPrimaryValue(birthday), toPrimaryValue(title), toPrimaryValues(urls), geo);
+        return new AddressBookParsedResult(toPrimaryValues(matchVCardPrefixedField), strArr, null, toPrimaryValues(matchVCardPrefixedField2), toTypes(matchVCardPrefixedField2), toPrimaryValues(matchVCardPrefixedField3), toTypes(matchVCardPrefixedField3), toPrimaryValue(matchSingleVCardPrefixedField6), toPrimaryValue(matchSingleVCardPrefixedField2), toPrimaryValues(matchVCardPrefixedField4), toTypes(matchVCardPrefixedField4), toPrimaryValue(matchSingleVCardPrefixedField3), toPrimaryValue(list), toPrimaryValue(matchSingleVCardPrefixedField5), toPrimaryValues(matchVCardPrefixedField5), (strArr2 == null || strArr2.length == 2) ? strArr2 : null);
     }
 
-    static List<List<String>> matchVCardPrefixedField(CharSequence prefix, String rawText, boolean trim, boolean parseFieldDivider) {
+    static List<List<String>> matchVCardPrefixedField(CharSequence charSequence, String str, boolean z, boolean z2) {
+        String str2;
+        boolean z3;
+        ArrayList arrayList;
+        int indexOf;
         int i;
-        int i2;
-        String element;
-        List<List<String>> matches = null;
+        String str3;
+        int length = str.length();
+        int i2 = 0;
         int i3 = 0;
-        int max = rawText.length();
-        while (i3 < max) {
-            Matcher matcher = Pattern.compile("(?:^|\n)" + ((Object) prefix) + "(?:;([^:]*))?:", 2).matcher(rawText);
+        ArrayList arrayList2 = null;
+        while (i3 < length) {
+            Matcher matcher = Pattern.compile("(?:^|\n)" + ((Object) charSequence) + "(?:;([^:]*))?:", 2).matcher(str);
             if (i3 > 0) {
                 i3--;
             }
             if (!matcher.find(i3)) {
                 break;
             }
-            int i4 = matcher.end(0);
-            int i5 = 1;
-            String metadataString = matcher.group(1);
-            List<String> metadata = null;
-            boolean quotedPrintable = false;
-            String quotedPrintableCharset = null;
-            if (metadataString != null) {
-                String[] split = SEMICOLON.split(metadataString);
-                int length = split.length;
-                int i6 = 0;
-                while (i6 < length) {
-                    String metadatum = split[i6];
-                    if (metadata == null) {
-                        metadata = new ArrayList<>(i5);
+            int end = matcher.end(i2);
+            String group = matcher.group(1);
+            if (group != null) {
+                String[] split = SEMICOLON.split(group);
+                int length2 = split.length;
+                int i4 = 0;
+                arrayList = null;
+                z3 = false;
+                str2 = null;
+                while (i4 < length2) {
+                    String str4 = split[i4];
+                    if (arrayList == null) {
+                        arrayList = new ArrayList(1);
                     }
-                    metadata.add(metadatum);
-                    String[] metadatumTokens = EQUALS.split(metadatum, 2);
-                    if (metadatumTokens.length > 1) {
-                        String key = metadatumTokens[0];
-                        String value = metadatumTokens[1];
-                        if ("ENCODING".equalsIgnoreCase(key) && "QUOTED-PRINTABLE".equalsIgnoreCase(value)) {
-                            quotedPrintable = true;
-                        } else if ("CHARSET".equalsIgnoreCase(key)) {
-                            quotedPrintableCharset = value;
+                    arrayList.add(str4);
+                    String[] split2 = EQUALS.split(str4, 2);
+                    if (split2.length > 1) {
+                        String str5 = split2[i2];
+                        String str6 = split2[1];
+                        if ("ENCODING".equalsIgnoreCase(str5) && "QUOTED-PRINTABLE".equalsIgnoreCase(str6)) {
+                            z3 = true;
+                        } else if ("CHARSET".equalsIgnoreCase(str5)) {
+                            str2 = str6;
                         }
                     }
-                    i6++;
-                    matcher = matcher;
-                    i5 = 1;
+                    i4++;
+                    i2 = 0;
                 }
-            }
-            while (true) {
-                int indexOf = rawText.indexOf(10, i4);
-                i = indexOf;
-                if (indexOf < 0) {
-                    break;
-                } else if (i < rawText.length() - 1 && (rawText.charAt(i + 1) == ' ' || rawText.charAt(i + 1) == '\t')) {
-                    i4 = i + 2;
-                } else if (!quotedPrintable) {
-                    break;
-                } else {
-                    if (i < 1 || rawText.charAt(i - 1) != '=') {
-                        if (i >= 2) {
-                            if (rawText.charAt(i - 2) != '=') {
-                                break;
-                            }
-                        } else {
-                            break;
-                        }
-                    }
-                    i4 = i + 1;
-                }
-            }
-            if (i < 0) {
-                i3 = max;
-            } else if (i > i4) {
-                if (matches == null) {
-                    i2 = 1;
-                    matches = new ArrayList<>(1);
-                } else {
-                    i2 = 1;
-                }
-                if (i >= i2 && rawText.charAt(i - 1) == '\r') {
-                    i--;
-                }
-                String element2 = rawText.substring(i4, i);
-                if (trim) {
-                    element2 = element2.trim();
-                }
-                if (quotedPrintable) {
-                    element = decodeQuotedPrintable(element2, quotedPrintableCharset);
-                    if (parseFieldDivider) {
-                        element = UNESCAPED_SEMICOLONS.matcher(element).replaceAll("\n").trim();
-                    }
-                } else {
-                    if (parseFieldDivider) {
-                        element2 = UNESCAPED_SEMICOLONS.matcher(element2).replaceAll("\n").trim();
-                    }
-                    element = VCARD_ESCAPES.matcher(NEWLINE_ESCAPE.matcher(CR_LF_SPACE_TAB.matcher(element2).replaceAll("")).replaceAll("\n")).replaceAll("$1");
-                }
-                if (metadata == null) {
-                    List<String> match = new ArrayList<>(1);
-                    match.add(element);
-                    matches.add(match);
-                } else {
-                    metadata.add(0, element);
-                    matches.add(metadata);
-                }
-                i3 = i + 1;
             } else {
-                i3 = i + 1;
+                arrayList = null;
+                z3 = false;
+                str2 = null;
             }
+            int i5 = end;
+            while (true) {
+                indexOf = str.indexOf(10, i5);
+                if (indexOf >= 0) {
+                    if (indexOf < str.length() - 1) {
+                        int i6 = indexOf + 1;
+                        if (str.charAt(i6) == ' ' || str.charAt(i6) == '\t') {
+                            i5 = indexOf + 2;
+                        }
+                    }
+                    if (!z3 || ((indexOf < 1 || str.charAt(indexOf - 1) != '=') && (indexOf < 2 || str.charAt(indexOf - 2) != '='))) {
+                        break;
+                    }
+                    i5 = indexOf + 1;
+                } else {
+                    break;
+                }
+            }
+            if (indexOf < 0) {
+                i = length;
+            } else {
+                if (indexOf > end) {
+                    if (arrayList2 == null) {
+                        arrayList2 = new ArrayList(1);
+                    }
+                    if (indexOf >= 1 && str.charAt(indexOf - 1) == '\r') {
+                        indexOf--;
+                    }
+                    String substring = str.substring(end, indexOf);
+                    if (z) {
+                        substring = substring.trim();
+                    }
+                    if (z3) {
+                        str3 = decodeQuotedPrintable(substring, str2);
+                        if (z2) {
+                            str3 = UNESCAPED_SEMICOLONS.matcher(str3).replaceAll("\n").trim();
+                        }
+                    } else {
+                        if (z2) {
+                            substring = UNESCAPED_SEMICOLONS.matcher(substring).replaceAll("\n").trim();
+                        }
+                        str3 = VCARD_ESCAPES.matcher(NEWLINE_ESCAPE.matcher(CR_LF_SPACE_TAB.matcher(substring).replaceAll("")).replaceAll("\n")).replaceAll("$1");
+                    }
+                    if (arrayList == null) {
+                        ArrayList arrayList3 = new ArrayList(1);
+                        arrayList3.add(str3);
+                        arrayList2.add(arrayList3);
+                    } else {
+                        arrayList.add(0, str3);
+                        arrayList2.add(arrayList);
+                        i = indexOf + 1;
+                    }
+                }
+                i = indexOf + 1;
+            }
+            i3 = i;
+            i2 = 0;
         }
-        return matches;
+        return arrayList2;
     }
 
-    private static String decodeQuotedPrintable(CharSequence value, String charset) {
-        char nextChar;
-        int length = value.length();
-        StringBuilder result = new StringBuilder(length);
-        ByteArrayOutputStream fragmentBuffer = new ByteArrayOutputStream();
+    private static String decodeQuotedPrintable(CharSequence charSequence, String str) {
+        char charAt;
+        int length = charSequence.length();
+        StringBuilder sb = new StringBuilder(length);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         int i = 0;
         while (i < length) {
-            char c = value.charAt(i);
-            if (!(c == '\n' || c == '\r')) {
-                if (c != '=') {
-                    maybeAppendFragment(fragmentBuffer, charset, result);
-                    result.append(c);
-                } else if (!(i >= length - 2 || (nextChar = value.charAt(i + 1)) == '\r' || nextChar == '\n')) {
-                    char nextNextChar = value.charAt(i + 2);
-                    int firstDigit = parseHexDigit(nextChar);
-                    int secondDigit = parseHexDigit(nextNextChar);
-                    if (firstDigit >= 0 && secondDigit >= 0) {
-                        fragmentBuffer.write((firstDigit << 4) + secondDigit);
-                    }
+            char charAt2 = charSequence.charAt(i);
+            if (!(charAt2 == '\n' || charAt2 == '\r')) {
+                if (charAt2 != '=') {
+                    maybeAppendFragment(byteArrayOutputStream, str, sb);
+                    sb.append(charAt2);
+                } else if (!(i >= length - 2 || (charAt = charSequence.charAt(i + 1)) == '\r' || charAt == '\n')) {
                     i += 2;
+                    char charAt3 = charSequence.charAt(i);
+                    int parseHexDigit = parseHexDigit(charAt);
+                    int parseHexDigit2 = parseHexDigit(charAt3);
+                    if (parseHexDigit >= 0 && parseHexDigit2 >= 0) {
+                        byteArrayOutputStream.write((parseHexDigit << 4) + parseHexDigit2);
+                    }
                 }
             }
             i++;
         }
-        maybeAppendFragment(fragmentBuffer, charset, result);
-        return result.toString();
+        maybeAppendFragment(byteArrayOutputStream, str, sb);
+        return sb.toString();
     }
 
-    private static void maybeAppendFragment(ByteArrayOutputStream fragmentBuffer, String charset, StringBuilder result) {
-        String fragment;
-        if (fragmentBuffer.size() > 0) {
-            byte[] fragmentBytes = fragmentBuffer.toByteArray();
-            if (charset == null) {
-                fragment = new String(fragmentBytes, Charset.forName("UTF-8"));
+    private static void maybeAppendFragment(ByteArrayOutputStream byteArrayOutputStream, String str, StringBuilder sb) {
+        String str2;
+        if (byteArrayOutputStream.size() > 0) {
+            byte[] byteArray = byteArrayOutputStream.toByteArray();
+            if (str == null) {
+                str2 = new String(byteArray, Charset.forName("UTF-8"));
             } else {
                 try {
-                    fragment = new String(fragmentBytes, charset);
-                } catch (UnsupportedEncodingException e) {
-                    fragment = new String(fragmentBytes, Charset.forName("UTF-8"));
+                    str2 = new String(byteArray, str);
+                } catch (UnsupportedEncodingException unused) {
+                    str2 = new String(byteArray, Charset.forName("UTF-8"));
                 }
             }
-            fragmentBuffer.reset();
-            result.append(fragment);
+            byteArrayOutputStream.reset();
+            sb.append(str2);
         }
     }
 
-    static List<String> matchSingleVCardPrefixedField(CharSequence prefix, String rawText, boolean trim, boolean parseFieldDivider) {
-        List<List<String>> values = matchVCardPrefixedField(prefix, rawText, trim, parseFieldDivider);
-        if (values == null || values.isEmpty()) {
+    static List<String> matchSingleVCardPrefixedField(CharSequence charSequence, String str, boolean z, boolean z2) {
+        List<List<String>> matchVCardPrefixedField = matchVCardPrefixedField(charSequence, str, z, z2);
+        if (matchVCardPrefixedField == null || matchVCardPrefixedField.isEmpty()) {
             return null;
         }
-        return values.get(0);
+        return matchVCardPrefixedField.get(0);
     }
 
     private static String toPrimaryValue(List<String> list) {
@@ -235,84 +236,84 @@ public final class VCardResultParser extends ResultParser {
         return list.get(0);
     }
 
-    private static String[] toPrimaryValues(Collection<List<String>> lists) {
-        if (lists == null || lists.isEmpty()) {
+    private static String[] toPrimaryValues(Collection<List<String>> collection) {
+        if (collection == null || collection.isEmpty()) {
             return null;
         }
-        List<String> result = new ArrayList<>(lists.size());
-        for (List<String> list : lists) {
-            String value = list.get(0);
-            if (value != null && !value.isEmpty()) {
-                result.add(value);
+        ArrayList arrayList = new ArrayList(collection.size());
+        for (List<String> list : collection) {
+            String str = list.get(0);
+            if (str != null && !str.isEmpty()) {
+                arrayList.add(str);
             }
         }
-        return (String[]) result.toArray(new String[lists.size()]);
+        return (String[]) arrayList.toArray(new String[collection.size()]);
     }
 
-    private static String[] toTypes(Collection<List<String>> lists) {
-        if (lists == null || lists.isEmpty()) {
+    private static String[] toTypes(Collection<List<String>> collection) {
+        String str;
+        if (collection == null || collection.isEmpty()) {
             return null;
         }
-        List<String> result = new ArrayList<>(lists.size());
-        for (List<String> list : lists) {
-            String type = null;
+        ArrayList arrayList = new ArrayList(collection.size());
+        for (List<String> list : collection) {
             int i = 1;
             while (true) {
                 if (i >= list.size()) {
+                    str = null;
                     break;
                 }
-                String metadatum = list.get(i);
-                int equals = metadatum.indexOf(61);
-                if (equals < 0) {
-                    type = metadatum;
+                str = list.get(i);
+                int indexOf = str.indexOf(61);
+                if (indexOf < 0) {
                     break;
-                } else if (Intents.WifiConnect.TYPE.equalsIgnoreCase(metadatum.substring(0, equals))) {
-                    type = metadatum.substring(equals + 1);
+                } else if (Intents.WifiConnect.TYPE.equalsIgnoreCase(str.substring(0, indexOf))) {
+                    str = str.substring(indexOf + 1);
                     break;
                 } else {
                     i++;
                 }
             }
-            result.add(type);
+            arrayList.add(str);
         }
-        return (String[]) result.toArray(new String[lists.size()]);
+        return (String[]) arrayList.toArray(new String[collection.size()]);
     }
 
-    private static boolean isLikeVCardDate(CharSequence value) {
-        return value == null || VCARD_LIKE_DATE.matcher(value).matches();
+    private static boolean isLikeVCardDate(CharSequence charSequence) {
+        return charSequence == null || VCARD_LIKE_DATE.matcher(charSequence).matches();
     }
 
-    private static void formatNames(Iterable<List<String>> names) {
-        int end;
-        if (names != null) {
-            for (List<String> list : names) {
-                String name = list.get(0);
-                String[] components = new String[5];
-                int start = 0;
-                int componentIndex = 0;
-                while (componentIndex < components.length - 1 && (end = name.indexOf(59, start)) >= 0) {
-                    components[componentIndex] = name.substring(start, end);
-                    componentIndex++;
-                    start = end + 1;
+    private static void formatNames(Iterable<List<String>> iterable) {
+        int indexOf;
+        if (iterable != null) {
+            for (List<String> list : iterable) {
+                String str = list.get(0);
+                String[] strArr = new String[5];
+                int i = 0;
+                int i2 = 0;
+                while (i < 4 && (indexOf = str.indexOf(59, i2)) >= 0) {
+                    strArr[i] = str.substring(i2, indexOf);
+                    i++;
+                    i2 = indexOf + 1;
                 }
-                components[componentIndex] = name.substring(start);
-                StringBuilder newName = new StringBuilder(100);
-                maybeAppendComponent(components, 3, newName);
-                maybeAppendComponent(components, 1, newName);
-                maybeAppendComponent(components, 2, newName);
-                maybeAppendComponent(components, 0, newName);
-                maybeAppendComponent(components, 4, newName);
-                list.set(0, newName.toString().trim());
+                strArr[i] = str.substring(i2);
+                StringBuilder sb = new StringBuilder(100);
+                maybeAppendComponent(strArr, 3, sb);
+                maybeAppendComponent(strArr, 1, sb);
+                maybeAppendComponent(strArr, 2, sb);
+                maybeAppendComponent(strArr, 0, sb);
+                maybeAppendComponent(strArr, 4, sb);
+                list.set(0, sb.toString().trim());
             }
         }
     }
 
-    private static void maybeAppendComponent(String[] components, int i, StringBuilder newName) {
-        if (components[i] != null && !components[i].isEmpty()) {
-            if (newName.length() > 0) {
-                newName.append(' ');
+    private static void maybeAppendComponent(String[] strArr, int i, StringBuilder sb) {
+        if (strArr[i] != null && !strArr[i].isEmpty()) {
+            if (sb.length() > 0) {
+                sb.append(' ');
             }
-            newName.append(components[i]);
+            sb.append(strArr[i]);
         }
     }
 }

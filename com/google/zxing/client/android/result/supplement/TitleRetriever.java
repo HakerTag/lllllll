@@ -15,29 +15,29 @@ public final class TitleRetriever extends SupplementalInfoRetriever {
     private static final Pattern TITLE_PATTERN = Pattern.compile("<title>([^<]+)");
     private final String httpUrl;
 
-    TitleRetriever(TextView textView, URIParsedResult result, HistoryManager historyManager) {
+    TitleRetriever(TextView textView, URIParsedResult uRIParsedResult, HistoryManager historyManager) {
         super(textView, historyManager);
-        this.httpUrl = result.getURI();
+        this.httpUrl = uRIParsedResult.getURI();
     }
 
     /* access modifiers changed from: package-private */
     @Override // com.google.zxing.client.android.result.supplement.SupplementalInfoRetriever
     public void retrieveSupplementalInfo() {
-        String title;
+        String group;
         try {
-            CharSequence contents = HttpHelper.downloadViaHttp(this.httpUrl, HttpHelper.ContentType.HTML, 4096);
-            if (contents != null && contents.length() > 0) {
-                Matcher m = TITLE_PATTERN.matcher(contents);
-                if (m.find() && (title = m.group(1)) != null && !title.isEmpty()) {
-                    String title2 = Html.fromHtml(title).toString();
-                    if (title2.length() > MAX_TITLE_LEN) {
-                        title2 = title2.substring(0, MAX_TITLE_LEN) + "...";
+            CharSequence downloadViaHttp = HttpHelper.downloadViaHttp(this.httpUrl, HttpHelper.ContentType.HTML, 4096);
+            if (downloadViaHttp != null && downloadViaHttp.length() > 0) {
+                Matcher matcher = TITLE_PATTERN.matcher(downloadViaHttp);
+                if (matcher.find() && (group = matcher.group(1)) != null && !group.isEmpty()) {
+                    String obj = Html.fromHtml(group).toString();
+                    if (obj.length() > MAX_TITLE_LEN) {
+                        obj = obj.substring(0, MAX_TITLE_LEN) + "...";
                     }
                     String str = this.httpUrl;
-                    append(str, null, new String[]{title2}, str);
+                    append(str, null, new String[]{obj}, str);
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException unused) {
         }
     }
 }

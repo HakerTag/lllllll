@@ -22,112 +22,112 @@ public final class ArraySet<E> implements Collection<E>, Set<E> {
     private int[] mHashes;
     private int mSize;
 
-    private int indexOf(Object key, int hash) {
-        int N = this.mSize;
-        if (N == 0) {
+    private int indexOf(Object obj, int i) {
+        int i2 = this.mSize;
+        if (i2 == 0) {
             return -1;
         }
-        int index = ContainerHelpers.binarySearch(this.mHashes, N, hash);
-        if (index < 0 || key.equals(this.mArray[index])) {
-            return index;
+        int binarySearch = ContainerHelpers.binarySearch(this.mHashes, i2, i);
+        if (binarySearch < 0 || obj.equals(this.mArray[binarySearch])) {
+            return binarySearch;
         }
-        int end = index + 1;
-        while (end < N && this.mHashes[end] == hash) {
-            if (key.equals(this.mArray[end])) {
-                return end;
+        int i3 = binarySearch + 1;
+        while (i3 < i2 && this.mHashes[i3] == i) {
+            if (obj.equals(this.mArray[i3])) {
+                return i3;
             }
-            end++;
+            i3++;
         }
-        int i = index - 1;
-        while (i >= 0 && this.mHashes[i] == hash) {
-            if (key.equals(this.mArray[i])) {
-                return i;
+        int i4 = binarySearch - 1;
+        while (i4 >= 0 && this.mHashes[i4] == i) {
+            if (obj.equals(this.mArray[i4])) {
+                return i4;
             }
-            i--;
+            i4--;
         }
-        return ~end;
+        return ~i3;
     }
 
     private int indexOfNull() {
-        int N = this.mSize;
-        if (N == 0) {
+        int i = this.mSize;
+        if (i == 0) {
             return -1;
         }
-        int index = ContainerHelpers.binarySearch(this.mHashes, N, 0);
-        if (index < 0 || this.mArray[index] == null) {
-            return index;
+        int binarySearch = ContainerHelpers.binarySearch(this.mHashes, i, 0);
+        if (binarySearch < 0 || this.mArray[binarySearch] == null) {
+            return binarySearch;
         }
-        int end = index + 1;
-        while (end < N && this.mHashes[end] == 0) {
-            if (this.mArray[end] == null) {
-                return end;
+        int i2 = binarySearch + 1;
+        while (i2 < i && this.mHashes[i2] == 0) {
+            if (this.mArray[i2] == null) {
+                return i2;
             }
-            end++;
+            i2++;
         }
-        int i = index - 1;
-        while (i >= 0 && this.mHashes[i] == 0) {
-            if (this.mArray[i] == null) {
-                return i;
+        int i3 = binarySearch - 1;
+        while (i3 >= 0 && this.mHashes[i3] == 0) {
+            if (this.mArray[i3] == null) {
+                return i3;
             }
-            i--;
+            i3--;
         }
-        return ~end;
+        return ~i2;
     }
 
-    private void allocArrays(int size) {
-        if (size == 8) {
+    private void allocArrays(int i) {
+        if (i == 8) {
             synchronized (ArraySet.class) {
                 if (sTwiceBaseCache != null) {
-                    Object[] array = sTwiceBaseCache;
-                    this.mArray = array;
-                    sTwiceBaseCache = (Object[]) array[0];
-                    this.mHashes = (int[]) array[1];
-                    array[1] = null;
-                    array[0] = null;
+                    Object[] objArr = sTwiceBaseCache;
+                    this.mArray = objArr;
+                    sTwiceBaseCache = (Object[]) objArr[0];
+                    this.mHashes = (int[]) objArr[1];
+                    objArr[1] = null;
+                    objArr[0] = null;
                     sTwiceBaseCacheSize--;
                     return;
                 }
             }
-        } else if (size == 4) {
+        } else if (i == 4) {
             synchronized (ArraySet.class) {
                 if (sBaseCache != null) {
-                    Object[] array2 = sBaseCache;
-                    this.mArray = array2;
-                    sBaseCache = (Object[]) array2[0];
-                    this.mHashes = (int[]) array2[1];
-                    array2[1] = null;
-                    array2[0] = null;
+                    Object[] objArr2 = sBaseCache;
+                    this.mArray = objArr2;
+                    sBaseCache = (Object[]) objArr2[0];
+                    this.mHashes = (int[]) objArr2[1];
+                    objArr2[1] = null;
+                    objArr2[0] = null;
                     sBaseCacheSize--;
                     return;
                 }
             }
         }
-        this.mHashes = new int[size];
-        this.mArray = new Object[size];
+        this.mHashes = new int[i];
+        this.mArray = new Object[i];
     }
 
-    private static void freeArrays(int[] hashes, Object[] array, int size) {
-        if (hashes.length == 8) {
+    private static void freeArrays(int[] iArr, Object[] objArr, int i) {
+        if (iArr.length == 8) {
             synchronized (ArraySet.class) {
                 if (sTwiceBaseCacheSize < 10) {
-                    array[0] = sTwiceBaseCache;
-                    array[1] = hashes;
-                    for (int i = size - 1; i >= 2; i--) {
-                        array[i] = null;
+                    objArr[0] = sTwiceBaseCache;
+                    objArr[1] = iArr;
+                    for (int i2 = i - 1; i2 >= 2; i2--) {
+                        objArr[i2] = null;
                     }
-                    sTwiceBaseCache = array;
+                    sTwiceBaseCache = objArr;
                     sTwiceBaseCacheSize++;
                 }
             }
-        } else if (hashes.length == 4) {
+        } else if (iArr.length == 4) {
             synchronized (ArraySet.class) {
                 if (sBaseCacheSize < 10) {
-                    array[0] = sBaseCache;
-                    array[1] = hashes;
-                    for (int i2 = size - 1; i2 >= 2; i2--) {
-                        array[i2] = null;
+                    objArr[0] = sBaseCache;
+                    objArr[1] = iArr;
+                    for (int i3 = i - 1; i3 >= 2; i3--) {
+                        objArr[i3] = null;
                     }
-                    sBaseCache = array;
+                    sBaseCache = objArr;
                     sBaseCacheSize++;
                 }
             }
@@ -138,27 +138,27 @@ public final class ArraySet<E> implements Collection<E>, Set<E> {
         this(0);
     }
 
-    public ArraySet(int capacity) {
-        if (capacity == 0) {
+    public ArraySet(int i) {
+        if (i == 0) {
             this.mHashes = INT;
             this.mArray = OBJECT;
         } else {
-            allocArrays(capacity);
+            allocArrays(i);
         }
         this.mSize = 0;
     }
 
-    public ArraySet(ArraySet<E> set) {
+    public ArraySet(ArraySet<E> arraySet) {
         this();
-        if (set != null) {
-            addAll((ArraySet) set);
+        if (arraySet != null) {
+            addAll((ArraySet) arraySet);
         }
     }
 
-    public ArraySet(Collection<E> set) {
+    public ArraySet(Collection<E> collection) {
         this();
-        if (set != null) {
-            addAll(set);
+        if (collection != null) {
+            addAll(collection);
         }
     }
 
@@ -172,30 +172,30 @@ public final class ArraySet<E> implements Collection<E>, Set<E> {
         }
     }
 
-    public void ensureCapacity(int minimumCapacity) {
-        if (this.mHashes.length < minimumCapacity) {
-            int[] ohashes = this.mHashes;
-            Object[] oarray = this.mArray;
-            allocArrays(minimumCapacity);
-            int i = this.mSize;
-            if (i > 0) {
-                System.arraycopy(ohashes, 0, this.mHashes, 0, i);
-                System.arraycopy(oarray, 0, this.mArray, 0, this.mSize);
+    public void ensureCapacity(int i) {
+        int[] iArr = this.mHashes;
+        if (iArr.length < i) {
+            Object[] objArr = this.mArray;
+            allocArrays(i);
+            int i2 = this.mSize;
+            if (i2 > 0) {
+                System.arraycopy(iArr, 0, this.mHashes, 0, i2);
+                System.arraycopy(objArr, 0, this.mArray, 0, this.mSize);
             }
-            freeArrays(ohashes, oarray, this.mSize);
+            freeArrays(iArr, objArr, this.mSize);
         }
     }
 
-    public boolean contains(Object key) {
-        return indexOf(key) >= 0;
+    public boolean contains(Object obj) {
+        return indexOf(obj) >= 0;
     }
 
-    public int indexOf(Object key) {
-        return key == null ? indexOfNull() : indexOf(key, key.hashCode());
+    public int indexOf(Object obj) {
+        return obj == null ? indexOfNull() : indexOf(obj, obj.hashCode());
     }
 
-    public E valueAt(int index) {
-        return (E) this.mArray[index];
+    public E valueAt(int i) {
+        return (E) this.mArray[i];
     }
 
     public boolean isEmpty() {
@@ -203,143 +203,155 @@ public final class ArraySet<E> implements Collection<E>, Set<E> {
     }
 
     @Override // java.util.Collection, java.util.Set
-    public boolean add(E value) {
-        int index;
-        int hash;
-        if (value == null) {
-            hash = 0;
-            index = indexOfNull();
+    public boolean add(E e) {
+        int i;
+        int i2;
+        if (e == null) {
+            i2 = indexOfNull();
+            i = 0;
         } else {
-            hash = value.hashCode();
-            index = indexOf(value, hash);
+            int hashCode = e.hashCode();
+            i = hashCode;
+            i2 = indexOf(e, hashCode);
         }
-        if (index >= 0) {
+        if (i2 >= 0) {
             return false;
         }
-        int index2 = ~index;
-        int i = this.mSize;
-        if (i >= this.mHashes.length) {
-            int n = 4;
-            if (i >= 8) {
-                n = (i >> 1) + i;
-            } else if (i >= 4) {
-                n = 8;
+        int i3 = ~i2;
+        int i4 = this.mSize;
+        if (i4 >= this.mHashes.length) {
+            int i5 = 4;
+            if (i4 >= 8) {
+                i5 = (i4 >> 1) + i4;
+            } else if (i4 >= 4) {
+                i5 = 8;
             }
-            int[] ohashes = this.mHashes;
-            Object[] oarray = this.mArray;
-            allocArrays(n);
             int[] iArr = this.mHashes;
-            if (iArr.length > 0) {
-                System.arraycopy(ohashes, 0, iArr, 0, ohashes.length);
-                System.arraycopy(oarray, 0, this.mArray, 0, oarray.length);
-            }
-            freeArrays(ohashes, oarray, this.mSize);
-        }
-        int i2 = this.mSize;
-        if (index2 < i2) {
-            int[] iArr2 = this.mHashes;
-            System.arraycopy(iArr2, index2, iArr2, index2 + 1, i2 - index2);
             Object[] objArr = this.mArray;
-            System.arraycopy(objArr, index2, objArr, index2 + 1, this.mSize - index2);
+            allocArrays(i5);
+            int[] iArr2 = this.mHashes;
+            if (iArr2.length > 0) {
+                System.arraycopy(iArr, 0, iArr2, 0, iArr.length);
+                System.arraycopy(objArr, 0, this.mArray, 0, objArr.length);
+            }
+            freeArrays(iArr, objArr, this.mSize);
         }
-        this.mHashes[index2] = hash;
-        this.mArray[index2] = value;
+        int i6 = this.mSize;
+        if (i3 < i6) {
+            int[] iArr3 = this.mHashes;
+            int i7 = i3 + 1;
+            System.arraycopy(iArr3, i3, iArr3, i7, i6 - i3);
+            Object[] objArr2 = this.mArray;
+            System.arraycopy(objArr2, i3, objArr2, i7, this.mSize - i3);
+        }
+        this.mHashes[i3] = i;
+        this.mArray[i3] = e;
         this.mSize++;
         return true;
     }
 
-    public void append(E value) {
-        int index = this.mSize;
-        int hash = value == null ? 0 : value.hashCode();
-        int[] iArr = this.mHashes;
-        if (index >= iArr.length) {
-            throw new IllegalStateException("Array is full");
-        } else if (index <= 0 || iArr[index - 1] <= hash) {
-            this.mSize = index + 1;
-            this.mHashes[index] = hash;
-            this.mArray[index] = value;
+    public void append(E e) {
+        int i;
+        int i2 = this.mSize;
+        if (e == null) {
+            i = 0;
         } else {
-            add(value);
+            i = e.hashCode();
+        }
+        int[] iArr = this.mHashes;
+        if (i2 >= iArr.length) {
+            throw new IllegalStateException("Array is full");
+        } else if (i2 <= 0 || iArr[i2 - 1] <= i) {
+            this.mSize = i2 + 1;
+            this.mHashes[i2] = i;
+            this.mArray[i2] = e;
+        } else {
+            add(e);
         }
     }
 
     /* JADX DEBUG: Multi-variable search result rejected for r4v0, resolved type: android.support.v4.util.ArraySet<E> */
-    /* JADX DEBUG: Multi-variable search result rejected for r2v0, resolved type: java.lang.Object */
+    /* JADX DEBUG: Multi-variable search result rejected for r1v3, resolved type: java.lang.Object */
     /* JADX WARN: Multi-variable type inference failed */
-    public void addAll(ArraySet<? extends E> array) {
-        int N = array.mSize;
-        ensureCapacity(this.mSize + N);
+    public void addAll(ArraySet<? extends E> arraySet) {
+        int i = arraySet.mSize;
+        ensureCapacity(this.mSize + i);
         if (this.mSize != 0) {
-            for (int i = 0; i < N; i++) {
-                add(array.valueAt(i));
+            for (int i2 = 0; i2 < i; i2++) {
+                add(arraySet.valueAt(i2));
             }
-        } else if (N > 0) {
-            System.arraycopy(array.mHashes, 0, this.mHashes, 0, N);
-            System.arraycopy(array.mArray, 0, this.mArray, 0, N);
-            this.mSize = N;
+        } else if (i > 0) {
+            System.arraycopy(arraySet.mHashes, 0, this.mHashes, 0, i);
+            System.arraycopy(arraySet.mArray, 0, this.mArray, 0, i);
+            this.mSize = i;
         }
     }
 
-    public boolean remove(Object object) {
-        int index = indexOf(object);
-        if (index < 0) {
+    public boolean remove(Object obj) {
+        int indexOf = indexOf(obj);
+        if (indexOf < 0) {
             return false;
         }
-        removeAt(index);
+        removeAt(indexOf);
         return true;
     }
 
-    public E removeAt(int index) {
+    public E removeAt(int i) {
         Object[] objArr = this.mArray;
-        E e = (E) objArr[index];
-        int i = this.mSize;
-        if (i <= 1) {
-            freeArrays(this.mHashes, objArr, i);
+        E e = (E) objArr[i];
+        int i2 = this.mSize;
+        if (i2 <= 1) {
+            freeArrays(this.mHashes, objArr, i2);
             this.mHashes = INT;
             this.mArray = OBJECT;
             this.mSize = 0;
         } else {
             int[] iArr = this.mHashes;
-            int n = 8;
-            if (iArr.length <= 8 || i >= iArr.length / 3) {
-                int i2 = this.mSize - 1;
-                this.mSize = i2;
-                if (index < i2) {
+            int i3 = 8;
+            if (iArr.length <= 8 || i2 >= iArr.length / 3) {
+                int i4 = this.mSize - 1;
+                this.mSize = i4;
+                if (i < i4) {
                     int[] iArr2 = this.mHashes;
-                    System.arraycopy(iArr2, index + 1, iArr2, index, i2 - index);
+                    int i5 = i + 1;
+                    System.arraycopy(iArr2, i5, iArr2, i, i4 - i);
                     Object[] objArr2 = this.mArray;
-                    System.arraycopy(objArr2, index + 1, objArr2, index, this.mSize - index);
+                    System.arraycopy(objArr2, i5, objArr2, i, this.mSize - i);
                 }
                 this.mArray[this.mSize] = null;
             } else {
-                if (i > 8) {
-                    n = i + (i >> 1);
+                if (i2 > 8) {
+                    i3 = i2 + (i2 >> 1);
                 }
-                int[] ohashes = this.mHashes;
-                Object[] oarray = this.mArray;
-                allocArrays(n);
+                int[] iArr3 = this.mHashes;
+                Object[] objArr3 = this.mArray;
+                allocArrays(i3);
                 this.mSize--;
-                if (index > 0) {
-                    System.arraycopy(ohashes, 0, this.mHashes, 0, index);
-                    System.arraycopy(oarray, 0, this.mArray, 0, index);
+                if (i > 0) {
+                    System.arraycopy(iArr3, 0, this.mHashes, 0, i);
+                    System.arraycopy(objArr3, 0, this.mArray, 0, i);
                 }
-                int i3 = this.mSize;
-                if (index < i3) {
-                    System.arraycopy(ohashes, index + 1, this.mHashes, index, i3 - index);
-                    System.arraycopy(oarray, index + 1, this.mArray, index, this.mSize - index);
+                int i6 = this.mSize;
+                if (i < i6) {
+                    int i7 = i + 1;
+                    System.arraycopy(iArr3, i7, this.mHashes, i, i6 - i);
+                    System.arraycopy(objArr3, i7, this.mArray, i, this.mSize - i);
                 }
             }
         }
         return e;
     }
 
-    public boolean removeAll(ArraySet<? extends E> array) {
-        int N = array.mSize;
-        int originalSize = this.mSize;
-        for (int i = 0; i < N; i++) {
-            remove(array.valueAt(i));
+    public boolean removeAll(ArraySet<? extends E> arraySet) {
+        int i = arraySet.mSize;
+        int i2 = this.mSize;
+        for (int i3 = 0; i3 < i; i3++) {
+            remove(arraySet.valueAt(i3));
         }
-        return originalSize != this.mSize;
+        if (i2 != this.mSize) {
+            return true;
+        }
+        return false;
     }
 
     public int size() {
@@ -348,81 +360,77 @@ public final class ArraySet<E> implements Collection<E>, Set<E> {
 
     public Object[] toArray() {
         int i = this.mSize;
-        Object[] result = new Object[i];
-        System.arraycopy(this.mArray, 0, result, 0, i);
-        return result;
+        Object[] objArr = new Object[i];
+        System.arraycopy(this.mArray, 0, objArr, 0, i);
+        return objArr;
     }
 
-    /* JADX WARN: Multi-variable type inference failed */
-    /* JADX WARN: Type inference failed for: r0v8, types: [java.lang.Object[]] */
     @Override // java.util.Collection, java.util.Set
-    public <T> T[] toArray(T[] array) {
-        if (array.length < this.mSize) {
-            array = (Object[]) Array.newInstance(array.getClass().getComponentType(), this.mSize);
+    public <T> T[] toArray(T[] tArr) {
+        T[] tArr2;
+        if (tArr.length < this.mSize) {
+            tArr = (T[]) ((Object[]) Array.newInstance(tArr.getClass().getComponentType(), this.mSize));
         }
-        System.arraycopy(this.mArray, 0, array, 0, this.mSize);
-        int length = array.length;
+        System.arraycopy(this.mArray, 0, tArr2, 0, this.mSize);
+        int length = tArr2.length;
         int i = this.mSize;
         if (length > i) {
-            array[i] = null;
+            tArr2[i] = null;
         }
-        return array;
+        return tArr2;
     }
 
-    public boolean equals(Object object) {
-        if (this == object) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (!(object instanceof Set)) {
-            return false;
-        }
-        Set<?> set = (Set) object;
-        if (size() != set.size()) {
-            return false;
-        }
-        for (int i = 0; i < this.mSize; i++) {
-            try {
-                if (!set.contains(valueAt(i))) {
-                    return false;
-                }
-            } catch (NullPointerException e) {
-                return false;
-            } catch (ClassCastException e2) {
+        if (obj instanceof Set) {
+            Set set = (Set) obj;
+            if (size() != set.size()) {
                 return false;
             }
+            for (int i = 0; i < this.mSize; i++) {
+                try {
+                    if (!set.contains(valueAt(i))) {
+                        return false;
+                    }
+                } catch (ClassCastException | NullPointerException unused) {
+                }
+            }
+            return true;
         }
-        return true;
+        return false;
     }
 
     public int hashCode() {
-        int[] hashes = this.mHashes;
-        int result = 0;
-        int s = this.mSize;
-        for (int i = 0; i < s; i++) {
-            result += hashes[i];
+        int[] iArr = this.mHashes;
+        int i = this.mSize;
+        int i2 = 0;
+        for (int i3 = 0; i3 < i; i3++) {
+            i2 += iArr[i3];
         }
-        return result;
+        return i2;
     }
 
     public String toString() {
         if (isEmpty()) {
             return "{}";
         }
-        StringBuilder buffer = new StringBuilder(this.mSize * 14);
-        buffer.append('{');
+        StringBuilder sb = new StringBuilder(this.mSize * 14);
+        sb.append('{');
         for (int i = 0; i < this.mSize; i++) {
             if (i > 0) {
-                buffer.append(", ");
+                sb.append(", ");
             }
-            Object value = valueAt(i);
-            if (value != this) {
-                buffer.append(value);
+            E valueAt = valueAt(i);
+            if (valueAt != this) {
+                sb.append((Object) valueAt);
             } else {
-                buffer.append("(this Set)");
+                sb.append("(this Set)");
             }
         }
-        buffer.append('}');
-        return buffer.toString();
+        sb.append('}');
+        return sb.toString();
     }
 
     private MapCollections<E, E> getCollection() {
@@ -438,20 +446,20 @@ public final class ArraySet<E> implements Collection<E>, Set<E> {
 
                 /* access modifiers changed from: protected */
                 @Override // android.support.v4.util.MapCollections
-                public Object colGetEntry(int index, int offset) {
-                    return ArraySet.this.mArray[index];
+                public Object colGetEntry(int i, int i2) {
+                    return ArraySet.this.mArray[i];
                 }
 
                 /* access modifiers changed from: protected */
                 @Override // android.support.v4.util.MapCollections
-                public int colIndexOfKey(Object key) {
-                    return ArraySet.this.indexOf(key);
+                public int colIndexOfKey(Object obj) {
+                    return ArraySet.this.indexOf(obj);
                 }
 
                 /* access modifiers changed from: protected */
                 @Override // android.support.v4.util.MapCollections
-                public int colIndexOfValue(Object value) {
-                    return ArraySet.this.indexOf(value);
+                public int colIndexOfValue(Object obj) {
+                    return ArraySet.this.indexOf(obj);
                 }
 
                 /* access modifiers changed from: protected */
@@ -462,20 +470,20 @@ public final class ArraySet<E> implements Collection<E>, Set<E> {
 
                 /* access modifiers changed from: protected */
                 @Override // android.support.v4.util.MapCollections
-                public void colPut(E key, E e) {
-                    ArraySet.this.add(key);
+                public void colPut(E e, E e2) {
+                    ArraySet.this.add(e);
                 }
 
                 /* access modifiers changed from: protected */
                 @Override // android.support.v4.util.MapCollections
-                public E colSetValue(int index, E e) {
+                public E colSetValue(int i, E e) {
                     throw new UnsupportedOperationException("not a map");
                 }
 
                 /* access modifiers changed from: protected */
                 @Override // android.support.v4.util.MapCollections
-                public void colRemoveAt(int index) {
-                    ArraySet.this.removeAt(index);
+                public void colRemoveAt(int i) {
+                    ArraySet.this.removeAt(i);
                 }
 
                 /* access modifiers changed from: protected */
@@ -504,39 +512,39 @@ public final class ArraySet<E> implements Collection<E>, Set<E> {
         return true;
     }
 
-    /* JADX DEBUG: Multi-variable search result rejected for r4v0, resolved type: android.support.v4.util.ArraySet<E> */
-    /* JADX DEBUG: Multi-variable search result rejected for r2v1, resolved type: java.lang.Object */
+    /* JADX DEBUG: Multi-variable search result rejected for r2v0, resolved type: android.support.v4.util.ArraySet<E> */
+    /* JADX DEBUG: Multi-variable search result rejected for r1v2, resolved type: java.lang.Object */
     /* JADX WARN: Multi-variable type inference failed */
     @Override // java.util.Collection, java.util.Set
     public boolean addAll(Collection<? extends E> collection) {
         ensureCapacity(this.mSize + collection.size());
-        boolean added = false;
         Iterator<? extends E> it = collection.iterator();
+        boolean z = false;
         while (it.hasNext()) {
-            added |= add(it.next());
+            z |= add(it.next());
         }
-        return added;
+        return z;
     }
 
     @Override // java.util.Collection, java.util.Set
     public boolean removeAll(Collection<?> collection) {
-        boolean removed = false;
         Iterator<?> it = collection.iterator();
+        boolean z = false;
         while (it.hasNext()) {
-            removed |= remove(it.next());
+            z |= remove(it.next());
         }
-        return removed;
+        return z;
     }
 
     @Override // java.util.Collection, java.util.Set
     public boolean retainAll(Collection<?> collection) {
-        boolean removed = false;
+        boolean z = false;
         for (int i = this.mSize - 1; i >= 0; i--) {
             if (!collection.contains(this.mArray[i])) {
                 removeAt(i);
-                removed = true;
+                z = true;
             }
         }
-        return removed;
+        return z;
     }
 }

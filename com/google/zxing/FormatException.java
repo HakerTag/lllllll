@@ -12,15 +12,15 @@ public final class FormatException extends ReaderException {
     private FormatException() {
     }
 
-    private FormatException(Throwable cause) {
-        super(cause);
+    private FormatException(Throwable th) {
+        super(th);
     }
 
     public static FormatException getFormatInstance() {
         return isStackTrace ? new FormatException() : INSTANCE;
     }
 
-    public static FormatException getFormatInstance(Throwable cause) {
-        return isStackTrace ? new FormatException(cause) : INSTANCE;
+    public static FormatException getFormatInstance(Throwable th) {
+        return isStackTrace ? new FormatException(th) : INSTANCE;
     }
 }

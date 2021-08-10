@@ -7,20 +7,14 @@ import com.google.zxing.oned.UPCEReader;
 public final class ProductResultParser extends ResultParser {
     @Override // com.google.zxing.client.result.ResultParser
     public ProductParsedResult parse(Result result) {
-        String normalizedProductID;
-        BarcodeFormat format = result.getBarcodeFormat();
-        if (format != BarcodeFormat.UPC_A && format != BarcodeFormat.UPC_E && format != BarcodeFormat.EAN_8 && format != BarcodeFormat.EAN_13) {
+        BarcodeFormat barcodeFormat = result.getBarcodeFormat();
+        if (barcodeFormat != BarcodeFormat.UPC_A && barcodeFormat != BarcodeFormat.UPC_E && barcodeFormat != BarcodeFormat.EAN_8 && barcodeFormat != BarcodeFormat.EAN_13) {
             return null;
         }
-        String rawText = getMassagedText(result);
-        if (!isStringOfDigits(rawText, rawText.length())) {
+        String massagedText = getMassagedText(result);
+        if (!isStringOfDigits(massagedText, massagedText.length())) {
             return null;
         }
-        if (format == BarcodeFormat.UPC_E && rawText.length() == 8) {
-            normalizedProductID = UPCEReader.convertUPCEtoUPCA(rawText);
-        } else {
-            normalizedProductID = rawText;
-        }
-        return new ProductParsedResult(rawText, normalizedProductID);
+        return new ProductParsedResult(massagedText, (barcodeFormat == BarcodeFormat.UPC_E && massagedText.length() == 8) ? UPCEReader.convertUPCEtoUPCA(massagedText) : massagedText);
     }
 }

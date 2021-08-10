@@ -5,7 +5,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -16,180 +15,179 @@ public abstract class ResultParser {
     private static final Pattern EQUALS = Pattern.compile("=");
     private static final ResultParser[] PARSERS = {new BookmarkDoCoMoResultParser(), new AddressBookDoCoMoResultParser(), new EmailDoCoMoResultParser(), new AddressBookAUResultParser(), new VCardResultParser(), new BizcardResultParser(), new VEventResultParser(), new EmailAddressResultParser(), new SMTPResultParser(), new TelResultParser(), new SMSMMSResultParser(), new SMSTOMMSTOResultParser(), new GeoResultParser(), new WifiResultParser(), new URLTOResultParser(), new URIResultParser(), new ISBNResultParser(), new ProductResultParser(), new ExpandedProductResultParser(), new VINResultParser()};
 
-    public abstract ParsedResult parse(Result result);
-
-    protected static String getMassagedText(Result result) {
-        String text = result.getText();
-        if (text.startsWith(BYTE_ORDER_MARK)) {
-            return text.substring(1);
-        }
-        return text;
-    }
-
-    public static ParsedResult parseResult(Result theResult) {
-        for (ResultParser parser : PARSERS) {
-            ParsedResult result = parser.parse(theResult);
-            if (result != null) {
-                return result;
-            }
-        }
-        return new TextParsedResult(theResult.getText(), null);
-    }
-
-    protected static void maybeAppend(String value, StringBuilder result) {
-        if (value != null) {
-            result.append('\n');
-            result.append(value);
-        }
-    }
-
-    protected static void maybeAppend(String[] value, StringBuilder result) {
-        if (value != null) {
-            for (String s : value) {
-                result.append('\n');
-                result.append(s);
-            }
-        }
-    }
-
-    protected static String[] maybeWrap(String value) {
-        if (value == null) {
+    protected static String[] maybeWrap(String str) {
+        if (str == null) {
             return null;
         }
-        return new String[]{value};
-    }
-
-    protected static String unescapeBackslash(String escaped) {
-        int backslash = escaped.indexOf(92);
-        if (backslash < 0) {
-            return escaped;
-        }
-        int max = escaped.length();
-        StringBuilder unescaped = new StringBuilder(max - 1);
-        unescaped.append(escaped.toCharArray(), 0, backslash);
-        boolean nextIsEscaped = false;
-        for (int i = backslash; i < max; i++) {
-            char c = escaped.charAt(i);
-            if (nextIsEscaped || c != '\\') {
-                unescaped.append(c);
-                nextIsEscaped = false;
-            } else {
-                nextIsEscaped = true;
-            }
-        }
-        return unescaped.toString();
+        return new String[]{str};
     }
 
     protected static int parseHexDigit(char c) {
         if (c >= '0' && c <= '9') {
             return c - '0';
         }
-        if (c >= 'a' && c <= 'f') {
-            return (c - 'a') + 10;
+        char c2 = 'a';
+        if (c < 'a' || c > 'f') {
+            c2 = 'A';
+            if (c < 'A' || c > 'F') {
+                return -1;
+            }
         }
-        if (c < 'A' || c > 'F') {
-            return -1;
-        }
-        return (c - 'A') + 10;
+        return (c - c2) + 10;
     }
 
-    protected static boolean isStringOfDigits(CharSequence value, int length) {
-        return value != null && length > 0 && length == value.length() && DIGITS.matcher(value).matches();
+    public abstract ParsedResult parse(Result result);
+
+    protected static String getMassagedText(Result result) {
+        String text = result.getText();
+        return text.startsWith(BYTE_ORDER_MARK) ? text.substring(1) : text;
     }
 
-    protected static boolean isSubstringOfDigits(CharSequence value, int offset, int length) {
-        int max;
-        if (value == null || length <= 0 || value.length() < (max = offset + length) || !DIGITS.matcher(value.subSequence(offset, max)).matches()) {
-            return false;
+    public static ParsedResult parseResult(Result result) {
+        for (ResultParser resultParser : PARSERS) {
+            ParsedResult parse = resultParser.parse(result);
+            if (parse != null) {
+                return parse;
+            }
         }
-        return true;
+        return new TextParsedResult(result.getText(), null);
     }
 
-    static Map<String, String> parseNameValuePairs(String uri) {
-        int paramStart = uri.indexOf(63);
-        if (paramStart < 0) {
-            return null;
+    protected static void maybeAppend(String str, StringBuilder sb) {
+        if (str != null) {
+            sb.append('\n');
+            sb.append(str);
         }
-        Map<String, String> result = new HashMap<>(3);
-        for (String keyValue : AMPERSAND.split(uri.substring(paramStart + 1))) {
-            appendKeyValue(keyValue, result);
-        }
-        return result;
     }
 
-    private static void appendKeyValue(CharSequence keyValue, Map<String, String> result) {
-        String[] keyValueTokens = EQUALS.split(keyValue, 2);
-        if (keyValueTokens.length == 2) {
-            try {
-                result.put(keyValueTokens[0], urlDecode(keyValueTokens[1]));
-            } catch (IllegalArgumentException e) {
+    protected static void maybeAppend(String[] strArr, StringBuilder sb) {
+        if (strArr != null) {
+            for (String str : strArr) {
+                sb.append('\n');
+                sb.append(str);
             }
         }
     }
 
-    static String urlDecode(String encoded) {
-        try {
-            return URLDecoder.decode(encoded, "UTF-8");
-        } catch (UnsupportedEncodingException uee) {
-            throw new IllegalStateException(uee);
+    protected static String unescapeBackslash(String str) {
+        int indexOf = str.indexOf(92);
+        if (indexOf < 0) {
+            return str;
+        }
+        int length = str.length();
+        StringBuilder sb = new StringBuilder(length - 1);
+        sb.append(str.toCharArray(), 0, indexOf);
+        boolean z = false;
+        while (indexOf < length) {
+            char charAt = str.charAt(indexOf);
+            if (z || charAt != '\\') {
+                sb.append(charAt);
+                z = false;
+            } else {
+                z = true;
+            }
+            indexOf++;
+        }
+        return sb.toString();
+    }
+
+    protected static boolean isStringOfDigits(CharSequence charSequence, int i) {
+        return charSequence != null && i > 0 && i == charSequence.length() && DIGITS.matcher(charSequence).matches();
+    }
+
+    protected static boolean isSubstringOfDigits(CharSequence charSequence, int i, int i2) {
+        int i3;
+        return charSequence != null && i2 > 0 && charSequence.length() >= (i3 = i2 + i) && DIGITS.matcher(charSequence.subSequence(i, i3)).matches();
+    }
+
+    static Map<String, String> parseNameValuePairs(String str) {
+        int indexOf = str.indexOf(63);
+        if (indexOf < 0) {
+            return null;
+        }
+        HashMap hashMap = new HashMap(3);
+        for (String str2 : AMPERSAND.split(str.substring(indexOf + 1))) {
+            appendKeyValue(str2, hashMap);
+        }
+        return hashMap;
+    }
+
+    private static void appendKeyValue(CharSequence charSequence, Map<String, String> map) {
+        String[] split = EQUALS.split(charSequence, 2);
+        if (split.length == 2) {
+            try {
+                map.put(split[0], urlDecode(split[1]));
+            } catch (IllegalArgumentException unused) {
+            }
         }
     }
 
-    static String[] matchPrefixedField(String prefix, String rawText, char endChar, boolean trim) {
-        List<String> matches = null;
+    static String urlDecode(String str) {
+        try {
+            return URLDecoder.decode(str, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    static String[] matchPrefixedField(String str, String str2, char c, boolean z) {
+        int length = str2.length();
+        ArrayList arrayList = null;
         int i = 0;
-        int max = rawText.length();
-        while (i < max) {
-            int i2 = rawText.indexOf(prefix, i);
-            if (i2 < 0) {
+        while (i < length) {
+            int indexOf = str2.indexOf(str, i);
+            if (indexOf < 0) {
                 break;
             }
-            i = i2 + prefix.length();
-            boolean more = true;
-            while (more) {
-                int i3 = rawText.indexOf(endChar, i);
-                if (i3 < 0) {
-                    i = rawText.length();
-                    more = false;
-                } else if (countPrecedingBackslashes(rawText, i3) % 2 != 0) {
-                    i = i3 + 1;
+            int length2 = indexOf + str.length();
+            ArrayList arrayList2 = arrayList;
+            boolean z2 = true;
+            int i2 = length2;
+            while (z2) {
+                int indexOf2 = str2.indexOf(c, i2);
+                if (indexOf2 < 0) {
+                    i2 = str2.length();
+                } else if (countPrecedingBackslashes(str2, indexOf2) % 2 != 0) {
+                    i2 = indexOf2 + 1;
                 } else {
-                    if (matches == null) {
-                        matches = new ArrayList<>(3);
+                    if (arrayList2 == null) {
+                        arrayList2 = new ArrayList(3);
                     }
-                    String element = unescapeBackslash(rawText.substring(i, i3));
-                    if (trim) {
-                        element = element.trim();
+                    String unescapeBackslash = unescapeBackslash(str2.substring(length2, indexOf2));
+                    if (z) {
+                        unescapeBackslash = unescapeBackslash.trim();
                     }
-                    if (!element.isEmpty()) {
-                        matches.add(element);
+                    if (!unescapeBackslash.isEmpty()) {
+                        arrayList2.add(unescapeBackslash);
                     }
-                    i = i3 + 1;
-                    more = false;
+                    i2 = indexOf2 + 1;
                 }
+                z2 = false;
             }
+            i = i2;
+            arrayList = arrayList2;
         }
-        if (matches == null || matches.isEmpty()) {
+        if (arrayList == null || arrayList.isEmpty()) {
             return null;
         }
-        return (String[]) matches.toArray(new String[matches.size()]);
+        return (String[]) arrayList.toArray(new String[arrayList.size()]);
     }
 
-    private static int countPrecedingBackslashes(CharSequence s, int pos) {
-        int count = 0;
-        int i = pos - 1;
-        while (i >= 0 && s.charAt(i) == '\\') {
-            count++;
-            i--;
+    private static int countPrecedingBackslashes(CharSequence charSequence, int i) {
+        int i2 = i - 1;
+        int i3 = 0;
+        while (i2 >= 0 && charSequence.charAt(i2) == '\\') {
+            i3++;
+            i2--;
         }
-        return count;
+        return i3;
     }
 
-    static String matchSinglePrefixedField(String prefix, String rawText, char endChar, boolean trim) {
-        String[] matches = matchPrefixedField(prefix, rawText, endChar, trim);
-        if (matches == null) {
+    static String matchSinglePrefixedField(String str, String str2, char c, boolean z) {
+        String[] matchPrefixedField = matchPrefixedField(str, str2, c, z);
+        if (matchPrefixedField == null) {
             return null;
         }
-        return matches[0];
+        return matchPrefixedField[0];
     }
 }

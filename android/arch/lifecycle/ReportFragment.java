@@ -20,10 +20,10 @@ public class ReportFragment extends Fragment {
     }
 
     public static void injectIfNeededIn(Activity activity) {
-        FragmentManager manager = activity.getFragmentManager();
-        if (manager.findFragmentByTag(REPORT_FRAGMENT_TAG) == null) {
-            manager.beginTransaction().add(new ReportFragment(), REPORT_FRAGMENT_TAG).commit();
-            manager.executePendingTransactions();
+        FragmentManager fragmentManager = activity.getFragmentManager();
+        if (fragmentManager.findFragmentByTag(REPORT_FRAGMENT_TAG) == null) {
+            fragmentManager.beginTransaction().add(new ReportFragment(), REPORT_FRAGMENT_TAG).commit();
+            fragmentManager.executePendingTransactions();
         }
     }
 
@@ -31,26 +31,26 @@ public class ReportFragment extends Fragment {
         return (ReportFragment) activity.getFragmentManager().findFragmentByTag(REPORT_FRAGMENT_TAG);
     }
 
-    private void dispatchCreate(ActivityInitializationListener listener) {
-        if (listener != null) {
-            listener.onCreate();
+    private void dispatchCreate(ActivityInitializationListener activityInitializationListener) {
+        if (activityInitializationListener != null) {
+            activityInitializationListener.onCreate();
         }
     }
 
-    private void dispatchStart(ActivityInitializationListener listener) {
-        if (listener != null) {
-            listener.onStart();
+    private void dispatchStart(ActivityInitializationListener activityInitializationListener) {
+        if (activityInitializationListener != null) {
+            activityInitializationListener.onStart();
         }
     }
 
-    private void dispatchResume(ActivityInitializationListener listener) {
-        if (listener != null) {
-            listener.onResume();
+    private void dispatchResume(ActivityInitializationListener activityInitializationListener) {
+        if (activityInitializationListener != null) {
+            activityInitializationListener.onResume();
         }
     }
 
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onActivityCreated(Bundle bundle) {
+        super.onActivityCreated(bundle);
         dispatchCreate(this.mProcessListener);
         dispatch(Lifecycle.Event.ON_CREATE);
     }
@@ -96,7 +96,7 @@ public class ReportFragment extends Fragment {
     }
 
     /* access modifiers changed from: package-private */
-    public void setProcessListener(ActivityInitializationListener processListener) {
-        this.mProcessListener = processListener;
+    public void setProcessListener(ActivityInitializationListener activityInitializationListener) {
+        this.mProcessListener = activityInitializationListener;
     }
 }

@@ -18,14 +18,14 @@ public class StatusBar extends CordovaPlugin {
     private static final String TAG = "StatusBar";
 
     @Override // org.apache.cordova.CordovaPlugin
-    public void initialize(final CordovaInterface cordova, CordovaWebView webView) {
+    public void initialize(final CordovaInterface cordovaInterface, CordovaWebView cordovaWebView) {
         LOG.v(TAG, "StatusBar: initialization");
-        super.initialize(cordova, webView);
+        super.initialize(cordovaInterface, cordovaWebView);
         this.cordova.getActivity().runOnUiThread(new Runnable() {
             /* class org.apache.cordova.statusbar.StatusBar.AnonymousClass1 */
 
             public void run() {
-                cordova.getActivity().getWindow().clearFlags(2048);
+                cordovaInterface.getActivity().getWindow().clearFlags(2048);
                 StatusBar statusBar = StatusBar.this;
                 statusBar.setStatusBarBackgroundColor(statusBar.preferences.getString("StatusBarBackgroundColor", "#000000"));
                 StatusBar statusBar2 = StatusBar.this;
@@ -35,17 +35,17 @@ public class StatusBar extends CordovaPlugin {
     }
 
     @Override // org.apache.cordova.CordovaPlugin
-    public boolean execute(String action, final CordovaArgs args, CallbackContext callbackContext) throws JSONException {
-        LOG.v(TAG, "Executing action: " + action);
+    public boolean execute(String str, final CordovaArgs cordovaArgs, CallbackContext callbackContext) throws JSONException {
+        LOG.v(TAG, "Executing action: " + str);
         final Window window = this.cordova.getActivity().getWindow();
-        boolean statusBarVisible = false;
-        if ("_ready".equals(action)) {
+        boolean z = false;
+        if ("_ready".equals(str)) {
             if ((window.getAttributes().flags & 1024) == 0) {
-                statusBarVisible = true;
+                z = true;
             }
-            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, statusBarVisible));
+            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, z));
             return true;
-        } else if ("show".equals(action)) {
+        } else if ("show".equals(str)) {
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 /* class org.apache.cordova.statusbar.StatusBar.AnonymousClass2 */
 
@@ -57,7 +57,7 @@ public class StatusBar extends CordovaPlugin {
                 }
             });
             return true;
-        } else if ("hide".equals(action)) {
+        } else if ("hide".equals(str)) {
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 /* class org.apache.cordova.statusbar.StatusBar.AnonymousClass3 */
 
@@ -69,36 +69,36 @@ public class StatusBar extends CordovaPlugin {
                 }
             });
             return true;
-        } else if ("backgroundColorByHexString".equals(action)) {
+        } else if ("backgroundColorByHexString".equals(str)) {
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 /* class org.apache.cordova.statusbar.StatusBar.AnonymousClass4 */
 
                 public void run() {
                     try {
-                        StatusBar.this.setStatusBarBackgroundColor(args.getString(0));
-                    } catch (JSONException e) {
+                        StatusBar.this.setStatusBarBackgroundColor(cordovaArgs.getString(0));
+                    } catch (JSONException unused) {
                         LOG.e(StatusBar.TAG, "Invalid hexString argument, use f.i. '#777777'");
                     }
                 }
             });
             return true;
-        } else if ("overlaysWebView".equals(action)) {
+        } else if ("overlaysWebView".equals(str)) {
             if (Build.VERSION.SDK_INT < 21) {
-                return !args.getBoolean(0);
+                return !cordovaArgs.getBoolean(0);
             }
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 /* class org.apache.cordova.statusbar.StatusBar.AnonymousClass5 */
 
                 public void run() {
                     try {
-                        StatusBar.this.setStatusBarTransparent(args.getBoolean(0));
-                    } catch (JSONException e) {
+                        StatusBar.this.setStatusBarTransparent(cordovaArgs.getBoolean(0));
+                    } catch (JSONException unused) {
                         LOG.e(StatusBar.TAG, "Invalid boolean argument");
                     }
                 }
             });
             return true;
-        } else if ("styleDefault".equals(action)) {
+        } else if ("styleDefault".equals(str)) {
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 /* class org.apache.cordova.statusbar.StatusBar.AnonymousClass6 */
 
@@ -107,7 +107,7 @@ public class StatusBar extends CordovaPlugin {
                 }
             });
             return true;
-        } else if ("styleLightContent".equals(action)) {
+        } else if ("styleLightContent".equals(str)) {
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 /* class org.apache.cordova.statusbar.StatusBar.AnonymousClass7 */
 
@@ -116,7 +116,7 @@ public class StatusBar extends CordovaPlugin {
                 }
             });
             return true;
-        } else if ("styleBlackTranslucent".equals(action)) {
+        } else if ("styleBlackTranslucent".equals(str)) {
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 /* class org.apache.cordova.statusbar.StatusBar.AnonymousClass8 */
 
@@ -125,7 +125,7 @@ public class StatusBar extends CordovaPlugin {
                 }
             });
             return true;
-        } else if (!"styleBlackOpaque".equals(action)) {
+        } else if (!"styleBlackOpaque".equals(str)) {
             return false;
         } else {
             this.cordova.getActivity().runOnUiThread(new Runnable() {
@@ -141,16 +141,16 @@ public class StatusBar extends CordovaPlugin {
 
     /* access modifiers changed from: private */
     /* access modifiers changed from: public */
-    private void setStatusBarBackgroundColor(String colorPref) {
-        if (Build.VERSION.SDK_INT >= 21 && colorPref != null && !colorPref.isEmpty()) {
+    private void setStatusBarBackgroundColor(String str) {
+        if (Build.VERSION.SDK_INT >= 21 && str != null && !str.isEmpty()) {
             Window window = this.cordova.getActivity().getWindow();
             window.clearFlags(67108864);
             window.addFlags(Integer.MIN_VALUE);
             try {
-                window.getClass().getMethod("setStatusBarColor", Integer.TYPE).invoke(window, Integer.valueOf(Color.parseColor(colorPref)));
-            } catch (IllegalArgumentException e) {
+                window.getClass().getMethod("setStatusBarColor", Integer.TYPE).invoke(window, Integer.valueOf(Color.parseColor(str)));
+            } catch (IllegalArgumentException unused) {
                 LOG.e(TAG, "Invalid hexString argument, use f.i. '#999999'");
-            } catch (Exception e2) {
+            } catch (Exception unused2) {
                 LOG.w(TAG, "Method window.setStatusBarColor not found for SDK level " + Build.VERSION.SDK_INT);
             }
         }
@@ -158,10 +158,10 @@ public class StatusBar extends CordovaPlugin {
 
     /* access modifiers changed from: private */
     /* access modifiers changed from: public */
-    private void setStatusBarTransparent(boolean transparent) {
+    private void setStatusBarTransparent(boolean z) {
         if (Build.VERSION.SDK_INT >= 21) {
             Window window = this.cordova.getActivity().getWindow();
-            if (transparent) {
+            if (z) {
                 window.getDecorView().setSystemUiVisibility(1280);
                 window.setStatusBarColor(0);
                 return;
@@ -172,15 +172,15 @@ public class StatusBar extends CordovaPlugin {
 
     /* access modifiers changed from: private */
     /* access modifiers changed from: public */
-    private void setStatusBarStyle(String style) {
-        if (Build.VERSION.SDK_INT >= 23 && style != null && !style.isEmpty()) {
+    private void setStatusBarStyle(String str) {
+        if (Build.VERSION.SDK_INT >= 23 && str != null && !str.isEmpty()) {
             View decorView = this.cordova.getActivity().getWindow().getDecorView();
-            int uiOptions = decorView.getSystemUiVisibility();
-            String[] lightContentStyles = {"lightcontent", "blacktranslucent", "blackopaque"};
-            if (Arrays.asList("default").contains(style.toLowerCase())) {
-                decorView.setSystemUiVisibility(uiOptions | 8192);
-            } else if (Arrays.asList(lightContentStyles).contains(style.toLowerCase())) {
-                decorView.setSystemUiVisibility(uiOptions & -8193);
+            int systemUiVisibility = decorView.getSystemUiVisibility();
+            String[] strArr = {"lightcontent", "blacktranslucent", "blackopaque"};
+            if (Arrays.asList("default").contains(str.toLowerCase())) {
+                decorView.setSystemUiVisibility(systemUiVisibility | 8192);
+            } else if (Arrays.asList(strArr).contains(str.toLowerCase())) {
+                decorView.setSystemUiVisibility(systemUiVisibility & -8193);
             } else {
                 LOG.e(TAG, "Invalid style, must be either 'default', 'lightcontent' or the deprecated 'blacktranslucent' and 'blackopaque'");
             }

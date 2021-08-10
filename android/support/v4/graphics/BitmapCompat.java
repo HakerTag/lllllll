@@ -7,14 +7,14 @@ public final class BitmapCompat {
     static final BitmapCompatBaseImpl IMPL;
 
     static class BitmapCompatBaseImpl {
-        BitmapCompatBaseImpl() {
-        }
-
         public boolean hasMipMap(Bitmap bitmap) {
             return false;
         }
 
-        public void setHasMipMap(Bitmap bitmap, boolean hasMipMap) {
+        public void setHasMipMap(Bitmap bitmap, boolean z) {
+        }
+
+        BitmapCompatBaseImpl() {
         }
 
         public int getAllocationByteCount(Bitmap bitmap) {
@@ -32,8 +32,8 @@ public final class BitmapCompat {
         }
 
         @Override // android.support.v4.graphics.BitmapCompat.BitmapCompatBaseImpl
-        public void setHasMipMap(Bitmap bitmap, boolean hasMipMap) {
-            bitmap.setHasMipMap(hasMipMap);
+        public void setHasMipMap(Bitmap bitmap, boolean z) {
+            bitmap.setHasMipMap(z);
         }
     }
 
@@ -61,8 +61,8 @@ public final class BitmapCompat {
         return IMPL.hasMipMap(bitmap);
     }
 
-    public static void setHasMipMap(Bitmap bitmap, boolean hasMipMap) {
-        IMPL.setHasMipMap(bitmap, hasMipMap);
+    public static void setHasMipMap(Bitmap bitmap, boolean z) {
+        IMPL.setHasMipMap(bitmap, z);
     }
 
     public static int getAllocationByteCount(Bitmap bitmap) {

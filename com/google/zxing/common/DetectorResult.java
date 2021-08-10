@@ -6,9 +6,9 @@ public class DetectorResult {
     private final BitMatrix bits;
     private final ResultPoint[] points;
 
-    public DetectorResult(BitMatrix bits2, ResultPoint[] points2) {
-        this.bits = bits2;
-        this.points = points2;
+    public DetectorResult(BitMatrix bitMatrix, ResultPoint[] resultPointArr) {
+        this.bits = bitMatrix;
+        this.points = resultPointArr;
     }
 
     public final BitMatrix getBits() {

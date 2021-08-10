@@ -10,22 +10,22 @@ public class PlaybackStateCompatApi22 {
     PlaybackStateCompatApi22() {
     }
 
-    public static Bundle getExtras(Object stateObj) {
-        return ((PlaybackState) stateObj).getExtras();
+    public static Bundle getExtras(Object obj) {
+        return ((PlaybackState) obj).getExtras();
     }
 
-    public static Object newInstance(int state, long position, long bufferedPosition, float speed, long actions, CharSequence errorMessage, long updateTime, List<Object> customActions, long activeItemId, Bundle extras) {
-        PlaybackState.Builder stateObj = new PlaybackState.Builder();
-        stateObj.setState(state, position, speed, updateTime);
-        stateObj.setBufferedPosition(bufferedPosition);
-        stateObj.setActions(actions);
-        stateObj.setErrorMessage(errorMessage);
-        Iterator<Object> it = customActions.iterator();
+    public static Object newInstance(int i, long j, long j2, float f, long j3, CharSequence charSequence, long j4, List<Object> list, long j5, Bundle bundle) {
+        PlaybackState.Builder builder = new PlaybackState.Builder();
+        builder.setState(i, j, f, j4);
+        builder.setBufferedPosition(j2);
+        builder.setActions(j3);
+        builder.setErrorMessage(charSequence);
+        Iterator<Object> it = list.iterator();
         while (it.hasNext()) {
-            stateObj.addCustomAction((PlaybackState.CustomAction) it.next());
+            builder.addCustomAction((PlaybackState.CustomAction) it.next());
         }
-        stateObj.setActiveQueueItemId(activeItemId);
-        stateObj.setExtras(extras);
-        return stateObj.build();
+        builder.setActiveQueueItemId(j5);
+        builder.setExtras(bundle);
+        return builder.build();
     }
 }

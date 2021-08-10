@@ -2,6 +2,7 @@ package com.google.zxing.qrcode.decoder;
 
 import com.google.zxing.FormatException;
 import com.google.zxing.common.BitMatrix;
+import kotlin.jvm.internal.IntCompanionObject;
 
 public final class Version {
     private static final Version[] VERSIONS = buildVersions();
@@ -11,17 +12,17 @@ public final class Version {
     private final int totalCodewords;
     private final int versionNumber;
 
-    private Version(int versionNumber2, int[] alignmentPatternCenters2, ECBlocks... ecBlocks2) {
-        this.versionNumber = versionNumber2;
-        this.alignmentPatternCenters = alignmentPatternCenters2;
-        this.ecBlocks = ecBlocks2;
-        int total = 0;
-        int ecCodewords = ecBlocks2[0].getECCodewordsPerBlock();
-        ECB[] ecbArray = ecBlocks2[0].getECBlocks();
-        for (ECB ecBlock : ecbArray) {
-            total += ecBlock.getCount() * (ecBlock.getDataCodewords() + ecCodewords);
+    private Version(int i, int[] iArr, ECBlocks... eCBlocksArr) {
+        this.versionNumber = i;
+        this.alignmentPatternCenters = iArr;
+        this.ecBlocks = eCBlocksArr;
+        int eCCodewordsPerBlock = eCBlocksArr[0].getECCodewordsPerBlock();
+        ECB[] eCBlocks = eCBlocksArr[0].getECBlocks();
+        int i2 = 0;
+        for (ECB ecb : eCBlocks) {
+            i2 += ecb.getCount() * (ecb.getDataCodewords() + eCCodewordsPerBlock);
         }
-        this.totalCodewords = total;
+        this.totalCodewords = i2;
     }
 
     public int getVersionNumber() {
@@ -40,15 +41,15 @@ public final class Version {
         return (this.versionNumber * 4) + 17;
     }
 
-    public ECBlocks getECBlocksForLevel(ErrorCorrectionLevel ecLevel) {
-        return this.ecBlocks[ecLevel.ordinal()];
+    public ECBlocks getECBlocksForLevel(ErrorCorrectionLevel errorCorrectionLevel) {
+        return this.ecBlocks[errorCorrectionLevel.ordinal()];
     }
 
-    public static Version getProvisionalVersionForDimension(int dimension) throws FormatException {
-        if (dimension % 4 == 1) {
+    public static Version getProvisionalVersionForDimension(int i) throws FormatException {
+        if (i % 4 == 1) {
             try {
-                return getVersionForNumber((dimension - 17) / 4);
-            } catch (IllegalArgumentException e) {
+                return getVersionForNumber((i - 17) / 4);
+            } catch (IllegalArgumentException unused) {
                 throw FormatException.getFormatInstance();
             }
         } else {
@@ -56,32 +57,32 @@ public final class Version {
         }
     }
 
-    public static Version getVersionForNumber(int versionNumber2) {
-        if (versionNumber2 >= 1 && versionNumber2 <= 40) {
-            return VERSIONS[versionNumber2 - 1];
+    public static Version getVersionForNumber(int i) {
+        if (i >= 1 && i <= 40) {
+            return VERSIONS[i - 1];
         }
         throw new IllegalArgumentException();
     }
 
-    static Version decodeVersionInformation(int versionBits) {
-        int bestDifference = Integer.MAX_VALUE;
-        int bestVersion = 0;
-        int i = 0;
+    static Version decodeVersionInformation(int i) {
+        int i2 = 0;
+        int i3 = 0;
+        int i4 = IntCompanionObject.MAX_VALUE;
         while (true) {
             int[] iArr = VERSION_DECODE_INFO;
-            if (i < iArr.length) {
-                int targetVersion = iArr[i];
-                if (targetVersion == versionBits) {
-                    return getVersionForNumber(i + 7);
+            if (i2 < iArr.length) {
+                int i5 = iArr[i2];
+                if (i5 == i) {
+                    return getVersionForNumber(i2 + 7);
                 }
-                int bitsDifference = FormatInformation.numBitsDiffering(versionBits, targetVersion);
-                if (bitsDifference < bestDifference) {
-                    bestVersion = i + 7;
-                    bestDifference = bitsDifference;
+                int numBitsDiffering = FormatInformation.numBitsDiffering(i, i5);
+                if (numBitsDiffering < i4) {
+                    i3 = i2 + 7;
+                    i4 = numBitsDiffering;
                 }
-                i++;
-            } else if (bestDifference <= 3) {
-                return getVersionForNumber(bestVersion);
+                i2++;
+            } else if (i4 <= 3) {
+                return getVersionForNumber(i3);
             } else {
                 return null;
             }
@@ -90,25 +91,28 @@ public final class Version {
 
     /* access modifiers changed from: package-private */
     public BitMatrix buildFunctionPattern() {
-        int dimension = getDimensionForVersion();
-        BitMatrix bitMatrix = new BitMatrix(dimension);
+        int dimensionForVersion = getDimensionForVersion();
+        BitMatrix bitMatrix = new BitMatrix(dimensionForVersion);
         bitMatrix.setRegion(0, 0, 9, 9);
-        bitMatrix.setRegion(dimension - 8, 0, 8, 9);
-        bitMatrix.setRegion(0, dimension - 8, 9, 8);
-        int max = this.alignmentPatternCenters.length;
-        for (int x = 0; x < max; x++) {
-            int i = this.alignmentPatternCenters[x] - 2;
-            for (int y = 0; y < max; y++) {
-                if (!((x == 0 && (y == 0 || y == max - 1)) || (x == max - 1 && y == 0))) {
-                    bitMatrix.setRegion(this.alignmentPatternCenters[y] - 2, i, 5, 5);
+        int i = dimensionForVersion - 8;
+        bitMatrix.setRegion(i, 0, 8, 9);
+        bitMatrix.setRegion(0, i, 9, 8);
+        int length = this.alignmentPatternCenters.length;
+        for (int i2 = 0; i2 < length; i2++) {
+            int i3 = this.alignmentPatternCenters[i2] - 2;
+            for (int i4 = 0; i4 < length; i4++) {
+                if (!((i2 == 0 && (i4 == 0 || i4 == length - 1)) || (i2 == length - 1 && i4 == 0))) {
+                    bitMatrix.setRegion(this.alignmentPatternCenters[i4] - 2, i3, 5, 5);
                 }
             }
         }
-        bitMatrix.setRegion(6, 9, 1, dimension - 17);
-        bitMatrix.setRegion(9, 6, dimension - 17, 1);
+        int i5 = dimensionForVersion - 17;
+        bitMatrix.setRegion(6, 9, 1, i5);
+        bitMatrix.setRegion(9, 6, i5, 1);
         if (this.versionNumber > 6) {
-            bitMatrix.setRegion(dimension - 11, 0, 3, 6);
-            bitMatrix.setRegion(0, dimension - 11, 6, 3);
+            int i6 = dimensionForVersion - 11;
+            bitMatrix.setRegion(i6, 0, 3, 6);
+            bitMatrix.setRegion(0, i6, 6, 3);
         }
         return bitMatrix;
     }
@@ -117,9 +121,9 @@ public final class Version {
         private final ECB[] ecBlocks;
         private final int ecCodewordsPerBlock;
 
-        ECBlocks(int ecCodewordsPerBlock2, ECB... ecBlocks2) {
-            this.ecCodewordsPerBlock = ecCodewordsPerBlock2;
-            this.ecBlocks = ecBlocks2;
+        ECBlocks(int i, ECB... ecbArr) {
+            this.ecCodewordsPerBlock = i;
+            this.ecBlocks = ecbArr;
         }
 
         public int getECCodewordsPerBlock() {
@@ -127,11 +131,11 @@ public final class Version {
         }
 
         public int getNumBlocks() {
-            int total = 0;
-            for (ECB ecBlock : this.ecBlocks) {
-                total += ecBlock.getCount();
+            int i = 0;
+            for (ECB ecb : this.ecBlocks) {
+                i += ecb.getCount();
             }
-            return total;
+            return i;
         }
 
         public int getTotalECCodewords() {
@@ -147,9 +151,9 @@ public final class Version {
         private final int count;
         private final int dataCodewords;
 
-        ECB(int count2, int dataCodewords2) {
-            this.count = count2;
-            this.dataCodewords = dataCodewords2;
+        ECB(int i, int i2) {
+            this.count = i;
+            this.dataCodewords = i2;
         }
 
         public int getCount() {

@@ -55,9 +55,9 @@ public final class InactivityTimer {
     /* access modifiers changed from: private */
     /* access modifiers changed from: public */
     private synchronized void cancel() {
-        AsyncTask<?, ?, ?> task = this.inactivityTask;
-        if (task != null) {
-            task.cancel(true);
+        AsyncTask<Object, Object, Object> asyncTask = this.inactivityTask;
+        if (asyncTask != null) {
+            asyncTask.cancel(true);
             this.inactivityTask = null;
         }
     }
@@ -89,13 +89,13 @@ public final class InactivityTimer {
 
         /* access modifiers changed from: protected */
         @Override // android.os.AsyncTask
-        public Object doInBackground(Object... objects) {
+        public Object doInBackground(Object... objArr) {
             try {
                 Thread.sleep(InactivityTimer.INACTIVITY_DELAY_MS);
                 Log.i(InactivityTimer.TAG, "Finishing activity due to inactivity");
                 InactivityTimer.this.activity.finish();
                 return null;
-            } catch (InterruptedException e) {
+            } catch (InterruptedException unused) {
                 return null;
             }
         }

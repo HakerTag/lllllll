@@ -11,8 +11,9 @@ import com.google.zxing.qrcode.decoder.Mode;
 import com.google.zxing.qrcode.decoder.Version;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map;
+import kotlin.UByte;
+import kotlin.jvm.internal.IntCompanionObject;
 
 public final class Encoder {
     private static final int[] ALPHANUMERIC_TABLE = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 36, -1, -1, -1, 37, 38, -1, -1, -1, -1, 39, 40, -1, 41, 42, 43, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 44, -1, -1, -1, -1, -1, -1, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, -1, -1, -1, -1, -1};
@@ -21,273 +22,273 @@ public final class Encoder {
     private Encoder() {
     }
 
-    private static int calculateMaskPenalty(ByteMatrix matrix) {
-        return MaskUtil.applyMaskPenaltyRule1(matrix) + MaskUtil.applyMaskPenaltyRule2(matrix) + MaskUtil.applyMaskPenaltyRule3(matrix) + MaskUtil.applyMaskPenaltyRule4(matrix);
+    private static int calculateMaskPenalty(ByteMatrix byteMatrix) {
+        return MaskUtil.applyMaskPenaltyRule1(byteMatrix) + MaskUtil.applyMaskPenaltyRule2(byteMatrix) + MaskUtil.applyMaskPenaltyRule3(byteMatrix) + MaskUtil.applyMaskPenaltyRule4(byteMatrix);
     }
 
-    public static QRCode encode(String content, ErrorCorrectionLevel ecLevel) throws WriterException {
-        return encode(content, ecLevel, null);
+    public static QRCode encode(String str, ErrorCorrectionLevel errorCorrectionLevel) throws WriterException {
+        return encode(str, errorCorrectionLevel, null);
     }
 
-    public static QRCode encode(String content, ErrorCorrectionLevel ecLevel, Map<EncodeHintType, ?> hints) throws WriterException {
+    public static QRCode encode(String str, ErrorCorrectionLevel errorCorrectionLevel, Map<EncodeHintType, ?> map) throws WriterException {
         Version version;
-        CharacterSetECI eci;
-        String encoding = DEFAULT_BYTE_MODE_ENCODING;
-        if (hints != null && hints.containsKey(EncodeHintType.CHARACTER_SET)) {
-            encoding = hints.get(EncodeHintType.CHARACTER_SET).toString();
+        CharacterSetECI characterSetECIByName;
+        String obj = (map == null || !map.containsKey(EncodeHintType.CHARACTER_SET)) ? DEFAULT_BYTE_MODE_ENCODING : map.get(EncodeHintType.CHARACTER_SET).toString();
+        Mode chooseMode = chooseMode(str, obj);
+        BitArray bitArray = new BitArray();
+        if (chooseMode == Mode.BYTE && !DEFAULT_BYTE_MODE_ENCODING.equals(obj) && (characterSetECIByName = CharacterSetECI.getCharacterSetECIByName(obj)) != null) {
+            appendECI(characterSetECIByName, bitArray);
         }
-        Mode mode = chooseMode(content, encoding);
-        BitArray headerBits = new BitArray();
-        if (mode == Mode.BYTE && !DEFAULT_BYTE_MODE_ENCODING.equals(encoding) && (eci = CharacterSetECI.getCharacterSetECIByName(encoding)) != null) {
-            appendECI(eci, headerBits);
-        }
-        appendModeInfo(mode, headerBits);
-        BitArray dataBits = new BitArray();
-        appendBytes(content, mode, dataBits, encoding);
-        if (hints == null || !hints.containsKey(EncodeHintType.QR_VERSION)) {
-            version = recommendVersion(ecLevel, mode, headerBits, dataBits);
+        appendModeInfo(chooseMode, bitArray);
+        BitArray bitArray2 = new BitArray();
+        appendBytes(str, chooseMode, bitArray2, obj);
+        if (map == null || !map.containsKey(EncodeHintType.QR_VERSION)) {
+            version = recommendVersion(errorCorrectionLevel, chooseMode, bitArray, bitArray2);
         } else {
-            version = Version.getVersionForNumber(Integer.parseInt(hints.get(EncodeHintType.QR_VERSION).toString()));
-            if (!willFit(calculateBitsNeeded(mode, headerBits, dataBits, version), version, ecLevel)) {
+            version = Version.getVersionForNumber(Integer.parseInt(map.get(EncodeHintType.QR_VERSION).toString()));
+            if (!willFit(calculateBitsNeeded(chooseMode, bitArray, bitArray2, version), version, errorCorrectionLevel)) {
                 throw new WriterException("Data too big for requested version");
             }
         }
-        BitArray headerAndDataBits = new BitArray();
-        headerAndDataBits.appendBitArray(headerBits);
-        appendLengthInfo(mode == Mode.BYTE ? dataBits.getSizeInBytes() : content.length(), version, mode, headerAndDataBits);
-        headerAndDataBits.appendBitArray(dataBits);
-        Version.ECBlocks ecBlocks = version.getECBlocksForLevel(ecLevel);
-        int numDataBytes = version.getTotalCodewords() - ecBlocks.getTotalECCodewords();
-        terminateBits(numDataBytes, headerAndDataBits);
-        BitArray finalBits = interleaveWithECBytes(headerAndDataBits, version.getTotalCodewords(), numDataBytes, ecBlocks.getNumBlocks());
-        QRCode qrCode = new QRCode();
-        qrCode.setECLevel(ecLevel);
-        qrCode.setMode(mode);
-        qrCode.setVersion(version);
-        int dimension = version.getDimensionForVersion();
-        ByteMatrix matrix = new ByteMatrix(dimension, dimension);
-        int maskPattern = chooseMaskPattern(finalBits, ecLevel, version, matrix);
-        qrCode.setMaskPattern(maskPattern);
-        MatrixUtil.buildMatrix(finalBits, ecLevel, version, maskPattern, matrix);
-        qrCode.setMatrix(matrix);
-        return qrCode;
+        BitArray bitArray3 = new BitArray();
+        bitArray3.appendBitArray(bitArray);
+        appendLengthInfo(chooseMode == Mode.BYTE ? bitArray2.getSizeInBytes() : str.length(), version, chooseMode, bitArray3);
+        bitArray3.appendBitArray(bitArray2);
+        Version.ECBlocks eCBlocksForLevel = version.getECBlocksForLevel(errorCorrectionLevel);
+        int totalCodewords = version.getTotalCodewords() - eCBlocksForLevel.getTotalECCodewords();
+        terminateBits(totalCodewords, bitArray3);
+        BitArray interleaveWithECBytes = interleaveWithECBytes(bitArray3, version.getTotalCodewords(), totalCodewords, eCBlocksForLevel.getNumBlocks());
+        QRCode qRCode = new QRCode();
+        qRCode.setECLevel(errorCorrectionLevel);
+        qRCode.setMode(chooseMode);
+        qRCode.setVersion(version);
+        int dimensionForVersion = version.getDimensionForVersion();
+        ByteMatrix byteMatrix = new ByteMatrix(dimensionForVersion, dimensionForVersion);
+        int chooseMaskPattern = chooseMaskPattern(interleaveWithECBytes, errorCorrectionLevel, version, byteMatrix);
+        qRCode.setMaskPattern(chooseMaskPattern);
+        MatrixUtil.buildMatrix(interleaveWithECBytes, errorCorrectionLevel, version, chooseMaskPattern, byteMatrix);
+        qRCode.setMatrix(byteMatrix);
+        return qRCode;
     }
 
-    private static Version recommendVersion(ErrorCorrectionLevel ecLevel, Mode mode, BitArray headerBits, BitArray dataBits) throws WriterException {
-        return chooseVersion(calculateBitsNeeded(mode, headerBits, dataBits, chooseVersion(calculateBitsNeeded(mode, headerBits, dataBits, Version.getVersionForNumber(1)), ecLevel)), ecLevel);
+    private static Version recommendVersion(ErrorCorrectionLevel errorCorrectionLevel, Mode mode, BitArray bitArray, BitArray bitArray2) throws WriterException {
+        return chooseVersion(calculateBitsNeeded(mode, bitArray, bitArray2, chooseVersion(calculateBitsNeeded(mode, bitArray, bitArray2, Version.getVersionForNumber(1)), errorCorrectionLevel)), errorCorrectionLevel);
     }
 
-    private static int calculateBitsNeeded(Mode mode, BitArray headerBits, BitArray dataBits, Version version) {
-        return headerBits.getSize() + mode.getCharacterCountBits(version) + dataBits.getSize();
+    private static int calculateBitsNeeded(Mode mode, BitArray bitArray, BitArray bitArray2, Version version) {
+        return bitArray.getSize() + mode.getCharacterCountBits(version) + bitArray2.getSize();
     }
 
-    static int getAlphanumericCode(int code) {
+    static int getAlphanumericCode(int i) {
         int[] iArr = ALPHANUMERIC_TABLE;
-        if (code < iArr.length) {
-            return iArr[code];
+        if (i < iArr.length) {
+            return iArr[i];
         }
         return -1;
     }
 
-    public static Mode chooseMode(String content) {
-        return chooseMode(content, null);
+    public static Mode chooseMode(String str) {
+        return chooseMode(str, null);
     }
 
-    private static Mode chooseMode(String content, String encoding) {
-        if ("Shift_JIS".equals(encoding) && isOnlyDoubleByteKanji(content)) {
+    private static Mode chooseMode(String str, String str2) {
+        if ("Shift_JIS".equals(str2) && isOnlyDoubleByteKanji(str)) {
             return Mode.KANJI;
         }
-        boolean hasNumeric = false;
-        boolean hasAlphanumeric = false;
-        for (int i = 0; i < content.length(); i++) {
-            char c = content.charAt(i);
-            if (c >= '0' && c <= '9') {
-                hasNumeric = true;
-            } else if (getAlphanumericCode(c) == -1) {
+        boolean z = false;
+        boolean z2 = false;
+        for (int i = 0; i < str.length(); i++) {
+            char charAt = str.charAt(i);
+            if (charAt >= '0' && charAt <= '9') {
+                z2 = true;
+            } else if (getAlphanumericCode(charAt) == -1) {
                 return Mode.BYTE;
             } else {
-                hasAlphanumeric = true;
+                z = true;
             }
         }
-        if (hasAlphanumeric) {
+        if (z) {
             return Mode.ALPHANUMERIC;
         }
-        if (hasNumeric) {
+        if (z2) {
             return Mode.NUMERIC;
         }
         return Mode.BYTE;
     }
 
-    private static boolean isOnlyDoubleByteKanji(String content) {
+    private static boolean isOnlyDoubleByteKanji(String str) {
         try {
-            byte[] bytes = content.getBytes("Shift_JIS");
+            byte[] bytes = str.getBytes("Shift_JIS");
             int length = bytes.length;
             if (length % 2 != 0) {
                 return false;
             }
             for (int i = 0; i < length; i += 2) {
-                int byte1 = bytes[i] & 255;
-                if ((byte1 < 129 || byte1 > 159) && (byte1 < 224 || byte1 > 235)) {
+                int i2 = bytes[i] & UByte.MAX_VALUE;
+                if ((i2 < 129 || i2 > 159) && (i2 < 224 || i2 > 235)) {
                     return false;
                 }
             }
             return true;
-        } catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException unused) {
             return false;
         }
     }
 
-    private static int chooseMaskPattern(BitArray bits, ErrorCorrectionLevel ecLevel, Version version, ByteMatrix matrix) throws WriterException {
-        int minPenalty = Integer.MAX_VALUE;
-        int bestMaskPattern = -1;
-        for (int maskPattern = 0; maskPattern < 8; maskPattern++) {
-            MatrixUtil.buildMatrix(bits, ecLevel, version, maskPattern, matrix);
-            int penalty = calculateMaskPenalty(matrix);
-            if (penalty < minPenalty) {
-                minPenalty = penalty;
-                bestMaskPattern = maskPattern;
+    private static int chooseMaskPattern(BitArray bitArray, ErrorCorrectionLevel errorCorrectionLevel, Version version, ByteMatrix byteMatrix) throws WriterException {
+        int i = IntCompanionObject.MAX_VALUE;
+        int i2 = -1;
+        for (int i3 = 0; i3 < 8; i3++) {
+            MatrixUtil.buildMatrix(bitArray, errorCorrectionLevel, version, i3, byteMatrix);
+            int calculateMaskPenalty = calculateMaskPenalty(byteMatrix);
+            if (calculateMaskPenalty < i) {
+                i2 = i3;
+                i = calculateMaskPenalty;
             }
         }
-        return bestMaskPattern;
+        return i2;
     }
 
-    private static Version chooseVersion(int numInputBits, ErrorCorrectionLevel ecLevel) throws WriterException {
-        for (int versionNum = 1; versionNum <= 40; versionNum++) {
-            Version version = Version.getVersionForNumber(versionNum);
-            if (willFit(numInputBits, version, ecLevel)) {
-                return version;
+    private static Version chooseVersion(int i, ErrorCorrectionLevel errorCorrectionLevel) throws WriterException {
+        for (int i2 = 1; i2 <= 40; i2++) {
+            Version versionForNumber = Version.getVersionForNumber(i2);
+            if (willFit(i, versionForNumber, errorCorrectionLevel)) {
+                return versionForNumber;
             }
         }
         throw new WriterException("Data too big");
     }
 
-    private static boolean willFit(int numInputBits, Version version, ErrorCorrectionLevel ecLevel) {
-        return version.getTotalCodewords() - version.getECBlocksForLevel(ecLevel).getTotalECCodewords() >= (numInputBits + 7) / 8;
+    private static boolean willFit(int i, Version version, ErrorCorrectionLevel errorCorrectionLevel) {
+        return version.getTotalCodewords() - version.getECBlocksForLevel(errorCorrectionLevel).getTotalECCodewords() >= (i + 7) / 8;
     }
 
-    static void terminateBits(int numDataBytes, BitArray bits) throws WriterException {
-        int capacity = numDataBytes * 8;
-        if (bits.getSize() <= capacity) {
-            for (int i = 0; i < 4 && bits.getSize() < capacity; i++) {
-                bits.appendBit(false);
+    static void terminateBits(int i, BitArray bitArray) throws WriterException {
+        int i2 = i * 8;
+        if (bitArray.getSize() <= i2) {
+            for (int i3 = 0; i3 < 4 && bitArray.getSize() < i2; i3++) {
+                bitArray.appendBit(false);
             }
-            int numBitsInLastByte = bits.getSize() & 7;
-            if (numBitsInLastByte > 0) {
-                for (int i2 = numBitsInLastByte; i2 < 8; i2++) {
-                    bits.appendBit(false);
+            int size = bitArray.getSize() & 7;
+            if (size > 0) {
+                while (size < 8) {
+                    bitArray.appendBit(false);
+                    size++;
                 }
             }
-            int numPaddingBytes = numDataBytes - bits.getSizeInBytes();
-            for (int i3 = 0; i3 < numPaddingBytes; i3++) {
-                bits.appendBits((i3 & 1) == 0 ? 236 : 17, 8);
+            int sizeInBytes = i - bitArray.getSizeInBytes();
+            for (int i4 = 0; i4 < sizeInBytes; i4++) {
+                bitArray.appendBits((i4 & 1) == 0 ? 236 : 17, 8);
             }
-            if (bits.getSize() != capacity) {
+            if (bitArray.getSize() != i2) {
                 throw new WriterException("Bits size does not equal capacity");
             }
             return;
         }
-        throw new WriterException("data bits cannot fit in the QR Code" + bits.getSize() + " > " + capacity);
+        throw new WriterException("data bits cannot fit in the QR Code" + bitArray.getSize() + " > " + i2);
     }
 
-    static void getNumDataBytesAndNumECBytesForBlockID(int numTotalBytes, int numDataBytes, int numRSBlocks, int blockID, int[] numDataBytesInBlock, int[] numECBytesInBlock) throws WriterException {
-        if (blockID < numRSBlocks) {
-            int numRsBlocksInGroup2 = numTotalBytes % numRSBlocks;
-            int numRsBlocksInGroup1 = numRSBlocks - numRsBlocksInGroup2;
-            int numTotalBytesInGroup1 = numTotalBytes / numRSBlocks;
-            int numDataBytesInGroup1 = numDataBytes / numRSBlocks;
-            int numDataBytesInGroup2 = numDataBytesInGroup1 + 1;
-            int numEcBytesInGroup1 = numTotalBytesInGroup1 - numDataBytesInGroup1;
-            int numEcBytesInGroup2 = (numTotalBytesInGroup1 + 1) - numDataBytesInGroup2;
-            if (numEcBytesInGroup1 != numEcBytesInGroup2) {
+    static void getNumDataBytesAndNumECBytesForBlockID(int i, int i2, int i3, int i4, int[] iArr, int[] iArr2) throws WriterException {
+        if (i4 < i3) {
+            int i5 = i % i3;
+            int i6 = i3 - i5;
+            int i7 = i / i3;
+            int i8 = i7 + 1;
+            int i9 = i2 / i3;
+            int i10 = i9 + 1;
+            int i11 = i7 - i9;
+            int i12 = i8 - i10;
+            if (i11 != i12) {
                 throw new WriterException("EC bytes mismatch");
-            } else if (numRSBlocks != numRsBlocksInGroup1 + numRsBlocksInGroup2) {
+            } else if (i3 != i6 + i5) {
                 throw new WriterException("RS blocks mismatch");
-            } else if (numTotalBytes != ((numDataBytesInGroup1 + numEcBytesInGroup1) * numRsBlocksInGroup1) + ((numDataBytesInGroup2 + numEcBytesInGroup2) * numRsBlocksInGroup2)) {
+            } else if (i != ((i9 + i11) * i6) + ((i10 + i12) * i5)) {
                 throw new WriterException("Total bytes mismatch");
-            } else if (blockID < numRsBlocksInGroup1) {
-                numDataBytesInBlock[0] = numDataBytesInGroup1;
-                numECBytesInBlock[0] = numEcBytesInGroup1;
+            } else if (i4 < i6) {
+                iArr[0] = i9;
+                iArr2[0] = i11;
             } else {
-                numDataBytesInBlock[0] = numDataBytesInGroup2;
-                numECBytesInBlock[0] = numEcBytesInGroup2;
+                iArr[0] = i10;
+                iArr2[0] = i12;
             }
         } else {
             throw new WriterException("Block ID too large");
         }
     }
 
-    static BitArray interleaveWithECBytes(BitArray bits, int numTotalBytes, int numDataBytes, int numRSBlocks) throws WriterException {
-        if (bits.getSizeInBytes() == numDataBytes) {
-            Collection<BlockPair> blocks = new ArrayList<>(numRSBlocks);
-            int dataBytesOffset = 0;
-            int maxNumDataBytes = 0;
-            int maxNumEcBytes = 0;
-            for (int i = 0; i < numRSBlocks; i++) {
-                int[] numDataBytesInBlock = new int[1];
-                int[] numEcBytesInBlock = new int[1];
-                getNumDataBytesAndNumECBytesForBlockID(numTotalBytes, numDataBytes, numRSBlocks, i, numDataBytesInBlock, numEcBytesInBlock);
-                int size = numDataBytesInBlock[0];
-                byte[] dataBytes = new byte[size];
-                bits.toBytes(dataBytesOffset * 8, dataBytes, 0, size);
-                byte[] ecBytes = generateECBytes(dataBytes, numEcBytesInBlock[0]);
-                blocks.add(new BlockPair(dataBytes, ecBytes));
-                maxNumDataBytes = Math.max(maxNumDataBytes, size);
-                maxNumEcBytes = Math.max(maxNumEcBytes, ecBytes.length);
-                dataBytesOffset += numDataBytesInBlock[0];
+    static BitArray interleaveWithECBytes(BitArray bitArray, int i, int i2, int i3) throws WriterException {
+        if (bitArray.getSizeInBytes() == i2) {
+            ArrayList<BlockPair> arrayList = new ArrayList(i3);
+            int i4 = 0;
+            int i5 = 0;
+            int i6 = 0;
+            for (int i7 = 0; i7 < i3; i7++) {
+                int[] iArr = new int[1];
+                int[] iArr2 = new int[1];
+                getNumDataBytesAndNumECBytesForBlockID(i, i2, i3, i7, iArr, iArr2);
+                int i8 = iArr[0];
+                byte[] bArr = new byte[i8];
+                bitArray.toBytes(i4 * 8, bArr, 0, i8);
+                byte[] generateECBytes = generateECBytes(bArr, iArr2[0]);
+                arrayList.add(new BlockPair(bArr, generateECBytes));
+                i5 = Math.max(i5, i8);
+                i6 = Math.max(i6, generateECBytes.length);
+                i4 += iArr[0];
             }
-            if (numDataBytes == dataBytesOffset) {
-                BitArray result = new BitArray();
-                for (int i2 = 0; i2 < maxNumDataBytes; i2++) {
-                    for (BlockPair block : blocks) {
-                        byte[] dataBytes2 = block.getDataBytes();
-                        if (i2 < dataBytes2.length) {
-                            result.appendBits(dataBytes2[i2], 8);
+            if (i2 == i4) {
+                BitArray bitArray2 = new BitArray();
+                for (int i9 = 0; i9 < i5; i9++) {
+                    for (BlockPair blockPair : arrayList) {
+                        byte[] dataBytes = blockPair.getDataBytes();
+                        if (i9 < dataBytes.length) {
+                            bitArray2.appendBits(dataBytes[i9], 8);
                         }
                     }
                 }
-                for (int i3 = 0; i3 < maxNumEcBytes; i3++) {
-                    for (BlockPair block2 : blocks) {
-                        byte[] ecBytes2 = block2.getErrorCorrectionBytes();
-                        if (i3 < ecBytes2.length) {
-                            result.appendBits(ecBytes2[i3], 8);
+                for (int i10 = 0; i10 < i6; i10++) {
+                    for (BlockPair blockPair2 : arrayList) {
+                        byte[] errorCorrectionBytes = blockPair2.getErrorCorrectionBytes();
+                        if (i10 < errorCorrectionBytes.length) {
+                            bitArray2.appendBits(errorCorrectionBytes[i10], 8);
                         }
                     }
                 }
-                if (numTotalBytes == result.getSizeInBytes()) {
-                    return result;
+                if (i == bitArray2.getSizeInBytes()) {
+                    return bitArray2;
                 }
-                throw new WriterException("Interleaving error: " + numTotalBytes + " and " + result.getSizeInBytes() + " differ.");
+                throw new WriterException("Interleaving error: " + i + " and " + bitArray2.getSizeInBytes() + " differ.");
             }
             throw new WriterException("Data bytes does not match offset");
         }
         throw new WriterException("Number of bits and data bytes does not match");
     }
 
-    static byte[] generateECBytes(byte[] dataBytes, int numEcBytesInBlock) {
-        int numDataBytes = dataBytes.length;
-        int[] toEncode = new int[(numDataBytes + numEcBytesInBlock)];
-        for (int i = 0; i < numDataBytes; i++) {
-            toEncode[i] = dataBytes[i] & 255;
+    static byte[] generateECBytes(byte[] bArr, int i) {
+        int length = bArr.length;
+        int[] iArr = new int[(length + i)];
+        for (int i2 = 0; i2 < length; i2++) {
+            iArr[i2] = bArr[i2] & UByte.MAX_VALUE;
         }
-        new ReedSolomonEncoder(GenericGF.QR_CODE_FIELD_256).encode(toEncode, numEcBytesInBlock);
-        byte[] ecBytes = new byte[numEcBytesInBlock];
-        for (int i2 = 0; i2 < numEcBytesInBlock; i2++) {
-            ecBytes[i2] = (byte) toEncode[numDataBytes + i2];
+        new ReedSolomonEncoder(GenericGF.QR_CODE_FIELD_256).encode(iArr, i);
+        byte[] bArr2 = new byte[i];
+        for (int i3 = 0; i3 < i; i3++) {
+            bArr2[i3] = (byte) iArr[length + i3];
         }
-        return ecBytes;
+        return bArr2;
     }
 
-    static void appendModeInfo(Mode mode, BitArray bits) {
-        bits.appendBits(mode.getBits(), 4);
+    static void appendModeInfo(Mode mode, BitArray bitArray) {
+        bitArray.appendBits(mode.getBits(), 4);
     }
 
-    static void appendLengthInfo(int numLetters, Version version, Mode mode, BitArray bits) throws WriterException {
-        int numBits = mode.getCharacterCountBits(version);
-        if (numLetters < (1 << numBits)) {
-            bits.appendBits(numLetters, numBits);
+    static void appendLengthInfo(int i, Version version, Mode mode, BitArray bitArray) throws WriterException {
+        int characterCountBits = mode.getCharacterCountBits(version);
+        int i2 = 1 << characterCountBits;
+        if (i < i2) {
+            bitArray.appendBits(i, characterCountBits);
             return;
         }
-        throw new WriterException(numLetters + " is bigger than " + ((1 << numBits) - 1));
+        throw new WriterException(i + " is bigger than " + (i2 - 1));
     }
 
     /* access modifiers changed from: package-private */
@@ -295,118 +296,180 @@ public final class Encoder {
     public static /* synthetic */ class AnonymousClass1 {
         static final /* synthetic */ int[] $SwitchMap$com$google$zxing$qrcode$decoder$Mode;
 
+        /* JADX WARNING: Can't wrap try/catch for region: R(8:0|1|2|3|4|5|6|(3:7|8|10)) */
+        /* JADX WARNING: Failed to process nested try/catch */
+        /* JADX WARNING: Missing exception handler attribute for start block: B:3:0x0012 */
+        /* JADX WARNING: Missing exception handler attribute for start block: B:5:0x001d */
+        /* JADX WARNING: Missing exception handler attribute for start block: B:7:0x0028 */
         static {
-            int[] iArr = new int[Mode.values().length];
-            $SwitchMap$com$google$zxing$qrcode$decoder$Mode = iArr;
-            try {
-                iArr[Mode.NUMERIC.ordinal()] = 1;
-            } catch (NoSuchFieldError e) {
-            }
-            try {
-                $SwitchMap$com$google$zxing$qrcode$decoder$Mode[Mode.ALPHANUMERIC.ordinal()] = 2;
-            } catch (NoSuchFieldError e2) {
-            }
-            try {
-                $SwitchMap$com$google$zxing$qrcode$decoder$Mode[Mode.BYTE.ordinal()] = 3;
-            } catch (NoSuchFieldError e3) {
-            }
-            try {
-                $SwitchMap$com$google$zxing$qrcode$decoder$Mode[Mode.KANJI.ordinal()] = 4;
-            } catch (NoSuchFieldError e4) {
-            }
+            /*
+                com.google.zxing.qrcode.decoder.Mode[] r0 = com.google.zxing.qrcode.decoder.Mode.values()
+                int r0 = r0.length
+                int[] r0 = new int[r0]
+                com.google.zxing.qrcode.encoder.Encoder.AnonymousClass1.$SwitchMap$com$google$zxing$qrcode$decoder$Mode = r0
+                com.google.zxing.qrcode.decoder.Mode r1 = com.google.zxing.qrcode.decoder.Mode.NUMERIC     // Catch:{ NoSuchFieldError -> 0x0012 }
+                int r1 = r1.ordinal()     // Catch:{ NoSuchFieldError -> 0x0012 }
+                r2 = 1
+                r0[r1] = r2     // Catch:{ NoSuchFieldError -> 0x0012 }
+            L_0x0012:
+                int[] r0 = com.google.zxing.qrcode.encoder.Encoder.AnonymousClass1.$SwitchMap$com$google$zxing$qrcode$decoder$Mode     // Catch:{ NoSuchFieldError -> 0x001d }
+                com.google.zxing.qrcode.decoder.Mode r1 = com.google.zxing.qrcode.decoder.Mode.ALPHANUMERIC     // Catch:{ NoSuchFieldError -> 0x001d }
+                int r1 = r1.ordinal()     // Catch:{ NoSuchFieldError -> 0x001d }
+                r2 = 2
+                r0[r1] = r2     // Catch:{ NoSuchFieldError -> 0x001d }
+            L_0x001d:
+                int[] r0 = com.google.zxing.qrcode.encoder.Encoder.AnonymousClass1.$SwitchMap$com$google$zxing$qrcode$decoder$Mode     // Catch:{ NoSuchFieldError -> 0x0028 }
+                com.google.zxing.qrcode.decoder.Mode r1 = com.google.zxing.qrcode.decoder.Mode.BYTE     // Catch:{ NoSuchFieldError -> 0x0028 }
+                int r1 = r1.ordinal()     // Catch:{ NoSuchFieldError -> 0x0028 }
+                r2 = 3
+                r0[r1] = r2     // Catch:{ NoSuchFieldError -> 0x0028 }
+            L_0x0028:
+                int[] r0 = com.google.zxing.qrcode.encoder.Encoder.AnonymousClass1.$SwitchMap$com$google$zxing$qrcode$decoder$Mode     // Catch:{ NoSuchFieldError -> 0x0033 }
+                com.google.zxing.qrcode.decoder.Mode r1 = com.google.zxing.qrcode.decoder.Mode.KANJI     // Catch:{ NoSuchFieldError -> 0x0033 }
+                int r1 = r1.ordinal()     // Catch:{ NoSuchFieldError -> 0x0033 }
+                r2 = 4
+                r0[r1] = r2     // Catch:{ NoSuchFieldError -> 0x0033 }
+            L_0x0033:
+                return
+            */
+            throw new UnsupportedOperationException("Method not decompiled: com.google.zxing.qrcode.encoder.Encoder.AnonymousClass1.<clinit>():void");
         }
     }
 
-    static void appendBytes(String content, Mode mode, BitArray bits, String encoding) throws WriterException {
+    static void appendBytes(String str, Mode mode, BitArray bitArray, String str2) throws WriterException {
         int i = AnonymousClass1.$SwitchMap$com$google$zxing$qrcode$decoder$Mode[mode.ordinal()];
         if (i == 1) {
-            appendNumericBytes(content, bits);
+            appendNumericBytes(str, bitArray);
         } else if (i == 2) {
-            appendAlphanumericBytes(content, bits);
+            appendAlphanumericBytes(str, bitArray);
         } else if (i == 3) {
-            append8BitBytes(content, bits, encoding);
+            append8BitBytes(str, bitArray, str2);
         } else if (i == 4) {
-            appendKanjiBytes(content, bits);
+            appendKanjiBytes(str, bitArray);
         } else {
             throw new WriterException("Invalid mode: " + mode);
         }
     }
 
-    static void appendNumericBytes(CharSequence content, BitArray bits) {
-        int length = content.length();
+    static void appendNumericBytes(CharSequence charSequence, BitArray bitArray) {
+        int length = charSequence.length();
         int i = 0;
         while (i < length) {
-            int num1 = content.charAt(i) - '0';
-            if (i + 2 < length) {
-                bits.appendBits((num1 * 100) + ((content.charAt(i + 1) - '0') * 10) + (content.charAt(i + 2) - '0'), 10);
+            int charAt = charSequence.charAt(i) - '0';
+            int i2 = i + 2;
+            if (i2 < length) {
+                bitArray.appendBits((charAt * 100) + ((charSequence.charAt(i + 1) - '0') * 10) + (charSequence.charAt(i2) - '0'), 10);
                 i += 3;
-            } else if (i + 1 < length) {
-                bits.appendBits((num1 * 10) + (content.charAt(i + 1) - '0'), 7);
-                i += 2;
             } else {
-                bits.appendBits(num1, 4);
                 i++;
+                if (i < length) {
+                    bitArray.appendBits((charAt * 10) + (charSequence.charAt(i) - '0'), 7);
+                    i = i2;
+                } else {
+                    bitArray.appendBits(charAt, 4);
+                }
             }
         }
     }
 
-    static void appendAlphanumericBytes(CharSequence content, BitArray bits) throws WriterException {
-        int length = content.length();
+    static void appendAlphanumericBytes(CharSequence charSequence, BitArray bitArray) throws WriterException {
+        int length = charSequence.length();
         int i = 0;
         while (i < length) {
-            int code1 = getAlphanumericCode(content.charAt(i));
-            if (code1 == -1) {
-                throw new WriterException();
-            } else if (i + 1 < length) {
-                int code2 = getAlphanumericCode(content.charAt(i + 1));
-                if (code2 != -1) {
-                    bits.appendBits((code1 * 45) + code2, 11);
-                    i += 2;
+            int alphanumericCode = getAlphanumericCode(charSequence.charAt(i));
+            if (alphanumericCode != -1) {
+                int i2 = i + 1;
+                if (i2 < length) {
+                    int alphanumericCode2 = getAlphanumericCode(charSequence.charAt(i2));
+                    if (alphanumericCode2 != -1) {
+                        bitArray.appendBits((alphanumericCode * 45) + alphanumericCode2, 11);
+                        i += 2;
+                    } else {
+                        throw new WriterException();
+                    }
                 } else {
-                    throw new WriterException();
+                    bitArray.appendBits(alphanumericCode, 6);
+                    i = i2;
                 }
             } else {
-                bits.appendBits(code1, 6);
-                i++;
+                throw new WriterException();
             }
         }
     }
 
-    static void append8BitBytes(String content, BitArray bits, String encoding) throws WriterException {
+    static void append8BitBytes(String str, BitArray bitArray, String str2) throws WriterException {
         try {
-            for (byte b : content.getBytes(encoding)) {
-                bits.appendBits(b, 8);
+            for (byte b : str.getBytes(str2)) {
+                bitArray.appendBits(b, 8);
             }
-        } catch (UnsupportedEncodingException uee) {
-            throw new WriterException(uee);
+        } catch (UnsupportedEncodingException e) {
+            throw new WriterException(e);
         }
     }
 
-    static void appendKanjiBytes(String content, BitArray bits) throws WriterException {
-        try {
-            byte[] bytes = content.getBytes("Shift_JIS");
-            int length = bytes.length;
-            for (int i = 0; i < length; i += 2) {
-                int code = ((bytes[i] & 255) << 8) | (bytes[i + 1] & 255);
-                int subtracted = -1;
-                if (code >= 33088 && code <= 40956) {
-                    subtracted = code - 33088;
-                } else if (code >= 57408 && code <= 60351) {
-                    subtracted = code - 49472;
-                }
-                if (subtracted != -1) {
-                    bits.appendBits(((subtracted >> 8) * 192) + (subtracted & 255), 13);
-                } else {
-                    throw new WriterException("Invalid byte sequence");
-                }
-            }
-        } catch (UnsupportedEncodingException uee) {
-            throw new WriterException(uee);
-        }
+    /* JADX WARNING: Removed duplicated region for block: B:17:0x0035 A[LOOP:0: B:4:0x0008->B:17:0x0035, LOOP_END] */
+    /* JADX WARNING: Removed duplicated region for block: B:25:0x0044 A[SYNTHETIC] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    static void appendKanjiBytes(java.lang.String r6, com.google.zxing.common.BitArray r7) throws com.google.zxing.WriterException {
+        /*
+            java.lang.String r0 = "Shift_JIS"
+            byte[] r6 = r6.getBytes(r0)     // Catch:{ UnsupportedEncodingException -> 0x004d }
+            int r0 = r6.length
+            r1 = 0
+        L_0x0008:
+            if (r1 >= r0) goto L_0x004c
+            byte r2 = r6[r1]
+            r2 = r2 & 255(0xff, float:3.57E-43)
+            int r3 = r1 + 1
+            byte r3 = r6[r3]
+            r3 = r3 & 255(0xff, float:3.57E-43)
+            int r2 = r2 << 8
+            r2 = r2 | r3
+            r3 = 33088(0x8140, float:4.6366E-41)
+            r4 = -1
+            if (r2 < r3) goto L_0x0024
+            r5 = 40956(0x9ffc, float:5.7392E-41)
+            if (r2 > r5) goto L_0x0024
+        L_0x0022:
+            int r2 = r2 - r3
+            goto L_0x0033
+        L_0x0024:
+            r3 = 57408(0xe040, float:8.0446E-41)
+            if (r2 < r3) goto L_0x0032
+            r3 = 60351(0xebbf, float:8.457E-41)
+            if (r2 > r3) goto L_0x0032
+            r3 = 49472(0xc140, float:6.9325E-41)
+            goto L_0x0022
+        L_0x0032:
+            r2 = -1
+        L_0x0033:
+            if (r2 == r4) goto L_0x0044
+            int r3 = r2 >> 8
+            int r3 = r3 * 192
+            r2 = r2 & 255(0xff, float:3.57E-43)
+            int r3 = r3 + r2
+            r2 = 13
+            r7.appendBits(r3, r2)
+            int r1 = r1 + 2
+            goto L_0x0008
+        L_0x0044:
+            com.google.zxing.WriterException r6 = new com.google.zxing.WriterException
+            java.lang.String r7 = "Invalid byte sequence"
+            r6.<init>(r7)
+            throw r6
+        L_0x004c:
+            return
+        L_0x004d:
+            r6 = move-exception
+            com.google.zxing.WriterException r7 = new com.google.zxing.WriterException
+            r7.<init>(r6)
+            throw r7
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.google.zxing.qrcode.encoder.Encoder.appendKanjiBytes(java.lang.String, com.google.zxing.common.BitArray):void");
     }
 
-    private static void appendECI(CharacterSetECI eci, BitArray bits) {
-        bits.appendBits(Mode.ECI.getBits(), 4);
-        bits.appendBits(eci.getValue(), 8);
+    private static void appendECI(CharacterSetECI characterSetECI, BitArray bitArray) {
+        bitArray.appendBits(Mode.ECI.getBits(), 4);
+        bitArray.appendBits(characterSetECI.getValue(), 8);
     }
 }

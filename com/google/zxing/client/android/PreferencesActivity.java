@@ -30,8 +30,8 @@ public final class PreferencesActivity extends Activity {
     public static final String KEY_VIBRATE = "preferences_vibrate";
 
     /* access modifiers changed from: protected */
-    public void onCreate(Bundle icicle) {
-        super.onCreate(icicle);
+    public void onCreate(Bundle bundle) {
+        super.onCreate(bundle);
         getFragmentManager().beginTransaction().replace(16908290, new PreferencesFragment()).commit();
     }
 }

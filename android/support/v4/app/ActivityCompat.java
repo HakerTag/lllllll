@@ -42,8 +42,8 @@ public class ActivityCompat extends ContextCompat {
     protected ActivityCompat() {
     }
 
-    public static void setPermissionCompatDelegate(PermissionCompatDelegate delegate) {
-        sDelegate = delegate;
+    public static void setPermissionCompatDelegate(PermissionCompatDelegate permissionCompatDelegate) {
+        sDelegate = permissionCompatDelegate;
     }
 
     public static PermissionCompatDelegate getPermissionCompatDelegate() {
@@ -56,19 +56,19 @@ public class ActivityCompat extends ContextCompat {
         return true;
     }
 
-    public static void startActivityForResult(Activity activity, Intent intent, int requestCode, Bundle options) {
+    public static void startActivityForResult(Activity activity, Intent intent, int i, Bundle bundle) {
         if (Build.VERSION.SDK_INT >= 16) {
-            activity.startActivityForResult(intent, requestCode, options);
+            activity.startActivityForResult(intent, i, bundle);
         } else {
-            activity.startActivityForResult(intent, requestCode);
+            activity.startActivityForResult(intent, i);
         }
     }
 
-    public static void startIntentSenderForResult(Activity activity, IntentSender intent, int requestCode, Intent fillInIntent, int flagsMask, int flagsValues, int extraFlags, Bundle options) throws IntentSender.SendIntentException {
+    public static void startIntentSenderForResult(Activity activity, IntentSender intentSender, int i, Intent intent, int i2, int i3, int i4, Bundle bundle) throws IntentSender.SendIntentException {
         if (Build.VERSION.SDK_INT >= 16) {
-            activity.startIntentSenderForResult(intent, requestCode, fillInIntent, flagsMask, flagsValues, extraFlags, options);
+            activity.startIntentSenderForResult(intentSender, i, intent, i2, i3, i4, bundle);
         } else {
-            activity.startIntentSenderForResult(intent, requestCode, fillInIntent, flagsMask, flagsValues, extraFlags);
+            activity.startIntentSenderForResult(intentSender, i, intent, i2, i3, i4);
         }
     }
 
@@ -93,52 +93,52 @@ public class ActivityCompat extends ContextCompat {
             return activity.getReferrer();
         }
         Intent intent = activity.getIntent();
-        Uri referrer = (Uri) intent.getParcelableExtra("android.intent.extra.REFERRER");
-        if (referrer != null) {
-            return referrer;
+        Uri uri = (Uri) intent.getParcelableExtra("android.intent.extra.REFERRER");
+        if (uri != null) {
+            return uri;
         }
-        String referrerName = intent.getStringExtra("android.intent.extra.REFERRER_NAME");
-        if (referrerName != null) {
-            return Uri.parse(referrerName);
+        String stringExtra = intent.getStringExtra("android.intent.extra.REFERRER_NAME");
+        if (stringExtra != null) {
+            return Uri.parse(stringExtra);
         }
         return null;
     }
 
-    public static <T extends View> T requireViewById(Activity activity, int id) {
-        T view = (T) activity.findViewById(id);
-        if (view != null) {
-            return view;
+    public static <T extends View> T requireViewById(Activity activity, int i) {
+        T t = (T) activity.findViewById(i);
+        if (t != null) {
+            return t;
         }
         throw new IllegalArgumentException("ID does not reference a View inside this Activity");
     }
 
-    public static void setEnterSharedElementCallback(Activity activity, SharedElementCallback callback) {
-        SharedElementCallback frameworkCallback = null;
+    public static void setEnterSharedElementCallback(Activity activity, SharedElementCallback sharedElementCallback) {
+        SharedElementCallback sharedElementCallback2 = null;
         if (Build.VERSION.SDK_INT >= 23) {
-            if (callback != null) {
-                frameworkCallback = new SharedElementCallback23Impl(callback);
+            if (sharedElementCallback != null) {
+                sharedElementCallback2 = new SharedElementCallback23Impl(sharedElementCallback);
             }
-            activity.setEnterSharedElementCallback(frameworkCallback);
+            activity.setEnterSharedElementCallback(sharedElementCallback2);
         } else if (Build.VERSION.SDK_INT >= 21) {
-            if (callback != null) {
-                frameworkCallback = new SharedElementCallback21Impl(callback);
+            if (sharedElementCallback != null) {
+                sharedElementCallback2 = new SharedElementCallback21Impl(sharedElementCallback);
             }
-            activity.setEnterSharedElementCallback(frameworkCallback);
+            activity.setEnterSharedElementCallback(sharedElementCallback2);
         }
     }
 
-    public static void setExitSharedElementCallback(Activity activity, SharedElementCallback callback) {
-        SharedElementCallback frameworkCallback = null;
+    public static void setExitSharedElementCallback(Activity activity, SharedElementCallback sharedElementCallback) {
+        SharedElementCallback sharedElementCallback2 = null;
         if (Build.VERSION.SDK_INT >= 23) {
-            if (callback != null) {
-                frameworkCallback = new SharedElementCallback23Impl(callback);
+            if (sharedElementCallback != null) {
+                sharedElementCallback2 = new SharedElementCallback23Impl(sharedElementCallback);
             }
-            activity.setExitSharedElementCallback(frameworkCallback);
+            activity.setExitSharedElementCallback(sharedElementCallback2);
         } else if (Build.VERSION.SDK_INT >= 21) {
-            if (callback != null) {
-                frameworkCallback = new SharedElementCallback21Impl(callback);
+            if (sharedElementCallback != null) {
+                sharedElementCallback2 = new SharedElementCallback21Impl(sharedElementCallback);
             }
-            activity.setExitSharedElementCallback(frameworkCallback);
+            activity.setExitSharedElementCallback(sharedElementCallback2);
         }
     }
 
@@ -154,37 +154,37 @@ public class ActivityCompat extends ContextCompat {
         }
     }
 
-    public static void requestPermissions(final Activity activity, final String[] permissions, final int requestCode) {
+    public static void requestPermissions(final Activity activity, final String[] strArr, final int i) {
         PermissionCompatDelegate permissionCompatDelegate = sDelegate;
-        if (permissionCompatDelegate != null && permissionCompatDelegate.requestPermissions(activity, permissions, requestCode)) {
+        if (permissionCompatDelegate != null && permissionCompatDelegate.requestPermissions(activity, strArr, i)) {
             return;
         }
         if (Build.VERSION.SDK_INT >= 23) {
             if (activity instanceof RequestPermissionsRequestCodeValidator) {
-                ((RequestPermissionsRequestCodeValidator) activity).validateRequestPermissionsRequestCode(requestCode);
+                ((RequestPermissionsRequestCodeValidator) activity).validateRequestPermissionsRequestCode(i);
             }
-            activity.requestPermissions(permissions, requestCode);
+            activity.requestPermissions(strArr, i);
         } else if (activity instanceof OnRequestPermissionsResultCallback) {
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 /* class android.support.v4.app.ActivityCompat.AnonymousClass1 */
 
                 public void run() {
-                    int[] grantResults = new int[permissions.length];
+                    int[] iArr = new int[strArr.length];
                     PackageManager packageManager = activity.getPackageManager();
                     String packageName = activity.getPackageName();
-                    int permissionCount = permissions.length;
-                    for (int i = 0; i < permissionCount; i++) {
-                        grantResults[i] = packageManager.checkPermission(permissions[i], packageName);
+                    int length = strArr.length;
+                    for (int i = 0; i < length; i++) {
+                        iArr[i] = packageManager.checkPermission(strArr[i], packageName);
                     }
-                    ((OnRequestPermissionsResultCallback) activity).onRequestPermissionsResult(requestCode, permissions, grantResults);
+                    ((OnRequestPermissionsResultCallback) activity).onRequestPermissionsResult(i, strArr, iArr);
                 }
             });
         }
     }
 
-    public static boolean shouldShowRequestPermissionRationale(Activity activity, String permission) {
+    public static boolean shouldShowRequestPermissionRationale(Activity activity, String str) {
         if (Build.VERSION.SDK_INT >= 23) {
-            return activity.shouldShowRequestPermissionRationale(permission);
+            return activity.shouldShowRequestPermissionRationale(str);
         }
         return false;
     }
@@ -196,52 +196,52 @@ public class ActivityCompat extends ContextCompat {
     private static class SharedElementCallback21Impl extends SharedElementCallback {
         protected SharedElementCallback mCallback;
 
-        SharedElementCallback21Impl(SharedElementCallback callback) {
-            this.mCallback = callback;
+        SharedElementCallback21Impl(SharedElementCallback sharedElementCallback) {
+            this.mCallback = sharedElementCallback;
         }
 
         @Override // android.app.SharedElementCallback
-        public void onSharedElementStart(List<String> sharedElementNames, List<View> sharedElements, List<View> sharedElementSnapshots) {
-            this.mCallback.onSharedElementStart(sharedElementNames, sharedElements, sharedElementSnapshots);
+        public void onSharedElementStart(List<String> list, List<View> list2, List<View> list3) {
+            this.mCallback.onSharedElementStart(list, list2, list3);
         }
 
         @Override // android.app.SharedElementCallback
-        public void onSharedElementEnd(List<String> sharedElementNames, List<View> sharedElements, List<View> sharedElementSnapshots) {
-            this.mCallback.onSharedElementEnd(sharedElementNames, sharedElements, sharedElementSnapshots);
+        public void onSharedElementEnd(List<String> list, List<View> list2, List<View> list3) {
+            this.mCallback.onSharedElementEnd(list, list2, list3);
         }
 
         @Override // android.app.SharedElementCallback
-        public void onRejectSharedElements(List<View> rejectedSharedElements) {
-            this.mCallback.onRejectSharedElements(rejectedSharedElements);
+        public void onRejectSharedElements(List<View> list) {
+            this.mCallback.onRejectSharedElements(list);
         }
 
         @Override // android.app.SharedElementCallback
-        public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
-            this.mCallback.onMapSharedElements(names, sharedElements);
+        public void onMapSharedElements(List<String> list, Map<String, View> map) {
+            this.mCallback.onMapSharedElements(list, map);
         }
 
-        public Parcelable onCaptureSharedElementSnapshot(View sharedElement, Matrix viewToGlobalMatrix, RectF screenBounds) {
-            return this.mCallback.onCaptureSharedElementSnapshot(sharedElement, viewToGlobalMatrix, screenBounds);
+        public Parcelable onCaptureSharedElementSnapshot(View view, Matrix matrix, RectF rectF) {
+            return this.mCallback.onCaptureSharedElementSnapshot(view, matrix, rectF);
         }
 
-        public View onCreateSnapshotView(Context context, Parcelable snapshot) {
-            return this.mCallback.onCreateSnapshotView(context, snapshot);
+        public View onCreateSnapshotView(Context context, Parcelable parcelable) {
+            return this.mCallback.onCreateSnapshotView(context, parcelable);
         }
     }
 
     private static class SharedElementCallback23Impl extends SharedElementCallback21Impl {
-        SharedElementCallback23Impl(SharedElementCallback callback) {
-            super(callback);
+        SharedElementCallback23Impl(SharedElementCallback sharedElementCallback) {
+            super(sharedElementCallback);
         }
 
         @Override // android.app.SharedElementCallback
-        public void onSharedElementsArrived(List<String> sharedElementNames, List<View> sharedElements, final SharedElementCallback.OnSharedElementsReadyListener listener) {
-            this.mCallback.onSharedElementsArrived(sharedElementNames, sharedElements, new SharedElementCallback.OnSharedElementsReadyListener() {
+        public void onSharedElementsArrived(List<String> list, List<View> list2, final SharedElementCallback.OnSharedElementsReadyListener onSharedElementsReadyListener) {
+            this.mCallback.onSharedElementsArrived(list, list2, new SharedElementCallback.OnSharedElementsReadyListener() {
                 /* class android.support.v4.app.ActivityCompat.SharedElementCallback23Impl.AnonymousClass1 */
 
                 @Override // android.support.v4.app.SharedElementCallback.OnSharedElementsReadyListener
                 public void onSharedElementsReady() {
-                    listener.onSharedElementsReady();
+                    onSharedElementsReadyListener.onSharedElementsReady();
                 }
             });
         }

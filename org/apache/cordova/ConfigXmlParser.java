@@ -32,25 +32,25 @@ public class ConfigXmlParser {
         return this.launchUrl;
     }
 
-    public void parse(Context action) {
-        int id = action.getResources().getIdentifier("config", "xml", action.getClass().getPackage().getName());
-        if (id == 0 && (id = action.getResources().getIdentifier("config", "xml", action.getPackageName())) == 0) {
+    public void parse(Context context) {
+        int identifier = context.getResources().getIdentifier("config", "xml", context.getClass().getPackage().getName());
+        if (identifier == 0 && (identifier = context.getResources().getIdentifier("config", "xml", context.getPackageName())) == 0) {
             LOG.e(TAG, "res/xml/config.xml is missing!");
         } else {
-            parse(action.getResources().getXml(id));
+            parse(context.getResources().getXml(identifier));
         }
     }
 
-    public void parse(XmlPullParser xml) {
-        int eventType = -1;
-        while (eventType != 1) {
-            if (eventType == 2) {
-                handleStartTag(xml);
-            } else if (eventType == 3) {
-                handleEndTag(xml);
+    public void parse(XmlPullParser xmlPullParser) {
+        int i = -1;
+        while (i != 1) {
+            if (i == 2) {
+                handleStartTag(xmlPullParser);
+            } else if (i == 3) {
+                handleEndTag(xmlPullParser);
             }
             try {
-                eventType = xml.next();
+                i = xmlPullParser.next();
             } catch (XmlPullParserException e) {
                 e.printStackTrace();
             } catch (IOException e2) {
@@ -59,31 +59,31 @@ public class ConfigXmlParser {
         }
     }
 
-    public void handleStartTag(XmlPullParser xml) {
-        String src;
-        String strNode = xml.getName();
-        if (strNode.equals("feature")) {
+    public void handleStartTag(XmlPullParser xmlPullParser) {
+        String attributeValue;
+        String name = xmlPullParser.getName();
+        if (name.equals("feature")) {
             this.insideFeature = true;
-            this.service = xml.getAttributeValue(null, "name");
-        } else if (this.insideFeature && strNode.equals("param")) {
-            String attributeValue = xml.getAttributeValue(null, "name");
-            this.paramType = attributeValue;
-            if (attributeValue.equals(NotificationCompat.CATEGORY_SERVICE)) {
-                this.service = xml.getAttributeValue(null, "value");
+            this.service = xmlPullParser.getAttributeValue(null, "name");
+        } else if (this.insideFeature && name.equals("param")) {
+            String attributeValue2 = xmlPullParser.getAttributeValue(null, "name");
+            this.paramType = attributeValue2;
+            if (attributeValue2.equals(NotificationCompat.CATEGORY_SERVICE)) {
+                this.service = xmlPullParser.getAttributeValue(null, "value");
             } else if (this.paramType.equals("package") || this.paramType.equals("android-package")) {
-                this.pluginClass = xml.getAttributeValue(null, "value");
+                this.pluginClass = xmlPullParser.getAttributeValue(null, "value");
             } else if (this.paramType.equals("onload")) {
-                this.onload = "true".equals(xml.getAttributeValue(null, "value"));
+                this.onload = "true".equals(xmlPullParser.getAttributeValue(null, "value"));
             }
-        } else if (strNode.equals("preference")) {
-            this.prefs.set(xml.getAttributeValue(null, "name").toLowerCase(Locale.ENGLISH), xml.getAttributeValue(null, "value"));
-        } else if (strNode.equals("content") && (src = xml.getAttributeValue(null, "src")) != null) {
-            setStartUrl(src);
+        } else if (name.equals("preference")) {
+            this.prefs.set(xmlPullParser.getAttributeValue(null, "name").toLowerCase(Locale.ENGLISH), xmlPullParser.getAttributeValue(null, "value"));
+        } else if (name.equals("content") && (attributeValue = xmlPullParser.getAttributeValue(null, "src")) != null) {
+            setStartUrl(attributeValue);
         }
     }
 
-    public void handleEndTag(XmlPullParser xml) {
-        if (xml.getName().equals("feature")) {
+    public void handleEndTag(XmlPullParser xmlPullParser) {
+        if (xmlPullParser.getName().equals("feature")) {
             this.pluginEntries.add(new PluginEntry(this.service, this.pluginClass, this.onload));
             this.service = "";
             this.pluginClass = "";
@@ -92,14 +92,14 @@ public class ConfigXmlParser {
         }
     }
 
-    private void setStartUrl(String src) {
-        if (Pattern.compile("^[a-z-]+://").matcher(src).find()) {
-            this.launchUrl = src;
+    private void setStartUrl(String str) {
+        if (Pattern.compile("^[a-z-]+://").matcher(str).find()) {
+            this.launchUrl = str;
             return;
         }
-        if (src.charAt(0) == '/') {
-            src = src.substring(1);
+        if (str.charAt(0) == '/') {
+            str = str.substring(1);
         }
-        this.launchUrl = "file:///android_asset/www/" + src;
+        this.launchUrl = "file:///android_asset/www/" + str;
     }
 }

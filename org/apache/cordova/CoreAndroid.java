@@ -20,8 +20,8 @@ public class CoreAndroid extends CordovaPlugin {
     private PluginResult pendingResume;
     private BroadcastReceiver telephonyReceiver;
 
-    public void fireJavascriptEvent(String action) {
-        sendEventMessage(action);
+    public void fireJavascriptEvent(String str) {
+        sendEventMessage(str);
     }
 
     @Override // org.apache.cordova.CordovaPlugin
@@ -30,12 +30,12 @@ public class CoreAndroid extends CordovaPlugin {
     }
 
     @Override // org.apache.cordova.CordovaPlugin
-    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
+    public boolean execute(String str, JSONArray jSONArray, CallbackContext callbackContext) throws JSONException {
         PluginResult.Status status = PluginResult.Status.OK;
         try {
-            if (action.equals("clearCache")) {
+            if (str.equals("clearCache")) {
                 clearCache();
-            } else if (action.equals("show")) {
+            } else if (str.equals("show")) {
                 this.cordova.getActivity().runOnUiThread(new Runnable() {
                     /* class org.apache.cordova.CoreAndroid.AnonymousClass1 */
 
@@ -43,20 +43,20 @@ public class CoreAndroid extends CordovaPlugin {
                         CoreAndroid.this.webView.getPluginManager().postMessage("spinner", "stop");
                     }
                 });
-            } else if (action.equals("loadUrl")) {
-                loadUrl(args.getString(0), args.optJSONObject(1));
-            } else if (!action.equals("cancelLoadUrl")) {
-                if (action.equals("clearHistory")) {
+            } else if (str.equals("loadUrl")) {
+                loadUrl(jSONArray.getString(0), jSONArray.optJSONObject(1));
+            } else if (!str.equals("cancelLoadUrl")) {
+                if (str.equals("clearHistory")) {
                     clearHistory();
-                } else if (action.equals("backHistory")) {
+                } else if (str.equals("backHistory")) {
                     backHistory();
-                } else if (action.equals("overrideButton")) {
-                    overrideButton(args.getString(0), args.getBoolean(1));
-                } else if (action.equals("overrideBackbutton")) {
-                    overrideBackbutton(args.getBoolean(0));
-                } else if (action.equals("exitApp")) {
+                } else if (str.equals("overrideButton")) {
+                    overrideButton(jSONArray.getString(0), jSONArray.getBoolean(1));
+                } else if (str.equals("overrideBackbutton")) {
+                    overrideBackbutton(jSONArray.getBoolean(0));
+                } else if (str.equals("exitApp")) {
                     exitApp();
-                } else if (action.equals("messageChannel")) {
+                } else if (str.equals("messageChannel")) {
                     synchronized (this.messageChannelLock) {
                         this.messageChannel = callbackContext;
                         if (this.pendingPause != null) {
@@ -73,7 +73,7 @@ public class CoreAndroid extends CordovaPlugin {
             }
             callbackContext.sendPluginResult(new PluginResult(status, ""));
             return true;
-        } catch (JSONException e) {
+        } catch (JSONException unused) {
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION));
             return false;
         }
@@ -89,46 +89,54 @@ public class CoreAndroid extends CordovaPlugin {
         });
     }
 
-    public void loadUrl(String url, JSONObject props) throws JSONException {
-        LOG.d("App", "App.loadUrl(" + url + "," + props + ")");
-        int wait = 0;
-        boolean openExternal = false;
-        boolean clearHistory = false;
-        HashMap<String, Object> params = new HashMap<>();
-        if (props != null) {
-            JSONArray keys = props.names();
-            for (int i = 0; i < keys.length(); i++) {
-                String key = keys.getString(i);
-                if (key.equals("wait")) {
-                    wait = props.getInt(key);
-                } else if (key.equalsIgnoreCase("openexternal")) {
-                    openExternal = props.getBoolean(key);
-                } else if (key.equalsIgnoreCase("clearhistory")) {
-                    clearHistory = props.getBoolean(key);
+    public void loadUrl(String str, JSONObject jSONObject) throws JSONException {
+        boolean z;
+        boolean z2;
+        LOG.d("App", "App.loadUrl(" + str + "," + jSONObject + ")");
+        HashMap hashMap = new HashMap();
+        int i = 0;
+        if (jSONObject != null) {
+            JSONArray names = jSONObject.names();
+            int i2 = 0;
+            z2 = false;
+            z = false;
+            while (i < names.length()) {
+                String string = names.getString(i);
+                if (string.equals("wait")) {
+                    i2 = jSONObject.getInt(string);
+                } else if (string.equalsIgnoreCase("openexternal")) {
+                    z2 = jSONObject.getBoolean(string);
+                } else if (string.equalsIgnoreCase("clearhistory")) {
+                    z = jSONObject.getBoolean(string);
                 } else {
-                    Object value = props.get(key);
-                    if (value != null) {
-                        if (value.getClass().equals(String.class)) {
-                            params.put(key, (String) value);
-                        } else if (value.getClass().equals(Boolean.class)) {
-                            params.put(key, (Boolean) value);
-                        } else if (value.getClass().equals(Integer.class)) {
-                            params.put(key, (Integer) value);
+                    Object obj = jSONObject.get(string);
+                    if (obj != null) {
+                        if (obj.getClass().equals(String.class)) {
+                            hashMap.put(string, (String) obj);
+                        } else if (obj.getClass().equals(Boolean.class)) {
+                            hashMap.put(string, (Boolean) obj);
+                        } else if (obj.getClass().equals(Integer.class)) {
+                            hashMap.put(string, (Integer) obj);
                         }
                     }
                 }
+                i++;
             }
+            i = i2;
+        } else {
+            z2 = false;
+            z = false;
         }
-        if (wait > 0) {
+        if (i > 0) {
             try {
                 synchronized (this) {
-                    wait((long) wait);
+                    wait((long) i);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-        this.webView.showWebPage(url, openExternal, clearHistory, params);
+        this.webView.showWebPage(str, z2, z, hashMap);
     }
 
     public void clearHistory() {
@@ -151,19 +159,19 @@ public class CoreAndroid extends CordovaPlugin {
         });
     }
 
-    public void overrideBackbutton(boolean override) {
+    public void overrideBackbutton(boolean z) {
         LOG.i("App", "WARNING: Back Button Default Behavior will be overridden.  The backbutton event will be fired!");
-        this.webView.setButtonPlumbedToJs(4, override);
+        this.webView.setButtonPlumbedToJs(4, z);
     }
 
-    public void overrideButton(String button, boolean override) {
+    public void overrideButton(String str, boolean z) {
         LOG.i("App", "WARNING: Volume Button Default Behavior will be overridden.  The volume event will be fired!");
-        if (button.equals("volumeup")) {
-            this.webView.setButtonPlumbedToJs(24, override);
-        } else if (button.equals("volumedown")) {
-            this.webView.setButtonPlumbedToJs(25, override);
-        } else if (button.equals("menubutton")) {
-            this.webView.setButtonPlumbedToJs(82, override);
+        if (str.equals("volumeup")) {
+            this.webView.setButtonPlumbedToJs(24, z);
+        } else if (str.equals("volumedown")) {
+            this.webView.setButtonPlumbedToJs(25, z);
+        } else if (str.equals("menubutton")) {
+            this.webView.setButtonPlumbedToJs(82, z);
         }
     }
 
@@ -183,14 +191,14 @@ public class CoreAndroid extends CordovaPlugin {
 
             public void onReceive(Context context, Intent intent) {
                 if (intent != null && intent.getAction().equals("android.intent.action.PHONE_STATE") && intent.hasExtra("state")) {
-                    String extraData = intent.getStringExtra("state");
-                    if (extraData.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
+                    String stringExtra = intent.getStringExtra("state");
+                    if (stringExtra.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
                         LOG.i(CoreAndroid.TAG, "Telephone RINGING");
                         CoreAndroid.this.webView.getPluginManager().postMessage("telephone", "ringing");
-                    } else if (extraData.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
+                    } else if (stringExtra.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
                         LOG.i(CoreAndroid.TAG, "Telephone OFFHOOK");
                         CoreAndroid.this.webView.getPluginManager().postMessage("telephone", "offhook");
-                    } else if (extraData.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
+                    } else if (stringExtra.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
                         LOG.i(CoreAndroid.TAG, "Telephone IDLE");
                         CoreAndroid.this.webView.getPluginManager().postMessage("telephone", "idle");
                     }
@@ -200,31 +208,31 @@ public class CoreAndroid extends CordovaPlugin {
         this.webView.getContext().registerReceiver(this.telephonyReceiver, intentFilter);
     }
 
-    private void sendEventMessage(String action) {
-        JSONObject obj = new JSONObject();
+    private void sendEventMessage(String str) {
+        JSONObject jSONObject = new JSONObject();
         try {
-            obj.put("action", action);
+            jSONObject.put("action", str);
         } catch (JSONException e) {
             LOG.e(TAG, "Failed to create event message", e);
         }
-        PluginResult result = new PluginResult(PluginResult.Status.OK, obj);
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jSONObject);
         if (this.messageChannel == null) {
-            LOG.i(TAG, "Request to send event before messageChannel initialised: " + action);
-            if ("pause".equals(action)) {
-                this.pendingPause = result;
-            } else if ("resume".equals(action)) {
+            LOG.i(TAG, "Request to send event before messageChannel initialised: " + str);
+            if ("pause".equals(str)) {
+                this.pendingPause = pluginResult;
+            } else if ("resume".equals(str)) {
                 this.pendingPause = null;
             }
         } else {
-            sendEventMessage(result);
+            sendEventMessage(pluginResult);
         }
     }
 
-    private void sendEventMessage(PluginResult payload) {
-        payload.setKeepCallback(true);
+    private void sendEventMessage(PluginResult pluginResult) {
+        pluginResult.setKeepCallback(true);
         CallbackContext callbackContext = this.messageChannel;
         if (callbackContext != null) {
-            callbackContext.sendPluginResult(payload);
+            callbackContext.sendPluginResult(pluginResult);
         }
     }
 
@@ -233,33 +241,33 @@ public class CoreAndroid extends CordovaPlugin {
         this.webView.getContext().unregisterReceiver(this.telephonyReceiver);
     }
 
-    public void sendResumeEvent(PluginResult resumeEvent) {
+    public void sendResumeEvent(PluginResult pluginResult) {
         synchronized (this.messageChannelLock) {
             if (this.messageChannel != null) {
-                sendEventMessage(resumeEvent);
+                sendEventMessage(pluginResult);
             } else {
-                this.pendingResume = resumeEvent;
+                this.pendingResume = pluginResult;
             }
         }
     }
 
-    public static Object getBuildConfigValue(Context ctx, String key) {
+    public static Object getBuildConfigValue(Context context, String str) {
         try {
-            return Class.forName(ctx.getClass().getPackage().getName() + ".BuildConfig").getField(key).get(null);
+            return Class.forName(context.getClass().getPackage().getName() + ".BuildConfig").getField(str).get(null);
         } catch (ClassNotFoundException e) {
             LOG.d(TAG, "Unable to get the BuildConfig, is this built with ANT?");
             e.printStackTrace();
             return null;
-        } catch (NoSuchFieldException e2) {
-            LOG.d(TAG, key + " is not a valid field. Check your build.gradle");
+        } catch (NoSuchFieldException unused) {
+            LOG.d(TAG, str + " is not a valid field. Check your build.gradle");
             return null;
-        } catch (IllegalAccessException e3) {
+        } catch (IllegalAccessException e2) {
             LOG.d(TAG, "Illegal Access Exception: Let's print a stack trace.");
-            e3.printStackTrace();
+            e2.printStackTrace();
             return null;
-        } catch (NullPointerException e4) {
+        } catch (NullPointerException e3) {
             LOG.d(TAG, "Null Pointer Exception: Let's print a stack trace.");
-            e4.printStackTrace();
+            e3.printStackTrace();
             return null;
         }
     }

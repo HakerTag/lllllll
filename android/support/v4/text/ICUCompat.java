@@ -20,10 +20,10 @@ public final class ICUCompat {
             }
         } else {
             try {
-                Class<?> clazz = Class.forName("libcore.icu.ICU");
-                if (clazz != null) {
-                    sGetScriptMethod = clazz.getMethod("getScript", String.class);
-                    sAddLikelySubtagsMethod = clazz.getMethod("addLikelySubtags", String.class);
+                Class<?> cls = Class.forName("libcore.icu.ICU");
+                if (cls != null) {
+                    sGetScriptMethod = cls.getMethod("getScript", String.class);
+                    sAddLikelySubtagsMethod = cls.getMethod("addLikelySubtags", String.class);
                 }
             } catch (Exception e2) {
                 sGetScriptMethod = null;
@@ -45,18 +45,18 @@ public final class ICUCompat {
                 return locale.getScript();
             }
         } else {
-            String localeWithSubtags = addLikelySubtags(locale);
-            if (localeWithSubtags != null) {
-                return getScript(localeWithSubtags);
+            String addLikelySubtags = addLikelySubtags(locale);
+            if (addLikelySubtags != null) {
+                return getScript(addLikelySubtags);
             }
             return null;
         }
     }
 
-    private static String getScript(String localeStr) {
+    private static String getScript(String str) {
         try {
             if (sGetScriptMethod != null) {
-                return (String) sGetScriptMethod.invoke(null, localeStr);
+                return (String) sGetScriptMethod.invoke(null, str);
             }
         } catch (IllegalAccessException e) {
             Log.w(TAG, e);
@@ -67,17 +67,17 @@ public final class ICUCompat {
     }
 
     private static String addLikelySubtags(Locale locale) {
-        String localeStr = locale.toString();
+        String locale2 = locale.toString();
         try {
             if (sAddLikelySubtagsMethod != null) {
-                return (String) sAddLikelySubtagsMethod.invoke(null, localeStr);
+                return (String) sAddLikelySubtagsMethod.invoke(null, locale2);
             }
         } catch (IllegalAccessException e) {
             Log.w(TAG, e);
         } catch (InvocationTargetException e2) {
             Log.w(TAG, e2);
         }
-        return localeStr;
+        return locale2;
     }
 
     private ICUCompat() {

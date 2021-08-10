@@ -8,10 +8,10 @@ public class FragmentManagerNonConfig {
     private final List<Fragment> mFragments;
     private final List<ViewModelStore> mViewModelStores;
 
-    FragmentManagerNonConfig(List<Fragment> fragments, List<FragmentManagerNonConfig> childNonConfigs, List<ViewModelStore> viewModelStores) {
-        this.mFragments = fragments;
-        this.mChildNonConfigs = childNonConfigs;
-        this.mViewModelStores = viewModelStores;
+    FragmentManagerNonConfig(List<Fragment> list, List<FragmentManagerNonConfig> list2, List<ViewModelStore> list3) {
+        this.mFragments = list;
+        this.mChildNonConfigs = list2;
+        this.mViewModelStores = list3;
     }
 
     /* access modifiers changed from: package-private */

@@ -3,9 +3,9 @@ package com.google.zxing.client.result;
 public final class ISBNParsedResult extends ParsedResult {
     private final String isbn;
 
-    ISBNParsedResult(String isbn2) {
+    ISBNParsedResult(String str) {
         super(ParsedResultType.ISBN);
-        this.isbn = isbn2;
+        this.isbn = str;
     }
 
     public String getISBN() {

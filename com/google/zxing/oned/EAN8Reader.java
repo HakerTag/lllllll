@@ -9,28 +9,28 @@ public final class EAN8Reader extends UPCEANReader {
 
     /* access modifiers changed from: protected */
     @Override // com.google.zxing.oned.UPCEANReader
-    public int decodeMiddle(BitArray row, int[] startRange, StringBuilder result) throws NotFoundException {
-        int[] counters = this.decodeMiddleCounters;
-        counters[0] = 0;
-        counters[1] = 0;
-        counters[2] = 0;
-        counters[3] = 0;
-        int end = row.getSize();
-        int rowOffset = startRange[1];
-        for (int x = 0; x < 4 && rowOffset < end; x++) {
-            result.append((char) (decodeDigit(row, counters, rowOffset, L_PATTERNS) + 48));
-            for (int counter : counters) {
-                rowOffset += counter;
+    public int decodeMiddle(BitArray bitArray, int[] iArr, StringBuilder sb) throws NotFoundException {
+        int[] iArr2 = this.decodeMiddleCounters;
+        iArr2[0] = 0;
+        iArr2[1] = 0;
+        iArr2[2] = 0;
+        iArr2[3] = 0;
+        int size = bitArray.getSize();
+        int i = iArr[1];
+        for (int i2 = 0; i2 < 4 && i < size; i2++) {
+            sb.append((char) (decodeDigit(bitArray, iArr2, i, L_PATTERNS) + 48));
+            for (int i3 : iArr2) {
+                i += i3;
             }
         }
-        int rowOffset2 = findGuardPattern(row, rowOffset, true, MIDDLE_PATTERN)[1];
-        for (int x2 = 0; x2 < 4 && rowOffset2 < end; x2++) {
-            result.append((char) (decodeDigit(row, counters, rowOffset2, L_PATTERNS) + 48));
-            for (int counter2 : counters) {
-                rowOffset2 += counter2;
+        int i4 = findGuardPattern(bitArray, i, true, MIDDLE_PATTERN)[1];
+        for (int i5 = 0; i5 < 4 && i4 < size; i5++) {
+            sb.append((char) (decodeDigit(bitArray, iArr2, i4, L_PATTERNS) + 48));
+            for (int i6 : iArr2) {
+                i4 += i6;
             }
         }
-        return rowOffset2;
+        return i4;
     }
 
     /* access modifiers changed from: package-private */

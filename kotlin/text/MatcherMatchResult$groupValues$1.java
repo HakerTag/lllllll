@@ -1,0 +1,58 @@
+package kotlin.text;
+
+import kotlin.collections.AbstractList;
+
+public final class MatcherMatchResult$groupValues$1 extends AbstractList<String> {
+    final /* synthetic */ MatcherMatchResult this$0;
+
+    MatcherMatchResult$groupValues$1(MatcherMatchResult matcherMatchResult) {
+        this.this$0 = matcherMatchResult;
+    }
+
+    @Override // kotlin.collections.AbstractCollection
+    public final /* bridge */ boolean contains(Object obj) {
+        if (obj instanceof String) {
+            return contains((String) obj);
+        }
+        return false;
+    }
+
+    public /* bridge */ boolean contains(String str) {
+        return super.contains((Object) str);
+    }
+
+    @Override // kotlin.collections.AbstractList
+    public final /* bridge */ int indexOf(Object obj) {
+        if (obj instanceof String) {
+            return indexOf((String) obj);
+        }
+        return -1;
+    }
+
+    public /* bridge */ int indexOf(String str) {
+        return super.indexOf((Object) str);
+    }
+
+    @Override // kotlin.collections.AbstractList
+    public final /* bridge */ int lastIndexOf(Object obj) {
+        if (obj instanceof String) {
+            return lastIndexOf((String) obj);
+        }
+        return -1;
+    }
+
+    public /* bridge */ int lastIndexOf(String str) {
+        return super.lastIndexOf((Object) str);
+    }
+
+    @Override // kotlin.collections.AbstractList, kotlin.collections.AbstractCollection
+    public int getSize() {
+        return this.this$0.getMatchResult().groupCount() + 1;
+    }
+
+    @Override // java.util.List, kotlin.collections.AbstractList
+    public String get(int i) {
+        String group = this.this$0.getMatchResult().group(i);
+        return group != null ? group : "";
+    }
+}

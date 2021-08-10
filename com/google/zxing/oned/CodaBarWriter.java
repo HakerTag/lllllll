@@ -13,86 +13,89 @@ public final class CodaBarWriter extends OneDimensionalCodeWriter {
     }
 
     @Override // com.google.zxing.oned.OneDimensionalCodeWriter
-    public boolean[] encode(String contents) {
-        if (contents.length() < 2) {
-            contents = DEFAULT_GUARD + contents + DEFAULT_GUARD;
+    public boolean[] encode(String str) {
+        int i;
+        if (str.length() < 2) {
+            str = DEFAULT_GUARD + str + DEFAULT_GUARD;
         } else {
-            char firstChar = Character.toUpperCase(contents.charAt(0));
-            char lastChar = Character.toUpperCase(contents.charAt(contents.length() - 1));
-            boolean startsNormal = CodaBarReader.arrayContains(START_END_CHARS, firstChar);
-            boolean endsNormal = CodaBarReader.arrayContains(START_END_CHARS, lastChar);
-            boolean startsAlt = CodaBarReader.arrayContains(ALT_START_END_CHARS, firstChar);
-            boolean endsAlt = CodaBarReader.arrayContains(ALT_START_END_CHARS, lastChar);
-            if (startsNormal) {
-                if (!endsNormal) {
-                    throw new IllegalArgumentException("Invalid start/end guards: " + contents);
+            char upperCase = Character.toUpperCase(str.charAt(0));
+            char upperCase2 = Character.toUpperCase(str.charAt(str.length() - 1));
+            boolean arrayContains = CodaBarReader.arrayContains(START_END_CHARS, upperCase);
+            boolean arrayContains2 = CodaBarReader.arrayContains(START_END_CHARS, upperCase2);
+            boolean arrayContains3 = CodaBarReader.arrayContains(ALT_START_END_CHARS, upperCase);
+            boolean arrayContains4 = CodaBarReader.arrayContains(ALT_START_END_CHARS, upperCase2);
+            if (arrayContains) {
+                if (!arrayContains2) {
+                    throw new IllegalArgumentException("Invalid start/end guards: " + str);
                 }
-            } else if (startsAlt) {
-                if (!endsAlt) {
-                    throw new IllegalArgumentException("Invalid start/end guards: " + contents);
+            } else if (arrayContains3) {
+                if (!arrayContains4) {
+                    throw new IllegalArgumentException("Invalid start/end guards: " + str);
                 }
-            } else if (endsNormal || endsAlt) {
-                throw new IllegalArgumentException("Invalid start/end guards: " + contents);
+            } else if (arrayContains2 || arrayContains4) {
+                throw new IllegalArgumentException("Invalid start/end guards: " + str);
             } else {
-                contents = DEFAULT_GUARD + contents + DEFAULT_GUARD;
+                str = DEFAULT_GUARD + str + DEFAULT_GUARD;
             }
         }
-        int resultLength = 20;
-        for (int i = 1; i < contents.length() - 1; i++) {
-            if (Character.isDigit(contents.charAt(i)) || contents.charAt(i) == '-' || contents.charAt(i) == '$') {
-                resultLength += 9;
-            } else if (CodaBarReader.arrayContains(CHARS_WHICH_ARE_TEN_LENGTH_EACH_AFTER_DECODED, contents.charAt(i))) {
-                resultLength += 10;
+        int i2 = 20;
+        for (int i3 = 1; i3 < str.length() - 1; i3++) {
+            if (Character.isDigit(str.charAt(i3)) || str.charAt(i3) == '-' || str.charAt(i3) == '$') {
+                i2 += 9;
+            } else if (CodaBarReader.arrayContains(CHARS_WHICH_ARE_TEN_LENGTH_EACH_AFTER_DECODED, str.charAt(i3))) {
+                i2 += 10;
             } else {
-                throw new IllegalArgumentException("Cannot encode : '" + contents.charAt(i) + '\'');
+                throw new IllegalArgumentException("Cannot encode : '" + str.charAt(i3) + '\'');
             }
         }
-        boolean[] result = new boolean[(resultLength + (contents.length() - 1))];
-        int position = 0;
-        for (int index = 0; index < contents.length(); index++) {
-            char c = Character.toUpperCase(contents.charAt(index));
-            if (index == 0 || index == contents.length() - 1) {
-                if (c == '*') {
-                    c = 'C';
-                } else if (c == 'E') {
-                    c = 'D';
-                } else if (c == 'N') {
-                    c = 'B';
-                } else if (c == 'T') {
-                    c = 'A';
+        boolean[] zArr = new boolean[(i2 + (str.length() - 1))];
+        int i4 = 0;
+        for (int i5 = 0; i5 < str.length(); i5++) {
+            char upperCase3 = Character.toUpperCase(str.charAt(i5));
+            if (i5 == 0 || i5 == str.length() - 1) {
+                if (upperCase3 == '*') {
+                    upperCase3 = 'C';
+                } else if (upperCase3 == 'E') {
+                    upperCase3 = 'D';
+                } else if (upperCase3 == 'N') {
+                    upperCase3 = 'B';
+                } else if (upperCase3 == 'T') {
+                    upperCase3 = 'A';
                 }
             }
-            int code = 0;
-            int i2 = 0;
+            int i6 = 0;
             while (true) {
-                if (i2 >= CodaBarReader.ALPHABET.length) {
+                if (i6 >= CodaBarReader.ALPHABET.length) {
+                    i = 0;
                     break;
-                } else if (c == CodaBarReader.ALPHABET[i2]) {
-                    code = CodaBarReader.CHARACTER_ENCODINGS[i2];
+                } else if (upperCase3 == CodaBarReader.ALPHABET[i6]) {
+                    i = CodaBarReader.CHARACTER_ENCODINGS[i6];
                     break;
                 } else {
-                    i2++;
+                    i6++;
                 }
             }
-            boolean color = true;
-            int counter = 0;
-            int bit = 0;
-            while (bit < 7) {
-                result[position] = color;
-                position++;
-                if (((code >> (6 - bit)) & 1) == 0 || counter == 1) {
-                    color = !color;
-                    bit++;
-                    counter = 0;
-                } else {
-                    counter++;
+            int i7 = 0;
+            boolean z = true;
+            while (true) {
+                int i8 = 0;
+                while (i7 < 7) {
+                    zArr[i4] = z;
+                    i4++;
+                    if (((i >> (6 - i7)) & 1) == 0 || i8 == 1) {
+                        z = !z;
+                        i7++;
+                    } else {
+                        i8++;
+                    }
                 }
+                break;
             }
-            if (index < contents.length() - 1) {
-                result[position] = false;
-                position++;
+            if (i5 < str.length() - 1) {
+                zArr[i4] = false;
+                i4++;
             }
         }
-        return result;
+        return zArr;
     }
 }

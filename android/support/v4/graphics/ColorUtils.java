@@ -1,6 +1,7 @@
 package android.support.v4.graphics;
 
 import android.graphics.Color;
+import android.support.v4.view.ViewCompat;
 
 public final class ColorUtils {
     private static final int MIN_ALPHA_SEARCH_MAX_ITERATIONS = 10;
@@ -12,290 +13,303 @@ public final class ColorUtils {
     private static final double XYZ_WHITE_REFERENCE_Y = 100.0d;
     private static final double XYZ_WHITE_REFERENCE_Z = 108.883d;
 
+    private static float constrain(float f, float f2, float f3) {
+        return f < f2 ? f2 : f > f3 ? f3 : f;
+    }
+
+    private static int constrain(int i, int i2, int i3) {
+        return i < i2 ? i2 : i > i3 ? i3 : i;
+    }
+
     private ColorUtils() {
     }
 
-    public static int compositeColors(int foreground, int background) {
-        int bgAlpha = Color.alpha(background);
-        int fgAlpha = Color.alpha(foreground);
-        int a = compositeAlpha(fgAlpha, bgAlpha);
-        return Color.argb(a, compositeComponent(Color.red(foreground), fgAlpha, Color.red(background), bgAlpha, a), compositeComponent(Color.green(foreground), fgAlpha, Color.green(background), bgAlpha, a), compositeComponent(Color.blue(foreground), fgAlpha, Color.blue(background), bgAlpha, a));
+    public static int compositeColors(int i, int i2) {
+        int alpha = Color.alpha(i2);
+        int alpha2 = Color.alpha(i);
+        int compositeAlpha = compositeAlpha(alpha2, alpha);
+        return Color.argb(compositeAlpha, compositeComponent(Color.red(i), alpha2, Color.red(i2), alpha, compositeAlpha), compositeComponent(Color.green(i), alpha2, Color.green(i2), alpha, compositeAlpha), compositeComponent(Color.blue(i), alpha2, Color.blue(i2), alpha, compositeAlpha));
     }
 
-    private static int compositeAlpha(int foregroundAlpha, int backgroundAlpha) {
-        return 255 - (((255 - backgroundAlpha) * (255 - foregroundAlpha)) / 255);
+    private static int compositeAlpha(int i, int i2) {
+        return 255 - (((255 - i2) * (255 - i)) / 255);
     }
 
-    private static int compositeComponent(int fgC, int fgA, int bgC, int bgA, int a) {
-        if (a == 0) {
+    private static int compositeComponent(int i, int i2, int i3, int i4, int i5) {
+        if (i5 == 0) {
             return 0;
         }
-        return (((fgC * 255) * fgA) + ((bgC * bgA) * (255 - fgA))) / (a * 255);
+        return (((i * 255) * i2) + ((i3 * i4) * (255 - i2))) / (i5 * 255);
     }
 
-    public static double calculateLuminance(int color) {
-        double[] result = getTempDouble3Array();
-        colorToXYZ(color, result);
-        return result[1] / XYZ_WHITE_REFERENCE_Y;
+    public static double calculateLuminance(int i) {
+        double[] tempDouble3Array = getTempDouble3Array();
+        colorToXYZ(i, tempDouble3Array);
+        return tempDouble3Array[1] / XYZ_WHITE_REFERENCE_Y;
     }
 
-    public static double calculateContrast(int foreground, int background) {
-        if (Color.alpha(background) == 255) {
-            if (Color.alpha(foreground) < 255) {
-                foreground = compositeColors(foreground, background);
+    public static double calculateContrast(int i, int i2) {
+        if (Color.alpha(i2) == 255) {
+            if (Color.alpha(i) < 255) {
+                i = compositeColors(i, i2);
             }
-            double luminance1 = calculateLuminance(foreground) + 0.05d;
-            double luminance2 = calculateLuminance(background) + 0.05d;
-            return Math.max(luminance1, luminance2) / Math.min(luminance1, luminance2);
+            double calculateLuminance = calculateLuminance(i) + 0.05d;
+            double calculateLuminance2 = calculateLuminance(i2) + 0.05d;
+            return Math.max(calculateLuminance, calculateLuminance2) / Math.min(calculateLuminance, calculateLuminance2);
         }
-        throw new IllegalArgumentException("background can not be translucent: #" + Integer.toHexString(background));
+        throw new IllegalArgumentException("background can not be translucent: #" + Integer.toHexString(i2));
     }
 
-    public static int calculateMinimumAlpha(int foreground, int background, float minContrastRatio) {
-        if (Color.alpha(background) != 255) {
-            throw new IllegalArgumentException("background can not be translucent: #" + Integer.toHexString(background));
-        } else if (calculateContrast(setAlphaComponent(foreground, 255), background) < ((double) minContrastRatio)) {
-            return -1;
-        } else {
-            int minAlpha = 0;
-            int maxAlpha = 255;
-            for (int numIterations = 0; numIterations <= 10 && maxAlpha - minAlpha > 1; numIterations++) {
-                int testAlpha = (minAlpha + maxAlpha) / 2;
-                if (calculateContrast(setAlphaComponent(foreground, testAlpha), background) < ((double) minContrastRatio)) {
-                    minAlpha = testAlpha;
+    public static int calculateMinimumAlpha(int i, int i2, float f) {
+        int i3 = 255;
+        if (Color.alpha(i2) == 255) {
+            double d = (double) f;
+            if (calculateContrast(setAlphaComponent(i, 255), i2) < d) {
+                return -1;
+            }
+            int i4 = 0;
+            for (int i5 = 0; i5 <= 10 && i3 - i4 > 1; i5++) {
+                int i6 = (i4 + i3) / 2;
+                if (calculateContrast(setAlphaComponent(i, i6), i2) < d) {
+                    i4 = i6;
                 } else {
-                    maxAlpha = testAlpha;
+                    i3 = i6;
                 }
             }
-            return maxAlpha;
+            return i3;
         }
+        throw new IllegalArgumentException("background can not be translucent: #" + Integer.toHexString(i2));
     }
 
-    public static void RGBToHSL(int r, int g, int b, float[] outHsl) {
-        float h;
-        float s;
-        float rf = ((float) r) / 255.0f;
-        float gf = ((float) g) / 255.0f;
-        float bf = ((float) b) / 255.0f;
-        float max = Math.max(rf, Math.max(gf, bf));
-        float min = Math.min(rf, Math.min(gf, bf));
-        float deltaMaxMin = max - min;
-        float l = (max + min) / 2.0f;
+    public static void RGBToHSL(int i, int i2, int i3, float[] fArr) {
+        float f;
+        float f2;
+        float f3 = ((float) i) / 255.0f;
+        float f4 = ((float) i2) / 255.0f;
+        float f5 = ((float) i3) / 255.0f;
+        float max = Math.max(f3, Math.max(f4, f5));
+        float min = Math.min(f3, Math.min(f4, f5));
+        float f6 = max - min;
+        float f7 = (max + min) / 2.0f;
         if (max == min) {
-            s = 0.0f;
-            h = 0.0f;
+            f = 0.0f;
+            f2 = 0.0f;
         } else {
-            if (max == rf) {
-                h = ((gf - bf) / deltaMaxMin) % 6.0f;
-            } else if (max == gf) {
-                h = ((bf - rf) / deltaMaxMin) + 2.0f;
-            } else {
-                h = ((rf - gf) / deltaMaxMin) + 4.0f;
-            }
-            s = deltaMaxMin / (1.0f - Math.abs((2.0f * l) - 1.0f));
+            f = max == f3 ? ((f4 - f5) / f6) % 6.0f : max == f4 ? ((f5 - f3) / f6) + 2.0f : 4.0f + ((f3 - f4) / f6);
+            f2 = f6 / (1.0f - Math.abs((2.0f * f7) - 1.0f));
         }
-        float h2 = (60.0f * h) % 360.0f;
-        if (h2 < 0.0f) {
-            h2 += 360.0f;
+        float f8 = (f * 60.0f) % 360.0f;
+        if (f8 < 0.0f) {
+            f8 += 360.0f;
         }
-        outHsl[0] = constrain(h2, 0.0f, 360.0f);
-        outHsl[1] = constrain(s, 0.0f, 1.0f);
-        outHsl[2] = constrain(l, 0.0f, 1.0f);
+        fArr[0] = constrain(f8, 0.0f, 360.0f);
+        fArr[1] = constrain(f2, 0.0f, 1.0f);
+        fArr[2] = constrain(f7, 0.0f, 1.0f);
     }
 
-    public static void colorToHSL(int color, float[] outHsl) {
-        RGBToHSL(Color.red(color), Color.green(color), Color.blue(color), outHsl);
+    public static void colorToHSL(int i, float[] fArr) {
+        RGBToHSL(Color.red(i), Color.green(i), Color.blue(i), fArr);
     }
 
-    public static int HSLToColor(float[] hsl) {
-        float h = hsl[0];
-        float s = hsl[1];
-        float l = hsl[2];
-        float c = (1.0f - Math.abs((l * 2.0f) - 1.0f)) * s;
-        float m = l - (0.5f * c);
-        float x = (1.0f - Math.abs(((h / 60.0f) % 2.0f) - 1.0f)) * c;
-        int r = 0;
-        int g = 0;
-        int b = 0;
-        switch (((int) h) / 60) {
+    public static int HSLToColor(float[] fArr) {
+        int i;
+        int i2;
+        int i3;
+        float f = fArr[0];
+        float f2 = fArr[1];
+        float f3 = fArr[2];
+        float abs = (1.0f - Math.abs((f3 * 2.0f) - 1.0f)) * f2;
+        float f4 = f3 - (0.5f * abs);
+        float abs2 = (1.0f - Math.abs(((f / 60.0f) % 2.0f) - 1.0f)) * abs;
+        switch (((int) f) / 60) {
             case 0:
-                r = Math.round((c + m) * 255.0f);
-                g = Math.round((x + m) * 255.0f);
-                b = Math.round(255.0f * m);
+                i3 = Math.round((abs + f4) * 255.0f);
+                i2 = Math.round((abs2 + f4) * 255.0f);
+                i = Math.round(f4 * 255.0f);
                 break;
             case 1:
-                r = Math.round((x + m) * 255.0f);
-                g = Math.round((c + m) * 255.0f);
-                b = Math.round(255.0f * m);
+                i3 = Math.round((abs2 + f4) * 255.0f);
+                i2 = Math.round((abs + f4) * 255.0f);
+                i = Math.round(f4 * 255.0f);
                 break;
             case 2:
-                r = Math.round(m * 255.0f);
-                g = Math.round((c + m) * 255.0f);
-                b = Math.round((x + m) * 255.0f);
+                i3 = Math.round(f4 * 255.0f);
+                i2 = Math.round((abs + f4) * 255.0f);
+                i = Math.round((abs2 + f4) * 255.0f);
                 break;
             case 3:
-                r = Math.round(m * 255.0f);
-                g = Math.round((x + m) * 255.0f);
-                b = Math.round((c + m) * 255.0f);
+                i3 = Math.round(f4 * 255.0f);
+                i2 = Math.round((abs2 + f4) * 255.0f);
+                i = Math.round((abs + f4) * 255.0f);
                 break;
             case 4:
-                r = Math.round((x + m) * 255.0f);
-                g = Math.round(m * 255.0f);
-                b = Math.round((c + m) * 255.0f);
+                i3 = Math.round((abs2 + f4) * 255.0f);
+                i2 = Math.round(f4 * 255.0f);
+                i = Math.round((abs + f4) * 255.0f);
                 break;
             case 5:
             case 6:
-                r = Math.round((c + m) * 255.0f);
-                g = Math.round(m * 255.0f);
-                b = Math.round((x + m) * 255.0f);
+                i3 = Math.round((abs + f4) * 255.0f);
+                i2 = Math.round(f4 * 255.0f);
+                i = Math.round((abs2 + f4) * 255.0f);
+                break;
+            default:
+                i = 0;
+                i3 = 0;
+                i2 = 0;
                 break;
         }
-        return Color.rgb(constrain(r, 0, 255), constrain(g, 0, 255), constrain(b, 0, 255));
+        return Color.rgb(constrain(i3, 0, 255), constrain(i2, 0, 255), constrain(i, 0, 255));
     }
 
-    public static int setAlphaComponent(int color, int alpha) {
-        if (alpha >= 0 && alpha <= 255) {
-            return (16777215 & color) | (alpha << 24);
+    public static int setAlphaComponent(int i, int i2) {
+        if (i2 >= 0 && i2 <= 255) {
+            return (i & ViewCompat.MEASURED_SIZE_MASK) | (i2 << 24);
         }
         throw new IllegalArgumentException("alpha must be between 0 and 255.");
     }
 
-    public static void colorToLAB(int color, double[] outLab) {
-        RGBToLAB(Color.red(color), Color.green(color), Color.blue(color), outLab);
+    public static void colorToLAB(int i, double[] dArr) {
+        RGBToLAB(Color.red(i), Color.green(i), Color.blue(i), dArr);
     }
 
-    public static void RGBToLAB(int r, int g, int b, double[] outLab) {
-        RGBToXYZ(r, g, b, outLab);
-        XYZToLAB(outLab[0], outLab[1], outLab[2], outLab);
+    public static void RGBToLAB(int i, int i2, int i3, double[] dArr) {
+        RGBToXYZ(i, i2, i3, dArr);
+        XYZToLAB(dArr[0], dArr[1], dArr[2], dArr);
     }
 
-    public static void colorToXYZ(int color, double[] outXyz) {
-        RGBToXYZ(Color.red(color), Color.green(color), Color.blue(color), outXyz);
+    public static void colorToXYZ(int i, double[] dArr) {
+        RGBToXYZ(Color.red(i), Color.green(i), Color.blue(i), dArr);
     }
 
-    public static void RGBToXYZ(int r, int g, int b, double[] outXyz) {
-        if (outXyz.length == 3) {
-            double sr = ((double) r) / 255.0d;
-            double sr2 = sr < 0.04045d ? sr / 12.92d : Math.pow((sr + 0.055d) / 1.055d, 2.4d);
-            double sg = ((double) g) / 255.0d;
-            double sg2 = sg < 0.04045d ? sg / 12.92d : Math.pow((sg + 0.055d) / 1.055d, 2.4d);
-            double sb = ((double) b) / 255.0d;
-            double sb2 = sb < 0.04045d ? sb / 12.92d : Math.pow((0.055d + sb) / 1.055d, 2.4d);
-            outXyz[0] = ((0.4124d * sr2) + (0.3576d * sg2) + (0.1805d * sb2)) * XYZ_WHITE_REFERENCE_Y;
-            outXyz[1] = ((0.2126d * sr2) + (0.7152d * sg2) + (0.0722d * sb2)) * XYZ_WHITE_REFERENCE_Y;
-            outXyz[2] = ((0.0193d * sr2) + (0.1192d * sg2) + (0.9505d * sb2)) * XYZ_WHITE_REFERENCE_Y;
+    public static void RGBToXYZ(int i, int i2, int i3, double[] dArr) {
+        double d;
+        double d2;
+        double d3;
+        if (dArr.length == 3) {
+            double d4 = ((double) i) / 255.0d;
+            if (d4 < 0.04045d) {
+                d = d4 / 12.92d;
+            } else {
+                d = Math.pow((d4 + 0.055d) / 1.055d, 2.4d);
+            }
+            double d5 = ((double) i2) / 255.0d;
+            if (d5 < 0.04045d) {
+                d2 = d5 / 12.92d;
+            } else {
+                d2 = Math.pow((d5 + 0.055d) / 1.055d, 2.4d);
+            }
+            double d6 = ((double) i3) / 255.0d;
+            if (d6 < 0.04045d) {
+                d3 = d6 / 12.92d;
+            } else {
+                d3 = Math.pow((d6 + 0.055d) / 1.055d, 2.4d);
+            }
+            dArr[0] = ((0.4124d * d) + (0.3576d * d2) + (0.1805d * d3)) * XYZ_WHITE_REFERENCE_Y;
+            dArr[1] = ((0.2126d * d) + (0.7152d * d2) + (0.0722d * d3)) * XYZ_WHITE_REFERENCE_Y;
+            dArr[2] = ((d * 0.0193d) + (d2 * 0.1192d) + (d3 * 0.9505d)) * XYZ_WHITE_REFERENCE_Y;
             return;
         }
         throw new IllegalArgumentException("outXyz must have a length of 3.");
     }
 
-    public static void XYZToLAB(double x, double y, double z, double[] outLab) {
-        if (outLab.length == 3) {
-            double x2 = pivotXyzComponent(x / XYZ_WHITE_REFERENCE_X);
-            double y2 = pivotXyzComponent(y / XYZ_WHITE_REFERENCE_Y);
-            double z2 = pivotXyzComponent(z / XYZ_WHITE_REFERENCE_Z);
-            outLab[0] = Math.max(0.0d, (116.0d * y2) - 16.0d);
-            outLab[1] = (x2 - y2) * 500.0d;
-            outLab[2] = (y2 - z2) * 200.0d;
+    public static void XYZToLAB(double d, double d2, double d3, double[] dArr) {
+        if (dArr.length == 3) {
+            double pivotXyzComponent = pivotXyzComponent(d / XYZ_WHITE_REFERENCE_X);
+            double pivotXyzComponent2 = pivotXyzComponent(d2 / XYZ_WHITE_REFERENCE_Y);
+            double pivotXyzComponent3 = pivotXyzComponent(d3 / XYZ_WHITE_REFERENCE_Z);
+            dArr[0] = Math.max(0.0d, (116.0d * pivotXyzComponent2) - 16.0d);
+            dArr[1] = (pivotXyzComponent - pivotXyzComponent2) * 500.0d;
+            dArr[2] = (pivotXyzComponent2 - pivotXyzComponent3) * 200.0d;
             return;
         }
         throw new IllegalArgumentException("outLab must have a length of 3.");
     }
 
-    public static void LABToXYZ(double l, double a, double b, double[] outXyz) {
-        double fy = (l + 16.0d) / 116.0d;
-        double fx = (a / 500.0d) + fy;
-        double fz = fy - (b / 200.0d);
-        double tmp = Math.pow(fx, 3.0d);
-        double xr = tmp > XYZ_EPSILON ? tmp : ((fx * 116.0d) - 16.0d) / XYZ_KAPPA;
-        double yr = l > 7.9996247999999985d ? Math.pow(fy, 3.0d) : l / XYZ_KAPPA;
-        double tmp2 = Math.pow(fz, 3.0d);
-        double zr = tmp2 > XYZ_EPSILON ? tmp2 : ((116.0d * fz) - 16.0d) / XYZ_KAPPA;
-        outXyz[0] = XYZ_WHITE_REFERENCE_X * xr;
-        outXyz[1] = XYZ_WHITE_REFERENCE_Y * yr;
-        outXyz[2] = XYZ_WHITE_REFERENCE_Z * zr;
-    }
-
-    public static int XYZToColor(double x, double y, double z) {
-        double r = (((3.2406d * x) + (-1.5372d * y)) + (-0.4986d * z)) / XYZ_WHITE_REFERENCE_Y;
-        double g = (((-0.9689d * x) + (1.8758d * y)) + (0.0415d * z)) / XYZ_WHITE_REFERENCE_Y;
-        double b = (((0.0557d * x) + (-0.204d * y)) + (1.057d * z)) / XYZ_WHITE_REFERENCE_Y;
-        return Color.rgb(constrain((int) Math.round((r > 0.0031308d ? (Math.pow(r, 0.4166666666666667d) * 1.055d) - 0.055d : r * 12.92d) * 255.0d), 0, 255), constrain((int) Math.round((g > 0.0031308d ? (Math.pow(g, 0.4166666666666667d) * 1.055d) - 0.055d : g * 12.92d) * 255.0d), 0, 255), constrain((int) Math.round(255.0d * (b > 0.0031308d ? (Math.pow(b, 0.4166666666666667d) * 1.055d) - 0.055d : b * 12.92d)), 0, 255));
-    }
-
-    public static int LABToColor(double l, double a, double b) {
-        double[] result = getTempDouble3Array();
-        LABToXYZ(l, a, b, result);
-        return XYZToColor(result[0], result[1], result[2]);
-    }
-
-    public static double distanceEuclidean(double[] labX, double[] labY) {
-        return Math.sqrt(Math.pow(labX[0] - labY[0], 2.0d) + Math.pow(labX[1] - labY[1], 2.0d) + Math.pow(labX[2] - labY[2], 2.0d));
-    }
-
-    private static float constrain(float amount, float low, float high) {
-        if (amount < low) {
-            return low;
+    public static void LABToXYZ(double d, double d2, double d3, double[] dArr) {
+        double d4 = (d + 16.0d) / 116.0d;
+        double d5 = (d2 / 500.0d) + d4;
+        double d6 = d4 - (d3 / 200.0d);
+        double pow = Math.pow(d5, 3.0d);
+        if (pow <= XYZ_EPSILON) {
+            pow = ((d5 * 116.0d) - 16.0d) / XYZ_KAPPA;
         }
-        return amount > high ? high : amount;
-    }
-
-    private static int constrain(int amount, int low, int high) {
-        if (amount < low) {
-            return low;
+        double pow2 = d > 7.9996247999999985d ? Math.pow(d4, 3.0d) : d / XYZ_KAPPA;
+        double pow3 = Math.pow(d6, 3.0d);
+        if (pow3 <= XYZ_EPSILON) {
+            pow3 = ((d6 * 116.0d) - 16.0d) / XYZ_KAPPA;
         }
-        return amount > high ? high : amount;
+        dArr[0] = pow * XYZ_WHITE_REFERENCE_X;
+        dArr[1] = pow2 * XYZ_WHITE_REFERENCE_Y;
+        dArr[2] = pow3 * XYZ_WHITE_REFERENCE_Z;
     }
 
-    private static double pivotXyzComponent(double component) {
-        return component > XYZ_EPSILON ? Math.pow(component, 0.3333333333333333d) : ((XYZ_KAPPA * component) + 16.0d) / 116.0d;
+    public static int XYZToColor(double d, double d2, double d3) {
+        double d4 = (((3.2406d * d) + (-1.5372d * d2)) + (-0.4986d * d3)) / XYZ_WHITE_REFERENCE_Y;
+        double d5 = (((-0.9689d * d) + (1.8758d * d2)) + (0.0415d * d3)) / XYZ_WHITE_REFERENCE_Y;
+        double d6 = (((0.0557d * d) + (-0.204d * d2)) + (1.057d * d3)) / XYZ_WHITE_REFERENCE_Y;
+        return Color.rgb(constrain((int) Math.round((d4 > 0.0031308d ? (Math.pow(d4, 0.4166666666666667d) * 1.055d) - 0.055d : d4 * 12.92d) * 255.0d), 0, 255), constrain((int) Math.round((d5 > 0.0031308d ? (Math.pow(d5, 0.4166666666666667d) * 1.055d) - 0.055d : d5 * 12.92d) * 255.0d), 0, 255), constrain((int) Math.round((d6 > 0.0031308d ? (Math.pow(d6, 0.4166666666666667d) * 1.055d) - 0.055d : d6 * 12.92d) * 255.0d), 0, 255));
     }
 
-    public static int blendARGB(int color1, int color2, float ratio) {
-        float inverseRatio = 1.0f - ratio;
-        return Color.argb((int) ((((float) Color.alpha(color1)) * inverseRatio) + (((float) Color.alpha(color2)) * ratio)), (int) ((((float) Color.red(color1)) * inverseRatio) + (((float) Color.red(color2)) * ratio)), (int) ((((float) Color.green(color1)) * inverseRatio) + (((float) Color.green(color2)) * ratio)), (int) ((((float) Color.blue(color1)) * inverseRatio) + (((float) Color.blue(color2)) * ratio)));
+    public static int LABToColor(double d, double d2, double d3) {
+        double[] tempDouble3Array = getTempDouble3Array();
+        LABToXYZ(d, d2, d3, tempDouble3Array);
+        return XYZToColor(tempDouble3Array[0], tempDouble3Array[1], tempDouble3Array[2]);
     }
 
-    public static void blendHSL(float[] hsl1, float[] hsl2, float ratio, float[] outResult) {
-        if (outResult.length == 3) {
-            float inverseRatio = 1.0f - ratio;
-            outResult[0] = circularInterpolate(hsl1[0], hsl2[0], ratio);
-            outResult[1] = (hsl1[1] * inverseRatio) + (hsl2[1] * ratio);
-            outResult[2] = (hsl1[2] * inverseRatio) + (hsl2[2] * ratio);
+    public static double distanceEuclidean(double[] dArr, double[] dArr2) {
+        return Math.sqrt(Math.pow(dArr[0] - dArr2[0], 2.0d) + Math.pow(dArr[1] - dArr2[1], 2.0d) + Math.pow(dArr[2] - dArr2[2], 2.0d));
+    }
+
+    private static double pivotXyzComponent(double d) {
+        return d > XYZ_EPSILON ? Math.pow(d, 0.3333333333333333d) : ((d * XYZ_KAPPA) + 16.0d) / 116.0d;
+    }
+
+    public static int blendARGB(int i, int i2, float f) {
+        float f2 = 1.0f - f;
+        return Color.argb((int) ((((float) Color.alpha(i)) * f2) + (((float) Color.alpha(i2)) * f)), (int) ((((float) Color.red(i)) * f2) + (((float) Color.red(i2)) * f)), (int) ((((float) Color.green(i)) * f2) + (((float) Color.green(i2)) * f)), (int) ((((float) Color.blue(i)) * f2) + (((float) Color.blue(i2)) * f)));
+    }
+
+    public static void blendHSL(float[] fArr, float[] fArr2, float f, float[] fArr3) {
+        if (fArr3.length == 3) {
+            float f2 = 1.0f - f;
+            fArr3[0] = circularInterpolate(fArr[0], fArr2[0], f);
+            fArr3[1] = (fArr[1] * f2) + (fArr2[1] * f);
+            fArr3[2] = (fArr[2] * f2) + (fArr2[2] * f);
             return;
         }
         throw new IllegalArgumentException("result must have a length of 3.");
     }
 
-    public static void blendLAB(double[] lab1, double[] lab2, double ratio, double[] outResult) {
-        if (outResult.length == 3) {
-            double inverseRatio = 1.0d - ratio;
-            outResult[0] = (lab1[0] * inverseRatio) + (lab2[0] * ratio);
-            outResult[1] = (lab1[1] * inverseRatio) + (lab2[1] * ratio);
-            outResult[2] = (lab1[2] * inverseRatio) + (lab2[2] * ratio);
+    public static void blendLAB(double[] dArr, double[] dArr2, double d, double[] dArr3) {
+        if (dArr3.length == 3) {
+            double d2 = 1.0d - d;
+            dArr3[0] = (dArr[0] * d2) + (dArr2[0] * d);
+            dArr3[1] = (dArr[1] * d2) + (dArr2[1] * d);
+            dArr3[2] = (dArr[2] * d2) + (dArr2[2] * d);
             return;
         }
         throw new IllegalArgumentException("outResult must have a length of 3.");
     }
 
-    static float circularInterpolate(float a, float b, float f) {
-        if (Math.abs(b - a) > 180.0f) {
-            if (b > a) {
-                a += 360.0f;
+    static float circularInterpolate(float f, float f2, float f3) {
+        if (Math.abs(f2 - f) > 180.0f) {
+            if (f2 > f) {
+                f += 360.0f;
             } else {
-                b += 360.0f;
+                f2 += 360.0f;
             }
         }
-        return (((b - a) * f) + a) % 360.0f;
+        return (f + ((f2 - f) * f3)) % 360.0f;
     }
 
     private static double[] getTempDouble3Array() {
-        double[] result = TEMP_ARRAY.get();
-        if (result != null) {
-            return result;
+        double[] dArr = TEMP_ARRAY.get();
+        if (dArr != null) {
+            return dArr;
         }
-        double[] result2 = new double[3];
-        TEMP_ARRAY.set(result2);
-        return result2;
+        double[] dArr2 = new double[3];
+        TEMP_ARRAY.set(dArr2);
+        return dArr2;
     }
 }

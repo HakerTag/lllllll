@@ -22,7 +22,6 @@ import com.google.zxing.client.android.Intents;
 import com.google.zxing.client.android.LocaleManager;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,8 +46,8 @@ public final class SearchBookContentsActivity extends Activity {
     private final View.OnKeyListener keyListener = new View.OnKeyListener() {
         /* class com.google.zxing.client.android.book.SearchBookContentsActivity.AnonymousClass2 */
 
-        public boolean onKey(View view, int keyCode, KeyEvent event) {
-            if (keyCode != 66 || event.getAction() != 0) {
+        public boolean onKey(View view, int i, KeyEvent keyEvent) {
+            if (i != 66 || keyEvent.getAction() != 0) {
                 return false;
             }
             SearchBookContentsActivity.this.launchSearch();
@@ -65,8 +64,8 @@ public final class SearchBookContentsActivity extends Activity {
         return this.isbn;
     }
 
-    public void onCreate(Bundle icicle) {
-        super.onCreate(icicle);
+    public void onCreate(Bundle bundle) {
+        super.onCreate(bundle);
         CookieSyncManager.createInstance(this);
         CookieManager.getInstance().removeExpiredCookie();
         Intent intent = getIntent();
@@ -83,9 +82,9 @@ public final class SearchBookContentsActivity extends Activity {
         }
         setContentView(R.layout.search_book_contents);
         this.queryTextView = (EditText) findViewById(R.id.query_text_view);
-        String initialQuery = intent.getStringExtra(Intents.SearchBookContents.QUERY);
-        if (initialQuery != null && !initialQuery.isEmpty()) {
-            this.queryTextView.setText(initialQuery);
+        String stringExtra2 = intent.getStringExtra(Intents.SearchBookContents.QUERY);
+        if (stringExtra2 != null && !stringExtra2.isEmpty()) {
+            this.queryTextView.setText(stringExtra2);
         }
         this.queryTextView.setOnKeyListener(this.keyListener);
         View findViewById = findViewById(R.id.query_button);
@@ -105,9 +104,9 @@ public final class SearchBookContentsActivity extends Activity {
 
     /* access modifiers changed from: protected */
     public void onPause() {
-        AsyncTask<?, ?, ?> oldTask = this.networkTask;
-        if (oldTask != null) {
-            oldTask.cancel(true);
+        AsyncTask<String, ?, ?> asyncTask = this.networkTask;
+        if (asyncTask != null) {
+            asyncTask.cancel(true);
             this.networkTask = null;
         }
         super.onPause();
@@ -116,15 +115,15 @@ public final class SearchBookContentsActivity extends Activity {
     /* access modifiers changed from: private */
     /* access modifiers changed from: public */
     private void launchSearch() {
-        String query = this.queryTextView.getText().toString();
-        if (query != null && !query.isEmpty()) {
-            AsyncTask<?, ?, ?> oldTask = this.networkTask;
-            if (oldTask != null) {
-                oldTask.cancel(true);
+        String obj = this.queryTextView.getText().toString();
+        if (obj != null && !obj.isEmpty()) {
+            AsyncTask<String, ?, ?> asyncTask = this.networkTask;
+            if (asyncTask != null) {
+                asyncTask.cancel(true);
             }
             NetworkTask networkTask2 = new NetworkTask();
             this.networkTask = networkTask2;
-            networkTask2.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, query, this.isbn);
+            networkTask2.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, obj, this.isbn);
             this.headerView.setText(R.string.msg_sbc_searching_book);
             this.resultListView.setAdapter((ListAdapter) null);
             this.queryTextView.setEnabled(false);
@@ -138,55 +137,55 @@ public final class SearchBookContentsActivity extends Activity {
         }
 
         /* access modifiers changed from: protected */
-        public JSONObject doInBackground(String... args) {
-            String uri;
+        public JSONObject doInBackground(String... strArr) {
+            String str;
             try {
-                String theQuery = args[0];
-                String theIsbn = args[1];
-                if (LocaleManager.isBookSearchUrl(theIsbn)) {
-                    uri = "http://www.google.com/books?id=" + theIsbn.substring(theIsbn.indexOf(61) + 1) + "&jscmd=SearchWithinVolume2&q=" + theQuery;
+                String str2 = strArr[0];
+                String str3 = strArr[1];
+                if (LocaleManager.isBookSearchUrl(str3)) {
+                    str = "http://www.google.com/books?id=" + str3.substring(str3.indexOf(61) + 1) + "&jscmd=SearchWithinVolume2&q=" + str2;
                 } else {
-                    uri = "http://www.google.com/books?vid=isbn" + theIsbn + "&jscmd=SearchWithinVolume2&q=" + theQuery;
+                    str = "http://www.google.com/books?vid=isbn" + str3 + "&jscmd=SearchWithinVolume2&q=" + str2;
                 }
-                return new JSONObject(HttpHelper.downloadViaHttp(uri, HttpHelper.ContentType.JSON).toString());
-            } catch (IOException ioe) {
-                Log.w(SearchBookContentsActivity.TAG, "Error accessing book search", ioe);
+                return new JSONObject(HttpHelper.downloadViaHttp(str, HttpHelper.ContentType.JSON).toString());
+            } catch (IOException e) {
+                Log.w(SearchBookContentsActivity.TAG, "Error accessing book search", e);
                 return null;
-            } catch (JSONException je) {
-                Log.w(SearchBookContentsActivity.TAG, "Error accessing book search", je);
+            } catch (JSONException e2) {
+                Log.w(SearchBookContentsActivity.TAG, "Error accessing book search", e2);
                 return null;
             }
         }
 
         /* access modifiers changed from: protected */
-        public void onPostExecute(JSONObject result) {
-            if (result == null) {
+        public void onPostExecute(JSONObject jSONObject) {
+            if (jSONObject == null) {
                 SearchBookContentsActivity.this.headerView.setText(R.string.msg_sbc_failed);
             } else {
-                handleSearchResults(result);
+                handleSearchResults(jSONObject);
             }
             SearchBookContentsActivity.this.queryTextView.setEnabled(true);
             SearchBookContentsActivity.this.queryTextView.selectAll();
             SearchBookContentsActivity.this.queryButton.setEnabled(true);
         }
 
-        private void handleSearchResults(JSONObject json) {
+        private void handleSearchResults(JSONObject jSONObject) {
             try {
-                int count = json.getInt("number_of_results");
+                int i = jSONObject.getInt("number_of_results");
                 TextView textView = SearchBookContentsActivity.this.headerView;
-                textView.setText(SearchBookContentsActivity.this.getString(R.string.msg_sbc_results) + " : " + count);
-                if (count > 0) {
-                    JSONArray results = json.getJSONArray(MediaBrowserServiceCompat.KEY_SEARCH_RESULTS);
+                textView.setText(SearchBookContentsActivity.this.getString(R.string.msg_sbc_results) + " : " + i);
+                if (i > 0) {
+                    JSONArray jSONArray = jSONObject.getJSONArray(MediaBrowserServiceCompat.KEY_SEARCH_RESULTS);
                     SearchBookContentsResult.setQuery(SearchBookContentsActivity.this.queryTextView.getText().toString());
-                    List<SearchBookContentsResult> items = new ArrayList<>(count);
-                    for (int x = 0; x < count; x++) {
-                        items.add(parseResult(results.getJSONObject(x)));
+                    ArrayList arrayList = new ArrayList(i);
+                    for (int i2 = 0; i2 < i; i2++) {
+                        arrayList.add(parseResult(jSONArray.getJSONObject(i2)));
                     }
-                    SearchBookContentsActivity.this.resultListView.setOnItemClickListener(new BrowseBookListener(SearchBookContentsActivity.this, items));
-                    SearchBookContentsActivity.this.resultListView.setAdapter((ListAdapter) new SearchBookContentsAdapter(SearchBookContentsActivity.this, items));
+                    SearchBookContentsActivity.this.resultListView.setOnItemClickListener(new BrowseBookListener(SearchBookContentsActivity.this, arrayList));
+                    SearchBookContentsActivity.this.resultListView.setAdapter((ListAdapter) new SearchBookContentsAdapter(SearchBookContentsActivity.this, arrayList));
                     return;
                 }
-                if ("false".equals(json.optString("searchable"))) {
+                if ("false".equals(jSONObject.optString("searchable"))) {
                     SearchBookContentsActivity.this.headerView.setText(R.string.msg_sbc_book_not_searchable);
                 }
                 SearchBookContentsActivity.this.resultListView.setAdapter((ListAdapter) null);
@@ -197,28 +196,28 @@ public final class SearchBookContentsActivity extends Activity {
             }
         }
 
-        private SearchBookContentsResult parseResult(JSONObject json) {
-            String pageNumber;
-            String snippet;
-            boolean valid = false;
+        private SearchBookContentsResult parseResult(JSONObject jSONObject) {
+            String str;
+            String str2;
+            boolean z = false;
             try {
-                String pageId = json.getString("page_id");
-                String pageNumber2 = json.optString("page_number");
-                String snippet2 = json.optString("snippet_text");
-                if (pageNumber2 == null || pageNumber2.isEmpty()) {
-                    pageNumber = "";
+                String string = jSONObject.getString("page_id");
+                String optString = jSONObject.optString("page_number");
+                String optString2 = jSONObject.optString("snippet_text");
+                if (optString == null || optString.isEmpty()) {
+                    str = "";
                 } else {
-                    pageNumber = SearchBookContentsActivity.this.getString(R.string.msg_sbc_page) + ' ' + pageNumber2;
+                    str = SearchBookContentsActivity.this.getString(R.string.msg_sbc_page) + ' ' + optString;
                 }
-                if (snippet2 != null && !snippet2.isEmpty()) {
-                    valid = true;
+                if (optString2 != null && !optString2.isEmpty()) {
+                    z = true;
                 }
-                if (valid) {
-                    snippet = SearchBookContentsActivity.QUOT_ENTITY_PATTERN.matcher(SearchBookContentsActivity.QUOTE_ENTITY_PATTERN.matcher(SearchBookContentsActivity.GT_ENTITY_PATTERN.matcher(SearchBookContentsActivity.LT_ENTITY_PATTERN.matcher(SearchBookContentsActivity.TAG_PATTERN.matcher(snippet2).replaceAll("")).replaceAll("<")).replaceAll(">")).replaceAll("'")).replaceAll("\"");
+                if (z) {
+                    str2 = SearchBookContentsActivity.QUOT_ENTITY_PATTERN.matcher(SearchBookContentsActivity.QUOTE_ENTITY_PATTERN.matcher(SearchBookContentsActivity.GT_ENTITY_PATTERN.matcher(SearchBookContentsActivity.LT_ENTITY_PATTERN.matcher(SearchBookContentsActivity.TAG_PATTERN.matcher(optString2).replaceAll("")).replaceAll("<")).replaceAll(">")).replaceAll("'")).replaceAll("\"");
                 } else {
-                    snippet = '(' + SearchBookContentsActivity.this.getString(R.string.msg_sbc_snippet_unavailable) + ')';
+                    str2 = '(' + SearchBookContentsActivity.this.getString(R.string.msg_sbc_snippet_unavailable) + ')';
                 }
-                return new SearchBookContentsResult(pageId, pageNumber, snippet, valid);
+                return new SearchBookContentsResult(string, str, str2, z);
             } catch (JSONException e) {
                 Log.w(SearchBookContentsActivity.TAG, e);
                 return new SearchBookContentsResult(SearchBookContentsActivity.this.getString(R.string.msg_sbc_no_page_returned), "", "", false);

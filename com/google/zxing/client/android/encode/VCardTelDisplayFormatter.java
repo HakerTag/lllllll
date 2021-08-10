@@ -13,37 +13,37 @@ final class VCardTelDisplayFormatter implements Formatter {
         this(null);
     }
 
-    VCardTelDisplayFormatter(List<Map<String, Set<String>>> metadataForIndex2) {
-        this.metadataForIndex = metadataForIndex2;
+    VCardTelDisplayFormatter(List<Map<String, Set<String>>> list) {
+        this.metadataForIndex = list;
     }
 
     @Override // com.google.zxing.client.android.encode.Formatter
-    public CharSequence format(CharSequence value, int index) {
-        CharSequence value2 = PhoneNumberUtils.formatNumber(value.toString());
+    public CharSequence format(CharSequence charSequence, int i) {
+        String formatNumber = PhoneNumberUtils.formatNumber(charSequence.toString());
         List<Map<String, Set<String>>> list = this.metadataForIndex;
-        return formatMetadata(value2, (list == null || list.size() <= index) ? null : this.metadataForIndex.get(index));
+        return formatMetadata(formatNumber, (list == null || list.size() <= i) ? null : this.metadataForIndex.get(i));
     }
 
-    private static CharSequence formatMetadata(CharSequence value, Map<String, Set<String>> metadata) {
-        if (metadata == null || metadata.isEmpty()) {
-            return value;
+    private static CharSequence formatMetadata(CharSequence charSequence, Map<String, Set<String>> map) {
+        if (map == null || map.isEmpty()) {
+            return charSequence;
         }
-        StringBuilder withMetadata = new StringBuilder();
-        for (Map.Entry<String, Set<String>> metadatum : metadata.entrySet()) {
-            Set<String> values = metadatum.getValue();
-            if (values != null && !values.isEmpty()) {
-                Iterator<String> valuesIt = values.iterator();
-                withMetadata.append(valuesIt.next());
-                while (valuesIt.hasNext()) {
-                    withMetadata.append(',');
-                    withMetadata.append(valuesIt.next());
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, Set<String>> entry : map.entrySet()) {
+            Set<String> value = entry.getValue();
+            if (value != null && !value.isEmpty()) {
+                Iterator<String> it = value.iterator();
+                sb.append(it.next());
+                while (it.hasNext()) {
+                    sb.append(',');
+                    sb.append(it.next());
                 }
             }
         }
-        if (withMetadata.length() > 0) {
-            withMetadata.append(' ');
+        if (sb.length() > 0) {
+            sb.append(' ');
         }
-        withMetadata.append(value);
-        return withMetadata;
+        sb.append(charSequence);
+        return sb;
     }
 }

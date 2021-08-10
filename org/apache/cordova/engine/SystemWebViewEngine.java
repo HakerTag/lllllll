@@ -1,6 +1,5 @@
 package org.apache.cordova.engine;
 
-import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -35,50 +34,50 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
     protected CordovaResourceApi resourceApi;
     protected final SystemWebView webView;
 
-    public SystemWebViewEngine(Context context, CordovaPreferences preferences2) {
-        this(new SystemWebView(context), preferences2);
+    public SystemWebViewEngine(Context context, CordovaPreferences cordovaPreferences) {
+        this(new SystemWebView(context), cordovaPreferences);
     }
 
-    public SystemWebViewEngine(SystemWebView webView2) {
-        this(webView2, (CordovaPreferences) null);
+    public SystemWebViewEngine(SystemWebView systemWebView) {
+        this(systemWebView, (CordovaPreferences) null);
     }
 
-    public SystemWebViewEngine(SystemWebView webView2, CordovaPreferences preferences2) {
-        this.preferences = preferences2;
-        this.webView = webView2;
-        this.cookieManager = new SystemCookieManager(webView2);
+    public SystemWebViewEngine(SystemWebView systemWebView, CordovaPreferences cordovaPreferences) {
+        this.preferences = cordovaPreferences;
+        this.webView = systemWebView;
+        this.cookieManager = new SystemCookieManager(systemWebView);
     }
 
     @Override // org.apache.cordova.CordovaWebViewEngine
-    public void init(CordovaWebView parentWebView2, CordovaInterface cordova2, CordovaWebViewEngine.Client client2, CordovaResourceApi resourceApi2, PluginManager pluginManager2, NativeToJsMessageQueue nativeToJsMessageQueue2) {
+    public void init(CordovaWebView cordovaWebView, CordovaInterface cordovaInterface, CordovaWebViewEngine.Client client2, CordovaResourceApi cordovaResourceApi, PluginManager pluginManager2, NativeToJsMessageQueue nativeToJsMessageQueue2) {
         if (this.cordova == null) {
             if (this.preferences == null) {
-                this.preferences = parentWebView2.getPreferences();
+                this.preferences = cordovaWebView.getPreferences();
             }
-            this.parentWebView = parentWebView2;
-            this.cordova = cordova2;
+            this.parentWebView = cordovaWebView;
+            this.cordova = cordovaInterface;
             this.client = client2;
-            this.resourceApi = resourceApi2;
+            this.resourceApi = cordovaResourceApi;
             this.pluginManager = pluginManager2;
             this.nativeToJsMessageQueue = nativeToJsMessageQueue2;
-            this.webView.init(this, cordova2);
+            this.webView.init(this, cordovaInterface);
             initWebViewSettings();
             nativeToJsMessageQueue2.addBridgeMode(new NativeToJsMessageQueue.OnlineEventsBridgeMode(new NativeToJsMessageQueue.OnlineEventsBridgeMode.OnlineEventsBridgeModeDelegate() {
                 /* class org.apache.cordova.engine.SystemWebViewEngine.AnonymousClass1 */
 
                 @Override // org.apache.cordova.NativeToJsMessageQueue.OnlineEventsBridgeMode.OnlineEventsBridgeModeDelegate
-                public void setNetworkAvailable(boolean value) {
+                public void setNetworkAvailable(boolean z) {
                     if (SystemWebViewEngine.this.webView != null) {
-                        SystemWebViewEngine.this.webView.setNetworkAvailable(value);
+                        SystemWebViewEngine.this.webView.setNetworkAvailable(z);
                     }
                 }
 
                 @Override // org.apache.cordova.NativeToJsMessageQueue.OnlineEventsBridgeMode.OnlineEventsBridgeModeDelegate
-                public void runOnUiThread(Runnable r) {
-                    SystemWebViewEngine.this.cordova.getActivity().runOnUiThread(r);
+                public void runOnUiThread(Runnable runnable) {
+                    SystemWebViewEngine.this.cordova.getActivity().runOnUiThread(runnable);
                 }
             }));
-            nativeToJsMessageQueue2.addBridgeMode(new NativeToJsMessageQueue.EvalBridgeMode(this, cordova2));
+            nativeToJsMessageQueue2.addBridgeMode(new NativeToJsMessageQueue.EvalBridgeMode(this, cordovaInterface));
             CordovaBridge cordovaBridge = new CordovaBridge(pluginManager2, nativeToJsMessageQueue2);
             this.bridge = cordovaBridge;
             exposeJsInterface(this.webView, cordovaBridge);
@@ -102,7 +101,6 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
         return this.webView;
     }
 
-    @SuppressLint({"NewApi", "SetJavaScriptEnabled"})
     private void initWebViewSettings() {
         this.webView.setInitialScale(0);
         this.webView.setVerticalScrollBarEnabled(false);
@@ -111,32 +109,32 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
         settings.setJavaScriptCanOpenWindowsAutomatically(true);
         settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
         settings.setAllowFileAccess(true);
-        String manufacturer = Build.MANUFACTURER;
-        LOG.d(TAG, "CordovaWebView is running on device made by: " + manufacturer);
+        String str = Build.MANUFACTURER;
+        LOG.d(TAG, "CordovaWebView is running on device made by: " + str);
         settings.setSaveFormData(false);
         settings.setSavePassword(false);
         settings.setAllowUniversalAccessFromFileURLs(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
-        String databasePath = this.webView.getContext().getApplicationContext().getDir("database", 0).getPath();
+        String path = this.webView.getContext().getApplicationContext().getDir("database", 0).getPath();
         settings.setDatabaseEnabled(true);
-        settings.setDatabasePath(databasePath);
+        settings.setDatabasePath(path);
         if ((this.webView.getContext().getApplicationContext().getApplicationInfo().flags & 2) != 0) {
             enableRemoteDebugging();
         }
-        settings.setGeolocationDatabasePath(databasePath);
+        settings.setGeolocationDatabasePath(path);
         settings.setDomStorageEnabled(true);
         settings.setGeolocationEnabled(true);
         settings.setAppCacheMaxSize(5242880);
-        settings.setAppCachePath(databasePath);
+        settings.setAppCachePath(path);
         settings.setAppCacheEnabled(true);
-        String defaultUserAgent = settings.getUserAgentString();
-        String overrideUserAgent = this.preferences.getString("OverrideUserAgent", null);
-        if (overrideUserAgent != null) {
-            settings.setUserAgentString(overrideUserAgent);
+        String userAgentString = settings.getUserAgentString();
+        String string = this.preferences.getString("OverrideUserAgent", null);
+        if (string != null) {
+            settings.setUserAgentString(string);
         } else {
-            String appendUserAgent = this.preferences.getString("AppendUserAgent", null);
-            if (appendUserAgent != null) {
-                settings.setUserAgentString(defaultUserAgent + " " + appendUserAgent);
+            String string2 = this.preferences.getString("AppendUserAgent", null);
+            if (string2 != null) {
+                settings.setUserAgentString(userAgentString + " " + string2);
             }
         }
         IntentFilter intentFilter = new IntentFilter();
@@ -162,14 +160,13 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
         }
     }
 
-    @SuppressLint({"AddJavascriptInterface"})
-    private static void exposeJsInterface(WebView webView2, CordovaBridge bridge2) {
-        webView2.addJavascriptInterface(new SystemExposedJsApi(bridge2), "_cordovaNative");
+    private static void exposeJsInterface(WebView webView2, CordovaBridge cordovaBridge) {
+        webView2.addJavascriptInterface(new SystemExposedJsApi(cordovaBridge), "_cordovaNative");
     }
 
     @Override // org.apache.cordova.CordovaWebViewEngine
-    public void loadUrl(String url, boolean clearNavigationStack) {
-        this.webView.loadUrl(url);
+    public void loadUrl(String str, boolean z) {
+        this.webView.loadUrl(str);
     }
 
     @Override // org.apache.cordova.CordovaWebViewEngine
@@ -207,8 +204,8 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
     }
 
     @Override // org.apache.cordova.CordovaWebViewEngine
-    public void setPaused(boolean value) {
-        if (value) {
+    public void setPaused(boolean z) {
+        if (z) {
             this.webView.onPause();
             this.webView.pauseTimers();
             return;
@@ -231,7 +228,7 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
     }
 
     @Override // org.apache.cordova.CordovaWebViewEngine
-    public void evaluateJavascript(String js, ValueCallback<String> callback) {
-        this.webView.evaluateJavascript(js, callback);
+    public void evaluateJavascript(String str, ValueCallback<String> valueCallback) {
+        this.webView.evaluateJavascript(str, valueCallback);
     }
 }

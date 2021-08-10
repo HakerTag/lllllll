@@ -9,11 +9,11 @@ public final class Codeword {
     private final int startX;
     private final int value;
 
-    Codeword(int startX2, int endX2, int bucket2, int value2) {
-        this.startX = startX2;
-        this.endX = endX2;
-        this.bucket = bucket2;
-        this.value = value2;
+    Codeword(int i, int i2, int i3, int i4) {
+        this.startX = i;
+        this.endX = i2;
+        this.bucket = i3;
+        this.value = i4;
     }
 
     /* access modifiers changed from: package-private */
@@ -22,8 +22,8 @@ public final class Codeword {
     }
 
     /* access modifiers changed from: package-private */
-    public boolean isValidRowNumber(int rowNumber2) {
-        return rowNumber2 != -1 && this.bucket == (rowNumber2 % 3) * 3;
+    public boolean isValidRowNumber(int i) {
+        return i != -1 && this.bucket == (i % 3) * 3;
     }
 
     /* access modifiers changed from: package-private */
@@ -62,8 +62,8 @@ public final class Codeword {
     }
 
     /* access modifiers changed from: package-private */
-    public void setRowNumber(int rowNumber2) {
-        this.rowNumber = rowNumber2;
+    public void setRowNumber(int i) {
+        this.rowNumber = i;
     }
 
     public String toString() {

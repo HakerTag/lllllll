@@ -9,23 +9,23 @@ public final class TextUtilsCompat {
     private static final String HEBR_SCRIPT_SUBTAG = "Hebr";
     private static final Locale ROOT = new Locale("", "");
 
-    public static String htmlEncode(String s) {
+    public static String htmlEncode(String str) {
         if (Build.VERSION.SDK_INT >= 17) {
-            return TextUtils.htmlEncode(s);
+            return TextUtils.htmlEncode(str);
         }
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c == '\"') {
+        for (int i = 0; i < str.length(); i++) {
+            char charAt = str.charAt(i);
+            if (charAt == '\"') {
                 sb.append("&quot;");
-            } else if (c == '<') {
+            } else if (charAt == '<') {
                 sb.append("&lt;");
-            } else if (c == '>') {
+            } else if (charAt == '>') {
                 sb.append("&gt;");
-            } else if (c == '&') {
+            } else if (charAt == '&') {
                 sb.append("&amp;");
-            } else if (c != '\'') {
-                sb.append(c);
+            } else if (charAt != '\'') {
+                sb.append(charAt);
             } else {
                 sb.append("&#39;");
             }
@@ -40,14 +40,11 @@ public final class TextUtilsCompat {
         if (locale == null || locale.equals(ROOT)) {
             return 0;
         }
-        String scriptSubtag = ICUCompat.maximizeAndGetScript(locale);
-        if (scriptSubtag == null) {
+        String maximizeAndGetScript = ICUCompat.maximizeAndGetScript(locale);
+        if (maximizeAndGetScript == null) {
             return getLayoutDirectionFromFirstChar(locale);
         }
-        if (scriptSubtag.equalsIgnoreCase(ARAB_SCRIPT_SUBTAG) || scriptSubtag.equalsIgnoreCase(HEBR_SCRIPT_SUBTAG)) {
-            return 1;
-        }
-        return 0;
+        return (maximizeAndGetScript.equalsIgnoreCase(ARAB_SCRIPT_SUBTAG) || maximizeAndGetScript.equalsIgnoreCase(HEBR_SCRIPT_SUBTAG)) ? 1 : 0;
     }
 
     private static int getLayoutDirectionFromFirstChar(Locale locale) {

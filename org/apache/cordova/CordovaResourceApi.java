@@ -49,8 +49,8 @@ public class CordovaResourceApi {
         this.pluginManager = pluginManager2;
     }
 
-    public void setThreadCheckingEnabled(boolean value) {
-        this.threadCheckingEnabled = value;
+    public void setThreadCheckingEnabled(boolean z) {
+        this.threadCheckingEnabled = z;
     }
 
     public boolean isThreadCheckingEnabled() {
@@ -67,59 +67,53 @@ public class CordovaResourceApi {
             return 3;
         }
         if ("file".equalsIgnoreCase(scheme)) {
-            if (uri.getPath().startsWith("/android_asset/")) {
-                return 1;
-            }
-            return 0;
-        } else if ("data".equalsIgnoreCase(scheme)) {
-            return 4;
-        } else {
-            if ("http".equalsIgnoreCase(scheme)) {
-                return 5;
-            }
-            if ("https".equalsIgnoreCase(scheme)) {
-                return 6;
-            }
-            if (PLUGIN_URI_SCHEME.equalsIgnoreCase(scheme)) {
-                return 7;
-            }
-            return -1;
+            return uri.getPath().startsWith("/android_asset/") ? 1 : 0;
         }
+        if ("data".equalsIgnoreCase(scheme)) {
+            return 4;
+        }
+        if ("http".equalsIgnoreCase(scheme)) {
+            return 5;
+        }
+        if ("https".equalsIgnoreCase(scheme)) {
+            return 6;
+        }
+        return PLUGIN_URI_SCHEME.equalsIgnoreCase(scheme) ? 7 : -1;
     }
 
     public Uri remapUri(Uri uri) {
         assertNonRelative(uri);
-        Uri pluginUri = this.pluginManager.remapUri(uri);
-        return pluginUri != null ? pluginUri : uri;
+        Uri remapUri = this.pluginManager.remapUri(uri);
+        return remapUri != null ? remapUri : uri;
     }
 
-    public String remapPath(String path) {
-        return remapUri(Uri.fromFile(new File(path))).getPath();
+    public String remapPath(String str) {
+        return remapUri(Uri.fromFile(new File(str))).getPath();
     }
 
     public File mapUriToFile(Uri uri) {
-        Cursor cursor;
+        Cursor query;
         assertBackgroundThread();
         int uriType = getUriType(uri);
         if (uriType == 0) {
             return new File(uri.getPath());
         }
-        if (uriType != 2 || (cursor = this.contentResolver.query(uri, LOCAL_FILE_PROJECTION, null, null, null)) == null) {
+        if (uriType != 2 || (query = this.contentResolver.query(uri, LOCAL_FILE_PROJECTION, null, null, null)) == null) {
             return null;
         }
         try {
-            int columnIndex = cursor.getColumnIndex(LOCAL_FILE_PROJECTION[0]);
-            if (columnIndex != -1 && cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                String realPath = cursor.getString(columnIndex);
-                if (realPath != null) {
-                    return new File(realPath);
+            int columnIndex = query.getColumnIndex(LOCAL_FILE_PROJECTION[0]);
+            if (columnIndex != -1 && query.getCount() > 0) {
+                query.moveToFirst();
+                String string = query.getString(columnIndex);
+                if (string != null) {
+                    return new File(string);
                 }
             }
-            cursor.close();
+            query.close();
             return null;
         } finally {
-            cursor.close();
+            query.close();
         }
     }
 
@@ -136,15 +130,12 @@ public class CordovaResourceApi {
             case 5:
             case 6:
                 try {
-                    HttpURLConnection conn = (HttpURLConnection) new URL(uri.toString()).openConnection();
-                    conn.setDoInput(false);
-                    conn.setRequestMethod("HEAD");
-                    String mimeType = conn.getHeaderField("Content-Type");
-                    if (mimeType != null) {
-                        return mimeType.split(";")[0];
-                    }
-                    return mimeType;
-                } catch (IOException e) {
+                    HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(uri.toString()).openConnection();
+                    httpURLConnection.setDoInput(false);
+                    httpURLConnection.setRequestMethod("HEAD");
+                    String headerField = httpURLConnection.getHeaderField("Content-Type");
+                    return headerField != null ? headerField.split(";")[0] : headerField;
+                } catch (IOException unused) {
                     return null;
                 }
             default:
@@ -152,20 +143,19 @@ public class CordovaResourceApi {
         }
     }
 
-    private String getMimeTypeFromPath(String path) {
-        String extension = path;
-        int lastDot = extension.lastIndexOf(46);
-        if (lastDot != -1) {
-            extension = extension.substring(lastDot + 1);
+    private String getMimeTypeFromPath(String str) {
+        int lastIndexOf = str.lastIndexOf(46);
+        if (lastIndexOf != -1) {
+            str = str.substring(lastIndexOf + 1);
         }
-        String extension2 = extension.toLowerCase(Locale.getDefault());
-        if (extension2.equals("3ga")) {
+        String lowerCase = str.toLowerCase(Locale.getDefault());
+        if (lowerCase.equals("3ga")) {
             return "audio/3gpp";
         }
-        if (extension2.equals("js")) {
+        if (lowerCase.equals("js")) {
             return "text/javascript";
         }
-        return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension2);
+        return MimeTypeMap.getSingleton().getMimeTypeFromExtension(lowerCase);
     }
 
     public OpenForReadResult openForRead(Uri uri) throws IOException {
@@ -173,63 +163,56 @@ public class CordovaResourceApi {
     }
 
     /* JADX INFO: Can't fix incorrect switch cases order, some code will duplicate */
-    public OpenForReadResult openForRead(Uri uri, boolean skipThreadCheck) throws IOException {
-        long length;
-        AssetFileDescriptor assetFd;
+    public OpenForReadResult openForRead(Uri uri, boolean z) throws IOException {
+        long j;
         InputStream inputStream;
-        String mimeType;
         InputStream inputStream2;
-        if (!skipThreadCheck) {
+        if (!z) {
             assertBackgroundThread();
         }
         switch (getUriType(uri)) {
             case 0:
-                FileInputStream inputStream3 = new FileInputStream(uri.getPath());
-                return new OpenForReadResult(uri, inputStream3, getMimeTypeFromPath(uri.getPath()), inputStream3.getChannel().size(), null);
+                FileInputStream fileInputStream = new FileInputStream(uri.getPath());
+                return new OpenForReadResult(uri, fileInputStream, getMimeTypeFromPath(uri.getPath()), fileInputStream.getChannel().size(), null);
             case 1:
-                String assetPath = uri.getPath().substring(15);
-                AssetFileDescriptor assetFd2 = null;
+                String substring = uri.getPath().substring(15);
+                AssetFileDescriptor assetFileDescriptor = null;
                 try {
-                    assetFd2 = this.assetManager.openFd(assetPath);
-                    inputStream = assetFd2.createInputStream();
-                    assetFd = assetFd2;
-                    length = assetFd2.getLength();
-                } catch (FileNotFoundException e) {
-                    InputStream inputStream4 = this.assetManager.open(assetPath);
-                    assetFd = assetFd2;
-                    length = (long) inputStream4.available();
-                    inputStream = inputStream4;
+                    assetFileDescriptor = this.assetManager.openFd(substring);
+                    inputStream = assetFileDescriptor.createInputStream();
+                    j = assetFileDescriptor.getLength();
+                } catch (FileNotFoundException unused) {
+                    inputStream = this.assetManager.open(substring);
+                    j = (long) inputStream.available();
                 }
-                return new OpenForReadResult(uri, inputStream, getMimeTypeFromPath(assetPath), length, assetFd);
+                return new OpenForReadResult(uri, inputStream, getMimeTypeFromPath(substring), j, assetFileDescriptor);
             case 2:
             case 3:
-                String mimeType2 = this.contentResolver.getType(uri);
-                AssetFileDescriptor assetFd3 = this.contentResolver.openAssetFileDescriptor(uri, "r");
-                return new OpenForReadResult(uri, assetFd3.createInputStream(), mimeType2, assetFd3.getLength(), assetFd3);
+                String type = this.contentResolver.getType(uri);
+                AssetFileDescriptor openAssetFileDescriptor = this.contentResolver.openAssetFileDescriptor(uri, "r");
+                return new OpenForReadResult(uri, openAssetFileDescriptor.createInputStream(), type, openAssetFileDescriptor.getLength(), openAssetFileDescriptor);
             case 4:
-                OpenForReadResult ret = readDataUri(uri);
-                if (ret != null) {
-                    return ret;
+                OpenForReadResult readDataUri = readDataUri(uri);
+                if (readDataUri != null) {
+                    return readDataUri;
                 }
                 break;
             case 5:
             case 6:
-                HttpURLConnection conn = (HttpURLConnection) new URL(uri.toString()).openConnection();
-                conn.setRequestProperty("Accept-Encoding", "gzip");
-                conn.setDoInput(true);
-                String mimeType3 = conn.getHeaderField("Content-Type");
-                if (mimeType3 != null) {
-                    mimeType = mimeType3.split(";")[0];
-                } else {
-                    mimeType = mimeType3;
+                HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(uri.toString()).openConnection();
+                httpURLConnection.setRequestProperty("Accept-Encoding", "gzip");
+                httpURLConnection.setDoInput(true);
+                String headerField = httpURLConnection.getHeaderField("Content-Type");
+                if (headerField != null) {
+                    headerField = headerField.split(";")[0];
                 }
-                int length2 = conn.getContentLength();
-                if ("gzip".equals(conn.getContentEncoding())) {
-                    inputStream2 = new GZIPInputStream(conn.getInputStream());
+                int contentLength = httpURLConnection.getContentLength();
+                if ("gzip".equals(httpURLConnection.getContentEncoding())) {
+                    inputStream2 = new GZIPInputStream(httpURLConnection.getInputStream());
                 } else {
-                    inputStream2 = conn.getInputStream();
+                    inputStream2 = httpURLConnection.getInputStream();
                 }
-                return new OpenForReadResult(uri, inputStream2, mimeType, (long) length2, null);
+                return new OpenForReadResult(uri, inputStream2, headerField, (long) contentLength, null);
             case 7:
                 CordovaPlugin plugin = this.pluginManager.getPlugin(uri.getHost());
                 if (plugin != null) {
@@ -244,18 +227,18 @@ public class CordovaResourceApi {
         return openOutputStream(uri, false);
     }
 
-    public OutputStream openOutputStream(Uri uri, boolean append) throws IOException {
+    public OutputStream openOutputStream(Uri uri, boolean z) throws IOException {
         assertBackgroundThread();
         int uriType = getUriType(uri);
         if (uriType == 0) {
-            File localFile = new File(uri.getPath());
-            File parent = localFile.getParentFile();
-            if (parent != null) {
-                parent.mkdirs();
+            File file = new File(uri.getPath());
+            File parentFile = file.getParentFile();
+            if (parentFile != null) {
+                parentFile.mkdirs();
             }
-            return new FileOutputStream(localFile, append);
+            return new FileOutputStream(file, z);
         } else if (uriType == 2 || uriType == 3) {
-            return this.contentResolver.openAssetFileDescriptor(uri, append ? "wa" : "w").createOutputStream();
+            return this.contentResolver.openAssetFileDescriptor(uri, z ? "wa" : "w").createOutputStream();
         } else {
             throw new FileNotFoundException("URI not supported by CordovaResourceApi: " + uri);
         }
@@ -266,101 +249,99 @@ public class CordovaResourceApi {
         return (HttpURLConnection) new URL(uri.toString()).openConnection();
     }
 
-    public void copyResource(OpenForReadResult input, OutputStream outputStream) throws IOException {
-        long offset;
+    public void copyResource(OpenForReadResult openForReadResult, OutputStream outputStream) throws IOException {
         assertBackgroundThread();
         try {
-            InputStream inputStream = input.inputStream;
+            InputStream inputStream = openForReadResult.inputStream;
             if (!(inputStream instanceof FileInputStream) || !(outputStream instanceof FileOutputStream)) {
-                byte[] buffer = new byte[8192];
+                byte[] bArr = new byte[8192];
                 while (true) {
-                    int bytesRead = inputStream.read(buffer, 0, 8192);
-                    if (bytesRead <= 0) {
+                    int read = inputStream.read(bArr, 0, 8192);
+                    if (read <= 0) {
                         break;
                     }
-                    outputStream.write(buffer, 0, bytesRead);
+                    outputStream.write(bArr, 0, read);
                 }
             } else {
-                FileChannel inChannel = ((FileInputStream) input.inputStream).getChannel();
-                FileChannel outChannel = ((FileOutputStream) outputStream).getChannel();
-                long length = input.length;
-                if (input.assetFd != null) {
-                    offset = input.assetFd.getStartOffset();
-                } else {
-                    offset = 0;
+                FileChannel channel = ((FileInputStream) openForReadResult.inputStream).getChannel();
+                FileChannel channel2 = ((FileOutputStream) outputStream).getChannel();
+                long j = 0;
+                long j2 = openForReadResult.length;
+                if (openForReadResult.assetFd != null) {
+                    j = openForReadResult.assetFd.getStartOffset();
                 }
-                inChannel.position(offset);
-                outChannel.transferFrom(inChannel, 0, length);
+                channel.position(j);
+                channel2.transferFrom(channel, 0, j2);
             }
         } finally {
-            input.inputStream.close();
+            openForReadResult.inputStream.close();
             if (outputStream != null) {
                 outputStream.close();
             }
         }
     }
 
-    public void copyResource(Uri sourceUri, OutputStream outputStream) throws IOException {
-        copyResource(openForRead(sourceUri), outputStream);
+    public void copyResource(Uri uri, OutputStream outputStream) throws IOException {
+        copyResource(openForRead(uri), outputStream);
     }
 
-    public void copyResource(Uri sourceUri, Uri dstUri) throws IOException {
-        copyResource(openForRead(sourceUri), openOutputStream(dstUri));
+    public void copyResource(Uri uri, Uri uri2) throws IOException {
+        copyResource(openForRead(uri), openOutputStream(uri2));
     }
 
     private void assertBackgroundThread() {
         if (this.threadCheckingEnabled) {
-            Thread curThread = Thread.currentThread();
-            if (curThread == Looper.getMainLooper().getThread()) {
+            Thread currentThread = Thread.currentThread();
+            if (currentThread == Looper.getMainLooper().getThread()) {
                 throw new IllegalStateException("Do not perform IO operations on the UI thread. Use CordovaInterface.getThreadPool() instead.");
-            } else if (curThread == jsThread) {
+            } else if (currentThread == jsThread) {
                 throw new IllegalStateException("Tried to perform an IO operation on the WebCore thread. Use CordovaInterface.getThreadPool() instead.");
             }
         }
     }
 
     private String getDataUriMimeType(Uri uri) {
-        String uriAsString = uri.getSchemeSpecificPart();
-        int commaPos = uriAsString.indexOf(44);
-        if (commaPos == -1) {
+        String schemeSpecificPart = uri.getSchemeSpecificPart();
+        int indexOf = schemeSpecificPart.indexOf(44);
+        if (indexOf == -1) {
             return null;
         }
-        String[] mimeParts = uriAsString.substring(0, commaPos).split(";");
-        if (mimeParts.length > 0) {
-            return mimeParts[0];
+        String[] split = schemeSpecificPart.substring(0, indexOf).split(";");
+        if (split.length > 0) {
+            return split[0];
         }
         return null;
     }
 
     private OpenForReadResult readDataUri(Uri uri) {
-        byte[] data;
-        String uriAsString = uri.getSchemeSpecificPart();
-        int commaPos = uriAsString.indexOf(44);
-        if (commaPos == -1) {
+        byte[] bArr;
+        String schemeSpecificPart = uri.getSchemeSpecificPart();
+        int indexOf = schemeSpecificPart.indexOf(44);
+        String str = null;
+        if (indexOf == -1) {
             return null;
         }
-        String[] mimeParts = uriAsString.substring(0, commaPos).split(";");
-        String contentType = null;
-        boolean base64 = false;
-        if (mimeParts.length > 0) {
-            contentType = mimeParts[0];
+        String[] split = schemeSpecificPart.substring(0, indexOf).split(";");
+        if (split.length > 0) {
+            str = split[0];
         }
-        for (int i = 1; i < mimeParts.length; i++) {
-            if ("base64".equalsIgnoreCase(mimeParts[i])) {
-                base64 = true;
+        boolean z = false;
+        for (int i = 1; i < split.length; i++) {
+            if ("base64".equalsIgnoreCase(split[i])) {
+                z = true;
             }
         }
-        String dataPartAsString = uriAsString.substring(commaPos + 1);
-        if (base64) {
-            data = Base64.decode(dataPartAsString, 0);
+        String substring = schemeSpecificPart.substring(indexOf + 1);
+        if (z) {
+            bArr = Base64.decode(substring, 0);
         } else {
             try {
-                data = dataPartAsString.getBytes("UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                data = dataPartAsString.getBytes();
+                bArr = substring.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException unused) {
+                bArr = substring.getBytes();
             }
         }
-        return new OpenForReadResult(uri, new ByteArrayInputStream(data), contentType, (long) data.length, null);
+        return new OpenForReadResult(uri, new ByteArrayInputStream(bArr), str, (long) bArr.length, null);
     }
 
     private static void assertNonRelative(Uri uri) {
@@ -376,12 +357,12 @@ public class CordovaResourceApi {
         public final String mimeType;
         public final Uri uri;
 
-        public OpenForReadResult(Uri uri2, InputStream inputStream2, String mimeType2, long length2, AssetFileDescriptor assetFd2) {
+        public OpenForReadResult(Uri uri2, InputStream inputStream2, String str, long j, AssetFileDescriptor assetFileDescriptor) {
             this.uri = uri2;
             this.inputStream = inputStream2;
-            this.mimeType = mimeType2;
-            this.length = length2;
-            this.assetFd = assetFd2;
+            this.mimeType = str;
+            this.length = j;
+            this.assetFd = assetFileDescriptor;
         }
     }
 }

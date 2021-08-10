@@ -4,8 +4,8 @@ package com.google.zxing.oned.rss.expanded.decoders;
 public abstract class DecodedObject {
     private final int newPosition;
 
-    DecodedObject(int newPosition2) {
-        this.newPosition = newPosition2;
+    DecodedObject(int i) {
+        this.newPosition = i;
     }
 
     /* access modifiers changed from: package-private */

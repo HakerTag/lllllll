@@ -12,20 +12,20 @@ public final class Version {
     private final int totalCodewords;
     private final int versionNumber;
 
-    private Version(int versionNumber2, int symbolSizeRows2, int symbolSizeColumns2, int dataRegionSizeRows2, int dataRegionSizeColumns2, ECBlocks ecBlocks2) {
-        this.versionNumber = versionNumber2;
-        this.symbolSizeRows = symbolSizeRows2;
-        this.symbolSizeColumns = symbolSizeColumns2;
-        this.dataRegionSizeRows = dataRegionSizeRows2;
-        this.dataRegionSizeColumns = dataRegionSizeColumns2;
-        this.ecBlocks = ecBlocks2;
-        int total = 0;
-        int ecCodewords = ecBlocks2.getECCodewords();
-        ECB[] ecbArray = ecBlocks2.getECBlocks();
-        for (ECB ecBlock : ecbArray) {
-            total += ecBlock.getCount() * (ecBlock.getDataCodewords() + ecCodewords);
+    private Version(int i, int i2, int i3, int i4, int i5, ECBlocks eCBlocks) {
+        this.versionNumber = i;
+        this.symbolSizeRows = i2;
+        this.symbolSizeColumns = i3;
+        this.dataRegionSizeRows = i4;
+        this.dataRegionSizeColumns = i5;
+        this.ecBlocks = eCBlocks;
+        int eCCodewords = eCBlocks.getECCodewords();
+        ECB[] eCBlocks2 = eCBlocks.getECBlocks();
+        int i6 = 0;
+        for (ECB ecb : eCBlocks2) {
+            i6 += ecb.getCount() * (ecb.getDataCodewords() + eCCodewords);
         }
-        this.totalCodewords = total;
+        this.totalCodewords = i6;
     }
 
     public int getVersionNumber() {
@@ -57,11 +57,11 @@ public final class Version {
         return this.ecBlocks;
     }
 
-    public static Version getVersionForDimensions(int numRows, int numColumns) throws FormatException {
-        if ((numRows & 1) == 0 && (numColumns & 1) == 0) {
+    public static Version getVersionForDimensions(int i, int i2) throws FormatException {
+        if ((i & 1) == 0 && (i2 & 1) == 0) {
             Version[] versionArr = VERSIONS;
             for (Version version : versionArr) {
-                if (version.symbolSizeRows == numRows && version.symbolSizeColumns == numColumns) {
+                if (version.symbolSizeRows == i && version.symbolSizeColumns == i2) {
                     return version;
                 }
             }
@@ -75,14 +75,14 @@ public final class Version {
         private final ECB[] ecBlocks;
         private final int ecCodewords;
 
-        private ECBlocks(int ecCodewords2, ECB ecBlocks2) {
-            this.ecCodewords = ecCodewords2;
-            this.ecBlocks = new ECB[]{ecBlocks2};
+        private ECBlocks(int i, ECB ecb) {
+            this.ecCodewords = i;
+            this.ecBlocks = new ECB[]{ecb};
         }
 
-        private ECBlocks(int ecCodewords2, ECB ecBlocks1, ECB ecBlocks2) {
-            this.ecCodewords = ecCodewords2;
-            this.ecBlocks = new ECB[]{ecBlocks1, ecBlocks2};
+        private ECBlocks(int i, ECB ecb, ECB ecb2) {
+            this.ecCodewords = i;
+            this.ecBlocks = new ECB[]{ecb, ecb2};
         }
 
         /* access modifiers changed from: package-private */
@@ -101,9 +101,9 @@ public final class Version {
         private final int count;
         private final int dataCodewords;
 
-        private ECB(int count2, int dataCodewords2) {
-            this.count = count2;
-            this.dataCodewords = dataCodewords2;
+        private ECB(int i, int i2) {
+            this.count = i;
+            this.dataCodewords = i2;
         }
 
         /* access modifiers changed from: package-private */

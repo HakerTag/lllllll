@@ -4,36 +4,36 @@ import com.google.zxing.NotFoundException;
 
 public final class DefaultGridSampler extends GridSampler {
     @Override // com.google.zxing.common.GridSampler
-    public BitMatrix sampleGrid(BitMatrix image, int dimensionX, int dimensionY, float p1ToX, float p1ToY, float p2ToX, float p2ToY, float p3ToX, float p3ToY, float p4ToX, float p4ToY, float p1FromX, float p1FromY, float p2FromX, float p2FromY, float p3FromX, float p3FromY, float p4FromX, float p4FromY) throws NotFoundException {
-        return sampleGrid(image, dimensionX, dimensionY, PerspectiveTransform.quadrilateralToQuadrilateral(p1ToX, p1ToY, p2ToX, p2ToY, p3ToX, p3ToY, p4ToX, p4ToY, p1FromX, p1FromY, p2FromX, p2FromY, p3FromX, p3FromY, p4FromX, p4FromY));
+    public BitMatrix sampleGrid(BitMatrix bitMatrix, int i, int i2, float f, float f2, float f3, float f4, float f5, float f6, float f7, float f8, float f9, float f10, float f11, float f12, float f13, float f14, float f15, float f16) throws NotFoundException {
+        return sampleGrid(bitMatrix, i, i2, PerspectiveTransform.quadrilateralToQuadrilateral(f, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16));
     }
 
     @Override // com.google.zxing.common.GridSampler
-    public BitMatrix sampleGrid(BitMatrix image, int dimensionX, int dimensionY, PerspectiveTransform transform) throws NotFoundException {
-        if (dimensionX <= 0 || dimensionY <= 0) {
+    public BitMatrix sampleGrid(BitMatrix bitMatrix, int i, int i2, PerspectiveTransform perspectiveTransform) throws NotFoundException {
+        if (i <= 0 || i2 <= 0) {
             throw NotFoundException.getNotFoundInstance();
         }
-        BitMatrix bits = new BitMatrix(dimensionX, dimensionY);
-        float[] points = new float[(dimensionX * 2)];
-        for (int y = 0; y < dimensionY; y++) {
-            int max = points.length;
-            float iValue = ((float) y) + 0.5f;
-            for (int x = 0; x < max; x += 2) {
-                points[x] = ((float) (x / 2)) + 0.5f;
-                points[x + 1] = iValue;
+        BitMatrix bitMatrix2 = new BitMatrix(i, i2);
+        int i3 = i * 2;
+        float[] fArr = new float[i3];
+        for (int i4 = 0; i4 < i2; i4++) {
+            float f = ((float) i4) + 0.5f;
+            for (int i5 = 0; i5 < i3; i5 += 2) {
+                fArr[i5] = ((float) (i5 / 2)) + 0.5f;
+                fArr[i5 + 1] = f;
             }
-            transform.transformPoints(points);
-            checkAndNudgePoints(image, points);
-            for (int x2 = 0; x2 < max; x2 += 2) {
+            perspectiveTransform.transformPoints(fArr);
+            checkAndNudgePoints(bitMatrix, fArr);
+            for (int i6 = 0; i6 < i3; i6 += 2) {
                 try {
-                    if (image.get((int) points[x2], (int) points[x2 + 1])) {
-                        bits.set(x2 / 2, y);
+                    if (bitMatrix.get((int) fArr[i6], (int) fArr[i6 + 1])) {
+                        bitMatrix2.set(i6 / 2, i4);
                     }
-                } catch (ArrayIndexOutOfBoundsException e) {
+                } catch (ArrayIndexOutOfBoundsException unused) {
                     throw NotFoundException.getNotFoundInstance();
                 }
             }
         }
-        return bits;
+        return bitMatrix2;
     }
 }

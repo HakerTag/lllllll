@@ -11,11 +11,11 @@ public class Config {
     private Config() {
     }
 
-    public static void init(Activity action) {
+    public static void init(Activity activity) {
         ConfigXmlParser configXmlParser = new ConfigXmlParser();
         parser = configXmlParser;
-        configXmlParser.parse(action);
-        parser.getPreferences().setPreferencesBundle(action.getIntent().getExtras());
+        configXmlParser.parse(activity);
+        parser.getPreferences().setPreferencesBundle(activity.getIntent().getExtras());
     }
 
     public static void init() {

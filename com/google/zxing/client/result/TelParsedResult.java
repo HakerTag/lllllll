@@ -5,11 +5,11 @@ public final class TelParsedResult extends ParsedResult {
     private final String telURI;
     private final String title;
 
-    public TelParsedResult(String number2, String telURI2, String title2) {
+    public TelParsedResult(String str, String str2, String str3) {
         super(ParsedResultType.TEL);
-        this.number = number2;
-        this.telURI = telURI2;
-        this.title = title2;
+        this.number = str;
+        this.telURI = str2;
+        this.title = str3;
     }
 
     public String getNumber() {
@@ -26,9 +26,9 @@ public final class TelParsedResult extends ParsedResult {
 
     @Override // com.google.zxing.client.result.ParsedResult
     public String getDisplayResult() {
-        StringBuilder result = new StringBuilder(20);
-        maybeAppend(this.number, result);
-        maybeAppend(this.title, result);
-        return result.toString();
+        StringBuilder sb = new StringBuilder(20);
+        maybeAppend(this.number, sb);
+        maybeAppend(this.title, sb);
+        return sb.toString();
     }
 }

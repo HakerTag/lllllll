@@ -13,25 +13,28 @@ public final class EANManufacturerOrgSupport {
     }
 
     /* access modifiers changed from: package-private */
-    public String lookupCountryIdentifier(String productCode) {
-        int[] range;
-        int start;
+    public String lookupCountryIdentifier(String str) {
+        int[] iArr;
+        int i;
         initIfNeeded();
-        int prefix = Integer.parseInt(productCode.substring(0, 3));
-        int max = this.ranges.size();
-        int i = 0;
-        while (i < max && prefix >= (start = (range = this.ranges.get(i))[0])) {
-            if (prefix <= (range.length == 1 ? start : range[1])) {
-                return this.countryIdentifiers.get(i);
+        int parseInt = Integer.parseInt(str.substring(0, 3));
+        int size = this.ranges.size();
+        int i2 = 0;
+        while (i2 < size && parseInt >= (i = (iArr = this.ranges.get(i2))[0])) {
+            if (iArr.length != 1) {
+                i = iArr[1];
             }
-            i++;
+            if (parseInt <= i) {
+                return this.countryIdentifiers.get(i2);
+            }
+            i2++;
         }
         return null;
     }
 
-    private void add(int[] range, String id) {
-        this.ranges.add(range);
-        this.countryIdentifiers.add(id);
+    private void add(int[] iArr, String str) {
+        this.ranges.add(iArr);
+        this.countryIdentifiers.add(str);
     }
 
     private synchronized void initIfNeeded() {

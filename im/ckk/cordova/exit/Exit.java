@@ -13,14 +13,14 @@ public class Exit extends CordovaPlugin {
     }
 
     @Override // org.apache.cordova.CordovaPlugin
-    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        if (!action.equals("exit")) {
+    public boolean execute(String str, JSONArray jSONArray, CallbackContext callbackContext) throws JSONException {
+        if (!str.equals("exit")) {
             return false;
         }
         try {
             this.cordova.getActivity().finish();
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, 0));
-        } catch (Exception e) {
+        } catch (Exception unused) {
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, 1));
         }
         return true;

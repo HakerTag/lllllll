@@ -2,34 +2,34 @@ package com.google.zxing.datamatrix.encoder;
 
 /* access modifiers changed from: package-private */
 public final class X12Encoder extends C40Encoder {
-    X12Encoder() {
-    }
-
     @Override // com.google.zxing.datamatrix.encoder.Encoder, com.google.zxing.datamatrix.encoder.C40Encoder
     public int getEncodingMode() {
         return 3;
     }
 
+    X12Encoder() {
+    }
+
     @Override // com.google.zxing.datamatrix.encoder.Encoder, com.google.zxing.datamatrix.encoder.C40Encoder
-    public void encode(EncoderContext context) {
-        StringBuilder buffer = new StringBuilder();
+    public void encode(EncoderContext encoderContext) {
+        StringBuilder sb = new StringBuilder();
         while (true) {
-            if (!context.hasMoreCharacters()) {
+            if (!encoderContext.hasMoreCharacters()) {
                 break;
             }
-            char c = context.getCurrentChar();
-            context.pos++;
-            encodeChar(c, buffer);
-            if (buffer.length() % 3 == 0) {
-                writeNextTriplet(context, buffer);
-                int newMode = HighLevelEncoder.lookAheadTest(context.getMessage(), context.pos, getEncodingMode());
-                if (newMode != getEncodingMode()) {
-                    context.signalEncoderChange(newMode);
+            char currentChar = encoderContext.getCurrentChar();
+            encoderContext.pos++;
+            encodeChar(currentChar, sb);
+            if (sb.length() % 3 == 0) {
+                writeNextTriplet(encoderContext, sb);
+                int lookAheadTest = HighLevelEncoder.lookAheadTest(encoderContext.getMessage(), encoderContext.pos, getEncodingMode());
+                if (lookAheadTest != getEncodingMode()) {
+                    encoderContext.signalEncoderChange(lookAheadTest);
                     break;
                 }
             }
         }
-        handleEOD(context, buffer);
+        handleEOD(encoderContext, sb);
     }
 
     /* access modifiers changed from: package-private */
@@ -55,15 +55,15 @@ public final class X12Encoder extends C40Encoder {
 
     /* access modifiers changed from: package-private */
     @Override // com.google.zxing.datamatrix.encoder.C40Encoder
-    public void handleEOD(EncoderContext context, StringBuilder buffer) {
-        context.updateSymbolInfo();
-        int available = context.getSymbolInfo().getDataCapacity() - context.getCodewordCount();
-        context.pos -= buffer.length();
-        if (context.getRemainingCharacters() > 1 || available > 1 || context.getRemainingCharacters() != available) {
-            context.writeCodeword(254);
+    public void handleEOD(EncoderContext encoderContext, StringBuilder sb) {
+        encoderContext.updateSymbolInfo();
+        int dataCapacity = encoderContext.getSymbolInfo().getDataCapacity() - encoderContext.getCodewordCount();
+        encoderContext.pos -= sb.length();
+        if (encoderContext.getRemainingCharacters() > 1 || dataCapacity > 1 || encoderContext.getRemainingCharacters() != dataCapacity) {
+            encoderContext.writeCodeword(254);
         }
-        if (context.getNewEncoding() < 0) {
-            context.signalEncoderChange(0);
+        if (encoderContext.getNewEncoding() < 0) {
+            encoderContext.signalEncoderChange(0);
         }
     }
 }

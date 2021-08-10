@@ -24,17 +24,17 @@ class WrappedDrawableApi21 extends WrappedDrawableApi19 {
         findAndCacheIsProjectedDrawableMethod();
     }
 
-    WrappedDrawableApi21(WrappedDrawableApi14.DrawableWrapperState state, Resources resources) {
-        super(state, resources);
+    WrappedDrawableApi21(WrappedDrawableApi14.DrawableWrapperState drawableWrapperState, Resources resources) {
+        super(drawableWrapperState, resources);
         findAndCacheIsProjectedDrawableMethod();
     }
 
-    public void setHotspot(float x, float y) {
-        this.mDrawable.setHotspot(x, y);
+    public void setHotspot(float f, float f2) {
+        this.mDrawable.setHotspot(f, f2);
     }
 
-    public void setHotspotBounds(int left, int top, int right, int bottom) {
-        this.mDrawable.setHotspotBounds(left, top, right, bottom);
+    public void setHotspotBounds(int i, int i2, int i3, int i4) {
+        this.mDrawable.setHotspotBounds(i, i2, i3, i4);
     }
 
     public void getOutline(Outline outline) {
@@ -46,35 +46,35 @@ class WrappedDrawableApi21 extends WrappedDrawableApi19 {
     }
 
     @Override // android.support.v4.graphics.drawable.TintAwareDrawable, android.support.v4.graphics.drawable.WrappedDrawableApi14
-    public void setTintList(ColorStateList tint) {
+    public void setTintList(ColorStateList colorStateList) {
         if (isCompatTintEnabled()) {
-            super.setTintList(tint);
+            super.setTintList(colorStateList);
         } else {
-            this.mDrawable.setTintList(tint);
+            this.mDrawable.setTintList(colorStateList);
         }
     }
 
     @Override // android.support.v4.graphics.drawable.TintAwareDrawable, android.support.v4.graphics.drawable.WrappedDrawableApi14
-    public void setTint(int tintColor) {
+    public void setTint(int i) {
         if (isCompatTintEnabled()) {
-            super.setTint(tintColor);
+            super.setTint(i);
         } else {
-            this.mDrawable.setTint(tintColor);
+            this.mDrawable.setTint(i);
         }
     }
 
     @Override // android.support.v4.graphics.drawable.TintAwareDrawable, android.support.v4.graphics.drawable.WrappedDrawableApi14
-    public void setTintMode(PorterDuff.Mode tintMode) {
+    public void setTintMode(PorterDuff.Mode mode) {
         if (isCompatTintEnabled()) {
-            super.setTintMode(tintMode);
+            super.setTintMode(mode);
         } else {
-            this.mDrawable.setTintMode(tintMode);
+            this.mDrawable.setTintMode(mode);
         }
     }
 
     @Override // android.support.v4.graphics.drawable.WrappedDrawableApi14
-    public boolean setState(int[] stateSet) {
-        if (!super.setState(stateSet)) {
+    public boolean setState(int[] iArr) {
+        if (!super.setState(iArr)) {
             return false;
         }
         invalidateSelf();
@@ -99,8 +99,8 @@ class WrappedDrawableApi21 extends WrappedDrawableApi19 {
         if (!(this.mDrawable == null || (method = sIsProjectedDrawableMethod) == null)) {
             try {
                 return ((Boolean) method.invoke(this.mDrawable, new Object[0])).booleanValue();
-            } catch (Exception ex) {
-                Log.w(TAG, "Error calling Drawable#isProjected() method", ex);
+            } catch (Exception e) {
+                Log.w(TAG, "Error calling Drawable#isProjected() method", e);
             }
         }
         return false;
@@ -113,13 +113,13 @@ class WrappedDrawableApi21 extends WrappedDrawableApi19 {
     }
 
     private static class DrawableWrapperStateLollipop extends WrappedDrawableApi14.DrawableWrapperState {
-        DrawableWrapperStateLollipop(WrappedDrawableApi14.DrawableWrapperState orig, Resources res) {
-            super(orig, res);
+        DrawableWrapperStateLollipop(WrappedDrawableApi14.DrawableWrapperState drawableWrapperState, Resources resources) {
+            super(drawableWrapperState, resources);
         }
 
         @Override // android.support.v4.graphics.drawable.WrappedDrawableApi14.DrawableWrapperState
-        public Drawable newDrawable(Resources res) {
-            return new WrappedDrawableApi21(this, res);
+        public Drawable newDrawable(Resources resources) {
+            return new WrappedDrawableApi21(this, resources);
         }
     }
 
@@ -127,8 +127,8 @@ class WrappedDrawableApi21 extends WrappedDrawableApi19 {
         if (sIsProjectedDrawableMethod == null) {
             try {
                 sIsProjectedDrawableMethod = Drawable.class.getDeclaredMethod("isProjected", new Class[0]);
-            } catch (Exception ex) {
-                Log.w(TAG, "Failed to retrieve Drawable#isProjected() method", ex);
+            } catch (Exception e) {
+                Log.w(TAG, "Failed to retrieve Drawable#isProjected() method", e);
             }
         }
     }

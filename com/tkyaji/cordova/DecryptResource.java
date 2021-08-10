@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.regex.Pattern;
 import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import org.apache.cordova.CordovaPlugin;
@@ -17,64 +16,62 @@ import org.apache.cordova.CordovaResourceApi;
 import org.apache.cordova.LOG;
 
 public class DecryptResource extends CordovaPlugin {
-    private static final String CRYPT_IV = "ovI4nCyJHvppxw2E";
-    private static final String CRYPT_KEY = "w+Suz6n5byW0Tr86FuOHeLYLAKPzhEEg";
+    private static final String CRYPT_IV = "K44tz83R+n9vPzPp";
+    private static final String CRYPT_KEY = "XdYqnvDYDofBTz0r4Q/nWqNLWJqhXj05";
     private static final String[] EXCLUDE_FILES = new String[0];
     private static final String[] INCLUDE_FILES = {"\\.(htm|html|js|css)$"};
     private static final String TAG = "DecryptResource";
 
     @Override // org.apache.cordova.CordovaPlugin
     public Uri remapUri(Uri uri) {
-        if (uri.toString().indexOf("/+++/") > -1) {
-            return toPluginUri(uri);
-        }
-        return uri;
+        return uri.toString().indexOf("/+++/") > -1 ? toPluginUri(uri) : uri;
     }
 
     @Override // org.apache.cordova.CordovaPlugin
     public CordovaResourceApi.OpenForReadResult handleOpenForRead(Uri uri) throws IOException {
-        String uriStr = fromPluginUri(uri).toString().replace("/+++/", "/").split("\\?")[0];
-        CordovaResourceApi.OpenForReadResult readResult = this.webView.getResourceApi().openForRead(Uri.parse(uriStr), true);
-        if (!isCryptFiles(uriStr)) {
-            return readResult;
+        ByteArrayInputStream byteArrayInputStream;
+        String str = fromPluginUri(uri).toString().replace("/+++/", "/").split("\\?")[0];
+        CordovaResourceApi.OpenForReadResult openForRead = this.webView.getResourceApi().openForRead(Uri.parse(str), true);
+        if (!isCryptFiles(str)) {
+            return openForRead;
         }
-        BufferedReader br = new BufferedReader(new InputStreamReader(readResult.inputStream));
-        StringBuilder strb = new StringBuilder();
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(openForRead.inputStream));
+        StringBuilder sb = new StringBuilder();
         while (true) {
-            String line = br.readLine();
-            if (line == null) {
+            String readLine = bufferedReader.readLine();
+            if (readLine == null) {
                 break;
             }
-            strb.append(line);
+            sb.append(readLine);
         }
-        br.close();
-        byte[] bytes = Base64.decode(strb.toString(), 0);
-        LOG.d(TAG, "decrypt: " + uriStr);
-        ByteArrayInputStream byteInputStream = null;
+        bufferedReader.close();
+        byte[] decode = Base64.decode(sb.toString(), 0);
+        LOG.d(TAG, "decrypt: " + str);
         try {
-            SecretKey skey = new SecretKeySpec(CRYPT_KEY.getBytes("UTF-8"), "AES");
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            cipher.init(2, skey, new IvParameterSpec(CRYPT_IV.getBytes("UTF-8")));
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            bos.write(cipher.doFinal(bytes));
-            byteInputStream = new ByteArrayInputStream(bos.toByteArray());
-        } catch (Exception ex) {
-            LOG.e(TAG, ex.getMessage());
+            SecretKeySpec secretKeySpec = new SecretKeySpec(CRYPT_KEY.getBytes("UTF-8"), "AES");
+            Cipher instance = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            instance.init(2, secretKeySpec, new IvParameterSpec(CRYPT_IV.getBytes("UTF-8")));
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            byteArrayOutputStream.write(instance.doFinal(decode));
+            byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+        } catch (Exception e) {
+            LOG.e(TAG, e.getMessage());
+            byteArrayInputStream = null;
         }
-        return new CordovaResourceApi.OpenForReadResult(readResult.uri, byteInputStream, readResult.mimeType, readResult.length, readResult.assetFd);
+        return new CordovaResourceApi.OpenForReadResult(openForRead.uri, byteArrayInputStream, openForRead.mimeType, openForRead.length, openForRead.assetFd);
     }
 
-    private boolean isCryptFiles(String uri) {
-        String checkPath = uri.replace("file:///android_asset/www/", "");
-        if (hasMatch(checkPath, INCLUDE_FILES) && !hasMatch(checkPath, EXCLUDE_FILES)) {
+    private boolean isCryptFiles(String str) {
+        String replace = str.replace("file:///android_asset/www/", "");
+        if (hasMatch(replace, INCLUDE_FILES) && !hasMatch(replace, EXCLUDE_FILES)) {
             return true;
         }
         return false;
     }
 
-    private boolean hasMatch(String text, String[] regexArr) {
-        for (String regex : regexArr) {
-            if (Pattern.compile(regex).matcher(text).find()) {
+    private boolean hasMatch(String str, String[] strArr) {
+        for (String str2 : strArr) {
+            if (Pattern.compile(str2).matcher(str).find()) {
                 return true;
             }
         }

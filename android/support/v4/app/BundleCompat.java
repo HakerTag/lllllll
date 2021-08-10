@@ -19,7 +19,7 @@ public final class BundleCompat {
         BundleCompatBaseImpl() {
         }
 
-        public static IBinder getBinder(Bundle bundle, String key) {
+        public static IBinder getBinder(Bundle bundle, String str) {
             if (!sGetIBinderMethodFetched) {
                 try {
                     Method method = Bundle.class.getMethod("getIBinder", String.class);
@@ -33,7 +33,7 @@ public final class BundleCompat {
             Method method2 = sGetIBinderMethod;
             if (method2 != null) {
                 try {
-                    return (IBinder) method2.invoke(bundle, key);
+                    return (IBinder) method2.invoke(bundle, str);
                 } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e2) {
                     Log.i(TAG, "Failed to invoke getIBinder via reflection", e2);
                     sGetIBinderMethod = null;
@@ -42,7 +42,7 @@ public final class BundleCompat {
             return null;
         }
 
-        public static void putBinder(Bundle bundle, String key, IBinder binder) {
+        public static void putBinder(Bundle bundle, String str, IBinder iBinder) {
             if (!sPutIBinderMethodFetched) {
                 try {
                     Method method = Bundle.class.getMethod("putIBinder", String.class, IBinder.class);
@@ -56,7 +56,7 @@ public final class BundleCompat {
             Method method2 = sPutIBinderMethod;
             if (method2 != null) {
                 try {
-                    method2.invoke(bundle, key, binder);
+                    method2.invoke(bundle, str, iBinder);
                 } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e2) {
                     Log.i(TAG, "Failed to invoke putIBinder via reflection", e2);
                     sPutIBinderMethod = null;
@@ -68,18 +68,18 @@ public final class BundleCompat {
     private BundleCompat() {
     }
 
-    public static IBinder getBinder(Bundle bundle, String key) {
+    public static IBinder getBinder(Bundle bundle, String str) {
         if (Build.VERSION.SDK_INT >= 18) {
-            return bundle.getBinder(key);
+            return bundle.getBinder(str);
         }
-        return BundleCompatBaseImpl.getBinder(bundle, key);
+        return BundleCompatBaseImpl.getBinder(bundle, str);
     }
 
-    public static void putBinder(Bundle bundle, String key, IBinder binder) {
+    public static void putBinder(Bundle bundle, String str, IBinder iBinder) {
         if (Build.VERSION.SDK_INT >= 18) {
-            bundle.putBinder(key, binder);
+            bundle.putBinder(str, iBinder);
         } else {
-            BundleCompatBaseImpl.putBinder(bundle, key, binder);
+            BundleCompatBaseImpl.putBinder(bundle, str, iBinder);
         }
     }
 }

@@ -14,8 +14,8 @@ public final class CalendarResultHandler extends ResultHandler {
     private static final String TAG = CalendarResultHandler.class.getSimpleName();
     private static final int[] buttons = {R.string.button_add_calendar};
 
-    public CalendarResultHandler(Activity activity, ParsedResult result) {
-        super(activity, result);
+    public CalendarResultHandler(Activity activity, ParsedResult parsedResult) {
+        super(activity, parsedResult);
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler
@@ -24,53 +24,52 @@ public final class CalendarResultHandler extends ResultHandler {
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler
-    public int getButtonText(int index) {
-        return buttons[index];
+    public int getButtonText(int i) {
+        return buttons[i];
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler
-    public void handleButtonPress(int index) {
-        if (index == 0) {
-            CalendarParsedResult calendarResult = (CalendarParsedResult) getResult();
-            String description = calendarResult.getDescription();
-            String organizer = calendarResult.getOrganizer();
+    public void handleButtonPress(int i) {
+        String str;
+        if (i == 0) {
+            CalendarParsedResult calendarParsedResult = (CalendarParsedResult) getResult();
+            String description = calendarParsedResult.getDescription();
+            String organizer = calendarParsedResult.getOrganizer();
             if (organizer != null) {
                 if (description == null) {
-                    description = organizer;
-                } else {
-                    description = description + '\n' + organizer;
+                    str = organizer;
+                    addCalendarEvent(calendarParsedResult.getSummary(), calendarParsedResult.getStart(), calendarParsedResult.isStartAllDay(), calendarParsedResult.getEnd(), calendarParsedResult.getLocation(), str, calendarParsedResult.getAttendees());
                 }
+                description = description + '\n' + organizer;
             }
-            addCalendarEvent(calendarResult.getSummary(), calendarResult.getStart(), calendarResult.isStartAllDay(), calendarResult.getEnd(), calendarResult.getLocation(), description, calendarResult.getAttendees());
+            str = description;
+            addCalendarEvent(calendarParsedResult.getSummary(), calendarParsedResult.getStart(), calendarParsedResult.isStartAllDay(), calendarParsedResult.getEnd(), calendarParsedResult.getLocation(), str, calendarParsedResult.getAttendees());
         }
     }
 
-    private void addCalendarEvent(String summary, Date start, boolean allDay, Date end, String location, String description, String[] attendees) {
-        long endMilliseconds;
+    private void addCalendarEvent(String str, Date date, boolean z, Date date2, String str2, String str3, String[] strArr) {
         Intent intent = new Intent("android.intent.action.INSERT");
         intent.setType("vnd.android.cursor.item/event");
-        long startMilliseconds = start.getTime();
-        intent.putExtra("beginTime", startMilliseconds);
-        if (allDay) {
+        long time = date.getTime();
+        intent.putExtra("beginTime", time);
+        if (z) {
             intent.putExtra("allDay", true);
         }
-        if (end != null) {
-            endMilliseconds = end.getTime();
-        } else if (allDay) {
-            endMilliseconds = 86400000 + startMilliseconds;
-        } else {
-            endMilliseconds = startMilliseconds;
+        if (date2 != null) {
+            time = date2.getTime();
+        } else if (z) {
+            time += 86400000;
         }
-        intent.putExtra("endTime", endMilliseconds);
-        intent.putExtra("title", summary);
-        intent.putExtra("eventLocation", location);
-        intent.putExtra("description", description);
-        if (attendees != null) {
-            intent.putExtra("android.intent.extra.EMAIL", attendees);
+        intent.putExtra("endTime", time);
+        intent.putExtra("title", str);
+        intent.putExtra("eventLocation", str2);
+        intent.putExtra("description", str3);
+        if (strArr != null) {
+            intent.putExtra("android.intent.extra.EMAIL", strArr);
         }
         try {
             rawLaunchIntent(intent);
-        } catch (ActivityNotFoundException e) {
+        } catch (ActivityNotFoundException unused) {
             Log.w(TAG, "No calendar app available that responds to android.intent.action.INSERT");
             intent.setAction("android.intent.action.EDIT");
             launchIntent(intent);
@@ -79,36 +78,36 @@ public final class CalendarResultHandler extends ResultHandler {
 
     @Override // com.google.zxing.client.android.result.ResultHandler
     public CharSequence getDisplayContents() {
-        CalendarParsedResult calResult = (CalendarParsedResult) getResult();
-        StringBuilder result = new StringBuilder(100);
-        ParsedResult.maybeAppend(calResult.getSummary(), result);
-        Date start = calResult.getStart();
-        ParsedResult.maybeAppend(format(calResult.isStartAllDay(), start), result);
-        Date end = calResult.getEnd();
+        CalendarParsedResult calendarParsedResult = (CalendarParsedResult) getResult();
+        StringBuilder sb = new StringBuilder(100);
+        ParsedResult.maybeAppend(calendarParsedResult.getSummary(), sb);
+        Date start = calendarParsedResult.getStart();
+        ParsedResult.maybeAppend(format(calendarParsedResult.isStartAllDay(), start), sb);
+        Date end = calendarParsedResult.getEnd();
         if (end != null) {
-            if (calResult.isEndAllDay() && !start.equals(end)) {
+            if (calendarParsedResult.isEndAllDay() && !start.equals(end)) {
                 end = new Date(end.getTime() - 86400000);
             }
-            ParsedResult.maybeAppend(format(calResult.isEndAllDay(), end), result);
+            ParsedResult.maybeAppend(format(calendarParsedResult.isEndAllDay(), end), sb);
         }
-        ParsedResult.maybeAppend(calResult.getLocation(), result);
-        ParsedResult.maybeAppend(calResult.getOrganizer(), result);
-        ParsedResult.maybeAppend(calResult.getAttendees(), result);
-        ParsedResult.maybeAppend(calResult.getDescription(), result);
-        return result.toString();
+        ParsedResult.maybeAppend(calendarParsedResult.getLocation(), sb);
+        ParsedResult.maybeAppend(calendarParsedResult.getOrganizer(), sb);
+        ParsedResult.maybeAppend(calendarParsedResult.getAttendees(), sb);
+        ParsedResult.maybeAppend(calendarParsedResult.getDescription(), sb);
+        return sb.toString();
     }
 
-    private static String format(boolean allDay, Date date) {
-        DateFormat format;
+    private static String format(boolean z, Date date) {
+        DateFormat dateFormat;
         if (date == null) {
             return null;
         }
-        if (allDay) {
-            format = DateFormat.getDateInstance(2);
+        if (z) {
+            dateFormat = DateFormat.getDateInstance(2);
         } else {
-            format = DateFormat.getDateTimeInstance(2, 2);
+            dateFormat = DateFormat.getDateTimeInstance(2, 2);
         }
-        return format.format(date);
+        return dateFormat.format(date);
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler

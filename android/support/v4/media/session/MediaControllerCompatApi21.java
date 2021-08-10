@@ -40,149 +40,149 @@ public class MediaControllerCompatApi21 {
     MediaControllerCompatApi21() {
     }
 
-    public static Object fromToken(Context context, Object sessionToken) {
-        return new MediaController(context, (MediaSession.Token) sessionToken);
+    public static Object fromToken(Context context, Object obj) {
+        return new MediaController(context, (MediaSession.Token) obj);
     }
 
     public static Object createCallback(Callback callback) {
         return new CallbackProxy(callback);
     }
 
-    public static void registerCallback(Object controllerObj, Object callbackObj, Handler handler) {
-        ((MediaController) controllerObj).registerCallback((MediaController.Callback) callbackObj, handler);
+    public static void registerCallback(Object obj, Object obj2, Handler handler) {
+        ((MediaController) obj).registerCallback((MediaController.Callback) obj2, handler);
     }
 
-    public static void unregisterCallback(Object controllerObj, Object callbackObj) {
-        ((MediaController) controllerObj).unregisterCallback((MediaController.Callback) callbackObj);
+    public static void unregisterCallback(Object obj, Object obj2) {
+        ((MediaController) obj).unregisterCallback((MediaController.Callback) obj2);
     }
 
-    public static void setMediaController(Activity activity, Object controllerObj) {
-        activity.setMediaController((MediaController) controllerObj);
+    public static void setMediaController(Activity activity, Object obj) {
+        activity.setMediaController((MediaController) obj);
     }
 
     public static Object getMediaController(Activity activity) {
         return activity.getMediaController();
     }
 
-    public static Object getSessionToken(Object controllerObj) {
-        return ((MediaController) controllerObj).getSessionToken();
+    public static Object getSessionToken(Object obj) {
+        return ((MediaController) obj).getSessionToken();
     }
 
-    public static Object getTransportControls(Object controllerObj) {
-        return ((MediaController) controllerObj).getTransportControls();
+    public static Object getTransportControls(Object obj) {
+        return ((MediaController) obj).getTransportControls();
     }
 
-    public static Object getPlaybackState(Object controllerObj) {
-        return ((MediaController) controllerObj).getPlaybackState();
+    public static Object getPlaybackState(Object obj) {
+        return ((MediaController) obj).getPlaybackState();
     }
 
-    public static Object getMetadata(Object controllerObj) {
-        return ((MediaController) controllerObj).getMetadata();
+    public static Object getMetadata(Object obj) {
+        return ((MediaController) obj).getMetadata();
     }
 
-    public static List<Object> getQueue(Object controllerObj) {
-        List<MediaSession.QueueItem> queue = ((MediaController) controllerObj).getQueue();
+    public static List<Object> getQueue(Object obj) {
+        List<MediaSession.QueueItem> queue = ((MediaController) obj).getQueue();
         if (queue == null) {
             return null;
         }
-        return new ArrayList<>(queue);
+        return new ArrayList(queue);
     }
 
-    public static CharSequence getQueueTitle(Object controllerObj) {
-        return ((MediaController) controllerObj).getQueueTitle();
+    public static CharSequence getQueueTitle(Object obj) {
+        return ((MediaController) obj).getQueueTitle();
     }
 
-    public static Bundle getExtras(Object controllerObj) {
-        return ((MediaController) controllerObj).getExtras();
+    public static Bundle getExtras(Object obj) {
+        return ((MediaController) obj).getExtras();
     }
 
-    public static int getRatingType(Object controllerObj) {
-        return ((MediaController) controllerObj).getRatingType();
+    public static int getRatingType(Object obj) {
+        return ((MediaController) obj).getRatingType();
     }
 
-    public static long getFlags(Object controllerObj) {
-        return ((MediaController) controllerObj).getFlags();
+    public static long getFlags(Object obj) {
+        return ((MediaController) obj).getFlags();
     }
 
-    public static Object getPlaybackInfo(Object controllerObj) {
-        return ((MediaController) controllerObj).getPlaybackInfo();
+    public static Object getPlaybackInfo(Object obj) {
+        return ((MediaController) obj).getPlaybackInfo();
     }
 
-    public static PendingIntent getSessionActivity(Object controllerObj) {
-        return ((MediaController) controllerObj).getSessionActivity();
+    public static PendingIntent getSessionActivity(Object obj) {
+        return ((MediaController) obj).getSessionActivity();
     }
 
-    public static boolean dispatchMediaButtonEvent(Object controllerObj, KeyEvent event) {
-        return ((MediaController) controllerObj).dispatchMediaButtonEvent(event);
+    public static boolean dispatchMediaButtonEvent(Object obj, KeyEvent keyEvent) {
+        return ((MediaController) obj).dispatchMediaButtonEvent(keyEvent);
     }
 
-    public static void setVolumeTo(Object controllerObj, int value, int flags) {
-        ((MediaController) controllerObj).setVolumeTo(value, flags);
+    public static void setVolumeTo(Object obj, int i, int i2) {
+        ((MediaController) obj).setVolumeTo(i, i2);
     }
 
-    public static void adjustVolume(Object controllerObj, int direction, int flags) {
-        ((MediaController) controllerObj).adjustVolume(direction, flags);
+    public static void adjustVolume(Object obj, int i, int i2) {
+        ((MediaController) obj).adjustVolume(i, i2);
     }
 
-    public static void sendCommand(Object controllerObj, String command, Bundle params, ResultReceiver cb) {
-        ((MediaController) controllerObj).sendCommand(command, params, cb);
+    public static void sendCommand(Object obj, String str, Bundle bundle, ResultReceiver resultReceiver) {
+        ((MediaController) obj).sendCommand(str, bundle, resultReceiver);
     }
 
-    public static String getPackageName(Object controllerObj) {
-        return ((MediaController) controllerObj).getPackageName();
+    public static String getPackageName(Object obj) {
+        return ((MediaController) obj).getPackageName();
     }
 
     public static class TransportControls {
-        public static void play(Object controlsObj) {
-            ((MediaController.TransportControls) controlsObj).play();
+        public static void play(Object obj) {
+            ((MediaController.TransportControls) obj).play();
         }
 
-        public static void pause(Object controlsObj) {
-            ((MediaController.TransportControls) controlsObj).pause();
+        public static void pause(Object obj) {
+            ((MediaController.TransportControls) obj).pause();
         }
 
-        public static void stop(Object controlsObj) {
-            ((MediaController.TransportControls) controlsObj).stop();
+        public static void stop(Object obj) {
+            ((MediaController.TransportControls) obj).stop();
         }
 
-        public static void seekTo(Object controlsObj, long pos) {
-            ((MediaController.TransportControls) controlsObj).seekTo(pos);
+        public static void seekTo(Object obj, long j) {
+            ((MediaController.TransportControls) obj).seekTo(j);
         }
 
-        public static void fastForward(Object controlsObj) {
-            ((MediaController.TransportControls) controlsObj).fastForward();
+        public static void fastForward(Object obj) {
+            ((MediaController.TransportControls) obj).fastForward();
         }
 
-        public static void rewind(Object controlsObj) {
-            ((MediaController.TransportControls) controlsObj).rewind();
+        public static void rewind(Object obj) {
+            ((MediaController.TransportControls) obj).rewind();
         }
 
-        public static void skipToNext(Object controlsObj) {
-            ((MediaController.TransportControls) controlsObj).skipToNext();
+        public static void skipToNext(Object obj) {
+            ((MediaController.TransportControls) obj).skipToNext();
         }
 
-        public static void skipToPrevious(Object controlsObj) {
-            ((MediaController.TransportControls) controlsObj).skipToPrevious();
+        public static void skipToPrevious(Object obj) {
+            ((MediaController.TransportControls) obj).skipToPrevious();
         }
 
-        public static void setRating(Object controlsObj, Object ratingObj) {
-            ((MediaController.TransportControls) controlsObj).setRating((Rating) ratingObj);
+        public static void setRating(Object obj, Object obj2) {
+            ((MediaController.TransportControls) obj).setRating((Rating) obj2);
         }
 
-        public static void playFromMediaId(Object controlsObj, String mediaId, Bundle extras) {
-            ((MediaController.TransportControls) controlsObj).playFromMediaId(mediaId, extras);
+        public static void playFromMediaId(Object obj, String str, Bundle bundle) {
+            ((MediaController.TransportControls) obj).playFromMediaId(str, bundle);
         }
 
-        public static void playFromSearch(Object controlsObj, String query, Bundle extras) {
-            ((MediaController.TransportControls) controlsObj).playFromSearch(query, extras);
+        public static void playFromSearch(Object obj, String str, Bundle bundle) {
+            ((MediaController.TransportControls) obj).playFromSearch(str, bundle);
         }
 
-        public static void skipToQueueItem(Object controlsObj, long id) {
-            ((MediaController.TransportControls) controlsObj).skipToQueueItem(id);
+        public static void skipToQueueItem(Object obj, long j) {
+            ((MediaController.TransportControls) obj).skipToQueueItem(j);
         }
 
-        public static void sendCustomAction(Object controlsObj, String action, Bundle args) {
-            ((MediaController.TransportControls) controlsObj).sendCustomAction(action, args);
+        public static void sendCustomAction(Object obj, String str, Bundle bundle) {
+            ((MediaController.TransportControls) obj).sendCustomAction(str, bundle);
         }
     }
 
@@ -191,38 +191,38 @@ public class MediaControllerCompatApi21 {
         private static final int STREAM_BLUETOOTH_SCO = 6;
         private static final int STREAM_SYSTEM_ENFORCED = 7;
 
-        public static int getPlaybackType(Object volumeInfoObj) {
-            return ((MediaController.PlaybackInfo) volumeInfoObj).getPlaybackType();
+        public static int getPlaybackType(Object obj) {
+            return ((MediaController.PlaybackInfo) obj).getPlaybackType();
         }
 
-        public static AudioAttributes getAudioAttributes(Object volumeInfoObj) {
-            return ((MediaController.PlaybackInfo) volumeInfoObj).getAudioAttributes();
+        public static AudioAttributes getAudioAttributes(Object obj) {
+            return ((MediaController.PlaybackInfo) obj).getAudioAttributes();
         }
 
-        public static int getLegacyAudioStream(Object volumeInfoObj) {
-            return toLegacyStreamType(getAudioAttributes(volumeInfoObj));
+        public static int getLegacyAudioStream(Object obj) {
+            return toLegacyStreamType(getAudioAttributes(obj));
         }
 
-        public static int getVolumeControl(Object volumeInfoObj) {
-            return ((MediaController.PlaybackInfo) volumeInfoObj).getVolumeControl();
+        public static int getVolumeControl(Object obj) {
+            return ((MediaController.PlaybackInfo) obj).getVolumeControl();
         }
 
-        public static int getMaxVolume(Object volumeInfoObj) {
-            return ((MediaController.PlaybackInfo) volumeInfoObj).getMaxVolume();
+        public static int getMaxVolume(Object obj) {
+            return ((MediaController.PlaybackInfo) obj).getMaxVolume();
         }
 
-        public static int getCurrentVolume(Object volumeInfoObj) {
-            return ((MediaController.PlaybackInfo) volumeInfoObj).getCurrentVolume();
+        public static int getCurrentVolume(Object obj) {
+            return ((MediaController.PlaybackInfo) obj).getCurrentVolume();
         }
 
-        private static int toLegacyStreamType(AudioAttributes aa) {
-            if ((aa.getFlags() & 1) == 1) {
+        private static int toLegacyStreamType(AudioAttributes audioAttributes) {
+            if ((audioAttributes.getFlags() & 1) == 1) {
                 return 7;
             }
-            if ((aa.getFlags() & 4) == 4) {
+            if ((audioAttributes.getFlags() & 4) == 4) {
                 return 6;
             }
-            int usage = aa.getUsage();
+            int usage = audioAttributes.getUsage();
             if (usage == 13) {
                 return 1;
             }
@@ -251,41 +251,41 @@ public class MediaControllerCompatApi21 {
     public static class CallbackProxy<T extends Callback> extends MediaController.Callback {
         protected final T mCallback;
 
-        public CallbackProxy(T callback) {
-            this.mCallback = callback;
+        public CallbackProxy(T t) {
+            this.mCallback = t;
         }
 
         public void onSessionDestroyed() {
             this.mCallback.onSessionDestroyed();
         }
 
-        public void onSessionEvent(String event, Bundle extras) {
-            this.mCallback.onSessionEvent(event, extras);
+        public void onSessionEvent(String str, Bundle bundle) {
+            this.mCallback.onSessionEvent(str, bundle);
         }
 
-        public void onPlaybackStateChanged(PlaybackState state) {
-            this.mCallback.onPlaybackStateChanged(state);
+        public void onPlaybackStateChanged(PlaybackState playbackState) {
+            this.mCallback.onPlaybackStateChanged(playbackState);
         }
 
-        public void onMetadataChanged(MediaMetadata metadata) {
-            this.mCallback.onMetadataChanged(metadata);
+        public void onMetadataChanged(MediaMetadata mediaMetadata) {
+            this.mCallback.onMetadataChanged(mediaMetadata);
         }
 
         @Override // android.media.session.MediaController.Callback
-        public void onQueueChanged(List<MediaSession.QueueItem> queue) {
-            this.mCallback.onQueueChanged(queue);
+        public void onQueueChanged(List<MediaSession.QueueItem> list) {
+            this.mCallback.onQueueChanged(list);
         }
 
-        public void onQueueTitleChanged(CharSequence title) {
-            this.mCallback.onQueueTitleChanged(title);
+        public void onQueueTitleChanged(CharSequence charSequence) {
+            this.mCallback.onQueueTitleChanged(charSequence);
         }
 
-        public void onExtrasChanged(Bundle extras) {
-            this.mCallback.onExtrasChanged(extras);
+        public void onExtrasChanged(Bundle bundle) {
+            this.mCallback.onExtrasChanged(bundle);
         }
 
-        public void onAudioInfoChanged(MediaController.PlaybackInfo info) {
-            this.mCallback.onAudioInfoChanged(info.getPlaybackType(), PlaybackInfo.getLegacyAudioStream(info), info.getVolumeControl(), info.getMaxVolume(), info.getCurrentVolume());
+        public void onAudioInfoChanged(MediaController.PlaybackInfo playbackInfo) {
+            this.mCallback.onAudioInfoChanged(playbackInfo.getPlaybackType(), PlaybackInfo.getLegacyAudioStream(playbackInfo), playbackInfo.getVolumeControl(), playbackInfo.getMaxVolume(), playbackInfo.getCurrentVolume());
         }
     }
 }

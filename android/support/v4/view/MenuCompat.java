@@ -4,8 +4,8 @@ import android.view.MenuItem;
 
 public final class MenuCompat {
     @Deprecated
-    public static void setShowAsAction(MenuItem item, int actionEnum) {
-        item.setShowAsAction(actionEnum);
+    public static void setShowAsAction(MenuItem menuItem, int i) {
+        menuItem.setShowAsAction(i);
     }
 
     private MenuCompat() {

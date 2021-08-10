@@ -4,26 +4,23 @@ import com.google.zxing.common.BitArray;
 
 /* access modifiers changed from: package-private */
 public final class AI01320xDecoder extends AI013x0xDecoder {
-    AI01320xDecoder(BitArray information) {
-        super(information);
+    /* access modifiers changed from: protected */
+    @Override // com.google.zxing.oned.rss.expanded.decoders.AI01weightDecoder
+    public int checkWeight(int i) {
+        return i < 10000 ? i : i - 10000;
+    }
+
+    AI01320xDecoder(BitArray bitArray) {
+        super(bitArray);
     }
 
     /* access modifiers changed from: protected */
     @Override // com.google.zxing.oned.rss.expanded.decoders.AI01weightDecoder
-    public void addWeightCode(StringBuilder buf, int weight) {
-        if (weight < 10000) {
-            buf.append("(3202)");
+    public void addWeightCode(StringBuilder sb, int i) {
+        if (i < 10000) {
+            sb.append("(3202)");
         } else {
-            buf.append("(3203)");
+            sb.append("(3203)");
         }
-    }
-
-    /* access modifiers changed from: protected */
-    @Override // com.google.zxing.oned.rss.expanded.decoders.AI01weightDecoder
-    public int checkWeight(int weight) {
-        if (weight < 10000) {
-            return weight;
-        }
-        return weight - 10000;
     }
 }

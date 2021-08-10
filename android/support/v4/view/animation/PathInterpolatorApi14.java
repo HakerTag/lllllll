@@ -11,64 +11,64 @@ class PathInterpolatorApi14 implements Interpolator {
 
     PathInterpolatorApi14(Path path) {
         PathMeasure pathMeasure = new PathMeasure(path, false);
-        float pathLength = pathMeasure.getLength();
-        int numPoints = ((int) (pathLength / PRECISION)) + 1;
-        this.mX = new float[numPoints];
-        this.mY = new float[numPoints];
-        float[] position = new float[2];
-        for (int i = 0; i < numPoints; i++) {
-            pathMeasure.getPosTan((((float) i) * pathLength) / ((float) (numPoints - 1)), position, null);
-            this.mX[i] = position[0];
-            this.mY[i] = position[1];
+        float length = pathMeasure.getLength();
+        int i = ((int) (length / PRECISION)) + 1;
+        this.mX = new float[i];
+        this.mY = new float[i];
+        float[] fArr = new float[2];
+        for (int i2 = 0; i2 < i; i2++) {
+            pathMeasure.getPosTan((((float) i2) * length) / ((float) (i - 1)), fArr, null);
+            this.mX[i2] = fArr[0];
+            this.mY[i2] = fArr[1];
         }
     }
 
-    PathInterpolatorApi14(float controlX, float controlY) {
-        this(createQuad(controlX, controlY));
+    PathInterpolatorApi14(float f, float f2) {
+        this(createQuad(f, f2));
     }
 
-    PathInterpolatorApi14(float controlX1, float controlY1, float controlX2, float controlY2) {
-        this(createCubic(controlX1, controlY1, controlX2, controlY2));
+    PathInterpolatorApi14(float f, float f2, float f3, float f4) {
+        this(createCubic(f, f2, f3, f4));
     }
 
-    public float getInterpolation(float t) {
-        if (t <= 0.0f) {
+    public float getInterpolation(float f) {
+        if (f <= 0.0f) {
             return 0.0f;
         }
-        if (t >= 1.0f) {
+        if (f >= 1.0f) {
             return 1.0f;
         }
-        int startIndex = 0;
-        int endIndex = this.mX.length - 1;
-        while (endIndex - startIndex > 1) {
-            int midIndex = (startIndex + endIndex) / 2;
-            if (t < this.mX[midIndex]) {
-                endIndex = midIndex;
+        int i = 0;
+        int length = this.mX.length - 1;
+        while (length - i > 1) {
+            int i2 = (i + length) / 2;
+            if (f < this.mX[i2]) {
+                length = i2;
             } else {
-                startIndex = midIndex;
+                i = i2;
             }
         }
         float[] fArr = this.mX;
-        float xRange = fArr[endIndex] - fArr[startIndex];
-        if (xRange == 0.0f) {
-            return this.mY[startIndex];
+        float f2 = fArr[length] - fArr[i];
+        if (f2 == 0.0f) {
+            return this.mY[i];
         }
         float[] fArr2 = this.mY;
-        float startY = fArr2[startIndex];
-        return ((fArr2[endIndex] - startY) * ((t - fArr[startIndex]) / xRange)) + startY;
+        float f3 = fArr2[i];
+        return f3 + (((f - fArr[i]) / f2) * (fArr2[length] - f3));
     }
 
-    private static Path createQuad(float controlX, float controlY) {
+    private static Path createQuad(float f, float f2) {
         Path path = new Path();
         path.moveTo(0.0f, 0.0f);
-        path.quadTo(controlX, controlY, 1.0f, 1.0f);
+        path.quadTo(f, f2, 1.0f, 1.0f);
         return path;
     }
 
-    private static Path createCubic(float controlX1, float controlY1, float controlX2, float controlY2) {
+    private static Path createCubic(float f, float f2, float f3, float f4) {
         Path path = new Path();
         path.moveTo(0.0f, 0.0f);
-        path.cubicTo(controlX1, controlY1, controlX2, controlY2, 1.0f, 1.0f);
+        path.cubicTo(f, f2, f3, f4, 1.0f, 1.0f);
         return path;
     }
 }

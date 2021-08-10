@@ -10,9 +10,9 @@ public abstract class AbstractExpandedDecoder {
 
     public abstract String parseInformation() throws NotFoundException, FormatException;
 
-    AbstractExpandedDecoder(BitArray information2) {
-        this.information = information2;
-        this.generalDecoder = new GeneralAppIdDecoder(information2);
+    AbstractExpandedDecoder(BitArray bitArray) {
+        this.information = bitArray;
+        this.generalDecoder = new GeneralAppIdDecoder(bitArray);
     }
 
     /* access modifiers changed from: protected */
@@ -25,46 +25,46 @@ public abstract class AbstractExpandedDecoder {
         return this.generalDecoder;
     }
 
-    public static AbstractExpandedDecoder createDecoder(BitArray information2) {
-        if (information2.get(1)) {
-            return new AI01AndOtherAIs(information2);
+    public static AbstractExpandedDecoder createDecoder(BitArray bitArray) {
+        if (bitArray.get(1)) {
+            return new AI01AndOtherAIs(bitArray);
         }
-        if (!information2.get(2)) {
-            return new AnyAIDecoder(information2);
+        if (!bitArray.get(2)) {
+            return new AnyAIDecoder(bitArray);
         }
-        int fourBitEncodationMethod = GeneralAppIdDecoder.extractNumericValueFromBitArray(information2, 1, 4);
-        if (fourBitEncodationMethod == 4) {
-            return new AI013103decoder(information2);
+        int extractNumericValueFromBitArray = GeneralAppIdDecoder.extractNumericValueFromBitArray(bitArray, 1, 4);
+        if (extractNumericValueFromBitArray == 4) {
+            return new AI013103decoder(bitArray);
         }
-        if (fourBitEncodationMethod == 5) {
-            return new AI01320xDecoder(information2);
+        if (extractNumericValueFromBitArray == 5) {
+            return new AI01320xDecoder(bitArray);
         }
-        int fiveBitEncodationMethod = GeneralAppIdDecoder.extractNumericValueFromBitArray(information2, 1, 5);
-        if (fiveBitEncodationMethod == 12) {
-            return new AI01392xDecoder(information2);
+        int extractNumericValueFromBitArray2 = GeneralAppIdDecoder.extractNumericValueFromBitArray(bitArray, 1, 5);
+        if (extractNumericValueFromBitArray2 == 12) {
+            return new AI01392xDecoder(bitArray);
         }
-        if (fiveBitEncodationMethod == 13) {
-            return new AI01393xDecoder(information2);
+        if (extractNumericValueFromBitArray2 == 13) {
+            return new AI01393xDecoder(bitArray);
         }
-        switch (GeneralAppIdDecoder.extractNumericValueFromBitArray(information2, 1, 7)) {
+        switch (GeneralAppIdDecoder.extractNumericValueFromBitArray(bitArray, 1, 7)) {
             case 56:
-                return new AI013x0x1xDecoder(information2, "310", "11");
+                return new AI013x0x1xDecoder(bitArray, "310", "11");
             case 57:
-                return new AI013x0x1xDecoder(information2, "320", "11");
+                return new AI013x0x1xDecoder(bitArray, "320", "11");
             case 58:
-                return new AI013x0x1xDecoder(information2, "310", "13");
+                return new AI013x0x1xDecoder(bitArray, "310", "13");
             case 59:
-                return new AI013x0x1xDecoder(information2, "320", "13");
+                return new AI013x0x1xDecoder(bitArray, "320", "13");
             case 60:
-                return new AI013x0x1xDecoder(information2, "310", "15");
+                return new AI013x0x1xDecoder(bitArray, "310", "15");
             case 61:
-                return new AI013x0x1xDecoder(information2, "320", "15");
+                return new AI013x0x1xDecoder(bitArray, "320", "15");
             case 62:
-                return new AI013x0x1xDecoder(information2, "310", "17");
+                return new AI013x0x1xDecoder(bitArray, "310", "17");
             case 63:
-                return new AI013x0x1xDecoder(information2, "320", "17");
+                return new AI013x0x1xDecoder(bitArray, "320", "17");
             default:
-                throw new IllegalStateException("unknown decoder: " + information2);
+                throw new IllegalStateException("unknown decoder: " + bitArray);
         }
     }
 }

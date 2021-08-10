@@ -11,41 +11,47 @@ public final class EAN13Writer extends UPCEANWriter {
     private static final int CODE_WIDTH = 95;
 
     @Override // com.google.zxing.oned.OneDimensionalCodeWriter, com.google.zxing.Writer
-    public BitMatrix encode(String contents, BarcodeFormat format, int width, int height, Map<EncodeHintType, ?> hints) throws WriterException {
-        if (format == BarcodeFormat.EAN_13) {
-            return super.encode(contents, format, width, height, hints);
+    public BitMatrix encode(String str, BarcodeFormat barcodeFormat, int i, int i2, Map<EncodeHintType, ?> map) throws WriterException {
+        if (barcodeFormat == BarcodeFormat.EAN_13) {
+            return super.encode(str, barcodeFormat, i, i2, map);
         }
-        throw new IllegalArgumentException("Can only encode EAN_13, but got " + format);
+        throw new IllegalArgumentException("Can only encode EAN_13, but got " + barcodeFormat);
     }
 
     @Override // com.google.zxing.oned.OneDimensionalCodeWriter
-    public boolean[] encode(String contents) {
-        if (contents.length() == 13) {
+    public boolean[] encode(String str) {
+        if (str.length() == 13) {
             try {
-                if (UPCEANReader.checkStandardUPCEANChecksum(contents)) {
-                    int parities = EAN13Reader.FIRST_DIGIT_ENCODINGS[Integer.parseInt(contents.substring(0, 1))];
-                    boolean[] result = new boolean[CODE_WIDTH];
-                    int pos = 0 + appendPattern(result, 0, UPCEANReader.START_END_PATTERN, true);
-                    for (int i = 1; i <= 6; i++) {
-                        int digit = Integer.parseInt(contents.substring(i, i + 1));
-                        if (((parities >> (6 - i)) & 1) == 1) {
-                            digit += 10;
+                if (UPCEANReader.checkStandardUPCEANChecksum(str)) {
+                    int i = EAN13Reader.FIRST_DIGIT_ENCODINGS[Integer.parseInt(str.substring(0, 1))];
+                    boolean[] zArr = new boolean[CODE_WIDTH];
+                    int appendPattern = appendPattern(zArr, 0, UPCEANReader.START_END_PATTERN, true) + 0;
+                    int i2 = 1;
+                    while (i2 <= 6) {
+                        int i3 = i2 + 1;
+                        int parseInt = Integer.parseInt(str.substring(i2, i3));
+                        if (((i >> (6 - i2)) & 1) == 1) {
+                            parseInt += 10;
                         }
-                        pos += appendPattern(result, pos, UPCEANReader.L_AND_G_PATTERNS[digit], false);
+                        appendPattern += appendPattern(zArr, appendPattern, UPCEANReader.L_AND_G_PATTERNS[parseInt], false);
+                        i2 = i3;
                     }
-                    int pos2 = pos + appendPattern(result, pos, UPCEANReader.MIDDLE_PATTERN, false);
-                    for (int i2 = 7; i2 <= 12; i2++) {
-                        pos2 += appendPattern(result, pos2, UPCEANReader.L_PATTERNS[Integer.parseInt(contents.substring(i2, i2 + 1))], true);
+                    int appendPattern2 = appendPattern + appendPattern(zArr, appendPattern, UPCEANReader.MIDDLE_PATTERN, false);
+                    int i4 = 7;
+                    while (i4 <= 12) {
+                        int i5 = i4 + 1;
+                        appendPattern2 += appendPattern(zArr, appendPattern2, UPCEANReader.L_PATTERNS[Integer.parseInt(str.substring(i4, i5))], true);
+                        i4 = i5;
                     }
-                    appendPattern(result, pos2, UPCEANReader.START_END_PATTERN, true);
-                    return result;
+                    appendPattern(zArr, appendPattern2, UPCEANReader.START_END_PATTERN, true);
+                    return zArr;
                 }
                 throw new IllegalArgumentException("Contents do not pass checksum");
-            } catch (FormatException e) {
+            } catch (FormatException unused) {
                 throw new IllegalArgumentException("Illegal contents");
             }
         } else {
-            throw new IllegalArgumentException("Requested contents should be 13 digits long, but got " + contents.length());
+            throw new IllegalArgumentException("Requested contents should be 13 digits long, but got " + str.length());
         }
     }
 }

@@ -20,6 +20,14 @@ public final class PDF417 {
     private int minCols;
     private int minRows;
 
+    private static int getNumberOfPadCodewords(int i, int i2, int i3, int i4) {
+        int i5 = (i3 * i4) - i2;
+        if (i5 > i + 1) {
+            return (i5 - i) - 1;
+        }
+        return 0;
+    }
+
     static {
         int[] iArr = new int[PDF417Common.NUMBER_OF_CODEWORDS];
         // fill-array-data instruction
@@ -2821,8 +2829,8 @@ public final class PDF417 {
         this(false);
     }
 
-    public PDF417(boolean compact2) {
-        this.compact = compact2;
+    public PDF417(boolean z) {
+        this.compact = z;
         this.compaction = Compaction.AUTO;
         this.encoding = null;
         this.minCols = 2;
@@ -2835,138 +2843,135 @@ public final class PDF417 {
         return this.barcodeMatrix;
     }
 
-    private static int calculateNumberOfRows(int m, int k, int c) {
-        int r = (((m + 1) + k) / c) + 1;
-        if (c * r >= m + 1 + k + c) {
-            return r - 1;
-        }
-        return r;
+    private static int calculateNumberOfRows(int i, int i2, int i3) {
+        int i4 = i + 1 + i2;
+        int i5 = (i4 / i3) + 1;
+        return i3 * i5 >= i4 + i3 ? i5 - 1 : i5;
     }
 
-    private static int getNumberOfPadCodewords(int m, int k, int c, int r) {
-        int n = (c * r) - k;
-        if (n > m + 1) {
-            return (n - m) - 1;
-        }
-        return 0;
-    }
-
-    private static void encodeChar(int pattern, int len, BarcodeRow logic) {
-        int map = 1 << (len - 1);
-        boolean last = (pattern & map) != 0;
-        int width = 0;
-        for (int i = 0; i < len; i++) {
-            boolean black = (pattern & map) != 0;
-            if (last == black) {
-                width++;
+    private static void encodeChar(int i, int i2, BarcodeRow barcodeRow) {
+        int i3 = 1 << (i2 - 1);
+        boolean z = (i & i3) != 0;
+        int i4 = 0;
+        for (int i5 = 0; i5 < i2; i5++) {
+            boolean z2 = (i & i3) != 0;
+            if (z == z2) {
+                i4++;
             } else {
-                logic.addBar(last, width);
-                last = black;
-                width = 1;
+                barcodeRow.addBar(z, i4);
+                z = z2;
+                i4 = 1;
             }
-            map >>= 1;
+            i3 >>= 1;
         }
-        logic.addBar(last, width);
+        barcodeRow.addBar(z, i4);
     }
 
-    private void encodeLowLevel(CharSequence fullCodewords, int c, int r, int errorCorrectionLevel, BarcodeMatrix logic) {
-        int right;
-        int left;
-        int idx = 0;
-        for (int y = 0; y < r; y++) {
-            int cluster = y % 3;
-            logic.startRow();
-            encodeChar(START_PATTERN, 17, logic.getCurrentRow());
-            if (cluster == 0) {
-                left = ((y / 3) * 30) + ((r - 1) / 3);
-                right = ((y / 3) * 30) + (c - 1);
-            } else if (cluster == 1) {
-                left = ((y / 3) * 30) + (errorCorrectionLevel * 3) + ((r - 1) % 3);
-                right = ((y / 3) * 30) + ((r - 1) / 3);
+    private void encodeLowLevel(CharSequence charSequence, int i, int i2, int i3, BarcodeMatrix barcodeMatrix2) {
+        int i4;
+        int i5;
+        int i6;
+        int i7 = 0;
+        for (int i8 = 0; i8 < i2; i8++) {
+            int i9 = i8 % 3;
+            barcodeMatrix2.startRow();
+            encodeChar(START_PATTERN, 17, barcodeMatrix2.getCurrentRow());
+            if (i9 == 0) {
+                i5 = (i8 / 3) * 30;
+                i4 = ((i2 - 1) / 3) + i5;
+                i6 = i - 1;
+            } else if (i9 == 1) {
+                i5 = (i8 / 3) * 30;
+                int i10 = i2 - 1;
+                i4 = (i3 * 3) + i5 + (i10 % 3);
+                i6 = i10 / 3;
             } else {
-                left = ((y / 3) * 30) + (c - 1);
-                right = ((y / 3) * 30) + (errorCorrectionLevel * 3) + ((r - 1) % 3);
+                int i11 = (i8 / 3) * 30;
+                i4 = (i - 1) + i11;
+                i5 = i11 + (i3 * 3);
+                i6 = (i2 - 1) % 3;
             }
-            encodeChar(CODEWORD_TABLE[cluster][left], 17, logic.getCurrentRow());
-            for (int x = 0; x < c; x++) {
-                encodeChar(CODEWORD_TABLE[cluster][fullCodewords.charAt(idx)], 17, logic.getCurrentRow());
-                idx++;
+            int i12 = i5 + i6;
+            encodeChar(CODEWORD_TABLE[i9][i4], 17, barcodeMatrix2.getCurrentRow());
+            for (int i13 = 0; i13 < i; i13++) {
+                encodeChar(CODEWORD_TABLE[i9][charSequence.charAt(i7)], 17, barcodeMatrix2.getCurrentRow());
+                i7++;
             }
             if (this.compact) {
-                encodeChar(STOP_PATTERN, 1, logic.getCurrentRow());
+                encodeChar(STOP_PATTERN, 1, barcodeMatrix2.getCurrentRow());
             } else {
-                encodeChar(CODEWORD_TABLE[cluster][right], 17, logic.getCurrentRow());
-                encodeChar(STOP_PATTERN, 18, logic.getCurrentRow());
+                encodeChar(CODEWORD_TABLE[i9][i12], 17, barcodeMatrix2.getCurrentRow());
+                encodeChar(STOP_PATTERN, 18, barcodeMatrix2.getCurrentRow());
             }
         }
     }
 
-    public void generateBarcodeLogic(String msg, int errorCorrectionLevel) throws WriterException {
-        int errorCorrectionCodeWords = PDF417ErrorCorrection.getErrorCorrectionCodewordCount(errorCorrectionLevel);
-        String highLevel = PDF417HighLevelEncoder.encodeHighLevel(msg, this.compaction, this.encoding);
-        int sourceCodeWords = highLevel.length();
-        int[] dimension = determineDimensions(sourceCodeWords, errorCorrectionCodeWords);
-        int cols = dimension[0];
-        int rows = dimension[1];
-        int pad = getNumberOfPadCodewords(sourceCodeWords, errorCorrectionCodeWords, cols, rows);
-        if (sourceCodeWords + errorCorrectionCodeWords + 1 <= 929) {
-            int n = sourceCodeWords + pad + 1;
-            StringBuilder sb = new StringBuilder(n);
-            sb.append((char) n);
-            sb.append(highLevel);
-            for (int i = 0; i < pad; i++) {
+    public void generateBarcodeLogic(String str, int i) throws WriterException {
+        int errorCorrectionCodewordCount = PDF417ErrorCorrection.getErrorCorrectionCodewordCount(i);
+        String encodeHighLevel = PDF417HighLevelEncoder.encodeHighLevel(str, this.compaction, this.encoding);
+        int length = encodeHighLevel.length();
+        int[] determineDimensions = determineDimensions(length, errorCorrectionCodewordCount);
+        int i2 = determineDimensions[0];
+        int i3 = determineDimensions[1];
+        int numberOfPadCodewords = getNumberOfPadCodewords(length, errorCorrectionCodewordCount, i2, i3);
+        if (errorCorrectionCodewordCount + length + 1 <= 929) {
+            int i4 = length + numberOfPadCodewords + 1;
+            StringBuilder sb = new StringBuilder(i4);
+            sb.append((char) i4);
+            sb.append(encodeHighLevel);
+            for (int i5 = 0; i5 < numberOfPadCodewords; i5++) {
                 sb.append((char) 900);
             }
-            String dataCodewords = sb.toString();
-            String ec = PDF417ErrorCorrection.generateErrorCorrection(dataCodewords, errorCorrectionLevel);
-            this.barcodeMatrix = new BarcodeMatrix(rows, cols);
-            encodeLowLevel(dataCodewords + ec, cols, rows, errorCorrectionLevel, this.barcodeMatrix);
+            String sb2 = sb.toString();
+            String generateErrorCorrection = PDF417ErrorCorrection.generateErrorCorrection(sb2, i);
+            this.barcodeMatrix = new BarcodeMatrix(i3, i2);
+            encodeLowLevel(sb2 + generateErrorCorrection, i2, i3, i, this.barcodeMatrix);
             return;
         }
-        throw new WriterException("Encoded message contains too many code words, message too big (" + msg.length() + " bytes)");
+        throw new WriterException("Encoded message contains too many code words, message too big (" + str.length() + " bytes)");
     }
 
-    private int[] determineDimensions(int sourceCodeWords, int errorCorrectionCodeWords) throws WriterException {
-        int i;
-        int rows;
-        float ratio = 0.0f;
-        int[] dimension = null;
-        int cols = this.minCols;
-        while (cols <= this.maxCols && (rows = calculateNumberOfRows(sourceCodeWords, errorCorrectionCodeWords, cols)) >= this.minRows) {
-            if (rows <= this.maxRows) {
-                float newRatio = (((float) ((cols * 17) + 69)) * DEFAULT_MODULE_WIDTH) / (((float) rows) * HEIGHT);
-                if (dimension == null || Math.abs(newRatio - PREFERRED_RATIO) <= Math.abs(ratio - PREFERRED_RATIO)) {
-                    ratio = newRatio;
-                    dimension = new int[]{cols, rows};
+    private int[] determineDimensions(int i, int i2) throws WriterException {
+        int i3;
+        int calculateNumberOfRows;
+        int i4 = this.minCols;
+        float f = 0.0f;
+        int[] iArr = null;
+        while (i4 <= this.maxCols && (calculateNumberOfRows = calculateNumberOfRows(i, i2, i4)) >= this.minRows) {
+            if (calculateNumberOfRows <= this.maxRows) {
+                float f2 = (((float) ((i4 * 17) + 69)) * DEFAULT_MODULE_WIDTH) / (((float) calculateNumberOfRows) * HEIGHT);
+                if (iArr == null || Math.abs(f2 - PREFERRED_RATIO) <= Math.abs(f - PREFERRED_RATIO)) {
+                    iArr = new int[]{i4, calculateNumberOfRows};
+                    f = f2;
                 }
             }
-            cols++;
+            i4++;
         }
-        if (dimension == null && calculateNumberOfRows(sourceCodeWords, errorCorrectionCodeWords, this.minCols) < (i = this.minRows)) {
-            dimension = new int[]{this.minCols, i};
+        if (iArr == null && calculateNumberOfRows(i, i2, this.minCols) < (i3 = this.minRows)) {
+            iArr = new int[]{this.minCols, i3};
         }
-        if (dimension != null) {
-            return dimension;
+        if (iArr != null) {
+            return iArr;
         }
         throw new WriterException("Unable to fit message in columns");
     }
 
-    public void setDimensions(int maxCols2, int minCols2, int maxRows2, int minRows2) {
-        this.maxCols = maxCols2;
-        this.minCols = minCols2;
-        this.maxRows = maxRows2;
-        this.minRows = minRows2;
+    public void setDimensions(int i, int i2, int i3, int i4) {
+        this.maxCols = i;
+        this.minCols = i2;
+        this.maxRows = i3;
+        this.minRows = i4;
     }
 
     public void setCompaction(Compaction compaction2) {
         this.compaction = compaction2;
     }
 
-    public void setCompact(boolean compact2) {
-        this.compact = compact2;
+    public void setCompact(boolean z) {
+        this.compact = z;
     }
 
-    public void setEncoding(Charset encoding2) {
-        this.encoding = encoding2;
+    public void setEncoding(Charset charset) {
+        this.encoding = charset;
     }
 }

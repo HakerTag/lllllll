@@ -12,17 +12,17 @@ public final class ClipboardInterface {
     }
 
     public static CharSequence getText(Context context) {
-        ClipData clip = getManager(context).getPrimaryClip();
+        ClipData primaryClip = getManager(context).getPrimaryClip();
         if (hasText(context)) {
-            return clip.getItemAt(0).coerceToText(context);
+            return primaryClip.getItemAt(0).coerceToText(context);
         }
         return null;
     }
 
-    public static void setText(CharSequence text, Context context) {
-        if (text != null) {
+    public static void setText(CharSequence charSequence, Context context) {
+        if (charSequence != null) {
             try {
-                getManager(context).setPrimaryClip(ClipData.newPlainText(null, text));
+                getManager(context).setPrimaryClip(ClipData.newPlainText(null, charSequence));
             } catch (IllegalStateException | NullPointerException e) {
                 Log.w(TAG, "Clipboard bug", e);
             }
@@ -30,8 +30,8 @@ public final class ClipboardInterface {
     }
 
     public static boolean hasText(Context context) {
-        ClipData clip = getManager(context).getPrimaryClip();
-        return clip != null && clip.getItemCount() > 0;
+        ClipData primaryClip = getManager(context).getPrimaryClip();
+        return primaryClip != null && primaryClip.getItemCount() > 0;
     }
 
     private static ClipboardManager getManager(Context context) {

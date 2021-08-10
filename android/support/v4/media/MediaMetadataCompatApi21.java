@@ -11,32 +11,32 @@ public class MediaMetadataCompatApi21 {
     MediaMetadataCompatApi21() {
     }
 
-    public static Set<String> keySet(Object metadataObj) {
-        return ((MediaMetadata) metadataObj).keySet();
+    public static Set<String> keySet(Object obj) {
+        return ((MediaMetadata) obj).keySet();
     }
 
-    public static Bitmap getBitmap(Object metadataObj, String key) {
-        return ((MediaMetadata) metadataObj).getBitmap(key);
+    public static Bitmap getBitmap(Object obj, String str) {
+        return ((MediaMetadata) obj).getBitmap(str);
     }
 
-    public static long getLong(Object metadataObj, String key) {
-        return ((MediaMetadata) metadataObj).getLong(key);
+    public static long getLong(Object obj, String str) {
+        return ((MediaMetadata) obj).getLong(str);
     }
 
-    public static Object getRating(Object metadataObj, String key) {
-        return ((MediaMetadata) metadataObj).getRating(key);
+    public static Object getRating(Object obj, String str) {
+        return ((MediaMetadata) obj).getRating(str);
     }
 
-    public static CharSequence getText(Object metadataObj, String key) {
-        return ((MediaMetadata) metadataObj).getText(key);
+    public static CharSequence getText(Object obj, String str) {
+        return ((MediaMetadata) obj).getText(str);
     }
 
-    public static void writeToParcel(Object metadataObj, Parcel dest, int flags) {
-        ((MediaMetadata) metadataObj).writeToParcel(dest, flags);
+    public static void writeToParcel(Object obj, Parcel parcel, int i) {
+        ((MediaMetadata) obj).writeToParcel(parcel, i);
     }
 
-    public static Object createFromParcel(Parcel in) {
-        return MediaMetadata.CREATOR.createFromParcel(in);
+    public static Object createFromParcel(Parcel parcel) {
+        return MediaMetadata.CREATOR.createFromParcel(parcel);
     }
 
     public static class Builder {
@@ -44,28 +44,28 @@ public class MediaMetadataCompatApi21 {
             return new MediaMetadata.Builder();
         }
 
-        public static void putBitmap(Object builderObj, String key, Bitmap value) {
-            ((MediaMetadata.Builder) builderObj).putBitmap(key, value);
+        public static void putBitmap(Object obj, String str, Bitmap bitmap) {
+            ((MediaMetadata.Builder) obj).putBitmap(str, bitmap);
         }
 
-        public static void putLong(Object builderObj, String key, long value) {
-            ((MediaMetadata.Builder) builderObj).putLong(key, value);
+        public static void putLong(Object obj, String str, long j) {
+            ((MediaMetadata.Builder) obj).putLong(str, j);
         }
 
-        public static void putRating(Object builderObj, String key, Object ratingObj) {
-            ((MediaMetadata.Builder) builderObj).putRating(key, (Rating) ratingObj);
+        public static void putRating(Object obj, String str, Object obj2) {
+            ((MediaMetadata.Builder) obj).putRating(str, (Rating) obj2);
         }
 
-        public static void putText(Object builderObj, String key, CharSequence value) {
-            ((MediaMetadata.Builder) builderObj).putText(key, value);
+        public static void putText(Object obj, String str, CharSequence charSequence) {
+            ((MediaMetadata.Builder) obj).putText(str, charSequence);
         }
 
-        public static void putString(Object builderObj, String key, String value) {
-            ((MediaMetadata.Builder) builderObj).putString(key, value);
+        public static void putString(Object obj, String str, String str2) {
+            ((MediaMetadata.Builder) obj).putString(str, str2);
         }
 
-        public static Object build(Object builderObj) {
-            return ((MediaMetadata.Builder) builderObj).build();
+        public static Object build(Object obj) {
+            return ((MediaMetadata.Builder) obj).build();
         }
     }
 }

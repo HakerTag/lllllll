@@ -10,6 +10,7 @@ import android.support.v4.provider.FontsContractCompat;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import kotlin.jvm.internal.IntCompanionObject;
 
 /* access modifiers changed from: package-private */
 public class TypefaceCompatBaseImpl implements TypefaceCompat.TypefaceCompatImpl {
@@ -26,112 +27,129 @@ public class TypefaceCompatBaseImpl implements TypefaceCompat.TypefaceCompatImpl
     TypefaceCompatBaseImpl() {
     }
 
-    private static <T> T findBestFont(T[] fonts, int style, StyleExtractor<T> extractor) {
-        int targetWeight = (style & 1) == 0 ? 400 : 700;
-        boolean isTargetItalic = (style & 2) != 0;
-        T best = null;
-        int bestScore = Integer.MAX_VALUE;
-        for (T font : fonts) {
-            int score = (Math.abs(extractor.getWeight(font) - targetWeight) * 2) + (extractor.isItalic(font) == isTargetItalic ? 0 : 1);
-            if (best == null || bestScore > score) {
-                best = font;
-                bestScore = score;
+    private static <T> T findBestFont(T[] tArr, int i, StyleExtractor<T> styleExtractor) {
+        int i2 = (i & 1) == 0 ? 400 : 700;
+        boolean z = (i & 2) != 0;
+        T t = null;
+        int i3 = IntCompanionObject.MAX_VALUE;
+        for (T t2 : tArr) {
+            int abs = (Math.abs(styleExtractor.getWeight(t2) - i2) * 2) + (styleExtractor.isItalic(t2) == z ? 0 : 1);
+            if (t == null || i3 > abs) {
+                t = t2;
+                i3 = abs;
             }
         }
-        return best;
+        return t;
     }
 
     /* access modifiers changed from: protected */
-    public FontsContractCompat.FontInfo findBestInfo(FontsContractCompat.FontInfo[] fonts, int style) {
-        return (FontsContractCompat.FontInfo) findBestFont(fonts, style, new StyleExtractor<FontsContractCompat.FontInfo>() {
+    public FontsContractCompat.FontInfo findBestInfo(FontsContractCompat.FontInfo[] fontInfoArr, int i) {
+        return (FontsContractCompat.FontInfo) findBestFont(fontInfoArr, i, new StyleExtractor<FontsContractCompat.FontInfo>() {
             /* class android.support.v4.graphics.TypefaceCompatBaseImpl.AnonymousClass1 */
 
-            public int getWeight(FontsContractCompat.FontInfo info) {
-                return info.getWeight();
+            public int getWeight(FontsContractCompat.FontInfo fontInfo) {
+                return fontInfo.getWeight();
             }
 
-            public boolean isItalic(FontsContractCompat.FontInfo info) {
-                return info.isItalic();
+            public boolean isItalic(FontsContractCompat.FontInfo fontInfo) {
+                return fontInfo.isItalic();
             }
         });
     }
 
     /* access modifiers changed from: protected */
-    public Typeface createFromInputStream(Context context, InputStream is) {
-        File tmpFile = TypefaceCompatUtil.getTempFile(context);
-        if (tmpFile == null) {
+    public Typeface createFromInputStream(Context context, InputStream inputStream) {
+        File tempFile = TypefaceCompatUtil.getTempFile(context);
+        if (tempFile == null) {
             return null;
         }
         try {
-            if (!TypefaceCompatUtil.copyToFile(tmpFile, is)) {
+            if (!TypefaceCompatUtil.copyToFile(tempFile, inputStream)) {
                 return null;
             }
-            Typeface createFromFile = Typeface.createFromFile(tmpFile.getPath());
-            tmpFile.delete();
+            Typeface createFromFile = Typeface.createFromFile(tempFile.getPath());
+            tempFile.delete();
             return createFromFile;
-        } catch (RuntimeException e) {
+        } catch (RuntimeException unused) {
             return null;
         } finally {
-            tmpFile.delete();
+            tempFile.delete();
         }
     }
 
     @Override // android.support.v4.graphics.TypefaceCompat.TypefaceCompatImpl
-    public Typeface createFromFontInfo(Context context, CancellationSignal cancellationSignal, FontsContractCompat.FontInfo[] fonts, int style) {
-        if (fonts.length < 1) {
+    public Typeface createFromFontInfo(Context context, CancellationSignal cancellationSignal, FontsContractCompat.FontInfo[] fontInfoArr, int i) {
+        InputStream inputStream;
+        InputStream inputStream2 = null;
+        if (fontInfoArr.length < 1) {
             return null;
         }
-        InputStream is = null;
         try {
-            is = context.getContentResolver().openInputStream(findBestInfo(fonts, style).getUri());
-            return createFromInputStream(context, is);
-        } catch (IOException e) {
+            inputStream = context.getContentResolver().openInputStream(findBestInfo(fontInfoArr, i).getUri());
+            try {
+                Typeface createFromInputStream = createFromInputStream(context, inputStream);
+                TypefaceCompatUtil.closeQuietly(inputStream);
+                return createFromInputStream;
+            } catch (IOException unused) {
+                TypefaceCompatUtil.closeQuietly(inputStream);
+                return null;
+            } catch (Throwable th) {
+                th = th;
+                inputStream2 = inputStream;
+                TypefaceCompatUtil.closeQuietly(inputStream2);
+                throw th;
+            }
+        } catch (IOException unused2) {
+            inputStream = null;
+            TypefaceCompatUtil.closeQuietly(inputStream);
             return null;
-        } finally {
-            TypefaceCompatUtil.closeQuietly(is);
+        } catch (Throwable th2) {
+            th = th2;
+            TypefaceCompatUtil.closeQuietly(inputStream2);
+            throw th;
         }
     }
 
-    private FontResourcesParserCompat.FontFileResourceEntry findBestEntry(FontResourcesParserCompat.FontFamilyFilesResourceEntry entry, int style) {
-        return (FontResourcesParserCompat.FontFileResourceEntry) findBestFont(entry.getEntries(), style, new StyleExtractor<FontResourcesParserCompat.FontFileResourceEntry>() {
+    private FontResourcesParserCompat.FontFileResourceEntry findBestEntry(FontResourcesParserCompat.FontFamilyFilesResourceEntry fontFamilyFilesResourceEntry, int i) {
+        return (FontResourcesParserCompat.FontFileResourceEntry) findBestFont(fontFamilyFilesResourceEntry.getEntries(), i, new StyleExtractor<FontResourcesParserCompat.FontFileResourceEntry>() {
             /* class android.support.v4.graphics.TypefaceCompatBaseImpl.AnonymousClass2 */
 
-            public int getWeight(FontResourcesParserCompat.FontFileResourceEntry entry) {
-                return entry.getWeight();
+            public int getWeight(FontResourcesParserCompat.FontFileResourceEntry fontFileResourceEntry) {
+                return fontFileResourceEntry.getWeight();
             }
 
-            public boolean isItalic(FontResourcesParserCompat.FontFileResourceEntry entry) {
-                return entry.isItalic();
+            public boolean isItalic(FontResourcesParserCompat.FontFileResourceEntry fontFileResourceEntry) {
+                return fontFileResourceEntry.isItalic();
             }
         });
     }
 
     @Override // android.support.v4.graphics.TypefaceCompat.TypefaceCompatImpl
-    public Typeface createFromFontFamilyFilesResourceEntry(Context context, FontResourcesParserCompat.FontFamilyFilesResourceEntry entry, Resources resources, int style) {
-        FontResourcesParserCompat.FontFileResourceEntry best = findBestEntry(entry, style);
-        if (best == null) {
+    public Typeface createFromFontFamilyFilesResourceEntry(Context context, FontResourcesParserCompat.FontFamilyFilesResourceEntry fontFamilyFilesResourceEntry, Resources resources, int i) {
+        FontResourcesParserCompat.FontFileResourceEntry findBestEntry = findBestEntry(fontFamilyFilesResourceEntry, i);
+        if (findBestEntry == null) {
             return null;
         }
-        return TypefaceCompat.createFromResourcesFontFile(context, resources, best.getResourceId(), best.getFileName(), style);
+        return TypefaceCompat.createFromResourcesFontFile(context, resources, findBestEntry.getResourceId(), findBestEntry.getFileName(), i);
     }
 
     @Override // android.support.v4.graphics.TypefaceCompat.TypefaceCompatImpl
-    public Typeface createFromResourcesFontFile(Context context, Resources resources, int id, String path, int style) {
-        File tmpFile = TypefaceCompatUtil.getTempFile(context);
-        if (tmpFile == null) {
+    public Typeface createFromResourcesFontFile(Context context, Resources resources, int i, String str, int i2) {
+        File tempFile = TypefaceCompatUtil.getTempFile(context);
+        if (tempFile == null) {
             return null;
         }
         try {
-            if (!TypefaceCompatUtil.copyToFile(tmpFile, resources, id)) {
+            if (!TypefaceCompatUtil.copyToFile(tempFile, resources, i)) {
                 return null;
             }
-            Typeface createFromFile = Typeface.createFromFile(tmpFile.getPath());
-            tmpFile.delete();
+            Typeface createFromFile = Typeface.createFromFile(tempFile.getPath());
+            tempFile.delete();
             return createFromFile;
-        } catch (RuntimeException e) {
+        } catch (RuntimeException unused) {
             return null;
         } finally {
-            tmpFile.delete();
+            tempFile.delete();
         }
     }
 }

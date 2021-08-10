@@ -5,24 +5,24 @@ import android.content.Context;
 public class BuildHelper {
     private static String TAG = "BuildHelper";
 
-    public static Object getBuildConfigValue(Context ctx, String key) {
+    public static Object getBuildConfigValue(Context context, String str) {
         try {
-            return Class.forName(ctx.getClass().getPackage().getName() + ".BuildConfig").getField(key).get(null);
+            return Class.forName(context.getClass().getPackage().getName() + ".BuildConfig").getField(str).get(null);
         } catch (ClassNotFoundException e) {
             LOG.d(TAG, "Unable to get the BuildConfig, is this built with ANT?");
             e.printStackTrace();
             return null;
-        } catch (NoSuchFieldException e2) {
-            String str = TAG;
-            LOG.d(str, key + " is not a valid field. Check your build.gradle");
+        } catch (NoSuchFieldException unused) {
+            String str2 = TAG;
+            LOG.d(str2, str + " is not a valid field. Check your build.gradle");
             return null;
-        } catch (IllegalAccessException e3) {
+        } catch (IllegalAccessException e2) {
             LOG.d(TAG, "Illegal Access Exception: Let's print a stack trace.");
-            e3.printStackTrace();
+            e2.printStackTrace();
             return null;
-        } catch (NullPointerException e4) {
+        } catch (NullPointerException e3) {
             LOG.d(TAG, "Null Pointer Exception: Let's print a stack trace.");
-            e4.printStackTrace();
+            e3.printStackTrace();
             return null;
         }
     }

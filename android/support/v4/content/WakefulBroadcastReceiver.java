@@ -16,38 +16,38 @@ public abstract class WakefulBroadcastReceiver extends BroadcastReceiver {
 
     public static ComponentName startWakefulService(Context context, Intent intent) {
         synchronized (sActiveWakeLocks) {
-            int id = mNextId;
-            int i = mNextId + 1;
-            mNextId = i;
-            if (i <= 0) {
+            int i = mNextId;
+            int i2 = mNextId + 1;
+            mNextId = i2;
+            if (i2 <= 0) {
                 mNextId = 1;
             }
-            intent.putExtra(EXTRA_WAKE_LOCK_ID, id);
-            ComponentName comp = context.startService(intent);
-            if (comp == null) {
+            intent.putExtra(EXTRA_WAKE_LOCK_ID, i);
+            ComponentName startService = context.startService(intent);
+            if (startService == null) {
                 return null;
             }
-            PowerManager.WakeLock wl = ((PowerManager) context.getSystemService("power")).newWakeLock(1, "wake:" + comp.flattenToShortString());
-            wl.setReferenceCounted(false);
-            wl.acquire(60000);
-            sActiveWakeLocks.put(id, wl);
-            return comp;
+            PowerManager.WakeLock newWakeLock = ((PowerManager) context.getSystemService("power")).newWakeLock(1, "wake:" + startService.flattenToShortString());
+            newWakeLock.setReferenceCounted(false);
+            newWakeLock.acquire(60000);
+            sActiveWakeLocks.put(i, newWakeLock);
+            return startService;
         }
     }
 
     public static boolean completeWakefulIntent(Intent intent) {
-        int id = intent.getIntExtra(EXTRA_WAKE_LOCK_ID, 0);
-        if (id == 0) {
+        int intExtra = intent.getIntExtra(EXTRA_WAKE_LOCK_ID, 0);
+        if (intExtra == 0) {
             return false;
         }
         synchronized (sActiveWakeLocks) {
-            PowerManager.WakeLock wl = sActiveWakeLocks.get(id);
-            if (wl != null) {
-                wl.release();
-                sActiveWakeLocks.remove(id);
+            PowerManager.WakeLock wakeLock = sActiveWakeLocks.get(intExtra);
+            if (wakeLock != null) {
+                wakeLock.release();
+                sActiveWakeLocks.remove(intExtra);
                 return true;
             }
-            Log.w("WakefulBroadcastReceiv.", "No active wake lock id #" + id);
+            Log.w("WakefulBroadcastReceiv.", "No active wake lock id #" + intExtra);
             return true;
         }
     }

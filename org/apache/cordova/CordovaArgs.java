@@ -8,79 +8,79 @@ import org.json.JSONObject;
 public class CordovaArgs {
     private JSONArray baseArgs;
 
-    public CordovaArgs(JSONArray args) {
-        this.baseArgs = args;
+    public CordovaArgs(JSONArray jSONArray) {
+        this.baseArgs = jSONArray;
     }
 
-    public Object get(int index) throws JSONException {
-        return this.baseArgs.get(index);
+    public Object get(int i) throws JSONException {
+        return this.baseArgs.get(i);
     }
 
-    public boolean getBoolean(int index) throws JSONException {
-        return this.baseArgs.getBoolean(index);
+    public boolean getBoolean(int i) throws JSONException {
+        return this.baseArgs.getBoolean(i);
     }
 
-    public double getDouble(int index) throws JSONException {
-        return this.baseArgs.getDouble(index);
+    public double getDouble(int i) throws JSONException {
+        return this.baseArgs.getDouble(i);
     }
 
-    public int getInt(int index) throws JSONException {
-        return this.baseArgs.getInt(index);
+    public int getInt(int i) throws JSONException {
+        return this.baseArgs.getInt(i);
     }
 
-    public JSONArray getJSONArray(int index) throws JSONException {
-        return this.baseArgs.getJSONArray(index);
+    public JSONArray getJSONArray(int i) throws JSONException {
+        return this.baseArgs.getJSONArray(i);
     }
 
-    public JSONObject getJSONObject(int index) throws JSONException {
-        return this.baseArgs.getJSONObject(index);
+    public JSONObject getJSONObject(int i) throws JSONException {
+        return this.baseArgs.getJSONObject(i);
     }
 
-    public long getLong(int index) throws JSONException {
-        return this.baseArgs.getLong(index);
+    public long getLong(int i) throws JSONException {
+        return this.baseArgs.getLong(i);
     }
 
-    public String getString(int index) throws JSONException {
-        return this.baseArgs.getString(index);
+    public String getString(int i) throws JSONException {
+        return this.baseArgs.getString(i);
     }
 
-    public Object opt(int index) {
-        return this.baseArgs.opt(index);
+    public Object opt(int i) {
+        return this.baseArgs.opt(i);
     }
 
-    public boolean optBoolean(int index) {
-        return this.baseArgs.optBoolean(index);
+    public boolean optBoolean(int i) {
+        return this.baseArgs.optBoolean(i);
     }
 
-    public double optDouble(int index) {
-        return this.baseArgs.optDouble(index);
+    public double optDouble(int i) {
+        return this.baseArgs.optDouble(i);
     }
 
-    public int optInt(int index) {
-        return this.baseArgs.optInt(index);
+    public int optInt(int i) {
+        return this.baseArgs.optInt(i);
     }
 
-    public JSONArray optJSONArray(int index) {
-        return this.baseArgs.optJSONArray(index);
+    public JSONArray optJSONArray(int i) {
+        return this.baseArgs.optJSONArray(i);
     }
 
-    public JSONObject optJSONObject(int index) {
-        return this.baseArgs.optJSONObject(index);
+    public JSONObject optJSONObject(int i) {
+        return this.baseArgs.optJSONObject(i);
     }
 
-    public long optLong(int index) {
-        return this.baseArgs.optLong(index);
+    public long optLong(int i) {
+        return this.baseArgs.optLong(i);
     }
 
-    public String optString(int index) {
-        return this.baseArgs.optString(index);
+    public String optString(int i) {
+        return this.baseArgs.optString(i);
     }
 
-    public boolean isNull(int index) {
-        return this.baseArgs.isNull(index);
+    public boolean isNull(int i) {
+        return this.baseArgs.isNull(i);
     }
 
-    public byte[] getArrayBuffer(int index) throws JSONException {
-        return Base64.decode(this.baseArgs.getString(index), 0);
+    public byte[] getArrayBuffer(int i) throws JSONException {
+        return Base64.decode(this.baseArgs.getString(i), 0);
     }
 }

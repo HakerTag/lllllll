@@ -63,6 +63,34 @@ public class AudioAttributesCompat {
     public @interface AttributeUsage {
     }
 
+    /* access modifiers changed from: private */
+    public static int usageForStreamType(int i) {
+        switch (i) {
+            case 0:
+                return 2;
+            case 1:
+            case 7:
+                return 13;
+            case 2:
+                return 6;
+            case 3:
+                return 1;
+            case 4:
+                return 4;
+            case 5:
+                return 5;
+            case 6:
+                return 2;
+            case 8:
+                return 3;
+            case 9:
+            default:
+                return 0;
+            case 10:
+                return 11;
+        }
+    }
+
     static {
         SparseIntArray sparseIntArray = new SparseIntArray();
         SUPPRESSIBLE_USAGES = sparseIntArray;
@@ -106,13 +134,13 @@ public class AudioAttributesCompat {
         return AudioAttributesCompatApi21.toLegacyStreamType(this.mAudioAttributesWrapper);
     }
 
-    public static AudioAttributesCompat wrap(Object aa) {
+    public static AudioAttributesCompat wrap(Object obj) {
         if (Build.VERSION.SDK_INT < 21 || sForceLegacyBehavior) {
             return null;
         }
-        AudioAttributesCompat aac = new AudioAttributesCompat();
-        aac.mAudioAttributesWrapper = AudioAttributesCompatApi21.Wrapper.wrap((AudioAttributes) aa);
-        return aac;
+        AudioAttributesCompat audioAttributesCompat = new AudioAttributesCompat();
+        audioAttributesCompat.mAudioAttributesWrapper = AudioAttributesCompatApi21.Wrapper.wrap((AudioAttributes) obj);
+        return audioAttributesCompat;
     }
 
     public int getContentType() {
@@ -136,14 +164,14 @@ public class AudioAttributesCompat {
         if (Build.VERSION.SDK_INT >= 21 && !sForceLegacyBehavior && (wrapper = this.mAudioAttributesWrapper) != null) {
             return wrapper.unwrap().getFlags();
         }
-        int flags = this.mFlags;
-        int legacyStream = getLegacyStreamType();
-        if (legacyStream == 6) {
-            flags |= 4;
-        } else if (legacyStream == 7) {
-            flags |= 1;
+        int i = this.mFlags;
+        int legacyStreamType = getLegacyStreamType();
+        if (legacyStreamType == 6) {
+            i |= 4;
+        } else if (legacyStreamType == 7) {
+            i |= 1;
         }
-        return flags & FLAG_ALL_PUBLIC;
+        return i & FLAG_ALL_PUBLIC;
     }
 
     public static class Builder {
@@ -156,38 +184,38 @@ public class AudioAttributesCompat {
         public Builder() {
         }
 
-        public Builder(AudioAttributesCompat aa) {
-            this.mUsage = aa.mUsage;
-            this.mContentType = aa.mContentType;
-            this.mFlags = aa.mFlags;
-            this.mLegacyStream = aa.mLegacyStream;
-            this.mAAObject = aa.unwrap();
+        public Builder(AudioAttributesCompat audioAttributesCompat) {
+            this.mUsage = audioAttributesCompat.mUsage;
+            this.mContentType = audioAttributesCompat.mContentType;
+            this.mFlags = audioAttributesCompat.mFlags;
+            this.mLegacyStream = audioAttributesCompat.mLegacyStream;
+            this.mAAObject = audioAttributesCompat.unwrap();
         }
 
         public AudioAttributesCompat build() {
             if (AudioAttributesCompat.sForceLegacyBehavior || Build.VERSION.SDK_INT < 21) {
-                AudioAttributesCompat aac = new AudioAttributesCompat();
-                aac.mContentType = this.mContentType;
-                aac.mFlags = this.mFlags;
-                aac.mUsage = this.mUsage;
-                aac.mLegacyStream = this.mLegacyStream;
-                aac.mAudioAttributesWrapper = null;
-                return aac;
+                AudioAttributesCompat audioAttributesCompat = new AudioAttributesCompat();
+                audioAttributesCompat.mContentType = this.mContentType;
+                audioAttributesCompat.mFlags = this.mFlags;
+                audioAttributesCompat.mUsage = this.mUsage;
+                audioAttributesCompat.mLegacyStream = this.mLegacyStream;
+                audioAttributesCompat.mAudioAttributesWrapper = null;
+                return audioAttributesCompat;
             }
             Object obj = this.mAAObject;
             if (obj != null) {
                 return AudioAttributesCompat.wrap(obj);
             }
-            AudioAttributes.Builder api21Builder = new AudioAttributes.Builder().setContentType(this.mContentType).setFlags(this.mFlags).setUsage(this.mUsage);
+            AudioAttributes.Builder usage = new AudioAttributes.Builder().setContentType(this.mContentType).setFlags(this.mFlags).setUsage(this.mUsage);
             Integer num = this.mLegacyStream;
             if (num != null) {
-                api21Builder.setLegacyStreamType(num.intValue());
+                usage.setLegacyStreamType(num.intValue());
             }
-            return AudioAttributesCompat.wrap(api21Builder.build());
+            return AudioAttributesCompat.wrap(usage.build());
         }
 
-        public Builder setUsage(int usage) {
-            switch (usage) {
+        public Builder setUsage(int i) {
+            switch (i) {
                 case 0:
                 case 1:
                 case 2:
@@ -204,11 +232,11 @@ public class AudioAttributesCompat {
                 case 13:
                 case 14:
                 case 15:
-                    this.mUsage = usage;
+                    this.mUsage = i;
                     break;
                 case 16:
                     if (!AudioAttributesCompat.sForceLegacyBehavior && Build.VERSION.SDK_INT > 25) {
-                        this.mUsage = usage;
+                        this.mUsage = i;
                         break;
                     } else {
                         this.mUsage = 12;
@@ -221,24 +249,24 @@ public class AudioAttributesCompat {
             return this;
         }
 
-        public Builder setContentType(int contentType) {
-            if (contentType == 0 || contentType == 1 || contentType == 2 || contentType == 3 || contentType == 4) {
-                this.mContentType = contentType;
+        public Builder setContentType(int i) {
+            if (i == 0 || i == 1 || i == 2 || i == 3 || i == 4) {
+                this.mContentType = i;
             } else {
                 this.mUsage = 0;
             }
             return this;
         }
 
-        public Builder setFlags(int flags) {
-            this.mFlags |= flags & AudioAttributesCompat.FLAG_ALL;
+        public Builder setFlags(int i) {
+            this.mFlags = (i & AudioAttributesCompat.FLAG_ALL) | this.mFlags;
             return this;
         }
 
-        public Builder setLegacyStreamType(int streamType) {
-            if (streamType != 10) {
-                this.mLegacyStream = Integer.valueOf(streamType);
-                this.mUsage = AudioAttributesCompat.usageForStreamType(streamType);
+        public Builder setLegacyStreamType(int i) {
+            if (i != 10) {
+                this.mLegacyStream = Integer.valueOf(i);
+                this.mUsage = AudioAttributesCompat.usageForStreamType(i);
                 return this;
             }
             throw new IllegalArgumentException("STREAM_ACCESSIBILITY is not a legacy stream type that was used for audio playback");
@@ -279,8 +307,8 @@ public class AudioAttributesCompat {
         return usageToString(this.mUsage);
     }
 
-    static String usageToString(int usage) {
-        switch (usage) {
+    static String usageToString(int i) {
+        switch (i) {
             case 0:
                 return new String("USAGE_UNKNOWN");
             case 1:
@@ -313,7 +341,7 @@ public class AudioAttributesCompat {
                 return new String("USAGE_GAME");
             case 15:
             default:
-                return new String("unknown usage " + usage);
+                return new String("unknown usage " + i);
             case 16:
                 return new String("USAGE_ASSISTANT");
         }
@@ -329,114 +357,75 @@ public class AudioAttributesCompat {
         }
     }
 
-    /* access modifiers changed from: private */
-    public static int usageForStreamType(int streamType) {
-        switch (streamType) {
+    public static void setForceLegacyBehavior(boolean z) {
+        sForceLegacyBehavior = z;
+    }
+
+    static int toVolumeStreamType(boolean z, AudioAttributesCompat audioAttributesCompat) {
+        return toVolumeStreamType(z, audioAttributesCompat.getFlags(), audioAttributesCompat.getUsage());
+    }
+
+    static int toVolumeStreamType(boolean z, int i, int i2) {
+        if ((i & 1) == 1) {
+            return z ? 1 : 7;
+        }
+        if ((i & 4) == 4) {
+            return z ? 0 : 6;
+        }
+        switch (i2) {
             case 0:
-                return 2;
+                return z ? Integer.MIN_VALUE : 3;
             case 1:
-            case 7:
-                return 13;
+            case 12:
+            case 14:
+            case 16:
+                return 3;
             case 2:
-                return 6;
+                return 0;
             case 3:
-                return 1;
+                return z ? 0 : 8;
             case 4:
                 return 4;
             case 5:
+            case 7:
+            case 8:
+            case 9:
+            case 10:
                 return 5;
             case 6:
                 return 2;
-            case 8:
-                return 3;
-            case 9:
-            default:
-                return 0;
-            case 10:
-                return 11;
-        }
-    }
-
-    public static void setForceLegacyBehavior(boolean force) {
-        sForceLegacyBehavior = force;
-    }
-
-    static int toVolumeStreamType(boolean fromGetVolumeControlStream, AudioAttributesCompat aa) {
-        return toVolumeStreamType(fromGetVolumeControlStream, aa.getFlags(), aa.getUsage());
-    }
-
-    static int toVolumeStreamType(boolean fromGetVolumeControlStream, int flags, int usage) {
-        if ((flags & 1) == 1) {
-            if (fromGetVolumeControlStream) {
+            case 11:
+                return 10;
+            case 13:
                 return 1;
-            }
-            return 7;
-        } else if ((flags & 4) != 4) {
-            switch (usage) {
-                case 0:
-                    if (fromGetVolumeControlStream) {
-                        return Integer.MIN_VALUE;
-                    }
+            case 15:
+            default:
+                if (!z) {
                     return 3;
-                case 1:
-                case 12:
-                case 14:
-                case 16:
-                    return 3;
-                case 2:
-                    return 0;
-                case 3:
-                    if (fromGetVolumeControlStream) {
-                        return 0;
-                    }
-                    return 8;
-                case 4:
-                    return 4;
-                case 5:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                    return 5;
-                case 6:
-                    return 2;
-                case 11:
-                    return 10;
-                case 13:
-                    return 1;
-                case 15:
-                default:
-                    if (!fromGetVolumeControlStream) {
-                        return 3;
-                    }
-                    throw new IllegalArgumentException("Unknown usage value " + usage + " in audio attributes");
-            }
-        } else if (fromGetVolumeControlStream) {
-            return 0;
-        } else {
-            return 6;
+                }
+                throw new IllegalArgumentException("Unknown usage value " + i2 + " in audio attributes");
         }
     }
 
-    public boolean equals(Object o) {
+    public boolean equals(Object obj) {
         AudioAttributesCompatApi21.Wrapper wrapper;
-        if (this == o) {
+        if (this == obj) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        AudioAttributesCompat that = (AudioAttributesCompat) o;
+        AudioAttributesCompat audioAttributesCompat = (AudioAttributesCompat) obj;
         if (Build.VERSION.SDK_INT >= 21 && !sForceLegacyBehavior && (wrapper = this.mAudioAttributesWrapper) != null) {
-            return wrapper.unwrap().equals(that.unwrap());
+            return wrapper.unwrap().equals(audioAttributesCompat.unwrap());
         }
-        if (this.mContentType == that.getContentType() && this.mFlags == that.getFlags() && this.mUsage == that.getUsage()) {
+        if (this.mContentType == audioAttributesCompat.getContentType() && this.mFlags == audioAttributesCompat.getFlags() && this.mUsage == audioAttributesCompat.getUsage()) {
             Integer num = this.mLegacyStream;
             if (num != null) {
-                if (num.equals(that.mLegacyStream)) {
+                if (num.equals(audioAttributesCompat.mLegacyStream)) {
                     return true;
                 }
-            } else if (that.mLegacyStream == null) {
+            } else if (audioAttributesCompat.mLegacyStream == null) {
                 return true;
             }
         }

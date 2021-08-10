@@ -3,6 +3,7 @@ package android.support.v4.app;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.support.v4.internal.view.SupportMenu;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -15,32 +16,26 @@ abstract class BaseFragmentActivityApi14 extends SupportActivity {
     BaseFragmentActivityApi14() {
     }
 
-    public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
-        View v = dispatchFragmentsOnCreateView(parent, name, context, attrs);
-        if (v == null) {
-            return super.onCreateView(parent, name, context, attrs);
-        }
-        return v;
+    public View onCreateView(View view, String str, Context context, AttributeSet attributeSet) {
+        View dispatchFragmentsOnCreateView = dispatchFragmentsOnCreateView(view, str, context, attributeSet);
+        return dispatchFragmentsOnCreateView == null ? super.onCreateView(view, str, context, attributeSet) : dispatchFragmentsOnCreateView;
     }
 
-    public View onCreateView(String name, Context context, AttributeSet attrs) {
-        View v = dispatchFragmentsOnCreateView(null, name, context, attrs);
-        if (v == null) {
-            return super.onCreateView(name, context, attrs);
-        }
-        return v;
+    public View onCreateView(String str, Context context, AttributeSet attributeSet) {
+        View dispatchFragmentsOnCreateView = dispatchFragmentsOnCreateView(null, str, context, attributeSet);
+        return dispatchFragmentsOnCreateView == null ? super.onCreateView(str, context, attributeSet) : dispatchFragmentsOnCreateView;
     }
 
     @Override // android.app.Activity
-    public void startIntentSenderForResult(IntentSender intent, int requestCode, Intent fillInIntent, int flagsMask, int flagsValues, int extraFlags) throws IntentSender.SendIntentException {
-        if (!this.mStartedIntentSenderFromFragment && requestCode != -1) {
-            checkForValidRequestCode(requestCode);
+    public void startIntentSenderForResult(IntentSender intentSender, int i, Intent intent, int i2, int i3, int i4) throws IntentSender.SendIntentException {
+        if (!this.mStartedIntentSenderFromFragment && i != -1) {
+            checkForValidRequestCode(i);
         }
-        super.startIntentSenderForResult(intent, requestCode, fillInIntent, flagsMask, flagsValues, extraFlags);
+        super.startIntentSenderForResult(intentSender, i, intent, i2, i3, i4);
     }
 
-    static void checkForValidRequestCode(int requestCode) {
-        if ((-65536 & requestCode) != 0) {
+    static void checkForValidRequestCode(int i) {
+        if ((i & SupportMenu.CATEGORY_MASK) != 0) {
             throw new IllegalArgumentException("Can only use lower 16 bits for requestCode");
         }
     }

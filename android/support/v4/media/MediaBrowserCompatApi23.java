@@ -14,33 +14,33 @@ class MediaBrowserCompatApi23 {
     MediaBrowserCompatApi23() {
     }
 
-    public static Object createItemCallback(ItemCallback callback) {
-        return new ItemCallbackProxy(callback);
+    public static Object createItemCallback(ItemCallback itemCallback) {
+        return new ItemCallbackProxy(itemCallback);
     }
 
-    public static void getItem(Object browserObj, String mediaId, Object itemCallbackObj) {
-        ((MediaBrowser) browserObj).getItem(mediaId, (MediaBrowser.ItemCallback) itemCallbackObj);
+    public static void getItem(Object obj, String str, Object obj2) {
+        ((MediaBrowser) obj).getItem(str, (MediaBrowser.ItemCallback) obj2);
     }
 
     static class ItemCallbackProxy<T extends ItemCallback> extends MediaBrowser.ItemCallback {
         protected final T mItemCallback;
 
-        public ItemCallbackProxy(T callback) {
-            this.mItemCallback = callback;
+        public ItemCallbackProxy(T t) {
+            this.mItemCallback = t;
         }
 
-        public void onItemLoaded(MediaBrowser.MediaItem item) {
-            if (item == null) {
+        public void onItemLoaded(MediaBrowser.MediaItem mediaItem) {
+            if (mediaItem == null) {
                 this.mItemCallback.onItemLoaded(null);
                 return;
             }
-            Parcel parcel = Parcel.obtain();
-            item.writeToParcel(parcel, 0);
-            this.mItemCallback.onItemLoaded(parcel);
+            Parcel obtain = Parcel.obtain();
+            mediaItem.writeToParcel(obtain, 0);
+            this.mItemCallback.onItemLoaded(obtain);
         }
 
-        public void onError(String itemId) {
-            this.mItemCallback.onError(itemId);
+        public void onError(String str) {
+            this.mItemCallback.onError(str);
         }
     }
 }

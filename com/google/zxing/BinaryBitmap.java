@@ -23,8 +23,8 @@ public final class BinaryBitmap {
         return this.binarizer.getHeight();
     }
 
-    public BitArray getBlackRow(int y, BitArray row) throws NotFoundException {
-        return this.binarizer.getBlackRow(y, row);
+    public BitArray getBlackRow(int i, BitArray bitArray) throws NotFoundException {
+        return this.binarizer.getBlackRow(i, bitArray);
     }
 
     public BitMatrix getBlackMatrix() throws NotFoundException {
@@ -38,8 +38,8 @@ public final class BinaryBitmap {
         return this.binarizer.getLuminanceSource().isCropSupported();
     }
 
-    public BinaryBitmap crop(int left, int top, int width, int height) {
-        return new BinaryBitmap(this.binarizer.createBinarizer(this.binarizer.getLuminanceSource().crop(left, top, width, height)));
+    public BinaryBitmap crop(int i, int i2, int i3, int i4) {
+        return new BinaryBitmap(this.binarizer.createBinarizer(this.binarizer.getLuminanceSource().crop(i, i2, i3, i4)));
     }
 
     public boolean isRotateSupported() {
@@ -57,7 +57,7 @@ public final class BinaryBitmap {
     public String toString() {
         try {
             return getBlackMatrix().toString();
-        } catch (NotFoundException e) {
+        } catch (NotFoundException unused) {
             return "";
         }
     }

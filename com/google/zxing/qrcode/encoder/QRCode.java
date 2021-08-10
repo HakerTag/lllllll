@@ -12,6 +12,10 @@ public final class QRCode {
     private Mode mode;
     private Version version;
 
+    public static boolean isValidMaskPattern(int i) {
+        return i >= 0 && i < 8;
+    }
+
     public Mode getMode() {
         return this.mode;
     }
@@ -33,47 +37,43 @@ public final class QRCode {
     }
 
     public String toString() {
-        StringBuilder result = new StringBuilder(200);
-        result.append("<<\n");
-        result.append(" mode: ");
-        result.append(this.mode);
-        result.append("\n ecLevel: ");
-        result.append(this.ecLevel);
-        result.append("\n version: ");
-        result.append(this.version);
-        result.append("\n maskPattern: ");
-        result.append(this.maskPattern);
+        StringBuilder sb = new StringBuilder(200);
+        sb.append("<<\n");
+        sb.append(" mode: ");
+        sb.append(this.mode);
+        sb.append("\n ecLevel: ");
+        sb.append(this.ecLevel);
+        sb.append("\n version: ");
+        sb.append(this.version);
+        sb.append("\n maskPattern: ");
+        sb.append(this.maskPattern);
         if (this.matrix == null) {
-            result.append("\n matrix: null\n");
+            sb.append("\n matrix: null\n");
         } else {
-            result.append("\n matrix:\n");
-            result.append(this.matrix);
+            sb.append("\n matrix:\n");
+            sb.append(this.matrix);
         }
-        result.append(">>\n");
-        return result.toString();
+        sb.append(">>\n");
+        return sb.toString();
     }
 
-    public void setMode(Mode value) {
-        this.mode = value;
+    public void setMode(Mode mode2) {
+        this.mode = mode2;
     }
 
-    public void setECLevel(ErrorCorrectionLevel value) {
-        this.ecLevel = value;
+    public void setECLevel(ErrorCorrectionLevel errorCorrectionLevel) {
+        this.ecLevel = errorCorrectionLevel;
     }
 
     public void setVersion(Version version2) {
         this.version = version2;
     }
 
-    public void setMaskPattern(int value) {
-        this.maskPattern = value;
+    public void setMaskPattern(int i) {
+        this.maskPattern = i;
     }
 
-    public void setMatrix(ByteMatrix value) {
-        this.matrix = value;
-    }
-
-    public static boolean isValidMaskPattern(int maskPattern2) {
-        return maskPattern2 >= 0 && maskPattern2 < 8;
+    public void setMatrix(ByteMatrix byteMatrix) {
+        this.matrix = byteMatrix;
     }
 }

@@ -19,22 +19,22 @@ public class ContextCompat {
     protected ContextCompat() {
     }
 
-    public static boolean startActivities(Context context, Intent[] intents) {
-        return startActivities(context, intents, null);
+    public static boolean startActivities(Context context, Intent[] intentArr) {
+        return startActivities(context, intentArr, null);
     }
 
-    public static boolean startActivities(Context context, Intent[] intents, Bundle options) {
+    public static boolean startActivities(Context context, Intent[] intentArr, Bundle bundle) {
         if (Build.VERSION.SDK_INT >= 16) {
-            context.startActivities(intents, options);
+            context.startActivities(intentArr, bundle);
             return true;
         }
-        context.startActivities(intents);
+        context.startActivities(intentArr);
         return true;
     }
 
-    public static void startActivity(Context context, Intent intent, Bundle options) {
+    public static void startActivity(Context context, Intent intent, Bundle bundle) {
         if (Build.VERSION.SDK_INT >= 16) {
-            context.startActivity(intent, options);
+            context.startActivity(intent, bundle);
         } else {
             context.startActivity(intent);
         }
@@ -44,9 +44,9 @@ public class ContextCompat {
         if (Build.VERSION.SDK_INT >= 24) {
             return context.getDataDir();
         }
-        String dataDir = context.getApplicationInfo().dataDir;
-        if (dataDir != null) {
-            return new File(dataDir);
+        String str = context.getApplicationInfo().dataDir;
+        if (str != null) {
+            return new File(str);
         }
         return null;
     }
@@ -58,11 +58,11 @@ public class ContextCompat {
         return new File[]{context.getObbDir()};
     }
 
-    public static File[] getExternalFilesDirs(Context context, String type) {
+    public static File[] getExternalFilesDirs(Context context, String str) {
         if (Build.VERSION.SDK_INT >= 19) {
-            return context.getExternalFilesDirs(type);
+            return context.getExternalFilesDirs(str);
         }
-        return new File[]{context.getExternalFilesDir(type)};
+        return new File[]{context.getExternalFilesDir(str)};
     }
 
     public static File[] getExternalCacheDirs(Context context) {
@@ -72,62 +72,52 @@ public class ContextCompat {
         return new File[]{context.getExternalCacheDir()};
     }
 
-    private static File buildPath(File base, String... segments) {
-        File cur = base;
-        for (String segment : segments) {
-            if (cur == null) {
-                cur = new File(segment);
-            } else if (segment != null) {
-                cur = new File(cur, segment);
+    private static File buildPath(File file, String... strArr) {
+        for (String str : strArr) {
+            if (file == null) {
+                file = new File(str);
+            } else if (str != null) {
+                file = new File(file, str);
             }
         }
-        return cur;
+        return file;
     }
 
-    public static Drawable getDrawable(Context context, int id) {
+    public static Drawable getDrawable(Context context, int i) {
+        int i2;
         if (Build.VERSION.SDK_INT >= 21) {
-            return context.getDrawable(id);
+            return context.getDrawable(i);
         }
         if (Build.VERSION.SDK_INT >= 16) {
-            return context.getResources().getDrawable(id);
+            return context.getResources().getDrawable(i);
         }
         synchronized (sLock) {
-            try {
-                if (sTempValue == null) {
-                    sTempValue = new TypedValue();
-                }
-                context.getResources().getValue(id, sTempValue, true);
-                int resolvedId = sTempValue.resourceId;
-                try {
-                    return context.getResources().getDrawable(resolvedId);
-                } catch (Throwable th) {
-                    th = th;
-                    throw th;
-                }
-            } catch (Throwable th2) {
-                th = th2;
-                throw th;
+            if (sTempValue == null) {
+                sTempValue = new TypedValue();
             }
+            context.getResources().getValue(i, sTempValue, true);
+            i2 = sTempValue.resourceId;
         }
+        return context.getResources().getDrawable(i2);
     }
 
-    public static ColorStateList getColorStateList(Context context, int id) {
+    public static ColorStateList getColorStateList(Context context, int i) {
         if (Build.VERSION.SDK_INT >= 23) {
-            return context.getColorStateList(id);
+            return context.getColorStateList(i);
         }
-        return context.getResources().getColorStateList(id);
+        return context.getResources().getColorStateList(i);
     }
 
-    public static int getColor(Context context, int id) {
+    public static int getColor(Context context, int i) {
         if (Build.VERSION.SDK_INT >= 23) {
-            return context.getColor(id);
+            return context.getColor(i);
         }
-        return context.getResources().getColor(id);
+        return context.getResources().getColor(i);
     }
 
-    public static int checkSelfPermission(Context context, String permission) {
-        if (permission != null) {
-            return context.checkPermission(permission, Process.myPid(), Process.myUid());
+    public static int checkSelfPermission(Context context, String str) {
+        if (str != null) {
+            return context.checkPermission(str, Process.myPid(), Process.myUid());
         }
         throw new IllegalArgumentException("permission is null");
     }

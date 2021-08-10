@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
+import kotlin.text.Typography;
 
 final class VCardFieldFormatter implements Formatter {
     private static final Pattern NEWLINE = Pattern.compile("\\n");
@@ -15,43 +16,43 @@ final class VCardFieldFormatter implements Formatter {
         this(null);
     }
 
-    VCardFieldFormatter(List<Map<String, Set<String>>> metadataForIndex2) {
-        this.metadataForIndex = metadataForIndex2;
+    VCardFieldFormatter(List<Map<String, Set<String>>> list) {
+        this.metadataForIndex = list;
     }
 
     @Override // com.google.zxing.client.android.encode.Formatter
-    public CharSequence format(CharSequence value, int index) {
-        CharSequence value2 = NEWLINE.matcher(RESERVED_VCARD_CHARS.matcher(value).replaceAll("\\\\$1")).replaceAll("");
+    public CharSequence format(CharSequence charSequence, int i) {
+        String replaceAll = NEWLINE.matcher(RESERVED_VCARD_CHARS.matcher(charSequence).replaceAll("\\\\$1")).replaceAll("");
         List<Map<String, Set<String>>> list = this.metadataForIndex;
-        return formatMetadata(value2, (list == null || list.size() <= index) ? null : this.metadataForIndex.get(index));
+        return formatMetadata(replaceAll, (list == null || list.size() <= i) ? null : this.metadataForIndex.get(i));
     }
 
-    private static CharSequence formatMetadata(CharSequence value, Map<String, Set<String>> metadata) {
-        StringBuilder withMetadata = new StringBuilder();
-        if (metadata != null) {
-            for (Map.Entry<String, Set<String>> metadatum : metadata.entrySet()) {
-                Set<String> values = metadatum.getValue();
-                if (values != null && !values.isEmpty()) {
-                    withMetadata.append(';');
-                    withMetadata.append(metadatum.getKey());
-                    withMetadata.append('=');
-                    if (values.size() > 1) {
-                        withMetadata.append('\"');
+    private static CharSequence formatMetadata(CharSequence charSequence, Map<String, Set<String>> map) {
+        StringBuilder sb = new StringBuilder();
+        if (map != null) {
+            for (Map.Entry<String, Set<String>> entry : map.entrySet()) {
+                Set<String> value = entry.getValue();
+                if (value != null && !value.isEmpty()) {
+                    sb.append(';');
+                    sb.append(entry.getKey());
+                    sb.append('=');
+                    if (value.size() > 1) {
+                        sb.append(Typography.quote);
                     }
-                    Iterator<String> valuesIt = values.iterator();
-                    withMetadata.append(valuesIt.next());
-                    while (valuesIt.hasNext()) {
-                        withMetadata.append(',');
-                        withMetadata.append(valuesIt.next());
+                    Iterator<String> it = value.iterator();
+                    sb.append(it.next());
+                    while (it.hasNext()) {
+                        sb.append(',');
+                        sb.append(it.next());
                     }
-                    if (values.size() > 1) {
-                        withMetadata.append('\"');
+                    if (value.size() > 1) {
+                        sb.append(Typography.quote);
                     }
                 }
             }
         }
-        withMetadata.append(':');
-        withMetadata.append(value);
-        return withMetadata;
+        sb.append(':');
+        sb.append(charSequence);
+        return sb;
     }
 }

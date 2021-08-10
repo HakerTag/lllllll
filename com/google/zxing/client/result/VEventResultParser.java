@@ -6,83 +6,71 @@ import java.util.List;
 public final class VEventResultParser extends ResultParser {
     @Override // com.google.zxing.client.result.ResultParser
     public CalendarParsedResult parse(Result result) {
-        double longitude;
-        double latitude;
-        String rawText = getMassagedText(result);
-        if (rawText.indexOf("BEGIN:VEVENT") < 0) {
+        double d;
+        String massagedText = getMassagedText(result);
+        if (massagedText.indexOf("BEGIN:VEVENT") < 0) {
             return null;
         }
-        String summary = matchSingleVCardPrefixedField("SUMMARY", rawText, true);
-        String start = matchSingleVCardPrefixedField("DTSTART", rawText, true);
-        if (start == null) {
+        String matchSingleVCardPrefixedField = matchSingleVCardPrefixedField("SUMMARY", massagedText, true);
+        String matchSingleVCardPrefixedField2 = matchSingleVCardPrefixedField("DTSTART", massagedText, true);
+        if (matchSingleVCardPrefixedField2 == null) {
             return null;
         }
-        String end = matchSingleVCardPrefixedField("DTEND", rawText, true);
-        String duration = matchSingleVCardPrefixedField("DURATION", rawText, true);
-        String location = matchSingleVCardPrefixedField("LOCATION", rawText, true);
-        String organizer = stripMailto(matchSingleVCardPrefixedField("ORGANIZER", rawText, true));
-        String[] attendees = matchVCardPrefixedField("ATTENDEE", rawText, true);
-        if (attendees != null) {
-            for (int i = 0; i < attendees.length; i++) {
-                attendees[i] = stripMailto(attendees[i]);
+        String matchSingleVCardPrefixedField3 = matchSingleVCardPrefixedField("DTEND", massagedText, true);
+        String matchSingleVCardPrefixedField4 = matchSingleVCardPrefixedField("DURATION", massagedText, true);
+        String matchSingleVCardPrefixedField5 = matchSingleVCardPrefixedField("LOCATION", massagedText, true);
+        String stripMailto = stripMailto(matchSingleVCardPrefixedField("ORGANIZER", massagedText, true));
+        String[] matchVCardPrefixedField = matchVCardPrefixedField("ATTENDEE", massagedText, true);
+        if (matchVCardPrefixedField != null) {
+            for (int i = 0; i < matchVCardPrefixedField.length; i++) {
+                matchVCardPrefixedField[i] = stripMailto(matchVCardPrefixedField[i]);
             }
         }
-        String description = matchSingleVCardPrefixedField("DESCRIPTION", rawText, true);
-        String geoString = matchSingleVCardPrefixedField("GEO", rawText, true);
-        if (geoString == null) {
-            latitude = Double.NaN;
-            longitude = Double.NaN;
+        String matchSingleVCardPrefixedField6 = matchSingleVCardPrefixedField("DESCRIPTION", massagedText, true);
+        String matchSingleVCardPrefixedField7 = matchSingleVCardPrefixedField("GEO", massagedText, true);
+        double d2 = Double.NaN;
+        if (matchSingleVCardPrefixedField7 == null) {
+            d = Double.NaN;
         } else {
-            int semicolon = geoString.indexOf(59);
-            if (semicolon < 0) {
+            int indexOf = matchSingleVCardPrefixedField7.indexOf(59);
+            if (indexOf < 0) {
                 return null;
             }
             try {
-                latitude = Double.parseDouble(geoString.substring(0, semicolon));
-                longitude = Double.parseDouble(geoString.substring(semicolon + 1));
-            } catch (NumberFormatException e) {
+                d2 = Double.parseDouble(matchSingleVCardPrefixedField7.substring(0, indexOf));
+                d = Double.parseDouble(matchSingleVCardPrefixedField7.substring(indexOf + 1));
+            } catch (NumberFormatException unused) {
                 return null;
             }
         }
-        try {
-            try {
-                return new CalendarParsedResult(summary, start, end, duration, location, organizer, attendees, description, latitude, longitude);
-            } catch (IllegalArgumentException e2) {
-                return null;
-            }
-        } catch (IllegalArgumentException e3) {
-            return null;
-        }
+        return new CalendarParsedResult(matchSingleVCardPrefixedField, matchSingleVCardPrefixedField2, matchSingleVCardPrefixedField3, matchSingleVCardPrefixedField4, matchSingleVCardPrefixedField5, stripMailto, matchVCardPrefixedField, matchSingleVCardPrefixedField6, d2, d);
     }
 
-    private static String matchSingleVCardPrefixedField(CharSequence prefix, String rawText, boolean trim) {
-        List<String> values = VCardResultParser.matchSingleVCardPrefixedField(prefix, rawText, trim, false);
-        if (values == null || values.isEmpty()) {
+    private static String matchSingleVCardPrefixedField(CharSequence charSequence, String str, boolean z) {
+        List<String> matchSingleVCardPrefixedField = VCardResultParser.matchSingleVCardPrefixedField(charSequence, str, z, false);
+        if (matchSingleVCardPrefixedField == null || matchSingleVCardPrefixedField.isEmpty()) {
             return null;
         }
-        return values.get(0);
+        return matchSingleVCardPrefixedField.get(0);
     }
 
-    private static String[] matchVCardPrefixedField(CharSequence prefix, String rawText, boolean trim) {
-        List<List<String>> values = VCardResultParser.matchVCardPrefixedField(prefix, rawText, trim, false);
-        if (values == null || values.isEmpty()) {
+    private static String[] matchVCardPrefixedField(CharSequence charSequence, String str, boolean z) {
+        List<List<String>> matchVCardPrefixedField = VCardResultParser.matchVCardPrefixedField(charSequence, str, z, false);
+        if (matchVCardPrefixedField == null || matchVCardPrefixedField.isEmpty()) {
             return null;
         }
-        int size = values.size();
-        String[] result = new String[size];
+        int size = matchVCardPrefixedField.size();
+        String[] strArr = new String[size];
         for (int i = 0; i < size; i++) {
-            result[i] = values.get(i).get(0);
+            strArr[i] = matchVCardPrefixedField.get(i).get(0);
         }
-        return result;
+        return strArr;
     }
 
-    private static String stripMailto(String s) {
-        if (s == null) {
-            return s;
+    private static String stripMailto(String str) {
+        if (str != null) {
+            return (str.startsWith("mailto:") || str.startsWith("MAILTO:")) ? str.substring(7) : str;
         }
-        if (s.startsWith("mailto:") || s.startsWith("MAILTO:")) {
-            return s.substring(7);
-        }
-        return s;
+        return str;
     }
 }

@@ -16,32 +16,32 @@ public final class ConnectivityManagerCompat {
     public @interface RestrictBackgroundStatus {
     }
 
-    public static boolean isActiveNetworkMetered(ConnectivityManager cm) {
+    public static boolean isActiveNetworkMetered(ConnectivityManager connectivityManager) {
         if (Build.VERSION.SDK_INT >= 16) {
-            return cm.isActiveNetworkMetered();
+            return connectivityManager.isActiveNetworkMetered();
         }
-        NetworkInfo info = cm.getActiveNetworkInfo();
-        if (info == null) {
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        if (activeNetworkInfo == null) {
             return true;
         }
-        int type = info.getType();
+        int type = activeNetworkInfo.getType();
         if (type == 1 || type == 7 || type == 9) {
             return false;
         }
         return true;
     }
 
-    public static NetworkInfo getNetworkInfoFromBroadcast(ConnectivityManager cm, Intent intent) {
-        NetworkInfo info = (NetworkInfo) intent.getParcelableExtra("networkInfo");
-        if (info != null) {
-            return cm.getNetworkInfo(info.getType());
+    public static NetworkInfo getNetworkInfoFromBroadcast(ConnectivityManager connectivityManager, Intent intent) {
+        NetworkInfo networkInfo = (NetworkInfo) intent.getParcelableExtra("networkInfo");
+        if (networkInfo != null) {
+            return connectivityManager.getNetworkInfo(networkInfo.getType());
         }
         return null;
     }
 
-    public static int getRestrictBackgroundStatus(ConnectivityManager cm) {
+    public static int getRestrictBackgroundStatus(ConnectivityManager connectivityManager) {
         if (Build.VERSION.SDK_INT >= 24) {
-            return cm.getRestrictBackgroundStatus();
+            return connectivityManager.getRestrictBackgroundStatus();
         }
         return 3;
     }

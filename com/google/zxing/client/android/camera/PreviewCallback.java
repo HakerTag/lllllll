@@ -12,24 +12,24 @@ public final class PreviewCallback implements Camera.PreviewCallback {
     private Handler previewHandler;
     private int previewMessage;
 
-    PreviewCallback(CameraConfigurationManager configManager2) {
-        this.configManager = configManager2;
+    PreviewCallback(CameraConfigurationManager cameraConfigurationManager) {
+        this.configManager = cameraConfigurationManager;
     }
 
     /* access modifiers changed from: package-private */
-    public void setHandler(Handler previewHandler2, int previewMessage2) {
-        this.previewHandler = previewHandler2;
-        this.previewMessage = previewMessage2;
+    public void setHandler(Handler handler, int i) {
+        this.previewHandler = handler;
+        this.previewMessage = i;
     }
 
-    public void onPreviewFrame(byte[] data, Camera camera) {
+    public void onPreviewFrame(byte[] bArr, Camera camera) {
         Point cameraResolution = this.configManager.getCameraResolution();
-        Handler thePreviewHandler = this.previewHandler;
-        if (cameraResolution == null || thePreviewHandler == null) {
+        Handler handler = this.previewHandler;
+        if (cameraResolution == null || handler == null) {
             Log.d(TAG, "Got preview callback, but no handler or resolution available");
             return;
         }
-        thePreviewHandler.obtainMessage(this.previewMessage, cameraResolution.x, cameraResolution.y, data).sendToTarget();
+        handler.obtainMessage(this.previewMessage, cameraResolution.x, cameraResolution.y, bArr).sendToTarget();
         this.previewHandler = null;
     }
 }

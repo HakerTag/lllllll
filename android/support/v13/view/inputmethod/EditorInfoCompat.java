@@ -10,26 +10,26 @@ public final class EditorInfoCompat {
     public static final int IME_FLAG_FORCE_ASCII = Integer.MIN_VALUE;
     public static final int IME_FLAG_NO_PERSONALIZED_LEARNING = 16777216;
 
-    public static void setContentMimeTypes(EditorInfo editorInfo, String[] contentMimeTypes) {
+    public static void setContentMimeTypes(EditorInfo editorInfo, String[] strArr) {
         if (Build.VERSION.SDK_INT >= 25) {
-            editorInfo.contentMimeTypes = contentMimeTypes;
+            editorInfo.contentMimeTypes = strArr;
             return;
         }
         if (editorInfo.extras == null) {
             editorInfo.extras = new Bundle();
         }
-        editorInfo.extras.putStringArray(CONTENT_MIME_TYPES_KEY, contentMimeTypes);
+        editorInfo.extras.putStringArray(CONTENT_MIME_TYPES_KEY, strArr);
     }
 
     public static String[] getContentMimeTypes(EditorInfo editorInfo) {
         if (Build.VERSION.SDK_INT >= 25) {
-            String[] result = editorInfo.contentMimeTypes;
-            return result != null ? result : EMPTY_STRING_ARRAY;
+            String[] strArr = editorInfo.contentMimeTypes;
+            return strArr != null ? strArr : EMPTY_STRING_ARRAY;
         } else if (editorInfo.extras == null) {
             return EMPTY_STRING_ARRAY;
         } else {
-            String[] result2 = editorInfo.extras.getStringArray(CONTENT_MIME_TYPES_KEY);
-            return result2 != null ? result2 : EMPTY_STRING_ARRAY;
+            String[] stringArray = editorInfo.extras.getStringArray(CONTENT_MIME_TYPES_KEY);
+            return stringArray != null ? stringArray : EMPTY_STRING_ARRAY;
         }
     }
 }

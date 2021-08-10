@@ -18,56 +18,57 @@ public final class UPCEANExtension2Support {
     }
 
     /* access modifiers changed from: package-private */
-    public Result decodeRow(int rowNumber, BitArray row, int[] extensionStartRange) throws NotFoundException {
-        StringBuilder result = this.decodeRowStringBuffer;
-        result.setLength(0);
-        int end = decodeMiddle(row, extensionStartRange, result);
-        String resultString = result.toString();
-        Map<ResultMetadataType, Object> extensionData = parseExtensionString(resultString);
-        Result extensionResult = new Result(resultString, null, new ResultPoint[]{new ResultPoint(((float) (extensionStartRange[0] + extensionStartRange[1])) / 2.0f, (float) rowNumber), new ResultPoint((float) end, (float) rowNumber)}, BarcodeFormat.UPC_EAN_EXTENSION);
-        if (extensionData != null) {
-            extensionResult.putAllMetadata(extensionData);
+    public Result decodeRow(int i, BitArray bitArray, int[] iArr) throws NotFoundException {
+        StringBuilder sb = this.decodeRowStringBuffer;
+        sb.setLength(0);
+        int decodeMiddle = decodeMiddle(bitArray, iArr, sb);
+        String sb2 = sb.toString();
+        Map<ResultMetadataType, Object> parseExtensionString = parseExtensionString(sb2);
+        float f = (float) i;
+        Result result = new Result(sb2, null, new ResultPoint[]{new ResultPoint(((float) (iArr[0] + iArr[1])) / 2.0f, f), new ResultPoint((float) decodeMiddle, f)}, BarcodeFormat.UPC_EAN_EXTENSION);
+        if (parseExtensionString != null) {
+            result.putAllMetadata(parseExtensionString);
         }
-        return extensionResult;
+        return result;
     }
 
-    private int decodeMiddle(BitArray row, int[] startRange, StringBuilder resultString) throws NotFoundException {
-        int[] counters = this.decodeMiddleCounters;
-        counters[0] = 0;
-        counters[1] = 0;
-        counters[2] = 0;
-        counters[3] = 0;
-        int end = row.getSize();
-        int rowOffset = startRange[1];
-        int checkParity = 0;
-        for (int x = 0; x < 2 && rowOffset < end; x++) {
-            int bestMatch = UPCEANReader.decodeDigit(row, counters, rowOffset, UPCEANReader.L_AND_G_PATTERNS);
-            resultString.append((char) ((bestMatch % 10) + 48));
-            for (int counter : counters) {
-                rowOffset += counter;
+    private int decodeMiddle(BitArray bitArray, int[] iArr, StringBuilder sb) throws NotFoundException {
+        int[] iArr2 = this.decodeMiddleCounters;
+        iArr2[0] = 0;
+        iArr2[1] = 0;
+        iArr2[2] = 0;
+        iArr2[3] = 0;
+        int size = bitArray.getSize();
+        int i = iArr[1];
+        int i2 = 0;
+        for (int i3 = 0; i3 < 2 && i < size; i3++) {
+            int decodeDigit = UPCEANReader.decodeDigit(bitArray, iArr2, i, UPCEANReader.L_AND_G_PATTERNS);
+            sb.append((char) ((decodeDigit % 10) + 48));
+            for (int i4 : iArr2) {
+                i += i4;
             }
-            if (bestMatch >= 10) {
-                checkParity |= 1 << (1 - x);
+            if (decodeDigit >= 10) {
+                i2 |= 1 << (1 - i3);
             }
-            if (x != 1) {
-                rowOffset = row.getNextUnset(row.getNextSet(rowOffset));
+            if (i3 != 1) {
+                i = bitArray.getNextUnset(bitArray.getNextSet(i));
             }
         }
-        if (resultString.length() != 2) {
+        if (sb.length() != 2) {
             throw NotFoundException.getNotFoundInstance();
-        } else if (Integer.parseInt(resultString.toString()) % 4 == checkParity) {
-            return rowOffset;
+        } else if (Integer.parseInt(sb.toString()) % 4 == i2) {
+            return i;
         } else {
             throw NotFoundException.getNotFoundInstance();
         }
     }
 
-    private static Map<ResultMetadataType, Object> parseExtensionString(String raw) {
-        if (raw.length() != 2) {
+    private static Map<ResultMetadataType, Object> parseExtensionString(String str) {
+        if (str.length() != 2) {
             return null;
         }
-        Map<ResultMetadataType, Object> result = new EnumMap<>(ResultMetadataType.class);
-        result.put(ResultMetadataType.ISSUE_NUMBER, Integer.valueOf(raw));
-        return result;
+        EnumMap enumMap = new EnumMap(ResultMetadataType.class);
+        enumMap.put((Object) ResultMetadataType.ISSUE_NUMBER, (Object) Integer.valueOf(str));
+        return enumMap;
     }
 }

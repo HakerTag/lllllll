@@ -9,8 +9,8 @@ public class MediaDescriptionCompatApi23 extends MediaDescriptionCompatApi21 {
     MediaDescriptionCompatApi23() {
     }
 
-    public static Uri getMediaUri(Object descriptionObj) {
-        return ((MediaDescription) descriptionObj).getMediaUri();
+    public static Uri getMediaUri(Object obj) {
+        return ((MediaDescription) obj).getMediaUri();
     }
 
     /* access modifiers changed from: package-private */
@@ -18,8 +18,8 @@ public class MediaDescriptionCompatApi23 extends MediaDescriptionCompatApi21 {
         Builder() {
         }
 
-        public static void setMediaUri(Object builderObj, Uri mediaUri) {
-            ((MediaDescription.Builder) builderObj).setMediaUri(mediaUri);
+        public static void setMediaUri(Object obj, Uri uri) {
+            ((MediaDescription.Builder) obj).setMediaUri(uri);
         }
     }
 }

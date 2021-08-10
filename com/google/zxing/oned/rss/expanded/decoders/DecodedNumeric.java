@@ -8,13 +8,13 @@ public final class DecodedNumeric extends DecodedObject {
     private final int firstDigit;
     private final int secondDigit;
 
-    DecodedNumeric(int newPosition, int firstDigit2, int secondDigit2) throws FormatException {
-        super(newPosition);
-        if (firstDigit2 < 0 || firstDigit2 > 10 || secondDigit2 < 0 || secondDigit2 > 10) {
+    DecodedNumeric(int i, int i2, int i3) throws FormatException {
+        super(i);
+        if (i2 < 0 || i2 > 10 || i3 < 0 || i3 > 10) {
             throw FormatException.getFormatInstance();
         }
-        this.firstDigit = firstDigit2;
-        this.secondDigit = secondDigit2;
+        this.firstDigit = i2;
+        this.secondDigit = i3;
     }
 
     /* access modifiers changed from: package-private */

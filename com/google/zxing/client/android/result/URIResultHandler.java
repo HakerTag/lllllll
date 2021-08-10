@@ -11,8 +11,8 @@ public final class URIResultHandler extends ResultHandler {
     private static final String[] SECURE_PROTOCOLS = {"otpauth:"};
     private static final int[] buttons = {R.string.button_open_browser, R.string.button_share_by_email, R.string.button_share_by_sms, R.string.button_search_book_contents};
 
-    public URIResultHandler(Activity activity, ParsedResult result) {
-        super(activity, result);
+    public URIResultHandler(Activity activity, ParsedResult parsedResult) {
+        super(activity, parsedResult);
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler
@@ -24,8 +24,8 @@ public final class URIResultHandler extends ResultHandler {
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler
-    public int getButtonText(int index) {
-        return buttons[index];
+    public int getButtonText(int i) {
+        return buttons[i];
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler
@@ -34,15 +34,15 @@ public final class URIResultHandler extends ResultHandler {
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler
-    public void handleButtonPress(int index) {
+    public void handleButtonPress(int i) {
         String uri = ((URIParsedResult) getResult()).getURI();
-        if (index == 0) {
+        if (i == 0) {
             openURL(uri);
-        } else if (index == 1) {
+        } else if (i == 1) {
             shareByEmail(uri);
-        } else if (index == 2) {
+        } else if (i == 2) {
             shareBySMS(uri);
-        } else if (index == 3) {
+        } else if (i == 3) {
             searchBookContents(uri);
         }
     }
@@ -54,9 +54,9 @@ public final class URIResultHandler extends ResultHandler {
 
     @Override // com.google.zxing.client.android.result.ResultHandler
     public boolean areContentsSecure() {
-        String uri = ((URIParsedResult) getResult()).getURI().toLowerCase(Locale.ENGLISH);
-        for (String secure : SECURE_PROTOCOLS) {
-            if (uri.startsWith(secure)) {
+        String lowerCase = ((URIParsedResult) getResult()).getURI().toLowerCase(Locale.ENGLISH);
+        for (String str : SECURE_PROTOCOLS) {
+            if (lowerCase.startsWith(str)) {
                 return true;
             }
         }

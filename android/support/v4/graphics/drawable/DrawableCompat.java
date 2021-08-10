@@ -27,9 +27,9 @@ public final class DrawableCompat {
         drawable.jumpToCurrentState();
     }
 
-    public static void setAutoMirrored(Drawable drawable, boolean mirrored) {
+    public static void setAutoMirrored(Drawable drawable, boolean z) {
         if (Build.VERSION.SDK_INT >= 19) {
-            drawable.setAutoMirrored(mirrored);
+            drawable.setAutoMirrored(z);
         }
     }
 
@@ -40,39 +40,39 @@ public final class DrawableCompat {
         return false;
     }
 
-    public static void setHotspot(Drawable drawable, float x, float y) {
+    public static void setHotspot(Drawable drawable, float f, float f2) {
         if (Build.VERSION.SDK_INT >= 21) {
-            drawable.setHotspot(x, y);
+            drawable.setHotspot(f, f2);
         }
     }
 
-    public static void setHotspotBounds(Drawable drawable, int left, int top, int right, int bottom) {
+    public static void setHotspotBounds(Drawable drawable, int i, int i2, int i3, int i4) {
         if (Build.VERSION.SDK_INT >= 21) {
-            drawable.setHotspotBounds(left, top, right, bottom);
+            drawable.setHotspotBounds(i, i2, i3, i4);
         }
     }
 
-    public static void setTint(Drawable drawable, int tint) {
+    public static void setTint(Drawable drawable, int i) {
         if (Build.VERSION.SDK_INT >= 21) {
-            drawable.setTint(tint);
+            drawable.setTint(i);
         } else if (drawable instanceof TintAwareDrawable) {
-            ((TintAwareDrawable) drawable).setTint(tint);
+            ((TintAwareDrawable) drawable).setTint(i);
         }
     }
 
-    public static void setTintList(Drawable drawable, ColorStateList tint) {
+    public static void setTintList(Drawable drawable, ColorStateList colorStateList) {
         if (Build.VERSION.SDK_INT >= 21) {
-            drawable.setTintList(tint);
+            drawable.setTintList(colorStateList);
         } else if (drawable instanceof TintAwareDrawable) {
-            ((TintAwareDrawable) drawable).setTintList(tint);
+            ((TintAwareDrawable) drawable).setTintList(colorStateList);
         }
     }
 
-    public static void setTintMode(Drawable drawable, PorterDuff.Mode tintMode) {
+    public static void setTintMode(Drawable drawable, PorterDuff.Mode mode) {
         if (Build.VERSION.SDK_INT >= 21) {
-            drawable.setTintMode(tintMode);
+            drawable.setTintMode(mode);
         } else if (drawable instanceof TintAwareDrawable) {
-            ((TintAwareDrawable) drawable).setTintMode(tintMode);
+            ((TintAwareDrawable) drawable).setTintMode(mode);
         }
     }
 
@@ -104,7 +104,7 @@ public final class DrawableCompat {
     }
 
     public static void clearColorFilter(Drawable drawable) {
-        DrawableContainer.DrawableContainerState state;
+        DrawableContainer.DrawableContainerState drawableContainerState;
         if (Build.VERSION.SDK_INT >= 23) {
             drawable.clearColorFilter();
         } else if (Build.VERSION.SDK_INT >= 21) {
@@ -113,10 +113,10 @@ public final class DrawableCompat {
                 clearColorFilter(((InsetDrawable) drawable).getDrawable());
             } else if (drawable instanceof WrappedDrawable) {
                 clearColorFilter(((WrappedDrawable) drawable).getWrappedDrawable());
-            } else if ((drawable instanceof DrawableContainer) && (state = (DrawableContainer.DrawableContainerState) ((DrawableContainer) drawable).getConstantState()) != null) {
-                int count = state.getChildCount();
-                for (int i = 0; i < count; i++) {
-                    Drawable child = state.getChild(i);
+            } else if ((drawable instanceof DrawableContainer) && (drawableContainerState = (DrawableContainer.DrawableContainerState) ((DrawableContainer) drawable).getConstantState()) != null) {
+                int childCount = drawableContainerState.getChildCount();
+                for (int i = 0; i < childCount; i++) {
+                    Drawable child = drawableContainerState.getChild(i);
                     if (child != null) {
                         clearColorFilter(child);
                     }
@@ -127,11 +127,11 @@ public final class DrawableCompat {
         }
     }
 
-    public static void inflate(Drawable drawable, Resources res, XmlPullParser parser, AttributeSet attrs, Resources.Theme theme) throws XmlPullParserException, IOException {
+    public static void inflate(Drawable drawable, Resources resources, XmlPullParser xmlPullParser, AttributeSet attributeSet, Resources.Theme theme) throws XmlPullParserException, IOException {
         if (Build.VERSION.SDK_INT >= 21) {
-            drawable.inflate(res, parser, attrs, theme);
+            drawable.inflate(resources, xmlPullParser, attributeSet, theme);
         } else {
-            drawable.inflate(res, parser, attrs);
+            drawable.inflate(resources, xmlPullParser, attributeSet);
         }
     }
 
@@ -139,21 +139,7 @@ public final class DrawableCompat {
         if (Build.VERSION.SDK_INT >= 23) {
             return drawable;
         }
-        if (Build.VERSION.SDK_INT >= 21) {
-            if (!(drawable instanceof TintAwareDrawable)) {
-                return new WrappedDrawableApi21(drawable);
-            }
-            return drawable;
-        } else if (Build.VERSION.SDK_INT >= 19) {
-            if (!(drawable instanceof TintAwareDrawable)) {
-                return new WrappedDrawableApi19(drawable);
-            }
-            return drawable;
-        } else if (!(drawable instanceof TintAwareDrawable)) {
-            return new WrappedDrawableApi14(drawable);
-        } else {
-            return drawable;
-        }
+        return Build.VERSION.SDK_INT >= 21 ? !(drawable instanceof TintAwareDrawable) ? new WrappedDrawableApi21(drawable) : drawable : Build.VERSION.SDK_INT >= 19 ? !(drawable instanceof TintAwareDrawable) ? new WrappedDrawableApi19(drawable) : drawable : !(drawable instanceof TintAwareDrawable) ? new WrappedDrawableApi14(drawable) : drawable;
     }
 
     /* JADX DEBUG: Multi-variable search result rejected for r1v0, resolved type: android.graphics.drawable.Drawable */
@@ -162,31 +148,30 @@ public final class DrawableCompat {
         return drawable instanceof WrappedDrawable ? (T) ((WrappedDrawable) drawable).getWrappedDrawable() : drawable;
     }
 
-    public static boolean setLayoutDirection(Drawable drawable, int layoutDirection) {
+    public static boolean setLayoutDirection(Drawable drawable, int i) {
         if (Build.VERSION.SDK_INT >= 23) {
-            return drawable.setLayoutDirection(layoutDirection);
+            return drawable.setLayoutDirection(i);
         }
-        if (Build.VERSION.SDK_INT < 17) {
-            return false;
-        }
-        if (!sSetLayoutDirectionMethodFetched) {
-            try {
-                Method declaredMethod = Drawable.class.getDeclaredMethod("setLayoutDirection", Integer.TYPE);
-                sSetLayoutDirectionMethod = declaredMethod;
-                declaredMethod.setAccessible(true);
-            } catch (NoSuchMethodException e) {
-                Log.i(TAG, "Failed to retrieve setLayoutDirection(int) method", e);
+        if (Build.VERSION.SDK_INT >= 17) {
+            if (!sSetLayoutDirectionMethodFetched) {
+                try {
+                    Method declaredMethod = Drawable.class.getDeclaredMethod("setLayoutDirection", Integer.TYPE);
+                    sSetLayoutDirectionMethod = declaredMethod;
+                    declaredMethod.setAccessible(true);
+                } catch (NoSuchMethodException e) {
+                    Log.i(TAG, "Failed to retrieve setLayoutDirection(int) method", e);
+                }
+                sSetLayoutDirectionMethodFetched = true;
             }
-            sSetLayoutDirectionMethodFetched = true;
-        }
-        Method method = sSetLayoutDirectionMethod;
-        if (method != null) {
-            try {
-                method.invoke(drawable, Integer.valueOf(layoutDirection));
-                return true;
-            } catch (Exception e2) {
-                Log.i(TAG, "Failed to invoke setLayoutDirection(int) via reflection", e2);
-                sSetLayoutDirectionMethod = null;
+            Method method = sSetLayoutDirectionMethod;
+            if (method != null) {
+                try {
+                    method.invoke(drawable, Integer.valueOf(i));
+                    return true;
+                } catch (Exception e2) {
+                    Log.i(TAG, "Failed to invoke setLayoutDirection(int) via reflection", e2);
+                    sSetLayoutDirectionMethod = null;
+                }
             }
         }
         return false;
@@ -196,26 +181,25 @@ public final class DrawableCompat {
         if (Build.VERSION.SDK_INT >= 23) {
             return drawable.getLayoutDirection();
         }
-        if (Build.VERSION.SDK_INT < 17) {
-            return 0;
-        }
-        if (!sGetLayoutDirectionMethodFetched) {
-            try {
-                Method declaredMethod = Drawable.class.getDeclaredMethod("getLayoutDirection", new Class[0]);
-                sGetLayoutDirectionMethod = declaredMethod;
-                declaredMethod.setAccessible(true);
-            } catch (NoSuchMethodException e) {
-                Log.i(TAG, "Failed to retrieve getLayoutDirection() method", e);
+        if (Build.VERSION.SDK_INT >= 17) {
+            if (!sGetLayoutDirectionMethodFetched) {
+                try {
+                    Method declaredMethod = Drawable.class.getDeclaredMethod("getLayoutDirection", new Class[0]);
+                    sGetLayoutDirectionMethod = declaredMethod;
+                    declaredMethod.setAccessible(true);
+                } catch (NoSuchMethodException e) {
+                    Log.i(TAG, "Failed to retrieve getLayoutDirection() method", e);
+                }
+                sGetLayoutDirectionMethodFetched = true;
             }
-            sGetLayoutDirectionMethodFetched = true;
-        }
-        Method method = sGetLayoutDirectionMethod;
-        if (method != null) {
-            try {
-                return ((Integer) method.invoke(drawable, new Object[0])).intValue();
-            } catch (Exception e2) {
-                Log.i(TAG, "Failed to invoke getLayoutDirection() via reflection", e2);
-                sGetLayoutDirectionMethod = null;
+            Method method = sGetLayoutDirectionMethod;
+            if (method != null) {
+                try {
+                    return ((Integer) method.invoke(drawable, new Object[0])).intValue();
+                } catch (Exception e2) {
+                    Log.i(TAG, "Failed to invoke getLayoutDirection() via reflection", e2);
+                    sGetLayoutDirectionMethod = null;
+                }
             }
         }
         return 0;

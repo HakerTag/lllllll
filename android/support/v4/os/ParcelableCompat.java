@@ -6,30 +6,30 @@ import android.os.Parcelable;
 @Deprecated
 public final class ParcelableCompat {
     @Deprecated
-    public static <T> Parcelable.Creator<T> newCreator(ParcelableCompatCreatorCallbacks<T> callbacks) {
-        return new ParcelableCompatCreatorHoneycombMR2(callbacks);
+    public static <T> Parcelable.Creator<T> newCreator(ParcelableCompatCreatorCallbacks<T> parcelableCompatCreatorCallbacks) {
+        return new ParcelableCompatCreatorHoneycombMR2(parcelableCompatCreatorCallbacks);
     }
 
     static class ParcelableCompatCreatorHoneycombMR2<T> implements Parcelable.ClassLoaderCreator<T> {
         private final ParcelableCompatCreatorCallbacks<T> mCallbacks;
 
-        ParcelableCompatCreatorHoneycombMR2(ParcelableCompatCreatorCallbacks<T> callbacks) {
-            this.mCallbacks = callbacks;
+        ParcelableCompatCreatorHoneycombMR2(ParcelableCompatCreatorCallbacks<T> parcelableCompatCreatorCallbacks) {
+            this.mCallbacks = parcelableCompatCreatorCallbacks;
         }
 
         @Override // android.os.Parcelable.Creator
-        public T createFromParcel(Parcel in) {
-            return this.mCallbacks.createFromParcel(in, null);
+        public T createFromParcel(Parcel parcel) {
+            return this.mCallbacks.createFromParcel(parcel, null);
         }
 
         @Override // android.os.Parcelable.ClassLoaderCreator
-        public T createFromParcel(Parcel in, ClassLoader loader) {
-            return this.mCallbacks.createFromParcel(in, loader);
+        public T createFromParcel(Parcel parcel, ClassLoader classLoader) {
+            return this.mCallbacks.createFromParcel(parcel, classLoader);
         }
 
         @Override // android.os.Parcelable.Creator
-        public T[] newArray(int size) {
-            return this.mCallbacks.newArray(size);
+        public T[] newArray(int i) {
+            return this.mCallbacks.newArray(i);
         }
     }
 

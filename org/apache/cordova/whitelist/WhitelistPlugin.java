@@ -21,20 +21,20 @@ public class WhitelistPlugin extends CordovaPlugin {
         new CustomConfigXmlParser().parse(context);
     }
 
-    public WhitelistPlugin(XmlPullParser xmlParser) {
+    public WhitelistPlugin(XmlPullParser xmlPullParser) {
         this(new Whitelist(), new Whitelist(), null);
-        new CustomConfigXmlParser().parse(xmlParser);
+        new CustomConfigXmlParser().parse(xmlPullParser);
     }
 
-    public WhitelistPlugin(Whitelist allowedNavigations2, Whitelist allowedIntents2, Whitelist allowedRequests2) {
-        if (allowedRequests2 == null) {
-            allowedRequests2 = new Whitelist();
-            allowedRequests2.addWhiteListEntry("file:///*", false);
-            allowedRequests2.addWhiteListEntry("data:*", false);
+    public WhitelistPlugin(Whitelist whitelist, Whitelist whitelist2, Whitelist whitelist3) {
+        if (whitelist3 == null) {
+            whitelist3 = new Whitelist();
+            whitelist3.addWhiteListEntry("file:///*", false);
+            whitelist3.addWhiteListEntry("data:*", false);
         }
-        this.allowedNavigations = allowedNavigations2;
-        this.allowedIntents = allowedIntents2;
-        this.allowedRequests = allowedRequests2;
+        this.allowedNavigations = whitelist;
+        this.allowedIntents = whitelist2;
+        this.allowedRequests = whitelist3;
     }
 
     @Override // org.apache.cordova.CordovaPlugin
@@ -48,103 +48,97 @@ public class WhitelistPlugin extends CordovaPlugin {
     }
 
     private class CustomConfigXmlParser extends ConfigXmlParser {
+        @Override // org.apache.cordova.ConfigXmlParser
+        public void handleEndTag(XmlPullParser xmlPullParser) {
+        }
+
         private CustomConfigXmlParser() {
         }
 
         @Override // org.apache.cordova.ConfigXmlParser
-        public void handleStartTag(XmlPullParser xml) {
-            String strNode = xml.getName();
+        public void handleStartTag(XmlPullParser xmlPullParser) {
+            String name = xmlPullParser.getName();
             boolean z = false;
-            if (strNode.equals("content")) {
-                WhitelistPlugin.this.allowedNavigations.addWhiteListEntry(xml.getAttributeValue(null, "src"), false);
-            } else if (strNode.equals("allow-navigation")) {
-                String origin = xml.getAttributeValue(null, "href");
-                if ("*".equals(origin)) {
+            if (name.equals("content")) {
+                WhitelistPlugin.this.allowedNavigations.addWhiteListEntry(xmlPullParser.getAttributeValue(null, "src"), false);
+            } else if (name.equals("allow-navigation")) {
+                String attributeValue = xmlPullParser.getAttributeValue(null, "href");
+                if ("*".equals(attributeValue)) {
                     WhitelistPlugin.this.allowedNavigations.addWhiteListEntry("http://*/*", false);
                     WhitelistPlugin.this.allowedNavigations.addWhiteListEntry("https://*/*", false);
                     WhitelistPlugin.this.allowedNavigations.addWhiteListEntry("data:*", false);
                     return;
                 }
-                WhitelistPlugin.this.allowedNavigations.addWhiteListEntry(origin, false);
-            } else if (strNode.equals("allow-intent")) {
-                WhitelistPlugin.this.allowedIntents.addWhiteListEntry(xml.getAttributeValue(null, "href"), false);
-            } else if (strNode.equals("access")) {
-                String origin2 = xml.getAttributeValue(null, "origin");
-                String subdomains = xml.getAttributeValue(null, "subdomains");
-                boolean external = xml.getAttributeValue(null, "launch-external") != null;
-                if (origin2 == null) {
+                WhitelistPlugin.this.allowedNavigations.addWhiteListEntry(attributeValue, false);
+            } else if (name.equals("allow-intent")) {
+                WhitelistPlugin.this.allowedIntents.addWhiteListEntry(xmlPullParser.getAttributeValue(null, "href"), false);
+            } else if (name.equals("access")) {
+                String attributeValue2 = xmlPullParser.getAttributeValue(null, "origin");
+                String attributeValue3 = xmlPullParser.getAttributeValue(null, "subdomains");
+                boolean z2 = xmlPullParser.getAttributeValue(null, "launch-external") != null;
+                if (attributeValue2 == null) {
                     return;
                 }
-                if (external) {
+                if (z2) {
                     LOG.w(WhitelistPlugin.LOG_TAG, "Found <access launch-external> within config.xml. Please use <allow-intent> instead.");
                     Whitelist whitelist = WhitelistPlugin.this.allowedIntents;
-                    if (subdomains != null && subdomains.compareToIgnoreCase("true") == 0) {
+                    if (attributeValue3 != null && attributeValue3.compareToIgnoreCase("true") == 0) {
                         z = true;
                     }
-                    whitelist.addWhiteListEntry(origin2, z);
-                } else if ("*".equals(origin2)) {
+                    whitelist.addWhiteListEntry(attributeValue2, z);
+                } else if ("*".equals(attributeValue2)) {
                     WhitelistPlugin.this.allowedRequests.addWhiteListEntry("http://*/*", false);
                     WhitelistPlugin.this.allowedRequests.addWhiteListEntry("https://*/*", false);
                 } else {
                     Whitelist whitelist2 = WhitelistPlugin.this.allowedRequests;
-                    if (subdomains != null && subdomains.compareToIgnoreCase("true") == 0) {
+                    if (attributeValue3 != null && attributeValue3.compareToIgnoreCase("true") == 0) {
                         z = true;
                     }
-                    whitelist2.addWhiteListEntry(origin2, z);
+                    whitelist2.addWhiteListEntry(attributeValue2, z);
                 }
             }
         }
-
-        @Override // org.apache.cordova.ConfigXmlParser
-        public void handleEndTag(XmlPullParser xml) {
-        }
     }
 
     @Override // org.apache.cordova.CordovaPlugin
-    public Boolean shouldAllowNavigation(String url) {
-        if (this.allowedNavigations.isUrlWhiteListed(url)) {
-            return true;
-        }
-        return null;
+    public Boolean shouldAllowNavigation(String str) {
+        return this.allowedNavigations.isUrlWhiteListed(str) ? true : null;
     }
 
     @Override // org.apache.cordova.CordovaPlugin
-    public Boolean shouldAllowRequest(String url) {
-        if (Boolean.TRUE != shouldAllowNavigation(url) && !this.allowedRequests.isUrlWhiteListed(url)) {
+    public Boolean shouldAllowRequest(String str) {
+        if (Boolean.TRUE != shouldAllowNavigation(str) && !this.allowedRequests.isUrlWhiteListed(str)) {
             return null;
         }
         return true;
     }
 
     @Override // org.apache.cordova.CordovaPlugin
-    public Boolean shouldOpenExternalUrl(String url) {
-        if (this.allowedIntents.isUrlWhiteListed(url)) {
-            return true;
-        }
-        return null;
+    public Boolean shouldOpenExternalUrl(String str) {
+        return this.allowedIntents.isUrlWhiteListed(str) ? true : null;
     }
 
     public Whitelist getAllowedNavigations() {
         return this.allowedNavigations;
     }
 
-    public void setAllowedNavigations(Whitelist allowedNavigations2) {
-        this.allowedNavigations = allowedNavigations2;
+    public void setAllowedNavigations(Whitelist whitelist) {
+        this.allowedNavigations = whitelist;
     }
 
     public Whitelist getAllowedIntents() {
         return this.allowedIntents;
     }
 
-    public void setAllowedIntents(Whitelist allowedIntents2) {
-        this.allowedIntents = allowedIntents2;
+    public void setAllowedIntents(Whitelist whitelist) {
+        this.allowedIntents = whitelist;
     }
 
     public Whitelist getAllowedRequests() {
         return this.allowedRequests;
     }
 
-    public void setAllowedRequests(Whitelist allowedRequests2) {
-        this.allowedRequests = allowedRequests2;
+    public void setAllowedRequests(Whitelist whitelist) {
+        this.allowedRequests = whitelist;
     }
 }

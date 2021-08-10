@@ -18,11 +18,11 @@ public class FakeR {
         this.packageName = context2.getPackageName();
     }
 
-    public int getId(String group, String key) {
-        return this.context.getResources().getIdentifier(key, group, this.packageName);
+    public int getId(String str, String str2) {
+        return this.context.getResources().getIdentifier(str2, str, this.packageName);
     }
 
-    public static int getId(Context context2, String group, String key) {
-        return context2.getResources().getIdentifier(key, group, context2.getPackageName());
+    public static int getId(Context context2, String str, String str2) {
+        return context2.getResources().getIdentifier(str2, str, context2.getPackageName());
     }
 }

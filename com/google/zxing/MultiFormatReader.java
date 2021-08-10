@@ -15,75 +15,75 @@ public final class MultiFormatReader implements Reader {
     private Reader[] readers;
 
     @Override // com.google.zxing.Reader
-    public Result decode(BinaryBitmap image) throws NotFoundException {
+    public Result decode(BinaryBitmap binaryBitmap) throws NotFoundException {
         setHints(null);
-        return decodeInternal(image);
+        return decodeInternal(binaryBitmap);
     }
 
     @Override // com.google.zxing.Reader
-    public Result decode(BinaryBitmap image, Map<DecodeHintType, ?> hints2) throws NotFoundException {
-        setHints(hints2);
-        return decodeInternal(image);
+    public Result decode(BinaryBitmap binaryBitmap, Map<DecodeHintType, ?> map) throws NotFoundException {
+        setHints(map);
+        return decodeInternal(binaryBitmap);
     }
 
-    public Result decodeWithState(BinaryBitmap image) throws NotFoundException {
+    public Result decodeWithState(BinaryBitmap binaryBitmap) throws NotFoundException {
         if (this.readers == null) {
             setHints(null);
         }
-        return decodeInternal(image);
+        return decodeInternal(binaryBitmap);
     }
 
-    public void setHints(Map<DecodeHintType, ?> hints2) {
-        Collection<BarcodeFormat> formats;
-        this.hints = hints2;
-        boolean addOneDReader = true;
-        boolean tryHarder = hints2 != null && hints2.containsKey(DecodeHintType.TRY_HARDER);
-        if (hints2 == null) {
-            formats = null;
+    public void setHints(Map<DecodeHintType, ?> map) {
+        Collection collection;
+        this.hints = map;
+        boolean z = true;
+        boolean z2 = map != null && map.containsKey(DecodeHintType.TRY_HARDER);
+        if (map == null) {
+            collection = null;
         } else {
-            formats = (Collection) hints2.get(DecodeHintType.POSSIBLE_FORMATS);
+            collection = (Collection) map.get(DecodeHintType.POSSIBLE_FORMATS);
         }
-        Collection<Reader> readers2 = new ArrayList<>();
-        if (formats != null) {
-            if (!formats.contains(BarcodeFormat.UPC_A) && !formats.contains(BarcodeFormat.UPC_E) && !formats.contains(BarcodeFormat.EAN_13) && !formats.contains(BarcodeFormat.EAN_8) && !formats.contains(BarcodeFormat.CODABAR) && !formats.contains(BarcodeFormat.CODE_39) && !formats.contains(BarcodeFormat.CODE_93) && !formats.contains(BarcodeFormat.CODE_128) && !formats.contains(BarcodeFormat.ITF) && !formats.contains(BarcodeFormat.RSS_14) && !formats.contains(BarcodeFormat.RSS_EXPANDED)) {
-                addOneDReader = false;
+        ArrayList arrayList = new ArrayList();
+        if (collection != null) {
+            if (!collection.contains(BarcodeFormat.UPC_A) && !collection.contains(BarcodeFormat.UPC_E) && !collection.contains(BarcodeFormat.EAN_13) && !collection.contains(BarcodeFormat.EAN_8) && !collection.contains(BarcodeFormat.CODABAR) && !collection.contains(BarcodeFormat.CODE_39) && !collection.contains(BarcodeFormat.CODE_93) && !collection.contains(BarcodeFormat.CODE_128) && !collection.contains(BarcodeFormat.ITF) && !collection.contains(BarcodeFormat.RSS_14) && !collection.contains(BarcodeFormat.RSS_EXPANDED)) {
+                z = false;
             }
-            if (addOneDReader && !tryHarder) {
-                readers2.add(new MultiFormatOneDReader(hints2));
+            if (z && !z2) {
+                arrayList.add(new MultiFormatOneDReader(map));
             }
-            if (formats.contains(BarcodeFormat.QR_CODE)) {
-                readers2.add(new QRCodeReader());
+            if (collection.contains(BarcodeFormat.QR_CODE)) {
+                arrayList.add(new QRCodeReader());
             }
-            if (formats.contains(BarcodeFormat.DATA_MATRIX)) {
-                readers2.add(new DataMatrixReader());
+            if (collection.contains(BarcodeFormat.DATA_MATRIX)) {
+                arrayList.add(new DataMatrixReader());
             }
-            if (formats.contains(BarcodeFormat.AZTEC)) {
-                readers2.add(new AztecReader());
+            if (collection.contains(BarcodeFormat.AZTEC)) {
+                arrayList.add(new AztecReader());
             }
-            if (formats.contains(BarcodeFormat.PDF_417)) {
-                readers2.add(new PDF417Reader());
+            if (collection.contains(BarcodeFormat.PDF_417)) {
+                arrayList.add(new PDF417Reader());
             }
-            if (formats.contains(BarcodeFormat.MAXICODE)) {
-                readers2.add(new MaxiCodeReader());
+            if (collection.contains(BarcodeFormat.MAXICODE)) {
+                arrayList.add(new MaxiCodeReader());
             }
-            if (addOneDReader && tryHarder) {
-                readers2.add(new MultiFormatOneDReader(hints2));
-            }
-        }
-        if (readers2.isEmpty()) {
-            if (!tryHarder) {
-                readers2.add(new MultiFormatOneDReader(hints2));
-            }
-            readers2.add(new QRCodeReader());
-            readers2.add(new DataMatrixReader());
-            readers2.add(new AztecReader());
-            readers2.add(new PDF417Reader());
-            readers2.add(new MaxiCodeReader());
-            if (tryHarder) {
-                readers2.add(new MultiFormatOneDReader(hints2));
+            if (z && z2) {
+                arrayList.add(new MultiFormatOneDReader(map));
             }
         }
-        this.readers = (Reader[]) readers2.toArray(new Reader[readers2.size()]);
+        if (arrayList.isEmpty()) {
+            if (!z2) {
+                arrayList.add(new MultiFormatOneDReader(map));
+            }
+            arrayList.add(new QRCodeReader());
+            arrayList.add(new DataMatrixReader());
+            arrayList.add(new AztecReader());
+            arrayList.add(new PDF417Reader());
+            arrayList.add(new MaxiCodeReader());
+            if (z2) {
+                arrayList.add(new MultiFormatOneDReader(map));
+            }
+        }
+        this.readers = (Reader[]) arrayList.toArray(new Reader[arrayList.size()]);
     }
 
     @Override // com.google.zxing.Reader
@@ -96,14 +96,13 @@ public final class MultiFormatReader implements Reader {
         }
     }
 
-    private Result decodeInternal(BinaryBitmap image) throws NotFoundException {
+    private Result decodeInternal(BinaryBitmap binaryBitmap) throws NotFoundException {
         Reader[] readerArr = this.readers;
         if (readerArr != null) {
-            int length = readerArr.length;
-            for (int i = 0; i < length; i++) {
+            for (Reader reader : readerArr) {
                 try {
-                    return readerArr[i].decode(image, this.hints);
-                } catch (ReaderException e) {
+                    return reader.decode(binaryBitmap, this.hints);
+                } catch (ReaderException unused) {
                 }
             }
         }

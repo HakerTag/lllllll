@@ -5,18 +5,18 @@ final class DecodedInformation extends DecodedObject {
     private final boolean remaining;
     private final int remainingValue;
 
-    DecodedInformation(int newPosition, String newString2) {
-        super(newPosition);
-        this.newString = newString2;
+    DecodedInformation(int i, String str) {
+        super(i);
+        this.newString = str;
         this.remaining = false;
         this.remainingValue = 0;
     }
 
-    DecodedInformation(int newPosition, String newString2, int remainingValue2) {
-        super(newPosition);
+    DecodedInformation(int i, String str, int i2) {
+        super(i);
         this.remaining = true;
-        this.remainingValue = remainingValue2;
-        this.newString = newString2;
+        this.remainingValue = i2;
+        this.newString = str;
     }
 
     /* access modifiers changed from: package-private */

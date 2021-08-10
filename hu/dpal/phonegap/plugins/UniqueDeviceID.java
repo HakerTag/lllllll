@@ -16,10 +16,10 @@ public class UniqueDeviceID extends CordovaPlugin {
     public CallbackContext callbackContext;
 
     @Override // org.apache.cordova.CordovaPlugin
-    public boolean execute(String action, JSONArray args, CallbackContext callbackContext2) throws JSONException {
+    public boolean execute(String str, JSONArray jSONArray, CallbackContext callbackContext2) throws JSONException {
         this.callbackContext = callbackContext2;
         try {
-            if (!action.equals("get")) {
+            if (!str.equals("get")) {
                 this.callbackContext.error("Invalid action");
                 return false;
             } else if (hasPermission(permission)) {
@@ -36,8 +36,8 @@ public class UniqueDeviceID extends CordovaPlugin {
     }
 
     @Override // org.apache.cordova.CordovaPlugin
-    public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
-        if (requestCode == 0) {
+    public void onRequestPermissionResult(int i, String[] strArr, int[] iArr) throws JSONException {
+        if (i == 0) {
             getDeviceId();
         }
     }
@@ -45,39 +45,39 @@ public class UniqueDeviceID extends CordovaPlugin {
     /* access modifiers changed from: protected */
     public void getDeviceId() {
         try {
-            Context context = this.cordova.getActivity().getApplicationContext();
-            TelephonyManager tm = (TelephonyManager) context.getSystemService("phone");
-            String androidID = Settings.Secure.getString(context.getContentResolver(), "android_id");
-            String deviceID = tm.getDeviceId();
-            String simID = tm.getSimSerialNumber();
-            if ("9774d56d682e549c".equals(androidID) || androidID == null) {
-                androidID = "";
+            Context applicationContext = this.cordova.getActivity().getApplicationContext();
+            TelephonyManager telephonyManager = (TelephonyManager) applicationContext.getSystemService("phone");
+            String string = Settings.Secure.getString(applicationContext.getContentResolver(), "android_id");
+            String deviceId = telephonyManager.getDeviceId();
+            String simSerialNumber = telephonyManager.getSimSerialNumber();
+            if ("9774d56d682e549c".equals(string) || string == null) {
+                string = "";
             }
-            if (deviceID == null) {
-                deviceID = "";
+            if (deviceId == null) {
+                deviceId = "";
             }
-            if (simID == null) {
-                simID = "";
+            if (simSerialNumber == null) {
+                simSerialNumber = "";
             }
-            this.callbackContext.success(String.format("%32s", androidID + deviceID + simID).replace(' ', '0').substring(0, 32).replaceAll("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5"));
+            this.callbackContext.success(String.format("%32s", string + deviceId + simSerialNumber).replace(' ', '0').substring(0, 32).replaceAll("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5"));
         } catch (Exception e) {
             this.callbackContext.error("Exception occurred: ".concat(e.getMessage()));
         }
     }
 
-    private boolean hasPermission(String permission2) throws Exception {
+    private boolean hasPermission(String str) throws Exception {
         try {
-            return ((Boolean) this.cordova.getClass().getMethod("hasPermission", permission2.getClass()).invoke(this.cordova, permission2)).booleanValue();
-        } catch (NoSuchMethodException e) {
-            Log.w(TAG, "Cordova v9.1.0 does not support API 23 runtime permissions so defaulting to GRANTED for " + permission2);
+            return ((Boolean) this.cordova.getClass().getMethod("hasPermission", str.getClass()).invoke(this.cordova, str)).booleanValue();
+        } catch (NoSuchMethodException unused) {
+            Log.w(TAG, "Cordova v9.1.0 does not support API 23 runtime permissions so defaulting to GRANTED for " + str);
             return true;
         }
     }
 
-    private void requestPermission(CordovaPlugin plugin, int requestCode, String permission2) throws Exception {
+    private void requestPermission(CordovaPlugin cordovaPlugin, int i, String str) throws Exception {
         try {
-            this.cordova.getClass().getMethod("requestPermission", CordovaPlugin.class, Integer.TYPE, String.class).invoke(this.cordova, plugin, Integer.valueOf(requestCode), permission2);
-        } catch (NoSuchMethodException e) {
+            this.cordova.getClass().getMethod("requestPermission", CordovaPlugin.class, Integer.TYPE, String.class).invoke(this.cordova, cordovaPlugin, Integer.valueOf(i), str);
+        } catch (NoSuchMethodException unused) {
             throw new Exception("requestPermission() method not found in CordovaInterface implementation of Cordova v9.1.0");
         }
     }

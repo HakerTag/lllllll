@@ -23,19 +23,19 @@ public class SupportActivity extends Activity implements LifecycleOwner {
     }
 
     /* access modifiers changed from: protected */
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onCreate(Bundle bundle) {
+        super.onCreate(bundle);
         ReportFragment.injectIfNeededIn(this);
     }
 
     /* access modifiers changed from: protected */
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(Bundle bundle) {
         this.mLifecycleRegistry.markState(Lifecycle.State.CREATED);
-        super.onSaveInstanceState(outState);
+        super.onSaveInstanceState(bundle);
     }
 
-    public <T extends ExtraData> T getExtraData(Class<T> extraDataClass) {
-        return (T) this.mExtraDataMap.get(extraDataClass);
+    public <T extends ExtraData> T getExtraData(Class<T> cls) {
+        return (T) this.mExtraDataMap.get(cls);
     }
 
     @Override // android.arch.lifecycle.LifecycleOwner

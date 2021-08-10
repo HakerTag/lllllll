@@ -9,37 +9,36 @@ import com.google.zxing.common.DetectorResult;
 import com.google.zxing.qrcode.detector.Detector;
 import com.google.zxing.qrcode.detector.FinderPatternInfo;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public final class MultiDetector extends Detector {
     private static final DetectorResult[] EMPTY_DETECTOR_RESULTS = new DetectorResult[0];
 
-    public MultiDetector(BitMatrix image) {
-        super(image);
+    public MultiDetector(BitMatrix bitMatrix) {
+        super(bitMatrix);
     }
 
-    public DetectorResult[] detectMulti(Map<DecodeHintType, ?> hints) throws NotFoundException {
+    public DetectorResult[] detectMulti(Map<DecodeHintType, ?> map) throws NotFoundException {
         ResultPointCallback resultPointCallback;
         BitMatrix image = getImage();
-        if (hints == null) {
+        if (map == null) {
             resultPointCallback = null;
         } else {
-            resultPointCallback = (ResultPointCallback) hints.get(DecodeHintType.NEED_RESULT_POINT_CALLBACK);
+            resultPointCallback = (ResultPointCallback) map.get(DecodeHintType.NEED_RESULT_POINT_CALLBACK);
         }
-        FinderPatternInfo[] infos = new MultiFinderPatternFinder(image, resultPointCallback).findMulti(hints);
-        if (infos.length != 0) {
-            List<DetectorResult> result = new ArrayList<>();
-            for (FinderPatternInfo info : infos) {
+        FinderPatternInfo[] findMulti = new MultiFinderPatternFinder(image, resultPointCallback).findMulti(map);
+        if (findMulti.length != 0) {
+            ArrayList arrayList = new ArrayList();
+            for (FinderPatternInfo finderPatternInfo : findMulti) {
                 try {
-                    result.add(processFinderPatternInfo(info));
-                } catch (ReaderException e) {
+                    arrayList.add(processFinderPatternInfo(finderPatternInfo));
+                } catch (ReaderException unused) {
                 }
             }
-            if (result.isEmpty()) {
+            if (arrayList.isEmpty()) {
                 return EMPTY_DETECTOR_RESULTS;
             }
-            return (DetectorResult[]) result.toArray(new DetectorResult[result.size()]);
+            return (DetectorResult[]) arrayList.toArray(new DetectorResult[arrayList.size()]);
         }
         throw NotFoundException.getNotFoundInstance();
     }

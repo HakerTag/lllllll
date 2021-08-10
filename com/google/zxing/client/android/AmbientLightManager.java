@@ -16,6 +16,9 @@ final class AmbientLightManager implements SensorEventListener {
     private final Context context;
     private Sensor lightSensor;
 
+    public void onAccuracyChanged(Sensor sensor, int i) {
+    }
+
     AmbientLightManager(Context context2) {
         this.context = context2;
     }
@@ -43,18 +46,15 @@ final class AmbientLightManager implements SensorEventListener {
     }
 
     public void onSensorChanged(SensorEvent sensorEvent) {
-        float ambientLightLux = sensorEvent.values[0];
+        float f = sensorEvent.values[0];
         CameraManager cameraManager2 = this.cameraManager;
         if (cameraManager2 == null) {
             return;
         }
-        if (ambientLightLux <= TOO_DARK_LUX) {
+        if (f <= TOO_DARK_LUX) {
             cameraManager2.setTorch(true);
-        } else if (ambientLightLux >= BRIGHT_ENOUGH_LUX) {
+        } else if (f >= BRIGHT_ENOUGH_LUX) {
             cameraManager2.setTorch(false);
         }
-    }
-
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 }

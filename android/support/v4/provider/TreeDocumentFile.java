@@ -12,34 +12,34 @@ class TreeDocumentFile extends DocumentFile {
     private Context mContext;
     private Uri mUri;
 
-    TreeDocumentFile(DocumentFile parent, Context context, Uri uri) {
-        super(parent);
+    TreeDocumentFile(DocumentFile documentFile, Context context, Uri uri) {
+        super(documentFile);
         this.mContext = context;
         this.mUri = uri;
     }
 
     @Override // android.support.v4.provider.DocumentFile
-    public DocumentFile createFile(String mimeType, String displayName) {
-        Uri result = createFile(this.mContext, this.mUri, mimeType, displayName);
-        if (result != null) {
-            return new TreeDocumentFile(this, this.mContext, result);
+    public DocumentFile createFile(String str, String str2) {
+        Uri createFile = createFile(this.mContext, this.mUri, str, str2);
+        if (createFile != null) {
+            return new TreeDocumentFile(this, this.mContext, createFile);
         }
         return null;
     }
 
-    private static Uri createFile(Context context, Uri self, String mimeType, String displayName) {
+    private static Uri createFile(Context context, Uri uri, String str, String str2) {
         try {
-            return DocumentsContract.createDocument(context.getContentResolver(), self, mimeType, displayName);
-        } catch (Exception e) {
+            return DocumentsContract.createDocument(context.getContentResolver(), uri, str, str2);
+        } catch (Exception unused) {
             return null;
         }
     }
 
     @Override // android.support.v4.provider.DocumentFile
-    public DocumentFile createDirectory(String displayName) {
-        Uri result = createFile(this.mContext, this.mUri, "vnd.android.document/directory", displayName);
-        if (result != null) {
-            return new TreeDocumentFile(this, this.mContext, result);
+    public DocumentFile createDirectory(String str) {
+        Uri createFile = createFile(this.mContext, this.mUri, "vnd.android.document/directory", str);
+        if (createFile != null) {
+            return new TreeDocumentFile(this, this.mContext, createFile);
         }
         return null;
     }
@@ -98,7 +98,7 @@ class TreeDocumentFile extends DocumentFile {
     public boolean delete() {
         try {
             return DocumentsContract.deleteDocument(this.mContext.getContentResolver(), this.mUri);
-        } catch (Exception e) {
+        } catch (Exception unused) {
             return false;
         }
     }
@@ -110,15 +110,15 @@ class TreeDocumentFile extends DocumentFile {
 
     @Override // android.support.v4.provider.DocumentFile
     public DocumentFile[] listFiles() {
-        ContentResolver resolver = this.mContext.getContentResolver();
+        ContentResolver contentResolver = this.mContext.getContentResolver();
         Uri uri = this.mUri;
-        Uri childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(uri, DocumentsContract.getDocumentId(uri));
-        ArrayList<Uri> results = new ArrayList<>();
-        Cursor c = null;
+        Uri buildChildDocumentsUriUsingTree = DocumentsContract.buildChildDocumentsUriUsingTree(uri, DocumentsContract.getDocumentId(uri));
+        ArrayList arrayList = new ArrayList();
+        Cursor cursor = null;
         try {
-            c = resolver.query(childrenUri, new String[]{"document_id"}, null, null, null);
-            while (c.moveToNext()) {
-                results.add(DocumentsContract.buildDocumentUriUsingTree(this.mUri, c.getString(0)));
+            cursor = contentResolver.query(buildChildDocumentsUriUsingTree, new String[]{"document_id"}, null, null, null);
+            while (cursor.moveToNext()) {
+                arrayList.add(DocumentsContract.buildDocumentUriUsingTree(this.mUri, cursor.getString(0)));
             }
         } catch (Exception e) {
             Log.w("DocumentFile", "Failed query: " + e);
@@ -126,37 +126,36 @@ class TreeDocumentFile extends DocumentFile {
             closeQuietly(null);
             throw th;
         }
-        closeQuietly(c);
-        Uri[] result = (Uri[]) results.toArray(new Uri[results.size()]);
-        DocumentFile[] resultFiles = new DocumentFile[result.length];
-        for (int i = 0; i < result.length; i++) {
-            resultFiles[i] = new TreeDocumentFile(this, this.mContext, result[i]);
+        closeQuietly(cursor);
+        Uri[] uriArr = (Uri[]) arrayList.toArray(new Uri[arrayList.size()]);
+        DocumentFile[] documentFileArr = new DocumentFile[uriArr.length];
+        for (int i = 0; i < uriArr.length; i++) {
+            documentFileArr[i] = new TreeDocumentFile(this, this.mContext, uriArr[i]);
         }
-        return resultFiles;
+        return documentFileArr;
     }
 
-    private static void closeQuietly(AutoCloseable closeable) {
-        if (closeable != null) {
+    private static void closeQuietly(AutoCloseable autoCloseable) {
+        if (autoCloseable != null) {
             try {
-                closeable.close();
-            } catch (RuntimeException rethrown) {
-                throw rethrown;
-            } catch (Exception e) {
+                autoCloseable.close();
+            } catch (RuntimeException e) {
+                throw e;
+            } catch (Exception unused) {
             }
         }
     }
 
     @Override // android.support.v4.provider.DocumentFile
-    public boolean renameTo(String displayName) {
+    public boolean renameTo(String str) {
         try {
-            Uri result = DocumentsContract.renameDocument(this.mContext.getContentResolver(), this.mUri, displayName);
-            if (result == null) {
-                return false;
+            Uri renameDocument = DocumentsContract.renameDocument(this.mContext.getContentResolver(), this.mUri, str);
+            if (renameDocument != null) {
+                this.mUri = renameDocument;
+                return true;
             }
-            this.mUri = result;
-            return true;
-        } catch (Exception e) {
-            return false;
+        } catch (Exception unused) {
         }
+        return false;
     }
 }

@@ -12,13 +12,13 @@ class AudioAttributesCompatApi21 {
     AudioAttributesCompatApi21() {
     }
 
-    public static int toLegacyStreamType(Wrapper aaWrap) {
-        AudioAttributes aaObject = aaWrap.unwrap();
+    public static int toLegacyStreamType(Wrapper wrapper) {
+        AudioAttributes unwrap = wrapper.unwrap();
         try {
             if (sAudioAttributesToLegacyStreamType == null) {
                 sAudioAttributesToLegacyStreamType = AudioAttributes.class.getMethod("toLegacyStreamType", AudioAttributes.class);
             }
-            return ((Integer) sAudioAttributesToLegacyStreamType.invoke(null, aaObject)).intValue();
+            return ((Integer) sAudioAttributesToLegacyStreamType.invoke(null, unwrap)).intValue();
         } catch (ClassCastException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             Log.w(TAG, "getLegacyStreamType() failed on API21+", e);
             return -1;
@@ -29,13 +29,13 @@ class AudioAttributesCompatApi21 {
     public static final class Wrapper {
         private AudioAttributes mWrapped;
 
-        private Wrapper(AudioAttributes obj) {
-            this.mWrapped = obj;
+        private Wrapper(AudioAttributes audioAttributes) {
+            this.mWrapped = audioAttributes;
         }
 
-        public static Wrapper wrap(AudioAttributes obj) {
-            if (obj != null) {
-                return new Wrapper(obj);
+        public static Wrapper wrap(AudioAttributes audioAttributes) {
+            if (audioAttributes != null) {
+                return new Wrapper(audioAttributes);
             }
             throw new IllegalArgumentException("AudioAttributesApi21.Wrapper cannot wrap null");
         }

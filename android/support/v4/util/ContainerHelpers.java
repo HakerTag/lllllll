@@ -6,61 +6,62 @@ public class ContainerHelpers {
     static final long[] EMPTY_LONGS = new long[0];
     static final Object[] EMPTY_OBJECTS = new Object[0];
 
+    public static int idealByteArraySize(int i) {
+        for (int i2 = 4; i2 < 32; i2++) {
+            int i3 = (1 << i2) - 12;
+            if (i <= i3) {
+                return i3;
+            }
+        }
+        return i;
+    }
+
     ContainerHelpers() {
     }
 
-    public static int idealIntArraySize(int need) {
-        return idealByteArraySize(need * 4) / 4;
+    public static int idealIntArraySize(int i) {
+        return idealByteArraySize(i * 4) / 4;
     }
 
-    public static int idealLongArraySize(int need) {
-        return idealByteArraySize(need * 8) / 8;
+    public static int idealLongArraySize(int i) {
+        return idealByteArraySize(i * 8) / 8;
     }
 
-    public static int idealByteArraySize(int need) {
-        for (int i = 4; i < 32; i++) {
-            if (need <= (1 << i) - 12) {
-                return (1 << i) - 12;
-            }
-        }
-        return need;
+    public static boolean equal(Object obj, Object obj2) {
+        return obj == obj2 || (obj != null && obj.equals(obj2));
     }
 
-    public static boolean equal(Object a, Object b) {
-        return a == b || (a != null && a.equals(b));
-    }
-
-    static int binarySearch(int[] array, int size, int value) {
-        int lo = 0;
-        int hi = size - 1;
-        while (lo <= hi) {
-            int mid = (lo + hi) >>> 1;
-            int midVal = array[mid];
-            if (midVal < value) {
-                lo = mid + 1;
-            } else if (midVal <= value) {
-                return mid;
+    static int binarySearch(int[] iArr, int i, int i2) {
+        int i3 = i - 1;
+        int i4 = 0;
+        while (i4 <= i3) {
+            int i5 = (i4 + i3) >>> 1;
+            int i6 = iArr[i5];
+            if (i6 < i2) {
+                i4 = i5 + 1;
+            } else if (i6 <= i2) {
+                return i5;
             } else {
-                hi = mid - 1;
+                i3 = i5 - 1;
             }
         }
-        return ~lo;
+        return ~i4;
     }
 
-    static int binarySearch(long[] array, int size, long value) {
-        int lo = 0;
-        int hi = size - 1;
-        while (lo <= hi) {
-            int mid = (lo + hi) >>> 1;
-            long midVal = array[mid];
-            if (midVal < value) {
-                lo = mid + 1;
-            } else if (midVal <= value) {
-                return mid;
+    static int binarySearch(long[] jArr, int i, long j) {
+        int i2 = i - 1;
+        int i3 = 0;
+        while (i3 <= i2) {
+            int i4 = (i3 + i2) >>> 1;
+            int i5 = (jArr[i4] > j ? 1 : (jArr[i4] == j ? 0 : -1));
+            if (i5 < 0) {
+                i3 = i4 + 1;
+            } else if (i5 <= 0) {
+                return i4;
             } else {
-                hi = mid - 1;
+                i2 = i4 - 1;
             }
         }
-        return ~lo;
+        return ~i3;
     }
 }

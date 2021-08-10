@@ -15,48 +15,48 @@ public final class ViewConfigurationCompat {
         if (Build.VERSION.SDK_INT == 25) {
             try {
                 sGetScaledScrollFactorMethod = ViewConfiguration.class.getDeclaredMethod("getScaledScrollFactor", new Class[0]);
-            } catch (Exception e) {
+            } catch (Exception unused) {
                 Log.i(TAG, "Could not find method getScaledScrollFactor() on ViewConfiguration");
             }
         }
     }
 
     @Deprecated
-    public static int getScaledPagingTouchSlop(ViewConfiguration config) {
-        return config.getScaledPagingTouchSlop();
+    public static int getScaledPagingTouchSlop(ViewConfiguration viewConfiguration) {
+        return viewConfiguration.getScaledPagingTouchSlop();
     }
 
     @Deprecated
-    public static boolean hasPermanentMenuKey(ViewConfiguration config) {
-        return config.hasPermanentMenuKey();
+    public static boolean hasPermanentMenuKey(ViewConfiguration viewConfiguration) {
+        return viewConfiguration.hasPermanentMenuKey();
     }
 
-    public static float getScaledHorizontalScrollFactor(ViewConfiguration config, Context context) {
+    public static float getScaledHorizontalScrollFactor(ViewConfiguration viewConfiguration, Context context) {
         if (Build.VERSION.SDK_INT >= 26) {
-            return config.getScaledHorizontalScrollFactor();
+            return viewConfiguration.getScaledHorizontalScrollFactor();
         }
-        return getLegacyScrollFactor(config, context);
+        return getLegacyScrollFactor(viewConfiguration, context);
     }
 
-    public static float getScaledVerticalScrollFactor(ViewConfiguration config, Context context) {
+    public static float getScaledVerticalScrollFactor(ViewConfiguration viewConfiguration, Context context) {
         if (Build.VERSION.SDK_INT >= 26) {
-            return config.getScaledVerticalScrollFactor();
+            return viewConfiguration.getScaledVerticalScrollFactor();
         }
-        return getLegacyScrollFactor(config, context);
+        return getLegacyScrollFactor(viewConfiguration, context);
     }
 
-    private static float getLegacyScrollFactor(ViewConfiguration config, Context context) {
+    private static float getLegacyScrollFactor(ViewConfiguration viewConfiguration, Context context) {
         Method method;
         if (Build.VERSION.SDK_INT >= 25 && (method = sGetScaledScrollFactorMethod) != null) {
             try {
-                return (float) ((Integer) method.invoke(config, new Object[0])).intValue();
-            } catch (Exception e) {
+                return (float) ((Integer) method.invoke(viewConfiguration, new Object[0])).intValue();
+            } catch (Exception unused) {
                 Log.i(TAG, "Could not find method getScaledScrollFactor() on ViewConfiguration");
             }
         }
-        TypedValue outValue = new TypedValue();
-        if (context.getTheme().resolveAttribute(16842829, outValue, true)) {
-            return outValue.getDimension(context.getResources().getDisplayMetrics());
+        TypedValue typedValue = new TypedValue();
+        if (context.getTheme().resolveAttribute(16842829, typedValue, true)) {
+            return typedValue.getDimension(context.getResources().getDisplayMetrics());
         }
         return 0.0f;
     }

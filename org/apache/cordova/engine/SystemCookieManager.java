@@ -9,25 +9,25 @@ public class SystemCookieManager implements ICordovaCookieManager {
     private final CookieManager cookieManager = CookieManager.getInstance();
     protected final WebView webView;
 
-    public SystemCookieManager(WebView webview) {
-        this.webView = webview;
+    public SystemCookieManager(WebView webView2) {
+        this.webView = webView2;
         CookieManager.setAcceptFileSchemeCookies(true);
         this.cookieManager.setAcceptThirdPartyCookies(this.webView, true);
     }
 
     @Override // org.apache.cordova.ICordovaCookieManager
-    public void setCookiesEnabled(boolean accept) {
-        this.cookieManager.setAcceptCookie(accept);
+    public void setCookiesEnabled(boolean z) {
+        this.cookieManager.setAcceptCookie(z);
     }
 
     @Override // org.apache.cordova.ICordovaCookieManager
-    public void setCookie(String url, String value) {
-        this.cookieManager.setCookie(url, value);
+    public void setCookie(String str, String str2) {
+        this.cookieManager.setCookie(str, str2);
     }
 
     @Override // org.apache.cordova.ICordovaCookieManager
-    public String getCookie(String url) {
-        return this.cookieManager.getCookie(url);
+    public String getCookie(String str) {
+        return this.cookieManager.getCookie(str);
     }
 
     @Override // org.apache.cordova.ICordovaCookieManager

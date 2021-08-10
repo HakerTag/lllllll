@@ -8,13 +8,13 @@ public class ParcelableVolumeInfo implements Parcelable {
         /* class android.support.v4.media.session.ParcelableVolumeInfo.AnonymousClass1 */
 
         @Override // android.os.Parcelable.Creator
-        public ParcelableVolumeInfo createFromParcel(Parcel in) {
-            return new ParcelableVolumeInfo(in);
+        public ParcelableVolumeInfo createFromParcel(Parcel parcel) {
+            return new ParcelableVolumeInfo(parcel);
         }
 
         @Override // android.os.Parcelable.Creator
-        public ParcelableVolumeInfo[] newArray(int size) {
-            return new ParcelableVolumeInfo[size];
+        public ParcelableVolumeInfo[] newArray(int i) {
+            return new ParcelableVolumeInfo[i];
         }
     };
     public int audioStream;
@@ -23,31 +23,31 @@ public class ParcelableVolumeInfo implements Parcelable {
     public int maxVolume;
     public int volumeType;
 
-    public ParcelableVolumeInfo(int volumeType2, int audioStream2, int controlType2, int maxVolume2, int currentVolume2) {
-        this.volumeType = volumeType2;
-        this.audioStream = audioStream2;
-        this.controlType = controlType2;
-        this.maxVolume = maxVolume2;
-        this.currentVolume = currentVolume2;
-    }
-
-    public ParcelableVolumeInfo(Parcel from) {
-        this.volumeType = from.readInt();
-        this.controlType = from.readInt();
-        this.maxVolume = from.readInt();
-        this.currentVolume = from.readInt();
-        this.audioStream = from.readInt();
-    }
-
     public int describeContents() {
         return 0;
     }
 
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(this.volumeType);
-        dest.writeInt(this.controlType);
-        dest.writeInt(this.maxVolume);
-        dest.writeInt(this.currentVolume);
-        dest.writeInt(this.audioStream);
+    public ParcelableVolumeInfo(int i, int i2, int i3, int i4, int i5) {
+        this.volumeType = i;
+        this.audioStream = i2;
+        this.controlType = i3;
+        this.maxVolume = i4;
+        this.currentVolume = i5;
+    }
+
+    public ParcelableVolumeInfo(Parcel parcel) {
+        this.volumeType = parcel.readInt();
+        this.controlType = parcel.readInt();
+        this.maxVolume = parcel.readInt();
+        this.currentVolume = parcel.readInt();
+        this.audioStream = parcel.readInt();
+    }
+
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(this.volumeType);
+        parcel.writeInt(this.controlType);
+        parcel.writeInt(this.maxVolume);
+        parcel.writeInt(this.currentVolume);
+        parcel.writeInt(this.audioStream);
     }
 }

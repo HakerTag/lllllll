@@ -4,7 +4,7 @@ import android.view.View;
 
 public class ViewPropertyAnimatorListenerAdapter implements ViewPropertyAnimatorListener {
     @Override // android.support.v4.view.ViewPropertyAnimatorListener
-    public void onAnimationStart(View view) {
+    public void onAnimationCancel(View view) {
     }
 
     @Override // android.support.v4.view.ViewPropertyAnimatorListener
@@ -12,6 +12,6 @@ public class ViewPropertyAnimatorListenerAdapter implements ViewPropertyAnimator
     }
 
     @Override // android.support.v4.view.ViewPropertyAnimatorListener
-    public void onAnimationCancel(View view) {
+    public void onAnimationStart(View view) {
     }
 }

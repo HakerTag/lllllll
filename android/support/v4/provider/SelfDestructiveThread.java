@@ -16,15 +16,15 @@ public class SelfDestructiveThread {
     private Handler.Callback mCallback = new Handler.Callback() {
         /* class android.support.v4.provider.SelfDestructiveThread.AnonymousClass1 */
 
-        public boolean handleMessage(Message msg) {
-            int i = msg.what;
+        public boolean handleMessage(Message message) {
+            int i = message.what;
             if (i == 0) {
                 SelfDestructiveThread.this.onDestruction();
                 return true;
             } else if (i != 1) {
                 return true;
             } else {
-                SelfDestructiveThread.this.onInvokeRunnable((Runnable) msg.obj);
+                SelfDestructiveThread.this.onInvokeRunnable((Runnable) message.obj);
                 return true;
             }
         }
@@ -41,10 +41,10 @@ public class SelfDestructiveThread {
         void onReply(T t);
     }
 
-    public SelfDestructiveThread(String threadName, int priority, int destructAfterMillisec) {
-        this.mThreadName = threadName;
-        this.mPriority = priority;
-        this.mDestructAfterMillisec = destructAfterMillisec;
+    public SelfDestructiveThread(String str, int i, int i2) {
+        this.mThreadName = str;
+        this.mPriority = i;
+        this.mDestructAfterMillisec = i2;
         this.mGeneration = 0;
     }
 
@@ -78,8 +78,8 @@ public class SelfDestructiveThread {
         }
     }
 
-    public <T> void postAndReply(final Callable<T> callable, final ReplyCallback<T> reply) {
-        final Handler callingHandler = new Handler();
+    public <T> void postAndReply(final Callable<T> callable, final ReplyCallback<T> replyCallback) {
+        final Handler handler = new Handler();
         post(new Runnable() {
             /* class android.support.v4.provider.SelfDestructiveThread.AnonymousClass2 */
 
@@ -87,62 +87,62 @@ public class SelfDestructiveThread {
                 final Object obj;
                 try {
                     obj = callable.call();
-                } catch (Exception e) {
+                } catch (Exception unused) {
                     obj = null;
                 }
-                callingHandler.post(new Runnable() {
+                handler.post(new Runnable() {
                     /* class android.support.v4.provider.SelfDestructiveThread.AnonymousClass2.AnonymousClass1 */
 
                     public void run() {
-                        reply.onReply(obj);
+                        replyCallback.onReply(obj);
                     }
                 });
             }
         });
     }
 
-    public <T> T postAndWait(final Callable<T> callable, int timeoutMillis) throws InterruptedException {
-        final ReentrantLock lock = new ReentrantLock();
-        final Condition cond = lock.newCondition();
-        final AtomicReference<T> holder = new AtomicReference<>();
-        final AtomicBoolean running = new AtomicBoolean(true);
+    public <T> T postAndWait(final Callable<T> callable, int i) throws InterruptedException {
+        final ReentrantLock reentrantLock = new ReentrantLock();
+        final Condition newCondition = reentrantLock.newCondition();
+        final AtomicReference atomicReference = new AtomicReference();
+        final AtomicBoolean atomicBoolean = new AtomicBoolean(true);
         post(new Runnable() {
             /* class android.support.v4.provider.SelfDestructiveThread.AnonymousClass3 */
 
             public void run() {
                 try {
-                    holder.set(callable.call());
-                } catch (Exception e) {
+                    atomicReference.set(callable.call());
+                } catch (Exception unused) {
                 }
-                lock.lock();
+                reentrantLock.lock();
                 try {
-                    running.set(false);
-                    cond.signal();
+                    atomicBoolean.set(false);
+                    newCondition.signal();
                 } finally {
-                    lock.unlock();
+                    reentrantLock.unlock();
                 }
             }
         });
-        lock.lock();
+        reentrantLock.lock();
         try {
-            if (!running.get()) {
-                return holder.get();
+            if (!atomicBoolean.get()) {
+                return (T) atomicReference.get();
             }
-            long remaining = TimeUnit.MILLISECONDS.toNanos((long) timeoutMillis);
+            long nanos = TimeUnit.MILLISECONDS.toNanos((long) i);
             do {
                 try {
-                    remaining = cond.awaitNanos(remaining);
-                } catch (InterruptedException e) {
+                    nanos = newCondition.awaitNanos(nanos);
+                } catch (InterruptedException unused) {
                 }
-                if (!running.get()) {
-                    T t = holder.get();
-                    lock.unlock();
+                if (!atomicBoolean.get()) {
+                    T t = (T) atomicReference.get();
+                    reentrantLock.unlock();
                     return t;
                 }
-            } while (remaining > 0);
+            } while (nanos > 0);
             throw new InterruptedException("timeout");
         } finally {
-            lock.unlock();
+            reentrantLock.unlock();
         }
     }
 

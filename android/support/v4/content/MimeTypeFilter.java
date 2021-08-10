@@ -6,65 +6,68 @@ public final class MimeTypeFilter {
     private MimeTypeFilter() {
     }
 
-    private static boolean mimeTypeAgainstFilter(String[] mimeTypeParts, String[] filterParts) {
-        if (filterParts.length != 2) {
+    private static boolean mimeTypeAgainstFilter(String[] strArr, String[] strArr2) {
+        if (strArr2.length != 2) {
             throw new IllegalArgumentException("Ill-formatted MIME type filter. Must be type/subtype.");
-        } else if (filterParts[0].isEmpty() || filterParts[1].isEmpty()) {
+        } else if (strArr2[0].isEmpty() || strArr2[1].isEmpty()) {
             throw new IllegalArgumentException("Ill-formatted MIME type filter. Type or subtype empty.");
-        } else if (mimeTypeParts.length != 2) {
+        } else if (strArr.length != 2) {
             return false;
         } else {
-            if ("*".equals(filterParts[0]) || filterParts[0].equals(mimeTypeParts[0])) {
-                return "*".equals(filterParts[1]) || filterParts[1].equals(mimeTypeParts[1]);
+            if (!"*".equals(strArr2[0]) && !strArr2[0].equals(strArr[0])) {
+                return false;
+            }
+            if ("*".equals(strArr2[1]) || strArr2[1].equals(strArr[1])) {
+                return true;
             }
             return false;
         }
     }
 
-    public static boolean matches(String mimeType, String filter) {
-        if (mimeType == null) {
+    public static boolean matches(String str, String str2) {
+        if (str == null) {
             return false;
         }
-        return mimeTypeAgainstFilter(mimeType.split("/"), filter.split("/"));
+        return mimeTypeAgainstFilter(str.split("/"), str2.split("/"));
     }
 
-    public static String matches(String mimeType, String[] filters) {
-        if (mimeType == null) {
+    public static String matches(String str, String[] strArr) {
+        if (str == null) {
             return null;
         }
-        String[] mimeTypeParts = mimeType.split("/");
-        for (String filter : filters) {
-            if (mimeTypeAgainstFilter(mimeTypeParts, filter.split("/"))) {
-                return filter;
+        String[] split = str.split("/");
+        for (String str2 : strArr) {
+            if (mimeTypeAgainstFilter(split, str2.split("/"))) {
+                return str2;
             }
         }
         return null;
     }
 
-    public static String matches(String[] mimeTypes, String filter) {
-        if (mimeTypes == null) {
+    public static String matches(String[] strArr, String str) {
+        if (strArr == null) {
             return null;
         }
-        String[] filterParts = filter.split("/");
-        for (String mimeType : mimeTypes) {
-            if (mimeTypeAgainstFilter(mimeType.split("/"), filterParts)) {
-                return mimeType;
+        String[] split = str.split("/");
+        for (String str2 : strArr) {
+            if (mimeTypeAgainstFilter(str2.split("/"), split)) {
+                return str2;
             }
         }
         return null;
     }
 
-    public static String[] matchesMany(String[] mimeTypes, String filter) {
-        if (mimeTypes == null) {
+    public static String[] matchesMany(String[] strArr, String str) {
+        if (strArr == null) {
             return new String[0];
         }
-        ArrayList<String> list = new ArrayList<>();
-        String[] filterParts = filter.split("/");
-        for (String mimeType : mimeTypes) {
-            if (mimeTypeAgainstFilter(mimeType.split("/"), filterParts)) {
-                list.add(mimeType);
+        ArrayList arrayList = new ArrayList();
+        String[] split = str.split("/");
+        for (String str2 : strArr) {
+            if (mimeTypeAgainstFilter(str2.split("/"), split)) {
+                arrayList.add(str2);
             }
         }
-        return (String[]) list.toArray(new String[list.size()]);
+        return (String[]) arrayList.toArray(new String[arrayList.size()]);
     }
 }

@@ -1,5 +1,6 @@
 package android.support.v4.provider;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
@@ -14,88 +15,86 @@ class DocumentsContractApi19 {
     DocumentsContractApi19() {
     }
 
-    public static boolean isDocumentUri(Context context, Uri self) {
-        return DocumentsContract.isDocumentUri(context, self);
+    public static boolean isDocumentUri(Context context, Uri uri) {
+        return DocumentsContract.isDocumentUri(context, uri);
     }
 
-    public static boolean isVirtual(Context context, Uri self) {
-        if (isDocumentUri(context, self) && (getFlags(context, self) & 512) != 0) {
+    public static boolean isVirtual(Context context, Uri uri) {
+        if (isDocumentUri(context, uri) && (getFlags(context, uri) & 512) != 0) {
             return true;
         }
         return false;
     }
 
-    public static String getName(Context context, Uri self) {
-        return queryForString(context, self, "_display_name", null);
+    public static String getName(Context context, Uri uri) {
+        return queryForString(context, uri, "_display_name", null);
     }
 
-    private static String getRawType(Context context, Uri self) {
-        return queryForString(context, self, "mime_type", null);
+    private static String getRawType(Context context, Uri uri) {
+        return queryForString(context, uri, "mime_type", null);
     }
 
-    public static String getType(Context context, Uri self) {
-        String rawType = getRawType(context, self);
+    public static String getType(Context context, Uri uri) {
+        String rawType = getRawType(context, uri);
         if ("vnd.android.document/directory".equals(rawType)) {
             return null;
         }
         return rawType;
     }
 
-    public static long getFlags(Context context, Uri self) {
-        return queryForLong(context, self, "flags", 0);
+    public static long getFlags(Context context, Uri uri) {
+        return queryForLong(context, uri, "flags", 0);
     }
 
-    public static boolean isDirectory(Context context, Uri self) {
-        return "vnd.android.document/directory".equals(getRawType(context, self));
+    public static boolean isDirectory(Context context, Uri uri) {
+        return "vnd.android.document/directory".equals(getRawType(context, uri));
     }
 
-    public static boolean isFile(Context context, Uri self) {
-        String type = getRawType(context, self);
-        if ("vnd.android.document/directory".equals(type) || TextUtils.isEmpty(type)) {
+    public static boolean isFile(Context context, Uri uri) {
+        String rawType = getRawType(context, uri);
+        return !"vnd.android.document/directory".equals(rawType) && !TextUtils.isEmpty(rawType);
+    }
+
+    public static long lastModified(Context context, Uri uri) {
+        return queryForLong(context, uri, "last_modified", 0);
+    }
+
+    public static long length(Context context, Uri uri) {
+        return queryForLong(context, uri, "_size", 0);
+    }
+
+    public static boolean canRead(Context context, Uri uri) {
+        return context.checkCallingOrSelfUriPermission(uri, 1) == 0 && !TextUtils.isEmpty(getRawType(context, uri));
+    }
+
+    public static boolean canWrite(Context context, Uri uri) {
+        if (context.checkCallingOrSelfUriPermission(uri, 2) != 0) {
+            return false;
+        }
+        String rawType = getRawType(context, uri);
+        int queryForInt = queryForInt(context, uri, "flags", 0);
+        if (TextUtils.isEmpty(rawType)) {
+            return false;
+        }
+        if ((queryForInt & 4) != 0) {
+            return true;
+        }
+        if ("vnd.android.document/directory".equals(rawType) && (queryForInt & 8) != 0) {
+            return true;
+        }
+        if (TextUtils.isEmpty(rawType) || (queryForInt & 2) == 0) {
             return false;
         }
         return true;
     }
 
-    public static long lastModified(Context context, Uri self) {
-        return queryForLong(context, self, "last_modified", 0);
-    }
-
-    public static long length(Context context, Uri self) {
-        return queryForLong(context, self, "_size", 0);
-    }
-
-    public static boolean canRead(Context context, Uri self) {
-        return context.checkCallingOrSelfUriPermission(self, 1) == 0 && !TextUtils.isEmpty(getRawType(context, self));
-    }
-
-    public static boolean canWrite(Context context, Uri self) {
-        if (context.checkCallingOrSelfUriPermission(self, 2) != 0) {
-            return false;
-        }
-        String type = getRawType(context, self);
-        int flags = queryForInt(context, self, "flags", 0);
-        if (TextUtils.isEmpty(type)) {
-            return false;
-        }
-        if ((flags & 4) != 0) {
-            return true;
-        }
-        if ("vnd.android.document/directory".equals(type) && (flags & 8) != 0) {
-            return true;
-        }
-        if (TextUtils.isEmpty(type) || (flags & 2) == 0) {
-            return false;
-        }
-        return true;
-    }
-
-    public static boolean exists(Context context, Uri self) {
-        Cursor c = null;
+    public static boolean exists(Context context, Uri uri) {
+        ContentResolver contentResolver = context.getContentResolver();
         boolean z = false;
+        Cursor cursor = null;
         try {
-            c = context.getContentResolver().query(self, new String[]{"document_id"}, null, null, null);
-            if (c.getCount() > 0) {
+            cursor = contentResolver.query(uri, new String[]{"document_id"}, null, null, null);
+            if (cursor.getCount() > 0) {
                 z = true;
             }
             return z;
@@ -103,55 +102,55 @@ class DocumentsContractApi19 {
             Log.w(TAG, "Failed query: " + e);
             return false;
         } finally {
-            closeQuietly(c);
+            closeQuietly(cursor);
         }
     }
 
-    private static String queryForString(Context context, Uri self, String column, String defaultValue) {
-        Cursor c = null;
+    private static String queryForString(Context context, Uri uri, String str, String str2) {
+        AutoCloseable autoCloseable = null;
         try {
-            c = context.getContentResolver().query(self, new String[]{column}, null, null, null);
-            if (c.moveToFirst() && !c.isNull(0)) {
-                return c.getString(0);
+            autoCloseable = context.getContentResolver().query(uri, new String[]{str}, null, null, null);
+            if (autoCloseable.moveToFirst() && !autoCloseable.isNull(0)) {
+                return autoCloseable.getString(0);
             }
-            closeQuietly(c);
-            return defaultValue;
+            closeQuietly(autoCloseable);
+            return str2;
         } catch (Exception e) {
             Log.w(TAG, "Failed query: " + e);
-            return defaultValue;
+            return str2;
         } finally {
-            closeQuietly(c);
+            closeQuietly(autoCloseable);
         }
     }
 
-    private static int queryForInt(Context context, Uri self, String column, int defaultValue) {
-        return (int) queryForLong(context, self, column, (long) defaultValue);
+    private static int queryForInt(Context context, Uri uri, String str, int i) {
+        return (int) queryForLong(context, uri, str, (long) i);
     }
 
-    private static long queryForLong(Context context, Uri self, String column, long defaultValue) {
-        Cursor c = null;
+    private static long queryForLong(Context context, Uri uri, String str, long j) {
+        AutoCloseable autoCloseable = null;
         try {
-            c = context.getContentResolver().query(self, new String[]{column}, null, null, null);
-            if (c.moveToFirst() && !c.isNull(0)) {
-                return c.getLong(0);
+            autoCloseable = context.getContentResolver().query(uri, new String[]{str}, null, null, null);
+            if (autoCloseable.moveToFirst() && !autoCloseable.isNull(0)) {
+                return autoCloseable.getLong(0);
             }
-            closeQuietly(c);
-            return defaultValue;
+            closeQuietly(autoCloseable);
+            return j;
         } catch (Exception e) {
             Log.w(TAG, "Failed query: " + e);
-            return defaultValue;
+            return j;
         } finally {
-            closeQuietly(c);
+            closeQuietly(autoCloseable);
         }
     }
 
-    private static void closeQuietly(AutoCloseable closeable) {
-        if (closeable != null) {
+    private static void closeQuietly(AutoCloseable autoCloseable) {
+        if (autoCloseable != null) {
             try {
-                closeable.close();
-            } catch (RuntimeException rethrown) {
-                throw rethrown;
-            } catch (Exception e) {
+                autoCloseable.close();
+            } catch (RuntimeException e) {
+                throw e;
+            } catch (Exception unused) {
             }
         }
     }

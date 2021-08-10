@@ -1,64 +1,66 @@
 package com.google.zxing.client.result;
 
+import kotlin.text.Typography;
+
 public final class SMSParsedResult extends ParsedResult {
     private final String body;
     private final String[] numbers;
     private final String subject;
     private final String[] vias;
 
-    public SMSParsedResult(String number, String via, String subject2, String body2) {
+    public SMSParsedResult(String str, String str2, String str3, String str4) {
         super(ParsedResultType.SMS);
-        this.numbers = new String[]{number};
-        this.vias = new String[]{via};
-        this.subject = subject2;
-        this.body = body2;
+        this.numbers = new String[]{str};
+        this.vias = new String[]{str2};
+        this.subject = str3;
+        this.body = str4;
     }
 
-    public SMSParsedResult(String[] numbers2, String[] vias2, String subject2, String body2) {
+    public SMSParsedResult(String[] strArr, String[] strArr2, String str, String str2) {
         super(ParsedResultType.SMS);
-        this.numbers = numbers2;
-        this.vias = vias2;
-        this.subject = subject2;
-        this.body = body2;
+        this.numbers = strArr;
+        this.vias = strArr2;
+        this.subject = str;
+        this.body = str2;
     }
 
     public String getSMSURI() {
-        StringBuilder result = new StringBuilder();
-        result.append("sms:");
-        boolean first = true;
+        StringBuilder sb = new StringBuilder();
+        sb.append("sms:");
+        boolean z = false;
+        boolean z2 = true;
         for (int i = 0; i < this.numbers.length; i++) {
-            if (first) {
-                first = false;
+            if (z2) {
+                z2 = false;
             } else {
-                result.append(',');
+                sb.append(',');
             }
-            result.append(this.numbers[i]);
+            sb.append(this.numbers[i]);
             String[] strArr = this.vias;
             if (!(strArr == null || strArr[i] == null)) {
-                result.append(";via=");
-                result.append(this.vias[i]);
+                sb.append(";via=");
+                sb.append(this.vias[i]);
             }
         }
-        boolean hasSubject = false;
-        boolean hasBody = this.body != null;
+        boolean z3 = this.body != null;
         if (this.subject != null) {
-            hasSubject = true;
+            z = true;
         }
-        if (hasBody || hasSubject) {
-            result.append('?');
-            if (hasBody) {
-                result.append("body=");
-                result.append(this.body);
+        if (z3 || z) {
+            sb.append('?');
+            if (z3) {
+                sb.append("body=");
+                sb.append(this.body);
             }
-            if (hasSubject) {
-                if (hasBody) {
-                    result.append('&');
+            if (z) {
+                if (z3) {
+                    sb.append(Typography.amp);
                 }
-                result.append("subject=");
-                result.append(this.subject);
+                sb.append("subject=");
+                sb.append(this.subject);
             }
         }
-        return result.toString();
+        return sb.toString();
     }
 
     public String[] getNumbers() {
@@ -79,10 +81,10 @@ public final class SMSParsedResult extends ParsedResult {
 
     @Override // com.google.zxing.client.result.ParsedResult
     public String getDisplayResult() {
-        StringBuilder result = new StringBuilder(100);
-        maybeAppend(this.numbers, result);
-        maybeAppend(this.subject, result);
-        maybeAppend(this.body, result);
-        return result.toString();
+        StringBuilder sb = new StringBuilder(100);
+        maybeAppend(this.numbers, sb);
+        maybeAppend(this.subject, sb);
+        maybeAppend(this.body, sb);
+        return sb.toString();
     }
 }

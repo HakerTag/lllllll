@@ -23,28 +23,28 @@ public final class PDF417Common {
     }
 
     @Deprecated
-    public static int getBitCountSum(int[] moduleBitCount) {
-        return MathUtils.sum(moduleBitCount);
+    public static int getBitCountSum(int[] iArr) {
+        return MathUtils.sum(iArr);
     }
 
-    public static int[] toIntArray(Collection<Integer> list) {
-        if (list == null || list.isEmpty()) {
+    public static int[] toIntArray(Collection<Integer> collection) {
+        if (collection == null || collection.isEmpty()) {
             return EMPTY_INT_ARRAY;
         }
-        int[] result = new int[list.size()];
+        int[] iArr = new int[collection.size()];
         int i = 0;
-        for (Integer integer : list) {
-            result[i] = integer.intValue();
+        for (Integer num : collection) {
+            iArr[i] = num.intValue();
             i++;
         }
-        return result;
+        return iArr;
     }
 
-    public static int getCodeword(int symbol) {
-        int i = Arrays.binarySearch(SYMBOL_TABLE, 262143 & symbol);
-        if (i < 0) {
+    public static int getCodeword(int i) {
+        int binarySearch = Arrays.binarySearch(SYMBOL_TABLE, i & 262143);
+        if (binarySearch < 0) {
             return -1;
         }
-        return (CODEWORD_TABLE[i] - 1) % NUMBER_OF_CODEWORDS;
+        return (CODEWORD_TABLE[binarySearch] - 1) % NUMBER_OF_CODEWORDS;
     }
 }

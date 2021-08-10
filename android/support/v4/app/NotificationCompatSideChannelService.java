@@ -27,46 +27,46 @@ public abstract class NotificationCompatSideChannelService extends Service {
         }
 
         @Override // android.support.v4.app.INotificationSideChannel
-        public void notify(String packageName, int id, String tag, Notification notification) throws RemoteException {
-            NotificationCompatSideChannelService.this.checkPermission(getCallingUid(), packageName);
-            long idToken = clearCallingIdentity();
+        public void notify(String str, int i, String str2, Notification notification) throws RemoteException {
+            NotificationCompatSideChannelService.this.checkPermission(getCallingUid(), str);
+            long clearCallingIdentity = clearCallingIdentity();
             try {
-                NotificationCompatSideChannelService.this.notify(packageName, id, tag, notification);
+                NotificationCompatSideChannelService.this.notify(str, i, str2, notification);
             } finally {
-                restoreCallingIdentity(idToken);
+                restoreCallingIdentity(clearCallingIdentity);
             }
         }
 
         @Override // android.support.v4.app.INotificationSideChannel
-        public void cancel(String packageName, int id, String tag) throws RemoteException {
-            NotificationCompatSideChannelService.this.checkPermission(getCallingUid(), packageName);
-            long idToken = clearCallingIdentity();
+        public void cancel(String str, int i, String str2) throws RemoteException {
+            NotificationCompatSideChannelService.this.checkPermission(getCallingUid(), str);
+            long clearCallingIdentity = clearCallingIdentity();
             try {
-                NotificationCompatSideChannelService.this.cancel(packageName, id, tag);
+                NotificationCompatSideChannelService.this.cancel(str, i, str2);
             } finally {
-                restoreCallingIdentity(idToken);
+                restoreCallingIdentity(clearCallingIdentity);
             }
         }
 
         @Override // android.support.v4.app.INotificationSideChannel
-        public void cancelAll(String packageName) {
-            NotificationCompatSideChannelService.this.checkPermission(getCallingUid(), packageName);
-            long idToken = clearCallingIdentity();
+        public void cancelAll(String str) {
+            NotificationCompatSideChannelService.this.checkPermission(getCallingUid(), str);
+            long clearCallingIdentity = clearCallingIdentity();
             try {
-                NotificationCompatSideChannelService.this.cancelAll(packageName);
+                NotificationCompatSideChannelService.this.cancelAll(str);
             } finally {
-                restoreCallingIdentity(idToken);
+                restoreCallingIdentity(clearCallingIdentity);
             }
         }
     }
 
     /* access modifiers changed from: package-private */
-    public void checkPermission(int callingUid, String packageName) {
-        for (String validPackage : getPackageManager().getPackagesForUid(callingUid)) {
-            if (validPackage.equals(packageName)) {
+    public void checkPermission(int i, String str) {
+        for (String str2 : getPackageManager().getPackagesForUid(i)) {
+            if (str2.equals(str)) {
                 return;
             }
         }
-        throw new SecurityException("NotificationSideChannelService: Uid " + callingUid + " is not authorized for package " + packageName);
+        throw new SecurityException("NotificationSideChannelService: Uid " + i + " is not authorized for package " + str);
     }
 }

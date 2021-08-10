@@ -20,69 +20,70 @@ public class SymbolInfo {
         symbols = symbolInfoArr;
     }
 
-    public static void overrideSymbolSet(SymbolInfo[] override) {
-        symbols = override;
+    public static void overrideSymbolSet(SymbolInfo[] symbolInfoArr) {
+        symbols = symbolInfoArr;
     }
 
-    public SymbolInfo(boolean rectangular2, int dataCapacity2, int errorCodewords2, int matrixWidth2, int matrixHeight2, int dataRegions2) {
-        this(rectangular2, dataCapacity2, errorCodewords2, matrixWidth2, matrixHeight2, dataRegions2, dataCapacity2, errorCodewords2);
+    public SymbolInfo(boolean z, int i, int i2, int i3, int i4, int i5) {
+        this(z, i, i2, i3, i4, i5, i, i2);
     }
 
-    SymbolInfo(boolean rectangular2, int dataCapacity2, int errorCodewords2, int matrixWidth2, int matrixHeight2, int dataRegions2, int rsBlockData2, int rsBlockError2) {
-        this.rectangular = rectangular2;
-        this.dataCapacity = dataCapacity2;
-        this.errorCodewords = errorCodewords2;
-        this.matrixWidth = matrixWidth2;
-        this.matrixHeight = matrixHeight2;
-        this.dataRegions = dataRegions2;
-        this.rsBlockData = rsBlockData2;
-        this.rsBlockError = rsBlockError2;
+    SymbolInfo(boolean z, int i, int i2, int i3, int i4, int i5, int i6, int i7) {
+        this.rectangular = z;
+        this.dataCapacity = i;
+        this.errorCodewords = i2;
+        this.matrixWidth = i3;
+        this.matrixHeight = i4;
+        this.dataRegions = i5;
+        this.rsBlockData = i6;
+        this.rsBlockError = i7;
     }
 
-    public static SymbolInfo lookup(int dataCodewords) {
-        return lookup(dataCodewords, SymbolShapeHint.FORCE_NONE, true);
+    public static SymbolInfo lookup(int i) {
+        return lookup(i, SymbolShapeHint.FORCE_NONE, true);
     }
 
-    public static SymbolInfo lookup(int dataCodewords, SymbolShapeHint shape) {
-        return lookup(dataCodewords, shape, true);
+    public static SymbolInfo lookup(int i, SymbolShapeHint symbolShapeHint) {
+        return lookup(i, symbolShapeHint, true);
     }
 
-    public static SymbolInfo lookup(int dataCodewords, boolean allowRectangular, boolean fail) {
-        return lookup(dataCodewords, allowRectangular ? SymbolShapeHint.FORCE_NONE : SymbolShapeHint.FORCE_SQUARE, fail);
+    public static SymbolInfo lookup(int i, boolean z, boolean z2) {
+        return lookup(i, z ? SymbolShapeHint.FORCE_NONE : SymbolShapeHint.FORCE_SQUARE, z2);
     }
 
-    private static SymbolInfo lookup(int dataCodewords, SymbolShapeHint shape, boolean fail) {
-        return lookup(dataCodewords, shape, null, null, fail);
+    private static SymbolInfo lookup(int i, SymbolShapeHint symbolShapeHint, boolean z) {
+        return lookup(i, symbolShapeHint, null, null, z);
     }
 
-    public static SymbolInfo lookup(int dataCodewords, SymbolShapeHint shape, Dimension minSize, Dimension maxSize, boolean fail) {
+    public static SymbolInfo lookup(int i, SymbolShapeHint symbolShapeHint, Dimension dimension, Dimension dimension2, boolean z) {
         SymbolInfo[] symbolInfoArr = symbols;
-        for (SymbolInfo symbol : symbolInfoArr) {
-            if ((shape != SymbolShapeHint.FORCE_SQUARE || !symbol.rectangular) && ((shape != SymbolShapeHint.FORCE_RECTANGLE || symbol.rectangular) && ((minSize == null || (symbol.getSymbolWidth() >= minSize.getWidth() && symbol.getSymbolHeight() >= minSize.getHeight())) && ((maxSize == null || (symbol.getSymbolWidth() <= maxSize.getWidth() && symbol.getSymbolHeight() <= maxSize.getHeight())) && dataCodewords <= symbol.dataCapacity)))) {
-                return symbol;
+        for (SymbolInfo symbolInfo : symbolInfoArr) {
+            if ((symbolShapeHint != SymbolShapeHint.FORCE_SQUARE || !symbolInfo.rectangular) && ((symbolShapeHint != SymbolShapeHint.FORCE_RECTANGLE || symbolInfo.rectangular) && ((dimension == null || (symbolInfo.getSymbolWidth() >= dimension.getWidth() && symbolInfo.getSymbolHeight() >= dimension.getHeight())) && ((dimension2 == null || (symbolInfo.getSymbolWidth() <= dimension2.getWidth() && symbolInfo.getSymbolHeight() <= dimension2.getHeight())) && i <= symbolInfo.dataCapacity)))) {
+                return symbolInfo;
             }
         }
-        if (!fail) {
+        if (!z) {
             return null;
         }
-        throw new IllegalArgumentException("Can't find a symbol arrangement that matches the message. Data codewords: " + dataCodewords);
+        throw new IllegalArgumentException("Can't find a symbol arrangement that matches the message. Data codewords: " + i);
     }
 
     private int getHorizontalDataRegions() {
         int i = this.dataRegions;
-        if (i == 1) {
-            return 1;
+        int i2 = 1;
+        if (i != 1) {
+            i2 = 2;
+            if (!(i == 2 || i == 4)) {
+                if (i == 16) {
+                    return 4;
+                }
+                if (i == 36) {
+                    return 6;
+                }
+                throw new IllegalStateException("Cannot handle this number of data regions");
+            }
         }
-        if (i == 2 || i == 4) {
-            return 2;
-        }
-        if (i == 16) {
-            return 4;
-        }
-        if (i == 36) {
-            return 6;
-        }
-        throw new IllegalStateException("Cannot handle this number of data regions");
+        return i2;
     }
 
     private int getVerticalDataRegions() {
@@ -134,11 +135,11 @@ public class SymbolInfo {
         return this.errorCodewords;
     }
 
-    public int getDataLengthForInterleavedBlock(int index) {
+    public int getDataLengthForInterleavedBlock(int i) {
         return this.rsBlockData;
     }
 
-    public final int getErrorLengthForInterleavedBlock(int index) {
+    public final int getErrorLengthForInterleavedBlock(int i) {
         return this.rsBlockError;
     }
 

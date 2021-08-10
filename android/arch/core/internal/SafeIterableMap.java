@@ -17,62 +17,62 @@ public class SafeIterableMap<K, V> implements Iterable<Map.Entry<K, V>> {
 
     /* access modifiers changed from: protected */
     public Entry<K, V> get(K k) {
-        Entry<K, V> currentNode = this.mStart;
-        while (currentNode != null && !currentNode.mKey.equals(k)) {
-            currentNode = currentNode.mNext;
+        Entry<K, V> entry = this.mStart;
+        while (entry != null && !entry.mKey.equals(k)) {
+            entry = entry.mNext;
         }
-        return currentNode;
+        return entry;
     }
 
-    public V putIfAbsent(K key, V v) {
-        Entry<K, V> entry = get(key);
+    public V putIfAbsent(K k, V v) {
+        Entry<K, V> entry = get(k);
         if (entry != null) {
             return entry.mValue;
         }
-        put(key, v);
+        put(k, v);
         return null;
     }
 
     /* access modifiers changed from: protected */
-    public Entry<K, V> put(K key, V v) {
-        Entry<K, V> newEntry = new Entry<>(key, v);
+    public Entry<K, V> put(K k, V v) {
+        Entry<K, V> entry = new Entry<>(k, v);
         this.mSize++;
-        Entry<K, V> entry = this.mEnd;
-        if (entry == null) {
-            this.mStart = newEntry;
-            this.mEnd = newEntry;
-            return newEntry;
+        Entry<K, V> entry2 = this.mEnd;
+        if (entry2 == null) {
+            this.mStart = entry;
+            this.mEnd = entry;
+            return entry;
         }
-        entry.mNext = newEntry;
-        newEntry.mPrevious = this.mEnd;
-        this.mEnd = newEntry;
-        return newEntry;
+        entry2.mNext = entry;
+        entry.mPrevious = this.mEnd;
+        this.mEnd = entry;
+        return entry;
     }
 
-    public V remove(K key) {
-        Entry<K, V> toRemove = get(key);
-        if (toRemove == null) {
+    public V remove(K k) {
+        Entry<K, V> entry = get(k);
+        if (entry == null) {
             return null;
         }
         this.mSize--;
         if (!this.mIterators.isEmpty()) {
-            for (SupportRemove<K, V> iter : this.mIterators.keySet()) {
-                iter.supportRemove(toRemove);
+            for (SupportRemove<K, V> supportRemove : this.mIterators.keySet()) {
+                supportRemove.supportRemove(entry);
             }
         }
-        if (toRemove.mPrevious != null) {
-            toRemove.mPrevious.mNext = toRemove.mNext;
+        if (entry.mPrevious != null) {
+            entry.mPrevious.mNext = entry.mNext;
         } else {
-            this.mStart = toRemove.mNext;
+            this.mStart = entry.mNext;
         }
-        if (toRemove.mNext != null) {
-            toRemove.mNext.mPrevious = toRemove.mPrevious;
+        if (entry.mNext != null) {
+            entry.mNext.mPrevious = entry.mPrevious;
         } else {
-            this.mEnd = toRemove.mPrevious;
+            this.mEnd = entry.mPrevious;
         }
-        toRemove.mNext = null;
-        toRemove.mPrevious = null;
-        return toRemove.mValue;
+        entry.mNext = null;
+        entry.mPrevious = null;
+        return entry.mValue;
     }
 
     public int size() {
@@ -81,21 +81,21 @@ public class SafeIterableMap<K, V> implements Iterable<Map.Entry<K, V>> {
 
     @Override // java.lang.Iterable
     public Iterator<Map.Entry<K, V>> iterator() {
-        ListIterator<K, V> iterator = new AscendingIterator<>(this.mStart, this.mEnd);
-        this.mIterators.put(iterator, false);
-        return iterator;
+        AscendingIterator ascendingIterator = new AscendingIterator(this.mStart, this.mEnd);
+        this.mIterators.put(ascendingIterator, false);
+        return ascendingIterator;
     }
 
     public Iterator<Map.Entry<K, V>> descendingIterator() {
-        DescendingIterator<K, V> iterator = new DescendingIterator<>(this.mEnd, this.mStart);
-        this.mIterators.put(iterator, false);
-        return iterator;
+        DescendingIterator descendingIterator = new DescendingIterator(this.mEnd, this.mStart);
+        this.mIterators.put(descendingIterator, false);
+        return descendingIterator;
     }
 
     public SafeIterableMap<K, V>.IteratorWithAdditions iteratorWithAdditions() {
-        SafeIterableMap<K, V>.IteratorWithAdditions iterator = new IteratorWithAdditions();
-        this.mIterators.put(iterator, false);
-        return iterator;
+        SafeIterableMap<K, V>.IteratorWithAdditions iteratorWithAdditions = new IteratorWithAdditions();
+        this.mIterators.put(iteratorWithAdditions, false);
+        return iteratorWithAdditions;
     }
 
     public Map.Entry<K, V> eldest() {
@@ -113,37 +113,37 @@ public class SafeIterableMap<K, V> implements Iterable<Map.Entry<K, V>> {
         if (!(obj instanceof SafeIterableMap)) {
             return false;
         }
-        SafeIterableMap map = (SafeIterableMap) obj;
-        if (size() != map.size()) {
+        SafeIterableMap safeIterableMap = (SafeIterableMap) obj;
+        if (size() != safeIterableMap.size()) {
             return false;
         }
-        Iterator<Map.Entry<K, V>> iterator1 = iterator();
-        Iterator iterator2 = map.iterator();
-        while (iterator1.hasNext() && iterator2.hasNext()) {
-            Map.Entry<K, V> next1 = iterator1.next();
-            Object next2 = iterator2.next();
-            if ((next1 == null && next2 != null) || (next1 != null && !next1.equals(next2))) {
+        Iterator<Map.Entry<K, V>> it = iterator();
+        Iterator<Map.Entry<K, V>> it2 = safeIterableMap.iterator();
+        while (it.hasNext() && it2.hasNext()) {
+            Map.Entry<K, V> next = it.next();
+            Map.Entry<K, V> next2 = it2.next();
+            if ((next == null && next2 != null) || (next != null && !next.equals(next2))) {
                 return false;
             }
         }
-        if (iterator1.hasNext() || iterator2.hasNext()) {
+        if (it.hasNext() || it2.hasNext()) {
             return false;
         }
         return true;
     }
 
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("[");
-        Iterator<Map.Entry<K, V>> iterator = iterator();
-        while (iterator.hasNext()) {
-            builder.append(iterator.next().toString());
-            if (iterator.hasNext()) {
-                builder.append(", ");
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        Iterator<Map.Entry<K, V>> it = iterator();
+        while (it.hasNext()) {
+            sb.append(it.next().toString());
+            if (it.hasNext()) {
+                sb.append(", ");
             }
         }
-        builder.append("]");
-        return builder.toString();
+        sb.append("]");
+        return sb.toString();
     }
 
     private static abstract class ListIterator<K, V> implements Iterator<Map.Entry<K, V>>, SupportRemove<K, V> {
@@ -156,9 +156,9 @@ public class SafeIterableMap<K, V> implements Iterable<Map.Entry<K, V>> {
         /* access modifiers changed from: package-private */
         public abstract Entry<K, V> forward(Entry<K, V> entry);
 
-        ListIterator(Entry<K, V> start, Entry<K, V> expectedEnd) {
-            this.mExpectedEnd = expectedEnd;
-            this.mNext = start;
+        ListIterator(Entry<K, V> entry, Entry<K, V> entry2) {
+            this.mExpectedEnd = entry2;
+            this.mNext = entry;
         }
 
         public boolean hasNext() {
@@ -191,16 +191,16 @@ public class SafeIterableMap<K, V> implements Iterable<Map.Entry<K, V>> {
 
         @Override // java.util.Iterator
         public Map.Entry<K, V> next() {
-            Map.Entry<K, V> result = this.mNext;
+            Entry<K, V> entry = this.mNext;
             this.mNext = nextNode();
-            return result;
+            return entry;
         }
     }
 
     /* access modifiers changed from: package-private */
     public static class AscendingIterator<K, V> extends ListIterator<K, V> {
-        AscendingIterator(Entry<K, V> start, Entry<K, V> expectedEnd) {
-            super(start, expectedEnd);
+        AscendingIterator(Entry<K, V> entry, Entry<K, V> entry2) {
+            super(entry, entry2);
         }
 
         /* access modifiers changed from: package-private */
@@ -217,8 +217,8 @@ public class SafeIterableMap<K, V> implements Iterable<Map.Entry<K, V>> {
     }
 
     private static class DescendingIterator<K, V> extends ListIterator<K, V> {
-        DescendingIterator(Entry<K, V> start, Entry<K, V> expectedEnd) {
-            super(start, expectedEnd);
+        DescendingIterator(Entry<K, V> entry, Entry<K, V> entry2) {
+            super(entry, entry2);
         }
 
         /* access modifiers changed from: package-private */
@@ -287,9 +287,9 @@ public class SafeIterableMap<K, V> implements Iterable<Map.Entry<K, V>> {
         Entry<K, V> mPrevious;
         final V mValue;
 
-        Entry(K key, V value) {
-            this.mKey = key;
-            this.mValue = value;
+        Entry(K k, V v) {
+            this.mKey = k;
+            this.mValue = v;
         }
 
         @Override // java.util.Map.Entry

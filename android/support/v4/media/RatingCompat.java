@@ -13,13 +13,13 @@ public final class RatingCompat implements Parcelable {
         /* class android.support.v4.media.RatingCompat.AnonymousClass1 */
 
         @Override // android.os.Parcelable.Creator
-        public RatingCompat createFromParcel(Parcel p) {
-            return new RatingCompat(p.readInt(), p.readFloat());
+        public RatingCompat createFromParcel(Parcel parcel) {
+            return new RatingCompat(parcel.readInt(), parcel.readFloat());
         }
 
         @Override // android.os.Parcelable.Creator
-        public RatingCompat[] newArray(int size) {
-            return new RatingCompat[size];
+        public RatingCompat[] newArray(int i) {
+            return new RatingCompat[i];
         }
     };
     public static final int RATING_3_STARS = 3;
@@ -43,9 +43,9 @@ public final class RatingCompat implements Parcelable {
     public @interface Style {
     }
 
-    RatingCompat(int ratingStyle, float rating) {
-        this.mRatingStyle = ratingStyle;
-        this.mRatingValue = rating;
+    RatingCompat(int i, float f) {
+        this.mRatingStyle = i;
+        this.mRatingValue = f;
     }
 
     public String toString() {
@@ -68,55 +68,55 @@ public final class RatingCompat implements Parcelable {
         return this.mRatingStyle;
     }
 
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(this.mRatingStyle);
-        dest.writeFloat(this.mRatingValue);
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(this.mRatingStyle);
+        parcel.writeFloat(this.mRatingValue);
     }
 
-    public static RatingCompat newUnratedRating(int ratingStyle) {
-        switch (ratingStyle) {
+    public static RatingCompat newUnratedRating(int i) {
+        switch (i) {
             case 1:
             case 2:
             case 3:
             case 4:
             case 5:
             case 6:
-                return new RatingCompat(ratingStyle, RATING_NOT_RATED);
+                return new RatingCompat(i, RATING_NOT_RATED);
             default:
                 return null;
         }
     }
 
-    public static RatingCompat newHeartRating(boolean hasHeart) {
-        return new RatingCompat(1, hasHeart ? 1.0f : 0.0f);
+    public static RatingCompat newHeartRating(boolean z) {
+        return new RatingCompat(1, z ? 1.0f : 0.0f);
     }
 
-    public static RatingCompat newThumbRating(boolean thumbIsUp) {
-        return new RatingCompat(2, thumbIsUp ? 1.0f : 0.0f);
+    public static RatingCompat newThumbRating(boolean z) {
+        return new RatingCompat(2, z ? 1.0f : 0.0f);
     }
 
-    public static RatingCompat newStarRating(int starRatingStyle, float starRating) {
-        float maxRating;
-        if (starRatingStyle == 3) {
-            maxRating = 3.0f;
-        } else if (starRatingStyle == 4) {
-            maxRating = 4.0f;
-        } else if (starRatingStyle != 5) {
-            Log.e(TAG, "Invalid rating style (" + starRatingStyle + ") for a star rating");
+    public static RatingCompat newStarRating(int i, float f) {
+        float f2;
+        if (i == 3) {
+            f2 = 3.0f;
+        } else if (i == 4) {
+            f2 = 4.0f;
+        } else if (i != 5) {
+            Log.e(TAG, "Invalid rating style (" + i + ") for a star rating");
             return null;
         } else {
-            maxRating = 5.0f;
+            f2 = 5.0f;
         }
-        if (starRating >= 0.0f && starRating <= maxRating) {
-            return new RatingCompat(starRatingStyle, starRating);
+        if (f >= 0.0f && f <= f2) {
+            return new RatingCompat(i, f);
         }
         Log.e(TAG, "Trying to set out of range star-based rating");
         return null;
     }
 
-    public static RatingCompat newPercentageRating(float percent) {
-        if (percent >= 0.0f && percent <= 100.0f) {
-            return new RatingCompat(6, percent);
+    public static RatingCompat newPercentageRating(float f) {
+        if (f >= 0.0f && f <= 100.0f) {
+            return new RatingCompat(6, f);
         }
         Log.e(TAG, "Invalid percentage-based rating value");
         return null;
@@ -146,49 +146,43 @@ public final class RatingCompat implements Parcelable {
 
     public float getStarRating() {
         int i = this.mRatingStyle;
-        if ((i == 3 || i == 4 || i == 5) && isRated()) {
-            return this.mRatingValue;
-        }
-        return RATING_NOT_RATED;
+        return ((i == 3 || i == 4 || i == 5) && isRated()) ? this.mRatingValue : RATING_NOT_RATED;
     }
 
     public float getPercentRating() {
-        if (this.mRatingStyle != 6 || !isRated()) {
-            return RATING_NOT_RATED;
-        }
-        return this.mRatingValue;
+        return (this.mRatingStyle != 6 || !isRated()) ? RATING_NOT_RATED : this.mRatingValue;
     }
 
-    public static RatingCompat fromRating(Object ratingObj) {
-        RatingCompat rating;
-        if (ratingObj == null || Build.VERSION.SDK_INT < 19) {
-            return null;
-        }
-        int ratingStyle = ((Rating) ratingObj).getRatingStyle();
-        if (((Rating) ratingObj).isRated()) {
-            switch (ratingStyle) {
-                case 1:
-                    rating = newHeartRating(((Rating) ratingObj).hasHeart());
-                    break;
-                case 2:
-                    rating = newThumbRating(((Rating) ratingObj).isThumbUp());
-                    break;
-                case 3:
-                case 4:
-                case 5:
-                    rating = newStarRating(ratingStyle, ((Rating) ratingObj).getStarRating());
-                    break;
-                case 6:
-                    rating = newPercentageRating(((Rating) ratingObj).getPercentRating());
-                    break;
-                default:
-                    return null;
+    public static RatingCompat fromRating(Object obj) {
+        RatingCompat ratingCompat = null;
+        if (obj != null && Build.VERSION.SDK_INT >= 19) {
+            Rating rating = (Rating) obj;
+            int ratingStyle = rating.getRatingStyle();
+            if (rating.isRated()) {
+                switch (ratingStyle) {
+                    case 1:
+                        ratingCompat = newHeartRating(rating.hasHeart());
+                        break;
+                    case 2:
+                        ratingCompat = newThumbRating(rating.isThumbUp());
+                        break;
+                    case 3:
+                    case 4:
+                    case 5:
+                        ratingCompat = newStarRating(ratingStyle, rating.getStarRating());
+                        break;
+                    case 6:
+                        ratingCompat = newPercentageRating(rating.getPercentRating());
+                        break;
+                    default:
+                        return null;
+                }
+            } else {
+                ratingCompat = newUnratedRating(ratingStyle);
             }
-        } else {
-            rating = newUnratedRating(ratingStyle);
+            ratingCompat.mRatingObj = obj;
         }
-        rating.mRatingObj = ratingObj;
-        return rating;
+        return ratingCompat;
     }
 
     public Object getRating() {

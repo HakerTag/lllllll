@@ -1,67 +1,69 @@
 package android.support.v4.media;
 
 import android.os.Bundle;
+import kotlin.jvm.internal.IntCompanionObject;
 
 public class MediaBrowserCompatUtils {
-    public static boolean areSameOptions(Bundle options1, Bundle options2) {
-        if (options1 == options2) {
+    public static boolean areSameOptions(Bundle bundle, Bundle bundle2) {
+        if (bundle == bundle2) {
             return true;
         }
-        if (options1 == null) {
-            if (options2.getInt(MediaBrowserCompat.EXTRA_PAGE, -1) == -1 && options2.getInt(MediaBrowserCompat.EXTRA_PAGE_SIZE, -1) == -1) {
+        if (bundle == null) {
+            if (bundle2.getInt(MediaBrowserCompat.EXTRA_PAGE, -1) == -1 && bundle2.getInt(MediaBrowserCompat.EXTRA_PAGE_SIZE, -1) == -1) {
                 return true;
             }
             return false;
-        } else if (options2 == null) {
-            if (options1.getInt(MediaBrowserCompat.EXTRA_PAGE, -1) == -1 && options1.getInt(MediaBrowserCompat.EXTRA_PAGE_SIZE, -1) == -1) {
+        } else if (bundle2 == null) {
+            if (bundle.getInt(MediaBrowserCompat.EXTRA_PAGE, -1) == -1 && bundle.getInt(MediaBrowserCompat.EXTRA_PAGE_SIZE, -1) == -1) {
                 return true;
             }
             return false;
-        } else if (options1.getInt(MediaBrowserCompat.EXTRA_PAGE, -1) == options2.getInt(MediaBrowserCompat.EXTRA_PAGE, -1) && options1.getInt(MediaBrowserCompat.EXTRA_PAGE_SIZE, -1) == options2.getInt(MediaBrowserCompat.EXTRA_PAGE_SIZE, -1)) {
+        } else if (bundle.getInt(MediaBrowserCompat.EXTRA_PAGE, -1) == bundle2.getInt(MediaBrowserCompat.EXTRA_PAGE, -1) && bundle.getInt(MediaBrowserCompat.EXTRA_PAGE_SIZE, -1) == bundle2.getInt(MediaBrowserCompat.EXTRA_PAGE_SIZE, -1)) {
             return true;
         } else {
             return false;
         }
     }
 
-    public static boolean hasDuplicatedItems(Bundle options1, Bundle options2) {
-        int pageSize1;
-        int pageSize2;
-        int endIndex1;
-        int startIndex1;
-        int endIndex2;
-        int startIndex2;
-        int page1 = options1 == null ? -1 : options1.getInt(MediaBrowserCompat.EXTRA_PAGE, -1);
-        int page2 = options2 == null ? -1 : options2.getInt(MediaBrowserCompat.EXTRA_PAGE, -1);
-        if (options1 == null) {
-            pageSize1 = -1;
+    public static boolean hasDuplicatedItems(Bundle bundle, Bundle bundle2) {
+        int i;
+        int i2;
+        int i3;
+        int i4;
+        int i5;
+        int i6;
+        int i7 = bundle == null ? -1 : bundle.getInt(MediaBrowserCompat.EXTRA_PAGE, -1);
+        if (bundle2 == null) {
+            i = -1;
         } else {
-            pageSize1 = options1.getInt(MediaBrowserCompat.EXTRA_PAGE_SIZE, -1);
+            i = bundle2.getInt(MediaBrowserCompat.EXTRA_PAGE, -1);
         }
-        if (options2 == null) {
-            pageSize2 = -1;
+        if (bundle == null) {
+            i2 = -1;
         } else {
-            pageSize2 = options2.getInt(MediaBrowserCompat.EXTRA_PAGE_SIZE, -1);
+            i2 = bundle.getInt(MediaBrowserCompat.EXTRA_PAGE_SIZE, -1);
         }
-        if (page1 == -1 || pageSize1 == -1) {
-            startIndex1 = 0;
-            endIndex1 = Integer.MAX_VALUE;
+        if (bundle2 == null) {
+            i3 = -1;
         } else {
-            startIndex1 = pageSize1 * page1;
-            endIndex1 = (startIndex1 + pageSize1) - 1;
+            i3 = bundle2.getInt(MediaBrowserCompat.EXTRA_PAGE_SIZE, -1);
         }
-        if (page2 == -1 || pageSize2 == -1) {
-            startIndex2 = 0;
-            endIndex2 = Integer.MAX_VALUE;
+        int i8 = IntCompanionObject.MAX_VALUE;
+        if (i7 == -1 || i2 == -1) {
+            i4 = IntCompanionObject.MAX_VALUE;
+            i5 = 0;
         } else {
-            startIndex2 = pageSize2 * page2;
-            endIndex2 = (startIndex2 + pageSize2) - 1;
+            i5 = i7 * i2;
+            i4 = (i2 + i5) - 1;
         }
-        if (startIndex1 <= startIndex2 && startIndex2 <= endIndex1) {
-            return true;
+        if (i == -1 || i3 == -1) {
+            i6 = 0;
+        } else {
+            i6 = i * i3;
+            i8 = (i3 + i6) - 1;
         }
-        if (startIndex1 > endIndex2 || endIndex2 > endIndex1) {
-            return false;
+        if (i5 > i6 || i6 > i4) {
+            return i5 <= i8 && i8 <= i4;
         }
         return true;
     }

@@ -19,14 +19,14 @@ public class TypefaceCompatUtil {
     }
 
     public static File getTempFile(Context context) {
-        String prefix = CACHE_FILE_PREFIX + Process.myPid() + "-" + Process.myTid() + "-";
+        String str = CACHE_FILE_PREFIX + Process.myPid() + "-" + Process.myTid() + "-";
         for (int i = 0; i < 100; i++) {
-            File file = new File(context.getCacheDir(), prefix + i);
+            File file = new File(context.getCacheDir(), str + i);
             try {
                 if (file.createNewFile()) {
                     return file;
                 }
-            } catch (IOException e) {
+            } catch (IOException unused) {
             }
         }
         return null;
@@ -36,16 +36,16 @@ public class TypefaceCompatUtil {
         r0.close();
      */
     /* JADX WARNING: Code restructure failed: missing block: B:12:0x0020, code lost:
-        r3 = move-exception;
+        r0 = move-exception;
      */
     /* JADX WARNING: Code restructure failed: missing block: B:13:0x0021, code lost:
-        r1.addSuppressed(r3);
+        r7.addSuppressed(r0);
      */
     /* JADX WARNING: Code restructure failed: missing block: B:14:0x0024, code lost:
-        throw r2;
+        throw r1;
      */
     /* JADX WARNING: Code restructure failed: missing block: B:9:0x001b, code lost:
-        r2 = move-exception;
+        r1 = move-exception;
      */
     /* Code decompiled incorrectly, please refer to instructions dump. */
     private static java.nio.ByteBuffer mmap(java.io.File r7) {
@@ -56,172 +56,202 @@ public class TypefaceCompatUtil {
             long r5 = r1.size()     // Catch:{ all -> 0x0019 }
             java.nio.channels.FileChannel$MapMode r2 = java.nio.channels.FileChannel.MapMode.READ_ONLY     // Catch:{ all -> 0x0019 }
             r3 = 0
-            java.nio.MappedByteBuffer r2 = r1.map(r2, r3, r5)     // Catch:{ all -> 0x0019 }
+            java.nio.MappedByteBuffer r7 = r1.map(r2, r3, r5)     // Catch:{ all -> 0x0019 }
             r0.close()
-            return r2
+            return r7
         L_0x0019:
-            r1 = move-exception
-            throw r1     // Catch:{ all -> 0x001b }
+            r7 = move-exception
+            throw r7     // Catch:{ all -> 0x001b }
         L_0x001b:
-            r2 = move-exception
+            r1 = move-exception
             r0.close()     // Catch:{ all -> 0x0020 }
             goto L_0x0024
         L_0x0020:
-            r3 = move-exception
-            r1.addSuppressed(r3)
-        L_0x0024:
-            throw r2
-        L_0x0025:
             r0 = move-exception
-            r1 = 0
-            return r1
+            r7.addSuppressed(r0)
+        L_0x0024:
+            throw r1
+        L_0x0025:
+            r7 = 0
+            return r7
         */
         throw new UnsupportedOperationException("Method not decompiled: android.support.v4.graphics.TypefaceCompatUtil.mmap(java.io.File):java.nio.ByteBuffer");
     }
 
-    /* JADX WARNING: Code restructure failed: missing block: B:18:0x0038, code lost:
-        r5 = move-exception;
+    /* JADX WARNING: Code restructure failed: missing block: B:18:0x0037, code lost:
+        r1 = move-exception;
      */
     /* JADX WARNING: Code restructure failed: missing block: B:20:?, code lost:
-        r3.close();
+        r8.close();
      */
-    /* JADX WARNING: Code restructure failed: missing block: B:21:0x003d, code lost:
-        r6 = move-exception;
+    /* JADX WARNING: Code restructure failed: missing block: B:21:0x003c, code lost:
+        r8 = move-exception;
      */
-    /* JADX WARNING: Code restructure failed: missing block: B:22:0x003e, code lost:
-        r4.addSuppressed(r6);
+    /* JADX WARNING: Code restructure failed: missing block: B:22:0x003d, code lost:
+        r9.addSuppressed(r8);
      */
-    /* JADX WARNING: Code restructure failed: missing block: B:23:0x0041, code lost:
-        throw r5;
+    /* JADX WARNING: Code restructure failed: missing block: B:23:0x0040, code lost:
+        throw r1;
      */
-    /* JADX WARNING: Code restructure failed: missing block: B:27:0x0044, code lost:
-        r4 = move-exception;
+    /* JADX WARNING: Code restructure failed: missing block: B:27:0x0043, code lost:
+        r9 = move-exception;
      */
-    /* JADX WARNING: Code restructure failed: missing block: B:28:0x0045, code lost:
-        if (r2 != null) goto L_0x0047;
+    /* JADX WARNING: Code restructure failed: missing block: B:28:0x0044, code lost:
+        if (r7 != null) goto L_0x0046;
      */
     /* JADX WARNING: Code restructure failed: missing block: B:30:?, code lost:
-        r2.close();
+        r7.close();
      */
-    /* JADX WARNING: Code restructure failed: missing block: B:31:0x004b, code lost:
-        r5 = move-exception;
+    /* JADX WARNING: Code restructure failed: missing block: B:31:0x004a, code lost:
+        r7 = move-exception;
      */
-    /* JADX WARNING: Code restructure failed: missing block: B:32:0x004c, code lost:
-        r3.addSuppressed(r5);
+    /* JADX WARNING: Code restructure failed: missing block: B:32:0x004b, code lost:
+        r8.addSuppressed(r7);
      */
-    /* JADX WARNING: Code restructure failed: missing block: B:33:0x004f, code lost:
-        throw r4;
+    /* JADX WARNING: Code restructure failed: missing block: B:33:0x004e, code lost:
+        throw r9;
      */
     /* Code decompiled incorrectly, please refer to instructions dump. */
-    public static java.nio.ByteBuffer mmap(android.content.Context r10, android.os.CancellationSignal r11, android.net.Uri r12) {
+    public static java.nio.ByteBuffer mmap(android.content.Context r7, android.os.CancellationSignal r8, android.net.Uri r9) {
         /*
-            android.content.ContentResolver r0 = r10.getContentResolver()
-            r1 = 0
-            java.lang.String r2 = "r"
-            android.os.ParcelFileDescriptor r2 = r0.openFileDescriptor(r12, r2, r11)     // Catch:{ IOException -> 0x0050 }
-            if (r2 != 0) goto L_0x0014
-            if (r2 == 0) goto L_0x0013
-            r2.close()     // Catch:{ IOException -> 0x0050 }
+            android.content.ContentResolver r7 = r7.getContentResolver()
+            r0 = 0
+            java.lang.String r1 = "r"
+            android.os.ParcelFileDescriptor r7 = r7.openFileDescriptor(r9, r1, r8)     // Catch:{ IOException -> 0x004f }
+            if (r7 != 0) goto L_0x0013
+            if (r7 == 0) goto L_0x0012
+            r7.close()     // Catch:{ IOException -> 0x004f }
+        L_0x0012:
+            return r0
         L_0x0013:
-            return r1
-        L_0x0014:
-            java.io.FileInputStream r3 = new java.io.FileInputStream     // Catch:{ all -> 0x0042 }
-            java.io.FileDescriptor r4 = r2.getFileDescriptor()     // Catch:{ all -> 0x0042 }
-            r3.<init>(r4)     // Catch:{ all -> 0x0042 }
-            java.nio.channels.FileChannel r4 = r3.getChannel()     // Catch:{ all -> 0x0036 }
-            long r8 = r4.size()     // Catch:{ all -> 0x0036 }
-            java.nio.channels.FileChannel$MapMode r5 = java.nio.channels.FileChannel.MapMode.READ_ONLY     // Catch:{ all -> 0x0036 }
-            r6 = 0
-            java.nio.MappedByteBuffer r5 = r4.map(r5, r6, r8)     // Catch:{ all -> 0x0036 }
-            r3.close()
-            if (r2 == 0) goto L_0x0035
-            r2.close()
+            java.io.FileInputStream r8 = new java.io.FileInputStream     // Catch:{ all -> 0x0041 }
+            java.io.FileDescriptor r9 = r7.getFileDescriptor()     // Catch:{ all -> 0x0041 }
+            r8.<init>(r9)     // Catch:{ all -> 0x0041 }
+            java.nio.channels.FileChannel r1 = r8.getChannel()     // Catch:{ all -> 0x0035 }
+            long r5 = r1.size()     // Catch:{ all -> 0x0035 }
+            java.nio.channels.FileChannel$MapMode r2 = java.nio.channels.FileChannel.MapMode.READ_ONLY     // Catch:{ all -> 0x0035 }
+            r3 = 0
+            java.nio.MappedByteBuffer r9 = r1.map(r2, r3, r5)     // Catch:{ all -> 0x0035 }
+            r8.close()
+            if (r7 == 0) goto L_0x0034
+            r7.close()
+        L_0x0034:
+            return r9
         L_0x0035:
-            return r5
-        L_0x0036:
-            r4 = move-exception
-            throw r4     // Catch:{ all -> 0x0038 }
-        L_0x0038:
-            r5 = move-exception
-            r3.close()     // Catch:{ all -> 0x003d }
-            goto L_0x0041
-        L_0x003d:
-            r6 = move-exception
-            r4.addSuppressed(r6)
+            r9 = move-exception
+            throw r9     // Catch:{ all -> 0x0037 }
+        L_0x0037:
+            r1 = move-exception
+            r8.close()     // Catch:{ all -> 0x003c }
+            goto L_0x0040
+        L_0x003c:
+            r8 = move-exception
+            r9.addSuppressed(r8)
+        L_0x0040:
+            throw r1
         L_0x0041:
-            throw r5
-        L_0x0042:
-            r3 = move-exception
-            throw r3     // Catch:{ all -> 0x0044 }
-        L_0x0044:
-            r4 = move-exception
-            if (r2 == 0) goto L_0x004f
-            r2.close()     // Catch:{ all -> 0x004b }
-            goto L_0x004f
-        L_0x004b:
-            r5 = move-exception
-            r3.addSuppressed(r5)
+            r8 = move-exception
+            throw r8     // Catch:{ all -> 0x0043 }
+        L_0x0043:
+            r9 = move-exception
+            if (r7 == 0) goto L_0x004e
+            r7.close()     // Catch:{ all -> 0x004a }
+            goto L_0x004e
+        L_0x004a:
+            r7 = move-exception
+            r8.addSuppressed(r7)
+        L_0x004e:
+            throw r9
         L_0x004f:
-            throw r4
-        L_0x0050:
-            r2 = move-exception
-            return r1
+            return r0
         */
         throw new UnsupportedOperationException("Method not decompiled: android.support.v4.graphics.TypefaceCompatUtil.mmap(android.content.Context, android.os.CancellationSignal, android.net.Uri):java.nio.ByteBuffer");
     }
 
-    public static ByteBuffer copyToDirectBuffer(Context context, Resources res, int id) {
-        File tmpFile = getTempFile(context);
-        ByteBuffer byteBuffer = null;
-        if (tmpFile == null) {
+    public static ByteBuffer copyToDirectBuffer(Context context, Resources resources, int i) {
+        File tempFile = getTempFile(context);
+        if (tempFile == null) {
             return null;
         }
         try {
-            if (copyToFile(tmpFile, res, id)) {
-                byteBuffer = mmap(tmpFile);
+            if (!copyToFile(tempFile, resources, i)) {
+                return null;
             }
-            return byteBuffer;
+            ByteBuffer mmap = mmap(tempFile);
+            tempFile.delete();
+            return mmap;
         } finally {
-            tmpFile.delete();
+            tempFile.delete();
         }
     }
 
-    public static boolean copyToFile(File file, InputStream is) {
-        FileOutputStream os = null;
+    public static boolean copyToFile(File file, InputStream inputStream) {
+        FileOutputStream fileOutputStream = null;
         try {
-            os = new FileOutputStream(file, false);
-            byte[] buffer = new byte[1024];
-            while (true) {
-                int readLen = is.read(buffer);
-                if (readLen != -1) {
-                    os.write(buffer, 0, readLen);
-                } else {
-                    return true;
-                }
-            }
-        } catch (IOException e) {
-            Log.e(TAG, "Error copying resource contents to temp file: " + e.getMessage());
-            return false;
-        } finally {
-            closeQuietly(os);
-        }
-    }
-
-    public static boolean copyToFile(File file, Resources res, int id) {
-        InputStream is = null;
-        try {
-            is = res.openRawResource(id);
-            return copyToFile(file, is);
-        } finally {
-            closeQuietly(is);
-        }
-    }
-
-    public static void closeQuietly(Closeable c) {
-        if (c != null) {
+            FileOutputStream fileOutputStream2 = new FileOutputStream(file, false);
             try {
-                c.close();
+                byte[] bArr = new byte[1024];
+                while (true) {
+                    int read = inputStream.read(bArr);
+                    if (read != -1) {
+                        fileOutputStream2.write(bArr, 0, read);
+                    } else {
+                        closeQuietly(fileOutputStream2);
+                        return true;
+                    }
+                }
             } catch (IOException e) {
+                e = e;
+                fileOutputStream = fileOutputStream2;
+                try {
+                    Log.e(TAG, "Error copying resource contents to temp file: " + e.getMessage());
+                    closeQuietly(fileOutputStream);
+                    return false;
+                } catch (Throwable th) {
+                    th = th;
+                    closeQuietly(fileOutputStream);
+                    throw th;
+                }
+            } catch (Throwable th2) {
+                th = th2;
+                fileOutputStream = fileOutputStream2;
+                closeQuietly(fileOutputStream);
+                throw th;
+            }
+        } catch (IOException e2) {
+            e = e2;
+            Log.e(TAG, "Error copying resource contents to temp file: " + e.getMessage());
+            closeQuietly(fileOutputStream);
+            return false;
+        }
+    }
+
+    public static boolean copyToFile(File file, Resources resources, int i) {
+        InputStream inputStream;
+        try {
+            inputStream = resources.openRawResource(i);
+            try {
+                boolean copyToFile = copyToFile(file, inputStream);
+                closeQuietly(inputStream);
+                return copyToFile;
+            } catch (Throwable th) {
+                th = th;
+                closeQuietly(inputStream);
+                throw th;
+            }
+        } catch (Throwable th2) {
+            th = th2;
+            inputStream = null;
+            closeQuietly(inputStream);
+            throw th;
+        }
+    }
+
+    public static void closeQuietly(Closeable closeable) {
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (IOException unused) {
             }
         }
     }

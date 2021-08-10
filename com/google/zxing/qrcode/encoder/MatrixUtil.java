@@ -15,221 +15,226 @@ public final class MatrixUtil {
     private static final int TYPE_INFO_POLY = 1335;
     private static final int VERSION_INFO_POLY = 7973;
 
+    private static boolean isEmpty(int i) {
+        return i == -1;
+    }
+
     private MatrixUtil() {
     }
 
-    static void clearMatrix(ByteMatrix matrix) {
-        matrix.clear((byte) -1);
+    static void clearMatrix(ByteMatrix byteMatrix) {
+        byteMatrix.clear((byte) -1);
     }
 
-    static void buildMatrix(BitArray dataBits, ErrorCorrectionLevel ecLevel, Version version, int maskPattern, ByteMatrix matrix) throws WriterException {
-        clearMatrix(matrix);
-        embedBasicPatterns(version, matrix);
-        embedTypeInfo(ecLevel, maskPattern, matrix);
-        maybeEmbedVersionInfo(version, matrix);
-        embedDataBits(dataBits, maskPattern, matrix);
+    static void buildMatrix(BitArray bitArray, ErrorCorrectionLevel errorCorrectionLevel, Version version, int i, ByteMatrix byteMatrix) throws WriterException {
+        clearMatrix(byteMatrix);
+        embedBasicPatterns(version, byteMatrix);
+        embedTypeInfo(errorCorrectionLevel, i, byteMatrix);
+        maybeEmbedVersionInfo(version, byteMatrix);
+        embedDataBits(bitArray, i, byteMatrix);
     }
 
-    static void embedBasicPatterns(Version version, ByteMatrix matrix) throws WriterException {
-        embedPositionDetectionPatternsAndSeparators(matrix);
-        embedDarkDotAtLeftBottomCorner(matrix);
-        maybeEmbedPositionAdjustmentPatterns(version, matrix);
-        embedTimingPatterns(matrix);
+    static void embedBasicPatterns(Version version, ByteMatrix byteMatrix) throws WriterException {
+        embedPositionDetectionPatternsAndSeparators(byteMatrix);
+        embedDarkDotAtLeftBottomCorner(byteMatrix);
+        maybeEmbedPositionAdjustmentPatterns(version, byteMatrix);
+        embedTimingPatterns(byteMatrix);
     }
 
-    static void embedTypeInfo(ErrorCorrectionLevel ecLevel, int maskPattern, ByteMatrix matrix) throws WriterException {
-        BitArray typeInfoBits = new BitArray();
-        makeTypeInfoBits(ecLevel, maskPattern, typeInfoBits);
-        for (int i = 0; i < typeInfoBits.getSize(); i++) {
-            boolean bit = typeInfoBits.get((typeInfoBits.getSize() - 1) - i);
+    static void embedTypeInfo(ErrorCorrectionLevel errorCorrectionLevel, int i, ByteMatrix byteMatrix) throws WriterException {
+        BitArray bitArray = new BitArray();
+        makeTypeInfoBits(errorCorrectionLevel, i, bitArray);
+        for (int i2 = 0; i2 < bitArray.getSize(); i2++) {
+            boolean z = bitArray.get((bitArray.getSize() - 1) - i2);
             int[][] iArr = TYPE_INFO_COORDINATES;
-            matrix.set(iArr[i][0], iArr[i][1], bit);
-            if (i < 8) {
-                matrix.set((matrix.getWidth() - i) - 1, 8, bit);
+            byteMatrix.set(iArr[i2][0], iArr[i2][1], z);
+            if (i2 < 8) {
+                byteMatrix.set((byteMatrix.getWidth() - i2) - 1, 8, z);
             } else {
-                matrix.set(8, (matrix.getHeight() - 7) + (i - 8), bit);
+                byteMatrix.set(8, (byteMatrix.getHeight() - 7) + (i2 - 8), z);
             }
         }
     }
 
-    static void maybeEmbedVersionInfo(Version version, ByteMatrix matrix) throws WriterException {
+    static void maybeEmbedVersionInfo(Version version, ByteMatrix byteMatrix) throws WriterException {
         if (version.getVersionNumber() >= 7) {
-            BitArray versionInfoBits = new BitArray();
-            makeVersionInfoBits(version, versionInfoBits);
-            int bitIndex = 17;
-            for (int i = 0; i < 6; i++) {
-                for (int j = 0; j < 3; j++) {
-                    boolean bit = versionInfoBits.get(bitIndex);
-                    bitIndex--;
-                    matrix.set(i, (matrix.getHeight() - 11) + j, bit);
-                    matrix.set((matrix.getHeight() - 11) + j, i, bit);
+            BitArray bitArray = new BitArray();
+            makeVersionInfoBits(version, bitArray);
+            int i = 17;
+            for (int i2 = 0; i2 < 6; i2++) {
+                for (int i3 = 0; i3 < 3; i3++) {
+                    boolean z = bitArray.get(i);
+                    i--;
+                    byteMatrix.set(i2, (byteMatrix.getHeight() - 11) + i3, z);
+                    byteMatrix.set((byteMatrix.getHeight() - 11) + i3, i2, z);
                 }
             }
         }
     }
 
-    static void embedDataBits(BitArray dataBits, int maskPattern, ByteMatrix matrix) throws WriterException {
-        boolean bit;
-        int bitIndex = 0;
-        int direction = -1;
-        int x = matrix.getWidth() - 1;
-        int y = matrix.getHeight() - 1;
-        while (x > 0) {
-            if (x == 6) {
-                x--;
+    static void embedDataBits(BitArray bitArray, int i, ByteMatrix byteMatrix) throws WriterException {
+        boolean z;
+        int width = byteMatrix.getWidth() - 1;
+        int height = byteMatrix.getHeight() - 1;
+        int i2 = 0;
+        int i3 = -1;
+        while (width > 0) {
+            if (width == 6) {
+                width--;
             }
-            while (y >= 0 && y < matrix.getHeight()) {
-                for (int i = 0; i < 2; i++) {
-                    int xx = x - i;
-                    if (isEmpty(matrix.get(xx, y))) {
-                        if (bitIndex < dataBits.getSize()) {
-                            bit = dataBits.get(bitIndex);
-                            bitIndex++;
+            while (height >= 0 && height < byteMatrix.getHeight()) {
+                for (int i4 = 0; i4 < 2; i4++) {
+                    int i5 = width - i4;
+                    if (isEmpty(byteMatrix.get(i5, height))) {
+                        if (i2 < bitArray.getSize()) {
+                            z = bitArray.get(i2);
+                            i2++;
                         } else {
-                            bit = false;
+                            z = false;
                         }
-                        if (maskPattern != -1 && MaskUtil.getDataMaskBit(maskPattern, xx, y)) {
-                            bit = !bit;
+                        if (i != -1 && MaskUtil.getDataMaskBit(i, i5, height)) {
+                            z = !z;
                         }
-                        matrix.set(xx, y, bit);
+                        byteMatrix.set(i5, height, z);
                     }
                 }
-                y += direction;
+                height += i3;
             }
-            direction = -direction;
-            y += direction;
-            x -= 2;
+            i3 = -i3;
+            height += i3;
+            width -= 2;
         }
-        if (bitIndex != dataBits.getSize()) {
-            throw new WriterException("Not all bits consumed: " + bitIndex + '/' + dataBits.getSize());
+        if (i2 != bitArray.getSize()) {
+            throw new WriterException("Not all bits consumed: " + i2 + '/' + bitArray.getSize());
         }
     }
 
-    static int findMSBSet(int value) {
-        return 32 - Integer.numberOfLeadingZeros(value);
+    static int findMSBSet(int i) {
+        return 32 - Integer.numberOfLeadingZeros(i);
     }
 
-    static int calculateBCHCode(int value, int poly) {
-        if (poly != 0) {
-            int msbSetInPoly = findMSBSet(poly);
-            int value2 = value << (msbSetInPoly - 1);
-            while (findMSBSet(value2) >= msbSetInPoly) {
-                value2 ^= poly << (findMSBSet(value2) - msbSetInPoly);
+    static int calculateBCHCode(int i, int i2) {
+        if (i2 != 0) {
+            int findMSBSet = findMSBSet(i2);
+            int i3 = i << (findMSBSet - 1);
+            while (findMSBSet(i3) >= findMSBSet) {
+                i3 ^= i2 << (findMSBSet(i3) - findMSBSet);
             }
-            return value2;
+            return i3;
         }
         throw new IllegalArgumentException("0 polynomial");
     }
 
-    static void makeTypeInfoBits(ErrorCorrectionLevel ecLevel, int maskPattern, BitArray bits) throws WriterException {
-        if (QRCode.isValidMaskPattern(maskPattern)) {
-            int typeInfo = (ecLevel.getBits() << 3) | maskPattern;
-            bits.appendBits(typeInfo, 5);
-            bits.appendBits(calculateBCHCode(typeInfo, TYPE_INFO_POLY), 10);
-            BitArray maskBits = new BitArray();
-            maskBits.appendBits(TYPE_INFO_MASK_PATTERN, 15);
-            bits.xor(maskBits);
-            if (bits.getSize() != 15) {
-                throw new WriterException("should not happen but we got: " + bits.getSize());
+    static void makeTypeInfoBits(ErrorCorrectionLevel errorCorrectionLevel, int i, BitArray bitArray) throws WriterException {
+        if (QRCode.isValidMaskPattern(i)) {
+            int bits = (errorCorrectionLevel.getBits() << 3) | i;
+            bitArray.appendBits(bits, 5);
+            bitArray.appendBits(calculateBCHCode(bits, TYPE_INFO_POLY), 10);
+            BitArray bitArray2 = new BitArray();
+            bitArray2.appendBits(TYPE_INFO_MASK_PATTERN, 15);
+            bitArray.xor(bitArray2);
+            if (bitArray.getSize() != 15) {
+                throw new WriterException("should not happen but we got: " + bitArray.getSize());
             }
             return;
         }
         throw new WriterException("Invalid mask pattern");
     }
 
-    static void makeVersionInfoBits(Version version, BitArray bits) throws WriterException {
-        bits.appendBits(version.getVersionNumber(), 6);
-        bits.appendBits(calculateBCHCode(version.getVersionNumber(), VERSION_INFO_POLY), 12);
-        if (bits.getSize() != 18) {
-            throw new WriterException("should not happen but we got: " + bits.getSize());
+    static void makeVersionInfoBits(Version version, BitArray bitArray) throws WriterException {
+        bitArray.appendBits(version.getVersionNumber(), 6);
+        bitArray.appendBits(calculateBCHCode(version.getVersionNumber(), VERSION_INFO_POLY), 12);
+        if (bitArray.getSize() != 18) {
+            throw new WriterException("should not happen but we got: " + bitArray.getSize());
         }
     }
 
-    private static boolean isEmpty(int value) {
-        return value == -1;
-    }
-
-    private static void embedTimingPatterns(ByteMatrix matrix) {
-        for (int i = 8; i < matrix.getWidth() - 8; i++) {
-            int bit = (i + 1) % 2;
-            if (isEmpty(matrix.get(i, 6))) {
-                matrix.set(i, 6, bit);
+    private static void embedTimingPatterns(ByteMatrix byteMatrix) {
+        int i = 8;
+        while (i < byteMatrix.getWidth() - 8) {
+            int i2 = i + 1;
+            int i3 = i2 % 2;
+            if (isEmpty(byteMatrix.get(i, 6))) {
+                byteMatrix.set(i, 6, i3);
             }
-            if (isEmpty(matrix.get(6, i))) {
-                matrix.set(6, i, bit);
+            if (isEmpty(byteMatrix.get(6, i))) {
+                byteMatrix.set(6, i, i3);
             }
+            i = i2;
         }
     }
 
-    private static void embedDarkDotAtLeftBottomCorner(ByteMatrix matrix) throws WriterException {
-        if (matrix.get(8, matrix.getHeight() - 8) != 0) {
-            matrix.set(8, matrix.getHeight() - 8, 1);
+    private static void embedDarkDotAtLeftBottomCorner(ByteMatrix byteMatrix) throws WriterException {
+        if (byteMatrix.get(8, byteMatrix.getHeight() - 8) != 0) {
+            byteMatrix.set(8, byteMatrix.getHeight() - 8, 1);
             return;
         }
         throw new WriterException();
     }
 
-    private static void embedHorizontalSeparationPattern(int xStart, int yStart, ByteMatrix matrix) throws WriterException {
-        for (int x = 0; x < 8; x++) {
-            if (isEmpty(matrix.get(xStart + x, yStart))) {
-                matrix.set(xStart + x, yStart, 0);
+    private static void embedHorizontalSeparationPattern(int i, int i2, ByteMatrix byteMatrix) throws WriterException {
+        for (int i3 = 0; i3 < 8; i3++) {
+            int i4 = i + i3;
+            if (isEmpty(byteMatrix.get(i4, i2))) {
+                byteMatrix.set(i4, i2, 0);
             } else {
                 throw new WriterException();
             }
         }
     }
 
-    private static void embedVerticalSeparationPattern(int xStart, int yStart, ByteMatrix matrix) throws WriterException {
-        for (int y = 0; y < 7; y++) {
-            if (isEmpty(matrix.get(xStart, yStart + y))) {
-                matrix.set(xStart, yStart + y, 0);
+    private static void embedVerticalSeparationPattern(int i, int i2, ByteMatrix byteMatrix) throws WriterException {
+        for (int i3 = 0; i3 < 7; i3++) {
+            int i4 = i2 + i3;
+            if (isEmpty(byteMatrix.get(i, i4))) {
+                byteMatrix.set(i, i4, 0);
             } else {
                 throw new WriterException();
             }
         }
     }
 
-    private static void embedPositionAdjustmentPattern(int xStart, int yStart, ByteMatrix matrix) {
-        for (int y = 0; y < 5; y++) {
-            for (int x = 0; x < 5; x++) {
-                matrix.set(xStart + x, yStart + y, POSITION_ADJUSTMENT_PATTERN[y][x]);
+    private static void embedPositionAdjustmentPattern(int i, int i2, ByteMatrix byteMatrix) {
+        for (int i3 = 0; i3 < 5; i3++) {
+            for (int i4 = 0; i4 < 5; i4++) {
+                byteMatrix.set(i + i4, i2 + i3, POSITION_ADJUSTMENT_PATTERN[i3][i4]);
             }
         }
     }
 
-    private static void embedPositionDetectionPattern(int xStart, int yStart, ByteMatrix matrix) {
-        for (int y = 0; y < 7; y++) {
-            for (int x = 0; x < 7; x++) {
-                matrix.set(xStart + x, yStart + y, POSITION_DETECTION_PATTERN[y][x]);
+    private static void embedPositionDetectionPattern(int i, int i2, ByteMatrix byteMatrix) {
+        for (int i3 = 0; i3 < 7; i3++) {
+            for (int i4 = 0; i4 < 7; i4++) {
+                byteMatrix.set(i + i4, i2 + i3, POSITION_DETECTION_PATTERN[i3][i4]);
             }
         }
     }
 
-    private static void embedPositionDetectionPatternsAndSeparators(ByteMatrix matrix) throws WriterException {
-        int pdpWidth = POSITION_DETECTION_PATTERN[0].length;
-        embedPositionDetectionPattern(0, 0, matrix);
-        embedPositionDetectionPattern(matrix.getWidth() - pdpWidth, 0, matrix);
-        embedPositionDetectionPattern(0, matrix.getWidth() - pdpWidth, matrix);
-        embedHorizontalSeparationPattern(0, 8 - 1, matrix);
-        embedHorizontalSeparationPattern(matrix.getWidth() - 8, 8 - 1, matrix);
-        embedHorizontalSeparationPattern(0, matrix.getWidth() - 8, matrix);
-        embedVerticalSeparationPattern(7, 0, matrix);
-        embedVerticalSeparationPattern((matrix.getHeight() - 7) - 1, 0, matrix);
-        embedVerticalSeparationPattern(7, matrix.getHeight() - 7, matrix);
+    private static void embedPositionDetectionPatternsAndSeparators(ByteMatrix byteMatrix) throws WriterException {
+        int length = POSITION_DETECTION_PATTERN[0].length;
+        embedPositionDetectionPattern(0, 0, byteMatrix);
+        embedPositionDetectionPattern(byteMatrix.getWidth() - length, 0, byteMatrix);
+        embedPositionDetectionPattern(0, byteMatrix.getWidth() - length, byteMatrix);
+        embedHorizontalSeparationPattern(0, 7, byteMatrix);
+        embedHorizontalSeparationPattern(byteMatrix.getWidth() - 8, 7, byteMatrix);
+        embedHorizontalSeparationPattern(0, byteMatrix.getWidth() - 8, byteMatrix);
+        embedVerticalSeparationPattern(7, 0, byteMatrix);
+        embedVerticalSeparationPattern((byteMatrix.getHeight() - 7) - 1, 0, byteMatrix);
+        embedVerticalSeparationPattern(7, byteMatrix.getHeight() - 7, byteMatrix);
     }
 
-    private static void maybeEmbedPositionAdjustmentPatterns(Version version, ByteMatrix matrix) {
+    private static void maybeEmbedPositionAdjustmentPatterns(Version version, ByteMatrix byteMatrix) {
         if (version.getVersionNumber() >= 2) {
-            int index = version.getVersionNumber() - 1;
+            int versionNumber = version.getVersionNumber() - 1;
             int[][] iArr = POSITION_ADJUSTMENT_PATTERN_COORDINATE_TABLE;
-            int[] coordinates = iArr[index];
-            int numCoordinates = iArr[index].length;
-            for (int i = 0; i < numCoordinates; i++) {
-                for (int j = 0; j < numCoordinates; j++) {
-                    int y = coordinates[i];
-                    int x = coordinates[j];
-                    if (!(x == -1 || y == -1 || !isEmpty(matrix.get(x, y)))) {
-                        embedPositionAdjustmentPattern(x - 2, y - 2, matrix);
+            int[] iArr2 = iArr[versionNumber];
+            int length = iArr[versionNumber].length;
+            for (int i = 0; i < length; i++) {
+                for (int i2 = 0; i2 < length; i2++) {
+                    int i3 = iArr2[i];
+                    int i4 = iArr2[i2];
+                    if (!(i4 == -1 || i3 == -1 || !isEmpty(byteMatrix.get(i4, i3)))) {
+                        embedPositionAdjustmentPattern(i4 - 2, i3 - 2, byteMatrix);
                     }
                 }
             }

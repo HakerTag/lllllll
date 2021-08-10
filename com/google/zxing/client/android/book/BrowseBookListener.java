@@ -12,21 +12,21 @@ public final class BrowseBookListener implements AdapterView.OnItemClickListener
     private final SearchBookContentsActivity activity;
     private final List<SearchBookContentsResult> items;
 
-    BrowseBookListener(SearchBookContentsActivity activity2, List<SearchBookContentsResult> items2) {
-        this.activity = activity2;
-        this.items = items2;
+    BrowseBookListener(SearchBookContentsActivity searchBookContentsActivity, List<SearchBookContentsResult> list) {
+        this.activity = searchBookContentsActivity;
+        this.items = list;
     }
 
     @Override // android.widget.AdapterView.OnItemClickListener
-    public void onItemClick(AdapterView<?> adapterView, View v, int position, long id) {
-        int itemOffset;
-        if (position >= 1 && position - 1 < this.items.size()) {
-            String pageId = this.items.get(itemOffset).getPageId();
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long j) {
+        int i2;
+        if (i >= 1 && (i2 = i - 1) < this.items.size()) {
+            String pageId = this.items.get(i2).getPageId();
             String query = SearchBookContentsResult.getQuery();
             if (LocaleManager.isBookSearchUrl(this.activity.getISBN()) && !pageId.isEmpty()) {
-                String uri = this.activity.getISBN();
-                String volumeId = uri.substring(uri.indexOf(61) + 1);
-                Intent intent = new Intent("android.intent.action.VIEW", Uri.parse("http://books.google." + LocaleManager.getBookSearchCountryTLD(this.activity) + "/books?id=" + volumeId + "&pg=" + pageId + "&vq=" + query));
+                String isbn = this.activity.getISBN();
+                String substring = isbn.substring(isbn.indexOf(61) + 1);
+                Intent intent = new Intent("android.intent.action.VIEW", Uri.parse("http://books.google." + LocaleManager.getBookSearchCountryTLD(this.activity) + "/books?id=" + substring + "&pg=" + pageId + "&vq=" + query));
                 intent.addFlags(524288);
                 this.activity.startActivity(intent);
             }

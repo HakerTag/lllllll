@@ -21,19 +21,19 @@ public abstract class DisplayManagerCompat {
     }
 
     public static DisplayManagerCompat getInstance(Context context) {
-        DisplayManagerCompat instance;
+        DisplayManagerCompat displayManagerCompat;
         synchronized (sInstances) {
-            instance = sInstances.get(context);
-            if (instance == null) {
+            displayManagerCompat = sInstances.get(context);
+            if (displayManagerCompat == null) {
                 if (Build.VERSION.SDK_INT >= 17) {
-                    instance = new DisplayManagerCompatApi17Impl(context);
+                    displayManagerCompat = new DisplayManagerCompatApi17Impl(context);
                 } else {
-                    instance = new DisplayManagerCompatApi14Impl(context);
+                    displayManagerCompat = new DisplayManagerCompatApi14Impl(context);
                 }
-                sInstances.put(context, instance);
+                sInstances.put(context, displayManagerCompat);
             }
         }
-        return instance;
+        return displayManagerCompat;
     }
 
     private static class DisplayManagerCompatApi14Impl extends DisplayManagerCompat {
@@ -44,10 +44,10 @@ public abstract class DisplayManagerCompat {
         }
 
         @Override // android.support.v4.hardware.display.DisplayManagerCompat
-        public Display getDisplay(int displayId) {
-            Display display = this.mWindowManager.getDefaultDisplay();
-            if (display.getDisplayId() == displayId) {
-                return display;
+        public Display getDisplay(int i) {
+            Display defaultDisplay = this.mWindowManager.getDefaultDisplay();
+            if (defaultDisplay.getDisplayId() == i) {
+                return defaultDisplay;
             }
             return null;
         }
@@ -58,8 +58,8 @@ public abstract class DisplayManagerCompat {
         }
 
         @Override // android.support.v4.hardware.display.DisplayManagerCompat
-        public Display[] getDisplays(String category) {
-            return category == null ? getDisplays() : new Display[0];
+        public Display[] getDisplays(String str) {
+            return str == null ? getDisplays() : new Display[0];
         }
     }
 
@@ -71,8 +71,8 @@ public abstract class DisplayManagerCompat {
         }
 
         @Override // android.support.v4.hardware.display.DisplayManagerCompat
-        public Display getDisplay(int displayId) {
-            return this.mDisplayManager.getDisplay(displayId);
+        public Display getDisplay(int i) {
+            return this.mDisplayManager.getDisplay(i);
         }
 
         @Override // android.support.v4.hardware.display.DisplayManagerCompat
@@ -81,8 +81,8 @@ public abstract class DisplayManagerCompat {
         }
 
         @Override // android.support.v4.hardware.display.DisplayManagerCompat
-        public Display[] getDisplays(String category) {
-            return this.mDisplayManager.getDisplays(category);
+        public Display[] getDisplays(String str) {
+            return this.mDisplayManager.getDisplays(str);
         }
     }
 }

@@ -62,28 +62,28 @@ public final class ScrollerCompat {
     }
 
     @Deprecated
-    public void startScroll(int startX, int startY, int dx, int dy) {
-        this.mScroller.startScroll(startX, startY, dx, dy);
+    public void startScroll(int i, int i2, int i3, int i4) {
+        this.mScroller.startScroll(i, i2, i3, i4);
     }
 
     @Deprecated
-    public void startScroll(int startX, int startY, int dx, int dy, int duration) {
-        this.mScroller.startScroll(startX, startY, dx, dy, duration);
+    public void startScroll(int i, int i2, int i3, int i4, int i5) {
+        this.mScroller.startScroll(i, i2, i3, i4, i5);
     }
 
     @Deprecated
-    public void fling(int startX, int startY, int velocityX, int velocityY, int minX, int maxX, int minY, int maxY) {
-        this.mScroller.fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY);
+    public void fling(int i, int i2, int i3, int i4, int i5, int i6, int i7, int i8) {
+        this.mScroller.fling(i, i2, i3, i4, i5, i6, i7, i8);
     }
 
     @Deprecated
-    public void fling(int startX, int startY, int velocityX, int velocityY, int minX, int maxX, int minY, int maxY, int overX, int overY) {
-        this.mScroller.fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY, overX, overY);
+    public void fling(int i, int i2, int i3, int i4, int i5, int i6, int i7, int i8, int i9, int i10) {
+        this.mScroller.fling(i, i2, i3, i4, i5, i6, i7, i8, i9, i10);
     }
 
     @Deprecated
-    public boolean springBack(int startX, int startY, int minX, int maxX, int minY, int maxY) {
-        return this.mScroller.springBack(startX, startY, minX, maxX, minY, maxY);
+    public boolean springBack(int i, int i2, int i3, int i4, int i5, int i6) {
+        return this.mScroller.springBack(i, i2, i3, i4, i5, i6);
     }
 
     @Deprecated
@@ -92,13 +92,13 @@ public final class ScrollerCompat {
     }
 
     @Deprecated
-    public void notifyHorizontalEdgeReached(int startX, int finalX, int overX) {
-        this.mScroller.notifyHorizontalEdgeReached(startX, finalX, overX);
+    public void notifyHorizontalEdgeReached(int i, int i2, int i3) {
+        this.mScroller.notifyHorizontalEdgeReached(i, i2, i3);
     }
 
     @Deprecated
-    public void notifyVerticalEdgeReached(int startY, int finalY, int overY) {
-        this.mScroller.notifyVerticalEdgeReached(startY, finalY, overY);
+    public void notifyVerticalEdgeReached(int i, int i2, int i3) {
+        this.mScroller.notifyVerticalEdgeReached(i, i2, i3);
     }
 
     @Deprecated

@@ -8,103 +8,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import kotlin.jvm.internal.IntCompanionObject;
 
 /* access modifiers changed from: package-private */
 public final class VCardContactEncoder extends ContactEncoder {
     private static final char TERMINATOR = '\n';
 
-    VCardContactEncoder() {
-    }
-
-    @Override // com.google.zxing.client.android.encode.ContactEncoder
-    public String[] encode(List<String> names, String organization, List<String> addresses, List<String> phones, List<String> phoneTypes, List<String> emails, List<String> urls, String note) {
-        StringBuilder newContents = new StringBuilder(100);
-        newContents.append("BEGIN:VCARD");
-        newContents.append(TERMINATOR);
-        newContents.append("VERSION:3.0");
-        newContents.append(TERMINATOR);
-        StringBuilder newDisplayContents = new StringBuilder(100);
-        Formatter fieldFormatter = new VCardFieldFormatter();
-        appendUpToUnique(newContents, newDisplayContents, "N", names, 1, null, fieldFormatter, TERMINATOR);
-        append(newContents, newDisplayContents, "ORG", organization, fieldFormatter, TERMINATOR);
-        appendUpToUnique(newContents, newDisplayContents, "ADR", addresses, 1, null, fieldFormatter, TERMINATOR);
-        List<Map<String, Set<String>>> phoneMetadata = buildPhoneMetadata(phones, phoneTypes);
-        appendUpToUnique(newContents, newDisplayContents, "TEL", phones, Integer.MAX_VALUE, new VCardTelDisplayFormatter(phoneMetadata), new VCardFieldFormatter(phoneMetadata), TERMINATOR);
-        appendUpToUnique(newContents, newDisplayContents, "EMAIL", emails, Integer.MAX_VALUE, null, fieldFormatter, TERMINATOR);
-        appendUpToUnique(newContents, newDisplayContents, "URL", urls, Integer.MAX_VALUE, null, fieldFormatter, TERMINATOR);
-        append(newContents, newDisplayContents, "NOTE", note, fieldFormatter, TERMINATOR);
-        newContents.append("END:VCARD");
-        newContents.append(TERMINATOR);
-        return new String[]{newContents.toString(), newDisplayContents.toString()};
-    }
-
-    private static List<Map<String, Set<String>>> buildPhoneMetadata(Collection<String> phones, List<String> phoneTypes) {
-        if (phoneTypes == null || phoneTypes.isEmpty()) {
-            return null;
-        }
-        List<Map<String, Set<String>>> metadataForIndex = new ArrayList<>();
-        for (int i = 0; i < phones.size(); i++) {
-            if (phoneTypes.size() <= i) {
-                metadataForIndex.add(null);
-            } else {
-                Map<String, Set<String>> metadata = new HashMap<>();
-                metadataForIndex.add(metadata);
-                Set<String> typeTokens = new HashSet<>();
-                metadata.put(Intents.WifiConnect.TYPE, typeTokens);
-                String typeString = phoneTypes.get(i);
-                Integer androidType = maybeIntValue(typeString);
-                if (androidType == null) {
-                    typeTokens.add(typeString);
-                } else {
-                    String purpose = vCardPurposeLabelForAndroidType(androidType.intValue());
-                    String context = vCardContextLabelForAndroidType(androidType.intValue());
-                    if (purpose != null) {
-                        typeTokens.add(purpose);
-                    }
-                    if (context != null) {
-                        typeTokens.add(context);
-                    }
-                }
-            }
-        }
-        return metadataForIndex;
-    }
-
-    private static Integer maybeIntValue(String value) {
-        try {
-            return Integer.valueOf(value);
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
-
-    private static String vCardPurposeLabelForAndroidType(int androidType) {
-        if (androidType == 4 || androidType == 5) {
-            return "fax";
-        }
-        if (androidType == 6) {
-            return "pager";
-        }
-        if (androidType == 13) {
-            return "fax";
-        }
-        if (androidType == 16) {
-            return "textphone";
-        }
-        if (androidType == 18) {
-            return "pager";
-        }
-        if (androidType != 20) {
-            return null;
-        }
-        return "text";
-    }
-
-    private static String vCardContextLabelForAndroidType(int androidType) {
-        if (androidType == 10 || androidType == 17 || androidType == 18) {
+    private static String vCardContextLabelForAndroidType(int i) {
+        if (i == 10 || i == 17 || i == 18) {
             return "work";
         }
-        switch (androidType) {
+        switch (i) {
             case 1:
             case 2:
             case 5:
@@ -115,6 +29,93 @@ public final class VCardContactEncoder extends ContactEncoder {
                 return "work";
             default:
                 return null;
+        }
+    }
+
+    private static String vCardPurposeLabelForAndroidType(int i) {
+        if (i == 4 || i == 5) {
+            return "fax";
+        }
+        if (i == 6) {
+            return "pager";
+        }
+        if (i == 13) {
+            return "fax";
+        }
+        if (i == 16) {
+            return "textphone";
+        }
+        if (i == 18) {
+            return "pager";
+        }
+        if (i != 20) {
+            return null;
+        }
+        return "text";
+    }
+
+    VCardContactEncoder() {
+    }
+
+    @Override // com.google.zxing.client.android.encode.ContactEncoder
+    public String[] encode(List<String> list, String str, List<String> list2, List<String> list3, List<String> list4, List<String> list5, List<String> list6, String str2) {
+        StringBuilder sb = new StringBuilder(100);
+        sb.append("BEGIN:VCARD");
+        sb.append(TERMINATOR);
+        sb.append("VERSION:3.0");
+        sb.append(TERMINATOR);
+        StringBuilder sb2 = new StringBuilder(100);
+        VCardFieldFormatter vCardFieldFormatter = new VCardFieldFormatter();
+        appendUpToUnique(sb, sb2, "N", list, 1, null, vCardFieldFormatter, TERMINATOR);
+        append(sb, sb2, "ORG", str, vCardFieldFormatter, TERMINATOR);
+        appendUpToUnique(sb, sb2, "ADR", list2, 1, null, vCardFieldFormatter, TERMINATOR);
+        List<Map<String, Set<String>>> buildPhoneMetadata = buildPhoneMetadata(list3, list4);
+        appendUpToUnique(sb, sb2, "TEL", list3, IntCompanionObject.MAX_VALUE, new VCardTelDisplayFormatter(buildPhoneMetadata), new VCardFieldFormatter(buildPhoneMetadata), TERMINATOR);
+        appendUpToUnique(sb, sb2, "EMAIL", list5, IntCompanionObject.MAX_VALUE, null, vCardFieldFormatter, TERMINATOR);
+        appendUpToUnique(sb, sb2, "URL", list6, IntCompanionObject.MAX_VALUE, null, vCardFieldFormatter, TERMINATOR);
+        append(sb, sb2, "NOTE", str2, vCardFieldFormatter, TERMINATOR);
+        sb.append("END:VCARD");
+        sb.append(TERMINATOR);
+        return new String[]{sb.toString(), sb2.toString()};
+    }
+
+    private static List<Map<String, Set<String>>> buildPhoneMetadata(Collection<String> collection, List<String> list) {
+        if (list == null || list.isEmpty()) {
+            return null;
+        }
+        ArrayList arrayList = new ArrayList();
+        for (int i = 0; i < collection.size(); i++) {
+            if (list.size() <= i) {
+                arrayList.add(null);
+            } else {
+                HashMap hashMap = new HashMap();
+                arrayList.add(hashMap);
+                HashSet hashSet = new HashSet();
+                hashMap.put(Intents.WifiConnect.TYPE, hashSet);
+                String str = list.get(i);
+                Integer maybeIntValue = maybeIntValue(str);
+                if (maybeIntValue == null) {
+                    hashSet.add(str);
+                } else {
+                    String vCardPurposeLabelForAndroidType = vCardPurposeLabelForAndroidType(maybeIntValue.intValue());
+                    String vCardContextLabelForAndroidType = vCardContextLabelForAndroidType(maybeIntValue.intValue());
+                    if (vCardPurposeLabelForAndroidType != null) {
+                        hashSet.add(vCardPurposeLabelForAndroidType);
+                    }
+                    if (vCardContextLabelForAndroidType != null) {
+                        hashSet.add(vCardContextLabelForAndroidType);
+                    }
+                }
+            }
+        }
+        return arrayList;
+    }
+
+    private static Integer maybeIntValue(String str) {
+        try {
+            return Integer.valueOf(str);
+        } catch (NumberFormatException unused) {
+            return null;
         }
     }
 }

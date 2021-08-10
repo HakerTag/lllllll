@@ -14,14 +14,14 @@ public class StayAwake extends CordovaPlugin {
     public static final String TAG = "cordova-android-styawake";
 
     @Override // org.apache.cordova.CordovaPlugin
-    public void initialize(CordovaInterface cordova, CordovaWebView webView) {
-        super.initialize(cordova, webView);
+    public void initialize(CordovaInterface cordovaInterface, CordovaWebView cordovaWebView) {
+        super.initialize(cordovaInterface, cordovaWebView);
         Log.i(TAG, "Init cordova-android-styawake plugin");
     }
 
     @Override // org.apache.cordova.CordovaPlugin
-    public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
-        if ("REACTIVATE_TIMEOUT".equals(action)) {
+    public boolean execute(String str, JSONArray jSONArray, final CallbackContext callbackContext) throws JSONException {
+        if ("REACTIVATE_TIMEOUT".equals(str)) {
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 /* class defpackage.StayAwake.AnonymousClass1 */
 
@@ -31,7 +31,7 @@ public class StayAwake extends CordovaPlugin {
                 }
             });
             return true;
-        } else if (!"DISABLE_TIMEOUT".equals(action)) {
+        } else if (!"DISABLE_TIMEOUT".equals(str)) {
             return false;
         } else {
             this.cordova.getActivity().runOnUiThread(new Runnable() {

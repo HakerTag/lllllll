@@ -19,8 +19,8 @@ public class SMS {
         this.date = cursor.getLong(cursor.getColumnIndexOrThrow("date"));
     }
 
-    private boolean applySenderFilter(String[] senderids) {
-        for (String str : senderids) {
+    private boolean applySenderFilter(String[] strArr) {
+        for (String str : strArr) {
             if (this.address.equals(str)) {
                 return true;
             }
@@ -28,18 +28,18 @@ public class SMS {
         return false;
     }
 
-    public boolean applyFilters(long sinceDate, String[] searchKeys, String[] senderids) {
-        if (this.date <= sinceDate) {
+    public boolean applyFilters(long j, String[] strArr, String[] strArr2) {
+        if (this.date <= j) {
             return false;
         }
-        if (senderids.length + searchKeys.length != 0 && !applyBodySearchFilters(searchKeys) && !applySenderFilter(senderids)) {
+        if (strArr2.length + strArr.length != 0 && !applyBodySearchFilters(strArr) && !applySenderFilter(strArr2)) {
             return false;
         }
         return true;
     }
 
-    private boolean applyBodySearchFilters(String[] searchKeys) {
-        for (String str : searchKeys) {
+    private boolean applyBodySearchFilters(String[] strArr) {
+        for (String str : strArr) {
             if (this.body.toLowerCase().contains(str.toLowerCase())) {
                 return true;
             }
@@ -48,12 +48,12 @@ public class SMS {
     }
 
     public JSONObject writeJSON() throws JSONException {
-        JSONObject sms = new JSONObject();
-        sms.put("id", this.id);
-        sms.put("address", this.address);
-        sms.put("body", this.body);
-        sms.put("read", this.read);
-        sms.put("date", this.date);
-        return sms;
+        JSONObject jSONObject = new JSONObject();
+        jSONObject.put("id", this.id);
+        jSONObject.put("address", this.address);
+        jSONObject.put("body", this.body);
+        jSONObject.put("read", this.read);
+        jSONObject.put("date", this.date);
+        return jSONObject;
     }
 }

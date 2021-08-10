@@ -43,136 +43,136 @@ public class BarcodeScanner extends CordovaPlugin {
     private JSONArray requestArgs;
 
     @Override // org.apache.cordova.CordovaPlugin
-    public boolean execute(String action, JSONArray args, CallbackContext callbackContext2) {
+    public boolean execute(String str, JSONArray jSONArray, CallbackContext callbackContext2) {
         this.callbackContext = callbackContext2;
-        this.requestArgs = args;
-        if (action.equals(ENCODE)) {
-            JSONObject obj = args.optJSONObject(0);
-            if (obj != null) {
-                String type = obj.optString(TYPE);
-                String data = obj.optString(DATA);
-                if (type == null) {
-                    type = "TEXT_TYPE";
+        this.requestArgs = jSONArray;
+        if (str.equals(ENCODE)) {
+            JSONObject optJSONObject = jSONArray.optJSONObject(0);
+            if (optJSONObject != null) {
+                String optString = optJSONObject.optString(TYPE);
+                String optString2 = optJSONObject.optString(DATA);
+                if (optString == null) {
+                    optString = "TEXT_TYPE";
                 }
-                if (data == null) {
+                if (optString2 == null) {
                     callbackContext2.error("User did not specify data to encode");
                     return true;
                 }
-                encode(type, data);
+                encode(optString, optString2);
             } else {
                 callbackContext2.error("User did not specify data to encode");
                 return true;
             }
-        } else if (!action.equals(SCAN)) {
+        } else if (!str.equals(SCAN)) {
             return false;
         } else {
             if (!hasPermisssion()) {
                 requestPermissions(0);
             } else {
-                scan(args);
+                scan(jSONArray);
             }
         }
         return true;
     }
 
-    public void scan(final JSONArray args) {
+    public void scan(final JSONArray jSONArray) {
         this.cordova.getThreadPool().execute(new Runnable() {
             /* class com.phonegap.plugins.barcodescanner.BarcodeScanner.AnonymousClass1 */
 
             public void run() {
-                Intent intentScan = new Intent(this.cordova.getActivity().getBaseContext(), CaptureActivity.class);
-                intentScan.setAction(Intents.Scan.ACTION);
-                intentScan.addCategory("android.intent.category.DEFAULT");
-                if (args.length() > 0) {
-                    for (int i = 0; i < args.length(); i++) {
+                Intent intent = new Intent(this.cordova.getActivity().getBaseContext(), CaptureActivity.class);
+                intent.setAction(Intents.Scan.ACTION);
+                intent.addCategory("android.intent.category.DEFAULT");
+                if (jSONArray.length() > 0) {
+                    for (int i = 0; i < jSONArray.length(); i++) {
                         try {
-                            JSONObject obj = args.getJSONObject(i);
-                            JSONArray names = obj.names();
-                            for (int j = 0; j < names.length(); j++) {
+                            JSONObject jSONObject = jSONArray.getJSONObject(i);
+                            JSONArray names = jSONObject.names();
+                            for (int i2 = 0; i2 < names.length(); i2++) {
                                 try {
-                                    String key = names.getString(j);
-                                    Object value = obj.get(key);
-                                    if (value instanceof Integer) {
-                                        intentScan.putExtra(key, (Integer) value);
-                                    } else if (value instanceof String) {
-                                        intentScan.putExtra(key, (String) value);
+                                    String string = names.getString(i2);
+                                    Object obj = jSONObject.get(string);
+                                    if (obj instanceof Integer) {
+                                        intent.putExtra(string, (Integer) obj);
+                                    } else if (obj instanceof String) {
+                                        intent.putExtra(string, (String) obj);
                                     }
                                 } catch (JSONException e) {
                                     Log.i("CordovaLog", e.getLocalizedMessage());
                                 }
                             }
-                            intentScan.putExtra(Intents.Scan.CAMERA_ID, obj.optBoolean(BarcodeScanner.PREFER_FRONTCAMERA, false) ? 1 : 0);
-                            intentScan.putExtra(Intents.Scan.SHOW_FLIP_CAMERA_BUTTON, obj.optBoolean(BarcodeScanner.SHOW_FLIP_CAMERA_BUTTON, false));
-                            intentScan.putExtra(Intents.Scan.SHOW_TORCH_BUTTON, obj.optBoolean(BarcodeScanner.SHOW_TORCH_BUTTON, false));
-                            intentScan.putExtra(Intents.Scan.TORCH_ON, obj.optBoolean(BarcodeScanner.TORCH_ON, false));
-                            intentScan.putExtra(Intents.Scan.SAVE_HISTORY, obj.optBoolean(BarcodeScanner.SAVE_HISTORY, false));
-                            intentScan.putExtra(Intents.Scan.BEEP_ON_SCAN, !obj.optBoolean(BarcodeScanner.DISABLE_BEEP, false));
-                            if (obj.has(BarcodeScanner.RESULTDISPLAY_DURATION)) {
-                                intentScan.putExtra(Intents.Scan.RESULT_DISPLAY_DURATION_MS, "" + obj.optLong(BarcodeScanner.RESULTDISPLAY_DURATION));
+                            intent.putExtra(Intents.Scan.CAMERA_ID, jSONObject.optBoolean(BarcodeScanner.PREFER_FRONTCAMERA, false) ? 1 : 0);
+                            intent.putExtra(Intents.Scan.SHOW_FLIP_CAMERA_BUTTON, jSONObject.optBoolean(BarcodeScanner.SHOW_FLIP_CAMERA_BUTTON, false));
+                            intent.putExtra(Intents.Scan.SHOW_TORCH_BUTTON, jSONObject.optBoolean(BarcodeScanner.SHOW_TORCH_BUTTON, false));
+                            intent.putExtra(Intents.Scan.TORCH_ON, jSONObject.optBoolean(BarcodeScanner.TORCH_ON, false));
+                            intent.putExtra(Intents.Scan.SAVE_HISTORY, jSONObject.optBoolean(BarcodeScanner.SAVE_HISTORY, false));
+                            intent.putExtra(Intents.Scan.BEEP_ON_SCAN, !jSONObject.optBoolean(BarcodeScanner.DISABLE_BEEP, false));
+                            if (jSONObject.has(BarcodeScanner.RESULTDISPLAY_DURATION)) {
+                                intent.putExtra(Intents.Scan.RESULT_DISPLAY_DURATION_MS, "" + jSONObject.optLong(BarcodeScanner.RESULTDISPLAY_DURATION));
                             }
-                            if (obj.has(BarcodeScanner.FORMATS)) {
-                                intentScan.putExtra(Intents.Scan.FORMATS, obj.optString(BarcodeScanner.FORMATS));
+                            if (jSONObject.has(BarcodeScanner.FORMATS)) {
+                                intent.putExtra(Intents.Scan.FORMATS, jSONObject.optString(BarcodeScanner.FORMATS));
                             }
-                            if (obj.has(BarcodeScanner.PROMPT)) {
-                                intentScan.putExtra(Intents.Scan.PROMPT_MESSAGE, obj.optString(BarcodeScanner.PROMPT));
+                            if (jSONObject.has(BarcodeScanner.PROMPT)) {
+                                intent.putExtra(Intents.Scan.PROMPT_MESSAGE, jSONObject.optString(BarcodeScanner.PROMPT));
                             }
-                            if (obj.has(BarcodeScanner.ORIENTATION)) {
-                                intentScan.putExtra(Intents.Scan.ORIENTATION_LOCK, obj.optString(BarcodeScanner.ORIENTATION));
+                            if (jSONObject.has(BarcodeScanner.ORIENTATION)) {
+                                intent.putExtra(Intents.Scan.ORIENTATION_LOCK, jSONObject.optString(BarcodeScanner.ORIENTATION));
                             }
                         } catch (JSONException e2) {
                             Log.i("CordovaLog", e2.getLocalizedMessage());
                         }
                     }
                 }
-                intentScan.setPackage(this.cordova.getActivity().getApplicationContext().getPackageName());
-                this.cordova.startActivityForResult(this, intentScan, BarcodeScanner.REQUEST_CODE);
+                intent.setPackage(this.cordova.getActivity().getApplicationContext().getPackageName());
+                this.cordova.startActivityForResult(this, intent, BarcodeScanner.REQUEST_CODE);
             }
         });
     }
 
     @Override // org.apache.cordova.CordovaPlugin
-    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+    public void onActivityResult(int i, int i2, Intent intent) {
         CallbackContext callbackContext2;
-        if (requestCode == 47740 && (callbackContext2 = this.callbackContext) != null) {
-            if (resultCode == -1) {
-                JSONObject obj = new JSONObject();
+        if (i == 47740 && (callbackContext2 = this.callbackContext) != null) {
+            if (i2 == -1) {
+                JSONObject jSONObject = new JSONObject();
                 try {
-                    obj.put(TEXT, intent.getStringExtra(Intents.Scan.RESULT));
-                    obj.put(FORMAT, intent.getStringExtra(Intents.Scan.RESULT_FORMAT));
-                    obj.put(CANCELLED, false);
-                } catch (JSONException e) {
+                    jSONObject.put(TEXT, intent.getStringExtra(Intents.Scan.RESULT));
+                    jSONObject.put(FORMAT, intent.getStringExtra(Intents.Scan.RESULT_FORMAT));
+                    jSONObject.put(CANCELLED, false);
+                } catch (JSONException unused) {
                     Log.d(LOG_TAG, "This should never happen");
                 }
-                this.callbackContext.success(obj);
-            } else if (resultCode == 0) {
-                JSONObject obj2 = new JSONObject();
+                this.callbackContext.success(jSONObject);
+            } else if (i2 == 0) {
+                JSONObject jSONObject2 = new JSONObject();
                 try {
-                    obj2.put(TEXT, "");
-                    obj2.put(FORMAT, "");
-                    obj2.put(CANCELLED, true);
-                } catch (JSONException e2) {
+                    jSONObject2.put(TEXT, "");
+                    jSONObject2.put(FORMAT, "");
+                    jSONObject2.put(CANCELLED, true);
+                } catch (JSONException unused2) {
                     Log.d(LOG_TAG, "This should never happen");
                 }
-                this.callbackContext.success(obj2);
+                this.callbackContext.success(jSONObject2);
             } else {
                 callbackContext2.error("Unexpected error");
             }
         }
     }
 
-    public void encode(String type, String data) {
-        Intent intentEncode = new Intent(this.cordova.getActivity().getBaseContext(), EncodeActivity.class);
-        intentEncode.setAction(Intents.Encode.ACTION);
-        intentEncode.putExtra(Intents.Encode.TYPE, type);
-        intentEncode.putExtra(Intents.Encode.DATA, data);
-        intentEncode.setPackage(this.cordova.getActivity().getApplicationContext().getPackageName());
-        this.cordova.getActivity().startActivity(intentEncode);
+    public void encode(String str, String str2) {
+        Intent intent = new Intent(this.cordova.getActivity().getBaseContext(), EncodeActivity.class);
+        intent.setAction(Intents.Encode.ACTION);
+        intent.putExtra(Intents.Encode.TYPE, str);
+        intent.putExtra(Intents.Encode.DATA, str2);
+        intent.setPackage(this.cordova.getActivity().getApplicationContext().getPackageName());
+        this.cordova.getActivity().startActivity(intent);
     }
 
     @Override // org.apache.cordova.CordovaPlugin
     public boolean hasPermisssion() {
-        for (String p : this.permissions) {
-            if (!PermissionHelper.hasPermission(this, p)) {
+        for (String str : this.permissions) {
+            if (!PermissionHelper.hasPermission(this, str)) {
                 return false;
             }
         }
@@ -180,26 +180,26 @@ public class BarcodeScanner extends CordovaPlugin {
     }
 
     @Override // org.apache.cordova.CordovaPlugin
-    public void requestPermissions(int requestCode) {
-        PermissionHelper.requestPermissions(this, requestCode, this.permissions);
+    public void requestPermissions(int i) {
+        PermissionHelper.requestPermissions(this, i, this.permissions);
     }
 
     @Override // org.apache.cordova.CordovaPlugin
-    public void onRequestPermissionResult(int requestCode, String[] permissions2, int[] grantResults) throws JSONException {
-        for (int r : grantResults) {
-            if (r == -1) {
+    public void onRequestPermissionResult(int i, String[] strArr, int[] iArr) throws JSONException {
+        for (int i2 : iArr) {
+            if (i2 == -1) {
                 Log.d(LOG_TAG, "Permission Denied!");
                 this.callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ILLEGAL_ACCESS_EXCEPTION));
                 return;
             }
         }
-        if (requestCode == 0) {
+        if (i == 0) {
             scan(this.requestArgs);
         }
     }
 
     @Override // org.apache.cordova.CordovaPlugin
-    public void onRestoreStateForActivityResult(Bundle state, CallbackContext callbackContext2) {
+    public void onRestoreStateForActivityResult(Bundle bundle, CallbackContext callbackContext2) {
         this.callbackContext = callbackContext2;
     }
 }

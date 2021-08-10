@@ -1,6 +1,7 @@
 package android.arch.lifecycle;
 
 import android.arch.core.internal.FastSafeIterableMap;
+import android.arch.core.internal.SafeIterableMap;
 import android.arch.lifecycle.Lifecycle;
 import android.util.Log;
 import java.lang.ref.WeakReference;
@@ -18,8 +19,8 @@ public class LifecycleRegistry extends Lifecycle {
     private ArrayList<Lifecycle.State> mParentStates = new ArrayList<>();
     private Lifecycle.State mState;
 
-    public LifecycleRegistry(LifecycleOwner provider) {
-        this.mLifecycleOwner = new WeakReference<>(provider);
+    public LifecycleRegistry(LifecycleOwner lifecycleOwner) {
+        this.mLifecycleOwner = new WeakReference<>(lifecycleOwner);
         this.mState = Lifecycle.State.INITIALIZED;
     }
 
@@ -31,9 +32,9 @@ public class LifecycleRegistry extends Lifecycle {
         moveToState(getStateAfter(event));
     }
 
-    private void moveToState(Lifecycle.State next) {
-        if (this.mState != next) {
-            this.mState = next;
+    private void moveToState(Lifecycle.State state) {
+        if (this.mState != state) {
+            this.mState = state;
             if (this.mHandlingEvent || this.mAddingObserverCounter != 0) {
                 this.mNewEventOccurred = true;
                 return;
@@ -48,40 +49,40 @@ public class LifecycleRegistry extends Lifecycle {
         if (this.mObserverMap.size() == 0) {
             return true;
         }
-        Lifecycle.State eldestObserverState = this.mObserverMap.eldest().getValue().mState;
-        Lifecycle.State newestObserverState = this.mObserverMap.newest().getValue().mState;
-        if (eldestObserverState == newestObserverState && this.mState == newestObserverState) {
+        Lifecycle.State state = this.mObserverMap.eldest().getValue().mState;
+        Lifecycle.State state2 = this.mObserverMap.newest().getValue().mState;
+        if (state == state2 && this.mState == state2) {
             return true;
         }
         return false;
     }
 
-    private Lifecycle.State calculateTargetState(LifecycleObserver observer) {
-        Map.Entry<LifecycleObserver, ObserverWithState> previous = this.mObserverMap.ceil(observer);
-        Lifecycle.State parentState = null;
-        Lifecycle.State siblingState = previous != null ? previous.getValue().mState : null;
+    private Lifecycle.State calculateTargetState(LifecycleObserver lifecycleObserver) {
+        Map.Entry<LifecycleObserver, ObserverWithState> ceil = this.mObserverMap.ceil(lifecycleObserver);
+        Lifecycle.State state = null;
+        Lifecycle.State state2 = ceil != null ? ceil.getValue().mState : null;
         if (!this.mParentStates.isEmpty()) {
             ArrayList<Lifecycle.State> arrayList = this.mParentStates;
-            parentState = arrayList.get(arrayList.size() - 1);
+            state = arrayList.get(arrayList.size() - 1);
         }
-        return min(min(this.mState, siblingState), parentState);
+        return min(min(this.mState, state2), state);
     }
 
     @Override // android.arch.lifecycle.Lifecycle
-    public void addObserver(LifecycleObserver observer) {
+    public void addObserver(LifecycleObserver lifecycleObserver) {
         LifecycleOwner lifecycleOwner;
-        ObserverWithState statefulObserver = new ObserverWithState(observer, this.mState == Lifecycle.State.DESTROYED ? Lifecycle.State.DESTROYED : Lifecycle.State.INITIALIZED);
-        if (this.mObserverMap.putIfAbsent(observer, statefulObserver) == null && (lifecycleOwner = this.mLifecycleOwner.get()) != null) {
-            boolean isReentrance = this.mAddingObserverCounter != 0 || this.mHandlingEvent;
-            Lifecycle.State targetState = calculateTargetState(observer);
+        ObserverWithState observerWithState = new ObserverWithState(lifecycleObserver, this.mState == Lifecycle.State.DESTROYED ? Lifecycle.State.DESTROYED : Lifecycle.State.INITIALIZED);
+        if (this.mObserverMap.putIfAbsent(lifecycleObserver, observerWithState) == null && (lifecycleOwner = this.mLifecycleOwner.get()) != null) {
+            boolean z = this.mAddingObserverCounter != 0 || this.mHandlingEvent;
+            Lifecycle.State calculateTargetState = calculateTargetState(lifecycleObserver);
             this.mAddingObserverCounter++;
-            while (statefulObserver.mState.compareTo((Enum) targetState) < 0 && this.mObserverMap.contains(observer)) {
-                pushParentState(statefulObserver.mState);
-                statefulObserver.dispatchEvent(lifecycleOwner, upEvent(statefulObserver.mState));
+            while (observerWithState.mState.compareTo((Enum) calculateTargetState) < 0 && this.mObserverMap.contains(lifecycleObserver)) {
+                pushParentState(observerWithState.mState);
+                observerWithState.dispatchEvent(lifecycleOwner, upEvent(observerWithState.mState));
                 popParentState();
-                targetState = calculateTargetState(observer);
+                calculateTargetState = calculateTargetState(lifecycleObserver);
             }
-            if (!isReentrance) {
+            if (!z) {
                 sync();
             }
             this.mAddingObserverCounter--;
@@ -98,8 +99,8 @@ public class LifecycleRegistry extends Lifecycle {
     }
 
     @Override // android.arch.lifecycle.Lifecycle
-    public void removeObserver(LifecycleObserver observer) {
-        this.mObserverMap.remove(observer);
+    public void removeObserver(LifecycleObserver lifecycleObserver) {
+        this.mObserverMap.remove(lifecycleObserver);
     }
 
     public int getObserverCount() {
@@ -134,59 +135,99 @@ public class LifecycleRegistry extends Lifecycle {
         static final /* synthetic */ int[] $SwitchMap$android$arch$lifecycle$Lifecycle$Event;
         static final /* synthetic */ int[] $SwitchMap$android$arch$lifecycle$Lifecycle$State;
 
+        /* JADX WARNING: Can't wrap try/catch for region: R(26:0|(2:1|2)|3|(2:5|6)|7|(2:9|10)|11|(2:13|14)|15|(2:17|18)|19|21|22|23|24|25|26|27|28|29|30|31|32|33|34|36) */
+        /* JADX WARNING: Can't wrap try/catch for region: R(27:0|(2:1|2)|3|(2:5|6)|7|9|10|11|(2:13|14)|15|(2:17|18)|19|21|22|23|24|25|26|27|28|29|30|31|32|33|34|36) */
+        /* JADX WARNING: Can't wrap try/catch for region: R(29:0|1|2|3|(2:5|6)|7|9|10|11|13|14|15|(2:17|18)|19|21|22|23|24|25|26|27|28|29|30|31|32|33|34|36) */
+        /* JADX WARNING: Can't wrap try/catch for region: R(30:0|1|2|3|(2:5|6)|7|9|10|11|13|14|15|17|18|19|21|22|23|24|25|26|27|28|29|30|31|32|33|34|36) */
+        /* JADX WARNING: Can't wrap try/catch for region: R(31:0|1|2|3|5|6|7|9|10|11|13|14|15|17|18|19|21|22|23|24|25|26|27|28|29|30|31|32|33|34|36) */
+        /* JADX WARNING: Code restructure failed: missing block: B:37:?, code lost:
+            return;
+         */
+        /* JADX WARNING: Failed to process nested try/catch */
+        /* JADX WARNING: Missing exception handler attribute for start block: B:23:0x004f */
+        /* JADX WARNING: Missing exception handler attribute for start block: B:25:0x0059 */
+        /* JADX WARNING: Missing exception handler attribute for start block: B:27:0x0063 */
+        /* JADX WARNING: Missing exception handler attribute for start block: B:29:0x006d */
+        /* JADX WARNING: Missing exception handler attribute for start block: B:31:0x0077 */
+        /* JADX WARNING: Missing exception handler attribute for start block: B:33:0x0082 */
         static {
-            int[] iArr = new int[Lifecycle.State.values().length];
-            $SwitchMap$android$arch$lifecycle$Lifecycle$State = iArr;
-            try {
-                iArr[Lifecycle.State.INITIALIZED.ordinal()] = 1;
-            } catch (NoSuchFieldError e) {
-            }
-            try {
-                $SwitchMap$android$arch$lifecycle$Lifecycle$State[Lifecycle.State.CREATED.ordinal()] = 2;
-            } catch (NoSuchFieldError e2) {
-            }
-            try {
-                $SwitchMap$android$arch$lifecycle$Lifecycle$State[Lifecycle.State.STARTED.ordinal()] = 3;
-            } catch (NoSuchFieldError e3) {
-            }
-            try {
-                $SwitchMap$android$arch$lifecycle$Lifecycle$State[Lifecycle.State.RESUMED.ordinal()] = 4;
-            } catch (NoSuchFieldError e4) {
-            }
-            try {
-                $SwitchMap$android$arch$lifecycle$Lifecycle$State[Lifecycle.State.DESTROYED.ordinal()] = 5;
-            } catch (NoSuchFieldError e5) {
-            }
-            int[] iArr2 = new int[Lifecycle.Event.values().length];
-            $SwitchMap$android$arch$lifecycle$Lifecycle$Event = iArr2;
-            try {
-                iArr2[Lifecycle.Event.ON_CREATE.ordinal()] = 1;
-            } catch (NoSuchFieldError e6) {
-            }
-            try {
-                $SwitchMap$android$arch$lifecycle$Lifecycle$Event[Lifecycle.Event.ON_STOP.ordinal()] = 2;
-            } catch (NoSuchFieldError e7) {
-            }
-            try {
-                $SwitchMap$android$arch$lifecycle$Lifecycle$Event[Lifecycle.Event.ON_START.ordinal()] = 3;
-            } catch (NoSuchFieldError e8) {
-            }
-            try {
-                $SwitchMap$android$arch$lifecycle$Lifecycle$Event[Lifecycle.Event.ON_PAUSE.ordinal()] = 4;
-            } catch (NoSuchFieldError e9) {
-            }
-            try {
-                $SwitchMap$android$arch$lifecycle$Lifecycle$Event[Lifecycle.Event.ON_RESUME.ordinal()] = 5;
-            } catch (NoSuchFieldError e10) {
-            }
-            try {
-                $SwitchMap$android$arch$lifecycle$Lifecycle$Event[Lifecycle.Event.ON_DESTROY.ordinal()] = 6;
-            } catch (NoSuchFieldError e11) {
-            }
-            try {
-                $SwitchMap$android$arch$lifecycle$Lifecycle$Event[Lifecycle.Event.ON_ANY.ordinal()] = 7;
-            } catch (NoSuchFieldError e12) {
-            }
+            /*
+                android.arch.lifecycle.Lifecycle$State[] r0 = android.arch.lifecycle.Lifecycle.State.values()
+                int r0 = r0.length
+                int[] r0 = new int[r0]
+                android.arch.lifecycle.LifecycleRegistry.AnonymousClass1.$SwitchMap$android$arch$lifecycle$Lifecycle$State = r0
+                r1 = 1
+                android.arch.lifecycle.Lifecycle$State r2 = android.arch.lifecycle.Lifecycle.State.INITIALIZED     // Catch:{ NoSuchFieldError -> 0x0012 }
+                int r2 = r2.ordinal()     // Catch:{ NoSuchFieldError -> 0x0012 }
+                r0[r2] = r1     // Catch:{ NoSuchFieldError -> 0x0012 }
+            L_0x0012:
+                r0 = 2
+                int[] r2 = android.arch.lifecycle.LifecycleRegistry.AnonymousClass1.$SwitchMap$android$arch$lifecycle$Lifecycle$State     // Catch:{ NoSuchFieldError -> 0x001d }
+                android.arch.lifecycle.Lifecycle$State r3 = android.arch.lifecycle.Lifecycle.State.CREATED     // Catch:{ NoSuchFieldError -> 0x001d }
+                int r3 = r3.ordinal()     // Catch:{ NoSuchFieldError -> 0x001d }
+                r2[r3] = r0     // Catch:{ NoSuchFieldError -> 0x001d }
+            L_0x001d:
+                r2 = 3
+                int[] r3 = android.arch.lifecycle.LifecycleRegistry.AnonymousClass1.$SwitchMap$android$arch$lifecycle$Lifecycle$State     // Catch:{ NoSuchFieldError -> 0x0028 }
+                android.arch.lifecycle.Lifecycle$State r4 = android.arch.lifecycle.Lifecycle.State.STARTED     // Catch:{ NoSuchFieldError -> 0x0028 }
+                int r4 = r4.ordinal()     // Catch:{ NoSuchFieldError -> 0x0028 }
+                r3[r4] = r2     // Catch:{ NoSuchFieldError -> 0x0028 }
+            L_0x0028:
+                r3 = 4
+                int[] r4 = android.arch.lifecycle.LifecycleRegistry.AnonymousClass1.$SwitchMap$android$arch$lifecycle$Lifecycle$State     // Catch:{ NoSuchFieldError -> 0x0033 }
+                android.arch.lifecycle.Lifecycle$State r5 = android.arch.lifecycle.Lifecycle.State.RESUMED     // Catch:{ NoSuchFieldError -> 0x0033 }
+                int r5 = r5.ordinal()     // Catch:{ NoSuchFieldError -> 0x0033 }
+                r4[r5] = r3     // Catch:{ NoSuchFieldError -> 0x0033 }
+            L_0x0033:
+                r4 = 5
+                int[] r5 = android.arch.lifecycle.LifecycleRegistry.AnonymousClass1.$SwitchMap$android$arch$lifecycle$Lifecycle$State     // Catch:{ NoSuchFieldError -> 0x003e }
+                android.arch.lifecycle.Lifecycle$State r6 = android.arch.lifecycle.Lifecycle.State.DESTROYED     // Catch:{ NoSuchFieldError -> 0x003e }
+                int r6 = r6.ordinal()     // Catch:{ NoSuchFieldError -> 0x003e }
+                r5[r6] = r4     // Catch:{ NoSuchFieldError -> 0x003e }
+            L_0x003e:
+                android.arch.lifecycle.Lifecycle$Event[] r5 = android.arch.lifecycle.Lifecycle.Event.values()
+                int r5 = r5.length
+                int[] r5 = new int[r5]
+                android.arch.lifecycle.LifecycleRegistry.AnonymousClass1.$SwitchMap$android$arch$lifecycle$Lifecycle$Event = r5
+                android.arch.lifecycle.Lifecycle$Event r6 = android.arch.lifecycle.Lifecycle.Event.ON_CREATE     // Catch:{ NoSuchFieldError -> 0x004f }
+                int r6 = r6.ordinal()     // Catch:{ NoSuchFieldError -> 0x004f }
+                r5[r6] = r1     // Catch:{ NoSuchFieldError -> 0x004f }
+            L_0x004f:
+                int[] r1 = android.arch.lifecycle.LifecycleRegistry.AnonymousClass1.$SwitchMap$android$arch$lifecycle$Lifecycle$Event     // Catch:{ NoSuchFieldError -> 0x0059 }
+                android.arch.lifecycle.Lifecycle$Event r5 = android.arch.lifecycle.Lifecycle.Event.ON_STOP     // Catch:{ NoSuchFieldError -> 0x0059 }
+                int r5 = r5.ordinal()     // Catch:{ NoSuchFieldError -> 0x0059 }
+                r1[r5] = r0     // Catch:{ NoSuchFieldError -> 0x0059 }
+            L_0x0059:
+                int[] r0 = android.arch.lifecycle.LifecycleRegistry.AnonymousClass1.$SwitchMap$android$arch$lifecycle$Lifecycle$Event     // Catch:{ NoSuchFieldError -> 0x0063 }
+                android.arch.lifecycle.Lifecycle$Event r1 = android.arch.lifecycle.Lifecycle.Event.ON_START     // Catch:{ NoSuchFieldError -> 0x0063 }
+                int r1 = r1.ordinal()     // Catch:{ NoSuchFieldError -> 0x0063 }
+                r0[r1] = r2     // Catch:{ NoSuchFieldError -> 0x0063 }
+            L_0x0063:
+                int[] r0 = android.arch.lifecycle.LifecycleRegistry.AnonymousClass1.$SwitchMap$android$arch$lifecycle$Lifecycle$Event     // Catch:{ NoSuchFieldError -> 0x006d }
+                android.arch.lifecycle.Lifecycle$Event r1 = android.arch.lifecycle.Lifecycle.Event.ON_PAUSE     // Catch:{ NoSuchFieldError -> 0x006d }
+                int r1 = r1.ordinal()     // Catch:{ NoSuchFieldError -> 0x006d }
+                r0[r1] = r3     // Catch:{ NoSuchFieldError -> 0x006d }
+            L_0x006d:
+                int[] r0 = android.arch.lifecycle.LifecycleRegistry.AnonymousClass1.$SwitchMap$android$arch$lifecycle$Lifecycle$Event     // Catch:{ NoSuchFieldError -> 0x0077 }
+                android.arch.lifecycle.Lifecycle$Event r1 = android.arch.lifecycle.Lifecycle.Event.ON_RESUME     // Catch:{ NoSuchFieldError -> 0x0077 }
+                int r1 = r1.ordinal()     // Catch:{ NoSuchFieldError -> 0x0077 }
+                r0[r1] = r4     // Catch:{ NoSuchFieldError -> 0x0077 }
+            L_0x0077:
+                int[] r0 = android.arch.lifecycle.LifecycleRegistry.AnonymousClass1.$SwitchMap$android$arch$lifecycle$Lifecycle$Event     // Catch:{ NoSuchFieldError -> 0x0082 }
+                android.arch.lifecycle.Lifecycle$Event r1 = android.arch.lifecycle.Lifecycle.Event.ON_DESTROY     // Catch:{ NoSuchFieldError -> 0x0082 }
+                int r1 = r1.ordinal()     // Catch:{ NoSuchFieldError -> 0x0082 }
+                r2 = 6
+                r0[r1] = r2     // Catch:{ NoSuchFieldError -> 0x0082 }
+            L_0x0082:
+                int[] r0 = android.arch.lifecycle.LifecycleRegistry.AnonymousClass1.$SwitchMap$android$arch$lifecycle$Lifecycle$Event     // Catch:{ NoSuchFieldError -> 0x008d }
+                android.arch.lifecycle.Lifecycle$Event r1 = android.arch.lifecycle.Lifecycle.Event.ON_ANY     // Catch:{ NoSuchFieldError -> 0x008d }
+                int r1 = r1.ordinal()     // Catch:{ NoSuchFieldError -> 0x008d }
+                r2 = 7
+                r0[r1] = r2     // Catch:{ NoSuchFieldError -> 0x008d }
+            L_0x008d:
+                return
+            */
+            throw new UnsupportedOperationException("Method not decompiled: android.arch.lifecycle.LifecycleRegistry.AnonymousClass1.<clinit>():void");
         }
     }
 
@@ -232,13 +273,13 @@ public class LifecycleRegistry extends Lifecycle {
     /* JADX DEBUG: Multi-variable search result rejected for r4v1, resolved type: java.lang.Object */
     /* JADX WARN: Multi-variable type inference failed */
     private void forwardPass(LifecycleOwner lifecycleOwner) {
-        Iterator<Map.Entry<LifecycleObserver, ObserverWithState>> ascendingIterator = this.mObserverMap.iteratorWithAdditions();
-        while (ascendingIterator.hasNext() && !this.mNewEventOccurred) {
-            Map.Entry<LifecycleObserver, ObserverWithState> entry = ascendingIterator.next();
-            ObserverWithState observer = entry.getValue();
-            while (observer.mState.compareTo((Enum) this.mState) < 0 && !this.mNewEventOccurred && this.mObserverMap.contains(entry.getKey())) {
-                pushParentState(observer.mState);
-                observer.dispatchEvent(lifecycleOwner, upEvent(observer.mState));
+        SafeIterableMap<K, V>.IteratorWithAdditions iteratorWithAdditions = this.mObserverMap.iteratorWithAdditions();
+        while (iteratorWithAdditions.hasNext() && !this.mNewEventOccurred) {
+            Map.Entry entry = (Map.Entry) iteratorWithAdditions.next();
+            ObserverWithState observerWithState = (ObserverWithState) entry.getValue();
+            while (observerWithState.mState.compareTo((Enum) this.mState) < 0 && !this.mNewEventOccurred && this.mObserverMap.contains(entry.getKey())) {
+                pushParentState(observerWithState.mState);
+                observerWithState.dispatchEvent(lifecycleOwner, upEvent(observerWithState.mState));
                 popParentState();
             }
         }
@@ -247,12 +288,12 @@ public class LifecycleRegistry extends Lifecycle {
     private void backwardPass(LifecycleOwner lifecycleOwner) {
         Iterator<Map.Entry<LifecycleObserver, ObserverWithState>> descendingIterator = this.mObserverMap.descendingIterator();
         while (descendingIterator.hasNext() && !this.mNewEventOccurred) {
-            Map.Entry<LifecycleObserver, ObserverWithState> entry = descendingIterator.next();
-            ObserverWithState observer = entry.getValue();
-            while (observer.mState.compareTo((Enum) this.mState) > 0 && !this.mNewEventOccurred && this.mObserverMap.contains(entry.getKey())) {
-                Lifecycle.Event event = downEvent(observer.mState);
-                pushParentState(getStateAfter(event));
-                observer.dispatchEvent(lifecycleOwner, event);
+            Map.Entry<LifecycleObserver, ObserverWithState> next = descendingIterator.next();
+            ObserverWithState value = next.getValue();
+            while (value.mState.compareTo((Enum) this.mState) > 0 && !this.mNewEventOccurred && this.mObserverMap.contains(next.getKey())) {
+                Lifecycle.Event downEvent = downEvent(value.mState);
+                pushParentState(getStateAfter(downEvent));
+                value.dispatchEvent(lifecycleOwner, downEvent);
                 popParentState();
             }
         }
@@ -277,8 +318,8 @@ public class LifecycleRegistry extends Lifecycle {
         this.mNewEventOccurred = false;
     }
 
-    static Lifecycle.State min(Lifecycle.State state1, Lifecycle.State state2) {
-        return (state2 == null || state2.compareTo(state1) >= 0) ? state1 : state2;
+    static Lifecycle.State min(Lifecycle.State state, Lifecycle.State state2) {
+        return (state2 == null || state2.compareTo(state) >= 0) ? state : state2;
     }
 
     /* access modifiers changed from: package-private */
@@ -286,17 +327,17 @@ public class LifecycleRegistry extends Lifecycle {
         GenericLifecycleObserver mLifecycleObserver;
         Lifecycle.State mState;
 
-        ObserverWithState(LifecycleObserver observer, Lifecycle.State initialState) {
-            this.mLifecycleObserver = Lifecycling.getCallback(observer);
-            this.mState = initialState;
+        ObserverWithState(LifecycleObserver lifecycleObserver, Lifecycle.State state) {
+            this.mLifecycleObserver = Lifecycling.getCallback(lifecycleObserver);
+            this.mState = state;
         }
 
         /* access modifiers changed from: package-private */
-        public void dispatchEvent(LifecycleOwner owner, Lifecycle.Event event) {
-            Lifecycle.State newState = LifecycleRegistry.getStateAfter(event);
-            this.mState = LifecycleRegistry.min(this.mState, newState);
-            this.mLifecycleObserver.onStateChanged(owner, event);
-            this.mState = newState;
+        public void dispatchEvent(LifecycleOwner lifecycleOwner, Lifecycle.Event event) {
+            Lifecycle.State stateAfter = LifecycleRegistry.getStateAfter(event);
+            this.mState = LifecycleRegistry.min(this.mState, stateAfter);
+            this.mLifecycleObserver.onStateChanged(lifecycleOwner, event);
+            this.mState = stateAfter;
         }
     }
 }

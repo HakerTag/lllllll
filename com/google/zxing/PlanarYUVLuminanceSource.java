@@ -1,5 +1,8 @@
 package com.google.zxing;
 
+import android.support.v4.view.ViewCompat;
+import kotlin.UByte;
+
 public final class PlanarYUVLuminanceSource extends LuminanceSource {
     private static final int THUMBNAIL_SCALE_FACTOR = 2;
     private final int dataHeight;
@@ -8,30 +11,35 @@ public final class PlanarYUVLuminanceSource extends LuminanceSource {
     private final int top;
     private final byte[] yuvData;
 
-    public PlanarYUVLuminanceSource(byte[] yuvData2, int dataWidth2, int dataHeight2, int left2, int top2, int width, int height, boolean reverseHorizontal) {
-        super(width, height);
-        int i = left2 + width;
-        this.yuvData = yuvData2;
-        this.dataWidth = dataWidth2;
-        this.dataHeight = dataHeight2;
-        this.left = left2;
-        this.top = top2;
-        if (reverseHorizontal) {
-            reverseHorizontal(width, height);
+    @Override // com.google.zxing.LuminanceSource
+    public boolean isCropSupported() {
+        return true;
+    }
+
+    public PlanarYUVLuminanceSource(byte[] bArr, int i, int i2, int i3, int i4, int i5, int i6, boolean z) {
+        super(i5, i6);
+        int i7 = i3 + i5;
+        this.yuvData = bArr;
+        this.dataWidth = i;
+        this.dataHeight = i2;
+        this.left = i3;
+        this.top = i4;
+        if (z) {
+            reverseHorizontal(i5, i6);
         }
     }
 
     @Override // com.google.zxing.LuminanceSource
-    public byte[] getRow(int y, byte[] row) {
-        if (y < 0 || y >= getHeight()) {
-            throw new IllegalArgumentException("Requested row is outside the image: " + y);
+    public byte[] getRow(int i, byte[] bArr) {
+        if (i < 0 || i >= getHeight()) {
+            throw new IllegalArgumentException("Requested row is outside the image: " + i);
         }
         int width = getWidth();
-        if (row == null || row.length < width) {
-            row = new byte[width];
+        if (bArr == null || bArr.length < width) {
+            bArr = new byte[width];
         }
-        System.arraycopy(this.yuvData, ((this.top + y) * this.dataWidth) + this.left, row, 0, width);
-        return row;
+        System.arraycopy(this.yuvData, ((i + this.top) * this.dataWidth) + this.left, bArr, 0, width);
+        return bArr;
     }
 
     @Override // com.google.zxing.LuminanceSource
@@ -41,46 +49,41 @@ public final class PlanarYUVLuminanceSource extends LuminanceSource {
         if (width == this.dataWidth && height == this.dataHeight) {
             return this.yuvData;
         }
-        int area = width * height;
-        byte[] matrix = new byte[area];
-        int i = this.top;
-        int i2 = this.dataWidth;
-        int inputOffset = (i * i2) + this.left;
-        if (width == i2) {
-            System.arraycopy(this.yuvData, inputOffset, matrix, 0, area);
-            return matrix;
+        int i = width * height;
+        byte[] bArr = new byte[i];
+        int i2 = this.top;
+        int i3 = this.dataWidth;
+        int i4 = (i2 * i3) + this.left;
+        if (width == i3) {
+            System.arraycopy(this.yuvData, i4, bArr, 0, i);
+            return bArr;
         }
-        for (int y = 0; y < height; y++) {
-            System.arraycopy(this.yuvData, inputOffset, matrix, y * width, width);
-            inputOffset += this.dataWidth;
+        for (int i5 = 0; i5 < height; i5++) {
+            System.arraycopy(this.yuvData, i4, bArr, i5 * width, width);
+            i4 += this.dataWidth;
         }
-        return matrix;
+        return bArr;
     }
 
     @Override // com.google.zxing.LuminanceSource
-    public boolean isCropSupported() {
-        return true;
-    }
-
-    @Override // com.google.zxing.LuminanceSource
-    public LuminanceSource crop(int left2, int top2, int width, int height) {
-        return new PlanarYUVLuminanceSource(this.yuvData, this.dataWidth, this.dataHeight, this.left + left2, this.top + top2, width, height, false);
+    public LuminanceSource crop(int i, int i2, int i3, int i4) {
+        return new PlanarYUVLuminanceSource(this.yuvData, this.dataWidth, this.dataHeight, this.left + i, this.top + i2, i3, i4, false);
     }
 
     public int[] renderThumbnail() {
         int width = getWidth() / 2;
         int height = getHeight() / 2;
-        int[] pixels = new int[(width * height)];
-        byte[] yuv = this.yuvData;
-        int inputOffset = (this.top * this.dataWidth) + this.left;
-        for (int y = 0; y < height; y++) {
-            int outputOffset = y * width;
-            for (int x = 0; x < width; x++) {
-                pixels[outputOffset + x] = -16777216 | (65793 * (yuv[(x * 2) + inputOffset] & 255));
+        int[] iArr = new int[(width * height)];
+        byte[] bArr = this.yuvData;
+        int i = (this.top * this.dataWidth) + this.left;
+        for (int i2 = 0; i2 < height; i2++) {
+            int i3 = i2 * width;
+            for (int i4 = 0; i4 < width; i4++) {
+                iArr[i3 + i4] = ((bArr[(i4 * 2) + i] & UByte.MAX_VALUE) * 65793) | ViewCompat.MEASURED_STATE_MASK;
             }
-            inputOffset += this.dataWidth * 2;
+            i += this.dataWidth * 2;
         }
-        return pixels;
+        return iArr;
     }
 
     public int getThumbnailWidth() {
@@ -91,23 +94,23 @@ public final class PlanarYUVLuminanceSource extends LuminanceSource {
         return getHeight() / 2;
     }
 
-    private void reverseHorizontal(int width, int height) {
-        byte[] yuvData2 = this.yuvData;
-        int y = 0;
-        int rowStart = (this.top * this.dataWidth) + this.left;
-        while (y < height) {
-            int middle = (width / 2) + rowStart;
-            int x1 = rowStart;
-            int x2 = (rowStart + width) - 1;
-            while (x1 < middle) {
-                byte temp = yuvData2[x1];
-                yuvData2[x1] = yuvData2[x2];
-                yuvData2[x2] = temp;
-                x1++;
-                x2--;
+    private void reverseHorizontal(int i, int i2) {
+        byte[] bArr = this.yuvData;
+        int i3 = (this.top * this.dataWidth) + this.left;
+        int i4 = 0;
+        while (i4 < i2) {
+            int i5 = (i / 2) + i3;
+            int i6 = (i3 + i) - 1;
+            int i7 = i3;
+            while (i7 < i5) {
+                byte b = bArr[i7];
+                bArr[i7] = bArr[i6];
+                bArr[i6] = b;
+                i7++;
+                i6--;
             }
-            y++;
-            rowStart += this.dataWidth;
+            i4++;
+            i3 += this.dataWidth;
         }
     }
 }

@@ -5,18 +5,18 @@ import com.google.zxing.Result;
 public final class BookmarkDoCoMoResultParser extends AbstractDoCoMoResultParser {
     @Override // com.google.zxing.client.result.ResultParser
     public URIParsedResult parse(Result result) {
-        String rawText = result.getText();
-        if (!rawText.startsWith("MEBKM:")) {
+        String text = result.getText();
+        if (!text.startsWith("MEBKM:")) {
             return null;
         }
-        String title = matchSingleDoCoMoPrefixedField("TITLE:", rawText, true);
-        String[] rawUri = matchDoCoMoPrefixedField("URL:", rawText, true);
-        if (rawUri == null) {
+        String matchSingleDoCoMoPrefixedField = matchSingleDoCoMoPrefixedField("TITLE:", text, true);
+        String[] matchDoCoMoPrefixedField = matchDoCoMoPrefixedField("URL:", text, true);
+        if (matchDoCoMoPrefixedField == null) {
             return null;
         }
-        String uri = rawUri[0];
-        if (URIResultParser.isBasicallyValidURI(uri)) {
-            return new URIParsedResult(uri, title);
+        String str = matchDoCoMoPrefixedField[0];
+        if (URIResultParser.isBasicallyValidURI(str)) {
+            return new URIParsedResult(str, matchSingleDoCoMoPrefixedField);
         }
         return null;
     }

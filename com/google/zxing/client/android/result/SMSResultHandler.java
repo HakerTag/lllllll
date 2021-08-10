@@ -9,8 +9,8 @@ import com.google.zxing.client.result.SMSParsedResult;
 public final class SMSResultHandler extends ResultHandler {
     private static final int[] buttons = {R.string.button_sms, R.string.button_mms};
 
-    public SMSResultHandler(Activity activity, ParsedResult result) {
-        super(activity, result);
+    public SMSResultHandler(Activity activity, ParsedResult parsedResult) {
+        super(activity, parsedResult);
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler
@@ -19,34 +19,34 @@ public final class SMSResultHandler extends ResultHandler {
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler
-    public int getButtonText(int index) {
-        return buttons[index];
+    public int getButtonText(int i) {
+        return buttons[i];
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler
-    public void handleButtonPress(int index) {
-        SMSParsedResult smsResult = (SMSParsedResult) getResult();
-        String number = smsResult.getNumbers()[0];
-        if (index == 0) {
-            sendSMS(number, smsResult.getBody());
-        } else if (index == 1) {
-            sendMMS(number, smsResult.getSubject(), smsResult.getBody());
+    public void handleButtonPress(int i) {
+        SMSParsedResult sMSParsedResult = (SMSParsedResult) getResult();
+        String str = sMSParsedResult.getNumbers()[0];
+        if (i == 0) {
+            sendSMS(str, sMSParsedResult.getBody());
+        } else if (i == 1) {
+            sendMMS(str, sMSParsedResult.getSubject(), sMSParsedResult.getBody());
         }
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler
     public CharSequence getDisplayContents() {
-        SMSParsedResult smsResult = (SMSParsedResult) getResult();
-        String[] rawNumbers = smsResult.getNumbers();
-        String[] formattedNumbers = new String[rawNumbers.length];
-        for (int i = 0; i < rawNumbers.length; i++) {
-            formattedNumbers[i] = PhoneNumberUtils.formatNumber(rawNumbers[i]);
+        SMSParsedResult sMSParsedResult = (SMSParsedResult) getResult();
+        String[] numbers = sMSParsedResult.getNumbers();
+        String[] strArr = new String[numbers.length];
+        for (int i = 0; i < numbers.length; i++) {
+            strArr[i] = PhoneNumberUtils.formatNumber(numbers[i]);
         }
-        StringBuilder contents = new StringBuilder(50);
-        ParsedResult.maybeAppend(formattedNumbers, contents);
-        ParsedResult.maybeAppend(smsResult.getSubject(), contents);
-        ParsedResult.maybeAppend(smsResult.getBody(), contents);
-        return contents.toString();
+        StringBuilder sb = new StringBuilder(50);
+        ParsedResult.maybeAppend(strArr, sb);
+        ParsedResult.maybeAppend(sMSParsedResult.getSubject(), sb);
+        ParsedResult.maybeAppend(sMSParsedResult.getBody(), sb);
+        return sb.toString();
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler

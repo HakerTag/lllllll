@@ -8,8 +8,8 @@ import com.google.zxing.common.BitArray;
 public final class AnyAIDecoder extends AbstractExpandedDecoder {
     private static final int HEADER_SIZE = 5;
 
-    AnyAIDecoder(BitArray information) {
-        super(information);
+    AnyAIDecoder(BitArray bitArray) {
+        super(bitArray);
     }
 
     @Override // com.google.zxing.oned.rss.expanded.decoders.AbstractExpandedDecoder

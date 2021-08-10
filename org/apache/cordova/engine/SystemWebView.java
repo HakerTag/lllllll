@@ -20,19 +20,19 @@ public class SystemWebView extends WebView implements CordovaWebViewEngine.Engin
         this(context, null);
     }
 
-    public SystemWebView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+    public SystemWebView(Context context, AttributeSet attributeSet) {
+        super(context, attributeSet);
     }
 
     /* access modifiers changed from: package-private */
-    public void init(SystemWebViewEngine parentEngine2, CordovaInterface cordova2) {
-        this.cordova = cordova2;
-        this.parentEngine = parentEngine2;
+    public void init(SystemWebViewEngine systemWebViewEngine, CordovaInterface cordovaInterface) {
+        this.cordova = cordovaInterface;
+        this.parentEngine = systemWebViewEngine;
         if (this.viewClient == null) {
-            setWebViewClient(new SystemWebViewClient(parentEngine2));
+            setWebViewClient(new SystemWebViewClient(systemWebViewEngine));
         }
         if (this.chromeClient == null) {
-            setWebChromeClient(new SystemWebChromeClient(parentEngine2));
+            setWebChromeClient(new SystemWebChromeClient(systemWebViewEngine));
         }
     }
 
@@ -45,21 +45,21 @@ public class SystemWebView extends WebView implements CordovaWebViewEngine.Engin
         return null;
     }
 
-    public void setWebViewClient(WebViewClient client) {
-        this.viewClient = (SystemWebViewClient) client;
-        super.setWebViewClient(client);
+    public void setWebViewClient(WebViewClient webViewClient) {
+        this.viewClient = (SystemWebViewClient) webViewClient;
+        super.setWebViewClient(webViewClient);
     }
 
-    public void setWebChromeClient(WebChromeClient client) {
-        this.chromeClient = (SystemWebChromeClient) client;
-        super.setWebChromeClient(client);
+    public void setWebChromeClient(WebChromeClient webChromeClient) {
+        this.chromeClient = (SystemWebChromeClient) webChromeClient;
+        super.setWebChromeClient(webChromeClient);
     }
 
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        Boolean ret = this.parentEngine.client.onDispatchKeyEvent(event);
-        if (ret != null) {
-            return ret.booleanValue();
+    public boolean dispatchKeyEvent(KeyEvent keyEvent) {
+        Boolean onDispatchKeyEvent = this.parentEngine.client.onDispatchKeyEvent(keyEvent);
+        if (onDispatchKeyEvent != null) {
+            return onDispatchKeyEvent.booleanValue();
         }
-        return super.dispatchKeyEvent(event);
+        return super.dispatchKeyEvent(keyEvent);
     }
 }

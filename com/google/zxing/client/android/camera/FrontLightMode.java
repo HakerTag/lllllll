@@ -8,11 +8,11 @@ public enum FrontLightMode {
     AUTO,
     OFF;
 
-    private static FrontLightMode parse(String modeString) {
-        return modeString == null ? OFF : valueOf(modeString);
+    private static FrontLightMode parse(String str) {
+        return str == null ? OFF : valueOf(str);
     }
 
-    public static FrontLightMode readPref(SharedPreferences sharedPrefs) {
-        return parse(sharedPrefs.getString(PreferencesActivity.KEY_FRONT_LIGHT_MODE, OFF.toString()));
+    public static FrontLightMode readPref(SharedPreferences sharedPreferences) {
+        return parse(sharedPreferences.getString(PreferencesActivity.KEY_FRONT_LIGHT_MODE, OFF.toString()));
     }
 }

@@ -12,52 +12,52 @@ public final class DirectedAcyclicGraph<T> {
     private final ArrayList<T> mSortResult = new ArrayList<>();
     private final HashSet<T> mSortTmpMarked = new HashSet<>();
 
-    public void addNode(T node) {
-        if (!this.mGraph.containsKey(node)) {
-            this.mGraph.put(node, null);
+    public void addNode(T t) {
+        if (!this.mGraph.containsKey(t)) {
+            this.mGraph.put(t, null);
         }
     }
 
-    public boolean contains(T node) {
-        return this.mGraph.containsKey(node);
+    public boolean contains(T t) {
+        return this.mGraph.containsKey(t);
     }
 
-    public void addEdge(T node, T incomingEdge) {
-        if (!this.mGraph.containsKey(node) || !this.mGraph.containsKey(incomingEdge)) {
+    public void addEdge(T t, T t2) {
+        if (!this.mGraph.containsKey(t) || !this.mGraph.containsKey(t2)) {
             throw new IllegalArgumentException("All nodes must be present in the graph before being added as an edge");
         }
-        ArrayList<T> edges = this.mGraph.get(node);
-        if (edges == null) {
-            edges = getEmptyList();
-            this.mGraph.put(node, edges);
+        ArrayList<T> arrayList = this.mGraph.get(t);
+        if (arrayList == null) {
+            arrayList = getEmptyList();
+            this.mGraph.put(t, arrayList);
         }
-        edges.add(incomingEdge);
+        arrayList.add(t2);
     }
 
-    public List getIncomingEdges(T node) {
-        return this.mGraph.get(node);
+    public List getIncomingEdges(T t) {
+        return this.mGraph.get(t);
     }
 
-    public List<T> getOutgoingEdges(T node) {
-        ArrayList<T> result = null;
+    public List<T> getOutgoingEdges(T t) {
         int size = this.mGraph.size();
+        ArrayList arrayList = null;
         for (int i = 0; i < size; i++) {
-            ArrayList<T> edges = this.mGraph.valueAt(i);
-            if (edges != null && edges.contains(node)) {
-                if (result == null) {
-                    result = new ArrayList<>();
+            ArrayList<T> valueAt = this.mGraph.valueAt(i);
+            if (valueAt != null && valueAt.contains(t)) {
+                if (arrayList == null) {
+                    arrayList = new ArrayList();
                 }
-                result.add(this.mGraph.keyAt(i));
+                arrayList.add(this.mGraph.keyAt(i));
             }
         }
-        return result;
+        return arrayList;
     }
 
-    public boolean hasOutgoingEdges(T node) {
+    public boolean hasOutgoingEdges(T t) {
         int size = this.mGraph.size();
         for (int i = 0; i < size; i++) {
-            ArrayList<T> edges = this.mGraph.valueAt(i);
-            if (edges != null && edges.contains(node)) {
+            ArrayList<T> valueAt = this.mGraph.valueAt(i);
+            if (valueAt != null && valueAt.contains(t)) {
                 return true;
             }
         }
@@ -67,9 +67,9 @@ public final class DirectedAcyclicGraph<T> {
     public void clear() {
         int size = this.mGraph.size();
         for (int i = 0; i < size; i++) {
-            ArrayList<T> edges = this.mGraph.valueAt(i);
-            if (edges != null) {
-                poolList(edges);
+            ArrayList<T> valueAt = this.mGraph.valueAt(i);
+            if (valueAt != null) {
+                poolList(valueAt);
             }
         }
         this.mGraph.clear();
@@ -85,19 +85,19 @@ public final class DirectedAcyclicGraph<T> {
         return this.mSortResult;
     }
 
-    private void dfs(T node, ArrayList<T> result, HashSet<T> tmpMarked) {
-        if (!result.contains(node)) {
-            if (!tmpMarked.contains(node)) {
-                tmpMarked.add(node);
-                ArrayList<T> edges = this.mGraph.get(node);
-                if (edges != null) {
-                    int size = edges.size();
+    private void dfs(T t, ArrayList<T> arrayList, HashSet<T> hashSet) {
+        if (!arrayList.contains(t)) {
+            if (!hashSet.contains(t)) {
+                hashSet.add(t);
+                ArrayList<T> arrayList2 = this.mGraph.get(t);
+                if (arrayList2 != null) {
+                    int size = arrayList2.size();
                     for (int i = 0; i < size; i++) {
-                        dfs(edges.get(i), result, tmpMarked);
+                        dfs(arrayList2.get(i), arrayList, hashSet);
                     }
                 }
-                tmpMarked.remove(node);
-                result.add(node);
+                hashSet.remove(t);
+                arrayList.add(t);
                 return;
             }
             throw new RuntimeException("This graph contains cyclic dependencies");
@@ -110,15 +110,12 @@ public final class DirectedAcyclicGraph<T> {
     }
 
     private ArrayList<T> getEmptyList() {
-        ArrayList<T> list = this.mListPool.acquire();
-        if (list == null) {
-            return new ArrayList<>();
-        }
-        return list;
+        ArrayList<T> acquire = this.mListPool.acquire();
+        return acquire == null ? new ArrayList<>() : acquire;
     }
 
-    private void poolList(ArrayList<T> list) {
-        list.clear();
-        this.mListPool.release(list);
+    private void poolList(ArrayList<T> arrayList) {
+        arrayList.clear();
+        this.mListPool.release(arrayList);
     }
 }

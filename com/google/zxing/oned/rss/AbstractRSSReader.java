@@ -3,6 +3,7 @@ package com.google.zxing.oned.rss;
 import com.google.zxing.NotFoundException;
 import com.google.zxing.common.detector.MathUtils;
 import com.google.zxing.oned.OneDReader;
+import kotlin.jvm.internal.IntCompanionObject;
 
 public abstract class AbstractRSSReader extends OneDReader {
     private static final float MAX_AVG_VARIANCE = 0.2f;
@@ -55,61 +56,61 @@ public abstract class AbstractRSSReader extends OneDReader {
         return this.evenCounts;
     }
 
-    protected static int parseFinderValue(int[] counters, int[][] finderPatterns) throws NotFoundException {
-        for (int value = 0; value < finderPatterns.length; value++) {
-            if (patternMatchVariance(counters, finderPatterns[value], MAX_INDIVIDUAL_VARIANCE) < MAX_AVG_VARIANCE) {
-                return value;
+    protected static int parseFinderValue(int[] iArr, int[][] iArr2) throws NotFoundException {
+        for (int i = 0; i < iArr2.length; i++) {
+            if (patternMatchVariance(iArr, iArr2[i], MAX_INDIVIDUAL_VARIANCE) < MAX_AVG_VARIANCE) {
+                return i;
             }
         }
         throw NotFoundException.getNotFoundInstance();
     }
 
     @Deprecated
-    protected static int count(int[] array) {
-        return MathUtils.sum(array);
+    protected static int count(int[] iArr) {
+        return MathUtils.sum(iArr);
     }
 
-    protected static void increment(int[] array, float[] errors) {
-        int index = 0;
-        float biggestError = errors[0];
-        for (int i = 1; i < array.length; i++) {
-            if (errors[i] > biggestError) {
-                biggestError = errors[i];
-                index = i;
+    protected static void increment(int[] iArr, float[] fArr) {
+        int i = 0;
+        float f = fArr[0];
+        for (int i2 = 1; i2 < iArr.length; i2++) {
+            if (fArr[i2] > f) {
+                f = fArr[i2];
+                i = i2;
             }
         }
-        array[index] = array[index] + 1;
+        iArr[i] = iArr[i] + 1;
     }
 
-    protected static void decrement(int[] array, float[] errors) {
-        int index = 0;
-        float biggestError = errors[0];
-        for (int i = 1; i < array.length; i++) {
-            if (errors[i] < biggestError) {
-                biggestError = errors[i];
-                index = i;
+    protected static void decrement(int[] iArr, float[] fArr) {
+        int i = 0;
+        float f = fArr[0];
+        for (int i2 = 1; i2 < iArr.length; i2++) {
+            if (fArr[i2] < f) {
+                f = fArr[i2];
+                i = i2;
             }
         }
-        array[index] = array[index] - 1;
+        iArr[i] = iArr[i] - 1;
     }
 
-    protected static boolean isFinderPattern(int[] counters) {
-        int firstTwoSum = counters[0] + counters[1];
-        float ratio = ((float) firstTwoSum) / ((float) ((counters[2] + firstTwoSum) + counters[3]));
-        if (ratio < MIN_FINDER_PATTERN_RATIO || ratio > MAX_FINDER_PATTERN_RATIO) {
+    protected static boolean isFinderPattern(int[] iArr) {
+        int i = iArr[0] + iArr[1];
+        float f = ((float) i) / ((float) ((iArr[2] + i) + iArr[3]));
+        if (f < MIN_FINDER_PATTERN_RATIO || f > MAX_FINDER_PATTERN_RATIO) {
             return false;
         }
-        int minCounter = Integer.MAX_VALUE;
-        int maxCounter = Integer.MIN_VALUE;
-        for (int counter : counters) {
-            if (counter > maxCounter) {
-                maxCounter = counter;
+        int i2 = IntCompanionObject.MAX_VALUE;
+        int i3 = Integer.MIN_VALUE;
+        for (int i4 : iArr) {
+            if (i4 > i3) {
+                i3 = i4;
             }
-            if (counter < minCounter) {
-                minCounter = counter;
+            if (i4 < i2) {
+                i2 = i4;
             }
         }
-        if (maxCounter < minCounter * 10) {
+        if (i3 < i2 * 10) {
             return true;
         }
         return false;

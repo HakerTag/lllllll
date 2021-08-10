@@ -12,22 +12,22 @@ public final class FontRequest {
     private final String mProviderPackage;
     private final String mQuery;
 
-    public FontRequest(String providerAuthority, String providerPackage, String query, List<List<byte[]>> certificates) {
-        this.mProviderAuthority = (String) Preconditions.checkNotNull(providerAuthority);
-        this.mProviderPackage = (String) Preconditions.checkNotNull(providerPackage);
-        this.mQuery = (String) Preconditions.checkNotNull(query);
-        this.mCertificates = (List) Preconditions.checkNotNull(certificates);
+    public FontRequest(String str, String str2, String str3, List<List<byte[]>> list) {
+        this.mProviderAuthority = (String) Preconditions.checkNotNull(str);
+        this.mProviderPackage = (String) Preconditions.checkNotNull(str2);
+        this.mQuery = (String) Preconditions.checkNotNull(str3);
+        this.mCertificates = (List) Preconditions.checkNotNull(list);
         this.mCertificatesArray = 0;
         this.mIdentifier = this.mProviderAuthority + "-" + this.mProviderPackage + "-" + this.mQuery;
     }
 
-    public FontRequest(String providerAuthority, String providerPackage, String query, int certificates) {
-        this.mProviderAuthority = (String) Preconditions.checkNotNull(providerAuthority);
-        this.mProviderPackage = (String) Preconditions.checkNotNull(providerPackage);
-        this.mQuery = (String) Preconditions.checkNotNull(query);
+    public FontRequest(String str, String str2, String str3, int i) {
+        this.mProviderAuthority = (String) Preconditions.checkNotNull(str);
+        this.mProviderPackage = (String) Preconditions.checkNotNull(str2);
+        this.mQuery = (String) Preconditions.checkNotNull(str3);
         this.mCertificates = null;
-        Preconditions.checkArgument(certificates != 0);
-        this.mCertificatesArray = certificates;
+        Preconditions.checkArgument(i != 0);
+        this.mCertificatesArray = i;
         this.mIdentifier = this.mProviderAuthority + "-" + this.mProviderPackage + "-" + this.mQuery;
     }
 
@@ -56,20 +56,20 @@ public final class FontRequest {
     }
 
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("FontRequest {mProviderAuthority: " + this.mProviderAuthority + ", mProviderPackage: " + this.mProviderPackage + ", mQuery: " + this.mQuery + ", mCertificates:");
+        StringBuilder sb = new StringBuilder();
+        sb.append("FontRequest {mProviderAuthority: " + this.mProviderAuthority + ", mProviderPackage: " + this.mProviderPackage + ", mQuery: " + this.mQuery + ", mCertificates:");
         for (int i = 0; i < this.mCertificates.size(); i++) {
-            builder.append(" [");
-            List<byte[]> set = this.mCertificates.get(i);
-            for (int j = 0; j < set.size(); j++) {
-                builder.append(" \"");
-                builder.append(Base64.encodeToString(set.get(j), 0));
-                builder.append("\"");
+            sb.append(" [");
+            List<byte[]> list = this.mCertificates.get(i);
+            for (int i2 = 0; i2 < list.size(); i2++) {
+                sb.append(" \"");
+                sb.append(Base64.encodeToString(list.get(i2), 0));
+                sb.append("\"");
             }
-            builder.append(" ]");
+            sb.append(" ]");
         }
-        builder.append("}");
-        builder.append("mCertificatesArray: " + this.mCertificatesArray);
-        return builder.toString();
+        sb.append("}");
+        sb.append("mCertificatesArray: " + this.mCertificatesArray);
+        return sb.toString();
     }
 }

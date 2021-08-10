@@ -5,13 +5,13 @@ public final class BlockParsedResult {
     private final DecodedInformation decodedInformation;
     private final boolean finished;
 
-    BlockParsedResult(boolean finished2) {
-        this(null, finished2);
+    BlockParsedResult(boolean z) {
+        this(null, z);
     }
 
-    BlockParsedResult(DecodedInformation information, boolean finished2) {
-        this.finished = finished2;
-        this.decodedInformation = information;
+    BlockParsedResult(DecodedInformation decodedInformation2, boolean z) {
+        this.finished = z;
+        this.decodedInformation = decodedInformation2;
     }
 
     /* access modifiers changed from: package-private */

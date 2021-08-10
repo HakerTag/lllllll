@@ -8,16 +8,20 @@ import android.view.View;
 @Deprecated
 public class Space extends View {
     @Deprecated
-    public Space(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
+    public void draw(Canvas canvas) {
+    }
+
+    @Deprecated
+    public Space(Context context, AttributeSet attributeSet, int i) {
+        super(context, attributeSet, i);
         if (getVisibility() == 0) {
             setVisibility(4);
         }
     }
 
     @Deprecated
-    public Space(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
+    public Space(Context context, AttributeSet attributeSet) {
+        this(context, attributeSet, 0);
     }
 
     @Deprecated
@@ -25,25 +29,18 @@ public class Space extends View {
         this(context, null);
     }
 
-    @Deprecated
-    public void draw(Canvas canvas) {
-    }
-
-    private static int getDefaultSize2(int size, int measureSpec) {
-        int specMode = View.MeasureSpec.getMode(measureSpec);
-        int specSize = View.MeasureSpec.getSize(measureSpec);
-        if (specMode == Integer.MIN_VALUE) {
-            return Math.min(size, specSize);
+    private static int getDefaultSize2(int i, int i2) {
+        int mode = View.MeasureSpec.getMode(i2);
+        int size = View.MeasureSpec.getSize(i2);
+        if (mode != Integer.MIN_VALUE) {
+            return mode != 1073741824 ? i : size;
         }
-        if (specMode != 0) {
-            return specMode != 1073741824 ? size : specSize;
-        }
-        return size;
+        return Math.min(i, size);
     }
 
     /* access modifiers changed from: protected */
     @Deprecated
-    public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        setMeasuredDimension(getDefaultSize2(getSuggestedMinimumWidth(), widthMeasureSpec), getDefaultSize2(getSuggestedMinimumHeight(), heightMeasureSpec));
+    public void onMeasure(int i, int i2) {
+        setMeasuredDimension(getDefaultSize2(getSuggestedMinimumWidth(), i), getDefaultSize2(getSuggestedMinimumHeight(), i2));
     }
 }

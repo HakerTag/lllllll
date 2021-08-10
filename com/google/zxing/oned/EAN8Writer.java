@@ -10,28 +10,34 @@ public final class EAN8Writer extends UPCEANWriter {
     private static final int CODE_WIDTH = 67;
 
     @Override // com.google.zxing.oned.OneDimensionalCodeWriter, com.google.zxing.Writer
-    public BitMatrix encode(String contents, BarcodeFormat format, int width, int height, Map<EncodeHintType, ?> hints) throws WriterException {
-        if (format == BarcodeFormat.EAN_8) {
-            return super.encode(contents, format, width, height, hints);
+    public BitMatrix encode(String str, BarcodeFormat barcodeFormat, int i, int i2, Map<EncodeHintType, ?> map) throws WriterException {
+        if (barcodeFormat == BarcodeFormat.EAN_8) {
+            return super.encode(str, barcodeFormat, i, i2, map);
         }
-        throw new IllegalArgumentException("Can only encode EAN_8, but got " + format);
+        throw new IllegalArgumentException("Can only encode EAN_8, but got " + barcodeFormat);
     }
 
     @Override // com.google.zxing.oned.OneDimensionalCodeWriter
-    public boolean[] encode(String contents) {
-        if (contents.length() == 8) {
-            boolean[] result = new boolean[CODE_WIDTH];
-            int pos = 0 + appendPattern(result, 0, UPCEANReader.START_END_PATTERN, true);
-            for (int i = 0; i <= 3; i++) {
-                pos += appendPattern(result, pos, UPCEANReader.L_PATTERNS[Integer.parseInt(contents.substring(i, i + 1))], false);
+    public boolean[] encode(String str) {
+        if (str.length() == 8) {
+            boolean[] zArr = new boolean[CODE_WIDTH];
+            int appendPattern = appendPattern(zArr, 0, UPCEANReader.START_END_PATTERN, true) + 0;
+            int i = 0;
+            while (i <= 3) {
+                int i2 = i + 1;
+                appendPattern += appendPattern(zArr, appendPattern, UPCEANReader.L_PATTERNS[Integer.parseInt(str.substring(i, i2))], false);
+                i = i2;
             }
-            int pos2 = pos + appendPattern(result, pos, UPCEANReader.MIDDLE_PATTERN, false);
-            for (int i2 = 4; i2 <= 7; i2++) {
-                pos2 += appendPattern(result, pos2, UPCEANReader.L_PATTERNS[Integer.parseInt(contents.substring(i2, i2 + 1))], true);
+            int appendPattern2 = appendPattern + appendPattern(zArr, appendPattern, UPCEANReader.MIDDLE_PATTERN, false);
+            int i3 = 4;
+            while (i3 <= 7) {
+                int i4 = i3 + 1;
+                appendPattern2 += appendPattern(zArr, appendPattern2, UPCEANReader.L_PATTERNS[Integer.parseInt(str.substring(i3, i4))], true);
+                i3 = i4;
             }
-            appendPattern(result, pos2, UPCEANReader.START_END_PATTERN, true);
-            return result;
+            appendPattern(zArr, appendPattern2, UPCEANReader.START_END_PATTERN, true);
+            return zArr;
         }
-        throw new IllegalArgumentException("Requested contents should be 8 digits long, but got " + contents.length());
+        throw new IllegalArgumentException("Requested contents should be 8 digits long, but got " + str.length());
     }
 }

@@ -8,6 +8,7 @@ import com.google.zxing.ResultPoint;
 import com.google.zxing.common.BitArray;
 import java.util.Arrays;
 import java.util.Map;
+import kotlin.jvm.internal.IntCompanionObject;
 
 public final class CodaBarReader extends OneDReader {
     static final char[] ALPHABET = ALPHABET_STRING.toCharArray();
@@ -21,62 +22,58 @@ public final class CodaBarReader extends OneDReader {
     private int[] counters = new int[80];
     private final StringBuilder decodeRowResult = new StringBuilder(20);
 
-    /* JADX INFO: Multiple debug info for r13v3 float: [D('left' float), D('i' int)] */
-    /* JADX INFO: Multiple debug info for r14v2 float: [D('i' int), D('right' float)] */
     @Override // com.google.zxing.oned.OneDReader
-    public Result decodeRow(int rowNumber, BitArray row, Map<DecodeHintType, ?> hints) throws NotFoundException {
-        CodaBarReader codaBarReader = this;
-        Map<DecodeHintType, ?> map = hints;
-        int i = 0;
-        Arrays.fill(codaBarReader.counters, 0);
-        codaBarReader.setCounters(row);
-        int startOffset = findStartPattern();
-        int nextStart = startOffset;
-        codaBarReader.decodeRowResult.setLength(0);
-        while (true) {
-            int charOffset = codaBarReader.toNarrowWidePattern(nextStart);
-            if (charOffset != -1) {
-                codaBarReader.decodeRowResult.append((char) charOffset);
-                nextStart += 8;
-                if ((codaBarReader.decodeRowResult.length() <= 1 || !arrayContains(STARTEND_ENCODING, ALPHABET[charOffset])) && nextStart < codaBarReader.counterLength) {
-                    i = 0;
-                    codaBarReader = this;
-                    map = hints;
+    public Result decodeRow(int i, BitArray bitArray, Map<DecodeHintType, ?> map) throws NotFoundException {
+        Arrays.fill(this.counters, 0);
+        setCounters(bitArray);
+        int findStartPattern = findStartPattern();
+        this.decodeRowResult.setLength(0);
+        int i2 = findStartPattern;
+        do {
+            int narrowWidePattern = toNarrowWidePattern(i2);
+            if (narrowWidePattern != -1) {
+                this.decodeRowResult.append((char) narrowWidePattern);
+                i2 += 8;
+                if (this.decodeRowResult.length() > 1 && arrayContains(STARTEND_ENCODING, ALPHABET[narrowWidePattern])) {
+                    break;
                 }
             } else {
                 throw NotFoundException.getNotFoundInstance();
             }
+        } while (i2 < this.counterLength);
+        int i3 = i2 - 1;
+        int i4 = this.counters[i3];
+        int i5 = 0;
+        for (int i6 = -8; i6 < -1; i6++) {
+            i5 += this.counters[i2 + i6];
         }
-        int trailingWhitespace = codaBarReader.counters[nextStart - 1];
-        int lastPatternSize = 0;
-        for (int i2 = -8; i2 < -1; i2++) {
-            lastPatternSize += codaBarReader.counters[nextStart + i2];
-        }
-        if (nextStart >= codaBarReader.counterLength || trailingWhitespace >= lastPatternSize / 2) {
-            codaBarReader.validatePattern(startOffset);
-            for (int i3 = 0; i3 < codaBarReader.decodeRowResult.length(); i3++) {
-                StringBuilder sb = codaBarReader.decodeRowResult;
-                sb.setCharAt(i3, ALPHABET[sb.charAt(i3)]);
+        if (i2 >= this.counterLength || i4 >= i5 / 2) {
+            validatePattern(findStartPattern);
+            for (int i7 = 0; i7 < this.decodeRowResult.length(); i7++) {
+                StringBuilder sb = this.decodeRowResult;
+                sb.setCharAt(i7, ALPHABET[sb.charAt(i7)]);
             }
-            if (arrayContains(STARTEND_ENCODING, codaBarReader.decodeRowResult.charAt(i))) {
-                StringBuilder sb2 = codaBarReader.decodeRowResult;
+            if (arrayContains(STARTEND_ENCODING, this.decodeRowResult.charAt(0))) {
+                StringBuilder sb2 = this.decodeRowResult;
                 if (!arrayContains(STARTEND_ENCODING, sb2.charAt(sb2.length() - 1))) {
                     throw NotFoundException.getNotFoundInstance();
-                } else if (codaBarReader.decodeRowResult.length() > 3) {
+                } else if (this.decodeRowResult.length() > 3) {
                     if (map == null || !map.containsKey(DecodeHintType.RETURN_CODABAR_START_END)) {
-                        StringBuilder sb3 = codaBarReader.decodeRowResult;
+                        StringBuilder sb3 = this.decodeRowResult;
                         sb3.deleteCharAt(sb3.length() - 1);
-                        codaBarReader.decodeRowResult.deleteCharAt(i);
+                        this.decodeRowResult.deleteCharAt(0);
                     }
-                    int runningCount = 0;
-                    for (int i4 = 0; i4 < startOffset; i4++) {
-                        runningCount += codaBarReader.counters[i4];
+                    int i8 = 0;
+                    for (int i9 = 0; i9 < findStartPattern; i9++) {
+                        i8 += this.counters[i9];
                     }
-                    float left = (float) runningCount;
-                    for (int i5 = startOffset; i5 < nextStart - 1; i5++) {
-                        runningCount += codaBarReader.counters[i5];
+                    float f = (float) i8;
+                    while (findStartPattern < i3) {
+                        i8 += this.counters[findStartPattern];
+                        findStartPattern++;
                     }
-                    return new Result(codaBarReader.decodeRowResult.toString(), null, new ResultPoint[]{new ResultPoint(left, (float) rowNumber), new ResultPoint((float) runningCount, (float) rowNumber)}, BarcodeFormat.CODABAR);
+                    float f2 = (float) i;
+                    return new Result(this.decodeRowResult.toString(), null, new ResultPoint[]{new ResultPoint(f, f2), new ResultPoint((float) i8, f2)}, BarcodeFormat.CODABAR);
                 } else {
                     throw NotFoundException.getNotFoundInstance();
                 }
@@ -88,49 +85,49 @@ public final class CodaBarReader extends OneDReader {
         }
     }
 
-    private void validatePattern(int start) throws NotFoundException {
-        int[] sizes = {0, 0, 0, 0};
-        int[] counts = {0, 0, 0, 0};
-        int end = this.decodeRowResult.length() - 1;
-        int pos = start;
-        int i = 0;
+    private void validatePattern(int i) throws NotFoundException {
+        int[] iArr = {0, 0, 0, 0};
+        int[] iArr2 = {0, 0, 0, 0};
+        int length = this.decodeRowResult.length() - 1;
+        int i2 = 0;
+        int i3 = i;
+        int i4 = 0;
         while (true) {
-            int pattern = CHARACTER_ENCODINGS[this.decodeRowResult.charAt(i)];
-            for (int j = 6; j >= 0; j--) {
-                int category = (j & 1) + ((pattern & 1) * 2);
-                sizes[category] = sizes[category] + this.counters[pos + j];
-                counts[category] = counts[category] + 1;
-                pattern >>= 1;
+            int i5 = CHARACTER_ENCODINGS[this.decodeRowResult.charAt(i4)];
+            for (int i6 = 6; i6 >= 0; i6--) {
+                int i7 = (i6 & 1) + ((i5 & 1) * 2);
+                iArr[i7] = iArr[i7] + this.counters[i3 + i6];
+                iArr2[i7] = iArr2[i7] + 1;
+                i5 >>= 1;
             }
-            if (i >= end) {
+            if (i4 >= length) {
                 break;
             }
-            pos += 8;
-            i++;
+            i3 += 8;
+            i4++;
         }
-        float[] maxes = new float[4];
-        float[] mins = new float[4];
-        for (int i2 = 0; i2 < 2; i2++) {
-            mins[i2] = 0.0f;
-            mins[i2 + 2] = ((((float) sizes[i2]) / ((float) counts[i2])) + (((float) sizes[i2 + 2]) / ((float) counts[i2 + 2]))) / MAX_ACCEPTABLE;
-            maxes[i2] = mins[i2 + 2];
-            maxes[i2 + 2] = ((((float) sizes[i2 + 2]) * MAX_ACCEPTABLE) + PADDING) / ((float) counts[i2 + 2]);
+        float[] fArr = new float[4];
+        float[] fArr2 = new float[4];
+        for (int i8 = 0; i8 < 2; i8++) {
+            fArr2[i8] = 0.0f;
+            int i9 = i8 + 2;
+            fArr2[i9] = ((((float) iArr[i8]) / ((float) iArr2[i8])) + (((float) iArr[i9]) / ((float) iArr2[i9]))) / MAX_ACCEPTABLE;
+            fArr[i8] = fArr2[i9];
+            fArr[i9] = ((((float) iArr[i9]) * MAX_ACCEPTABLE) + PADDING) / ((float) iArr2[i9]);
         }
-        int pos2 = start;
-        int i3 = 0;
         loop3:
         while (true) {
-            int pattern2 = CHARACTER_ENCODINGS[this.decodeRowResult.charAt(i3)];
-            for (int j2 = 6; j2 >= 0; j2--) {
-                int category2 = (j2 & 1) + ((pattern2 & 1) * 2);
-                int size = this.counters[pos2 + j2];
-                if (((float) size) >= mins[category2] && ((float) size) <= maxes[category2]) {
-                    pattern2 >>= 1;
+            int i10 = CHARACTER_ENCODINGS[this.decodeRowResult.charAt(i2)];
+            for (int i11 = 6; i11 >= 0; i11--) {
+                int i12 = (i11 & 1) + ((i10 & 1) * 2);
+                float f = (float) this.counters[i + i11];
+                if (f >= fArr2[i12] && f <= fArr[i12]) {
+                    i10 >>= 1;
                 }
             }
-            if (i3 < end) {
-                pos2 += 8;
-                i3++;
+            if (i2 < length) {
+                i += 8;
+                i2++;
             } else {
                 return;
             }
@@ -138,51 +135,51 @@ public final class CodaBarReader extends OneDReader {
         throw NotFoundException.getNotFoundInstance();
     }
 
-    private void setCounters(BitArray row) throws NotFoundException {
+    private void setCounters(BitArray bitArray) throws NotFoundException {
+        int i = 0;
         this.counterLength = 0;
-        int i = row.getNextUnset(0);
-        int end = row.getSize();
-        if (i < end) {
-            boolean isWhite = true;
-            int count = 0;
-            while (i < end) {
-                if (row.get(i) ^ isWhite) {
-                    count++;
+        int nextUnset = bitArray.getNextUnset(0);
+        int size = bitArray.getSize();
+        if (nextUnset < size) {
+            boolean z = true;
+            while (nextUnset < size) {
+                if (bitArray.get(nextUnset) ^ z) {
+                    i++;
                 } else {
-                    counterAppend(count);
-                    count = 1;
-                    isWhite = !isWhite;
+                    counterAppend(i);
+                    z = !z;
+                    i = 1;
                 }
-                i++;
+                nextUnset++;
             }
-            counterAppend(count);
+            counterAppend(i);
             return;
         }
         throw NotFoundException.getNotFoundInstance();
     }
 
-    private void counterAppend(int e) {
+    private void counterAppend(int i) {
         int[] iArr = this.counters;
-        int i = this.counterLength;
-        iArr[i] = e;
-        int i2 = i + 1;
-        this.counterLength = i2;
-        if (i2 >= iArr.length) {
-            int[] temp = new int[(i2 * 2)];
-            System.arraycopy(iArr, 0, temp, 0, i2);
-            this.counters = temp;
+        int i2 = this.counterLength;
+        iArr[i2] = i;
+        int i3 = i2 + 1;
+        this.counterLength = i3;
+        if (i3 >= iArr.length) {
+            int[] iArr2 = new int[(i3 * 2)];
+            System.arraycopy(iArr, 0, iArr2, 0, i3);
+            this.counters = iArr2;
         }
     }
 
     private int findStartPattern() throws NotFoundException {
         for (int i = 1; i < this.counterLength; i += 2) {
-            int charOffset = toNarrowWidePattern(i);
-            if (charOffset != -1 && arrayContains(STARTEND_ENCODING, ALPHABET[charOffset])) {
-                int patternSize = 0;
-                for (int j = i; j < i + 7; j++) {
-                    patternSize += this.counters[j];
+            int narrowWidePattern = toNarrowWidePattern(i);
+            if (narrowWidePattern != -1 && arrayContains(STARTEND_ENCODING, ALPHABET[narrowWidePattern])) {
+                int i2 = 0;
+                for (int i3 = i; i3 < i + 7; i3++) {
+                    i2 += this.counters[i3];
                 }
-                if (i == 1 || this.counters[i - 1] >= patternSize / 2) {
+                if (i == 1 || this.counters[i - 1] >= i2 / 2) {
                     return i;
                 }
             }
@@ -190,10 +187,10 @@ public final class CodaBarReader extends OneDReader {
         throw NotFoundException.getNotFoundInstance();
     }
 
-    static boolean arrayContains(char[] array, char key) {
-        if (array != null) {
-            for (char c : array) {
-                if (c == key) {
+    static boolean arrayContains(char[] cArr, char c) {
+        if (cArr != null) {
+            for (char c2 : cArr) {
+                if (c2 == c) {
                     return true;
                 }
             }
@@ -201,54 +198,54 @@ public final class CodaBarReader extends OneDReader {
         return false;
     }
 
-    private int toNarrowWidePattern(int position) {
-        int end = position + 7;
-        if (end >= this.counterLength) {
+    private int toNarrowWidePattern(int i) {
+        int i2 = i + 7;
+        if (i2 >= this.counterLength) {
             return -1;
         }
-        int[] theCounters = this.counters;
-        int maxBar = 0;
-        int minBar = Integer.MAX_VALUE;
-        for (int j = position; j < end; j += 2) {
-            int currentCounter = theCounters[j];
-            if (currentCounter < minBar) {
-                minBar = currentCounter;
+        int[] iArr = this.counters;
+        int i3 = IntCompanionObject.MAX_VALUE;
+        int i4 = 0;
+        int i5 = IntCompanionObject.MAX_VALUE;
+        int i6 = 0;
+        for (int i7 = i; i7 < i2; i7 += 2) {
+            int i8 = iArr[i7];
+            if (i8 < i5) {
+                i5 = i8;
             }
-            if (currentCounter > maxBar) {
-                maxBar = currentCounter;
-            }
-        }
-        int thresholdBar = (minBar + maxBar) / 2;
-        int maxSpace = 0;
-        int minSpace = Integer.MAX_VALUE;
-        for (int j2 = position + 1; j2 < end; j2 += 2) {
-            int currentCounter2 = theCounters[j2];
-            if (currentCounter2 < minSpace) {
-                minSpace = currentCounter2;
-            }
-            if (currentCounter2 > maxSpace) {
-                maxSpace = currentCounter2;
+            if (i8 > i6) {
+                i6 = i8;
             }
         }
-        int thresholdSpace = (minSpace + maxSpace) / 2;
-        int bitmask = 128;
-        int pattern = 0;
-        for (int i = 0; i < 7; i++) {
-            bitmask >>= 1;
-            if (theCounters[position + i] > ((i & 1) == 0 ? thresholdBar : thresholdSpace)) {
-                pattern |= bitmask;
+        int i9 = (i5 + i6) / 2;
+        int i10 = 0;
+        for (int i11 = i + 1; i11 < i2; i11 += 2) {
+            int i12 = iArr[i11];
+            if (i12 < i3) {
+                i3 = i12;
+            }
+            if (i12 > i10) {
+                i10 = i12;
             }
         }
-        int i2 = 0;
+        int i13 = (i3 + i10) / 2;
+        int i14 = 128;
+        int i15 = 0;
+        for (int i16 = 0; i16 < 7; i16++) {
+            i14 >>= 1;
+            if (iArr[i + i16] > ((i16 & 1) == 0 ? i9 : i13)) {
+                i15 |= i14;
+            }
+        }
         while (true) {
-            int[] iArr = CHARACTER_ENCODINGS;
-            if (i2 >= iArr.length) {
+            int[] iArr2 = CHARACTER_ENCODINGS;
+            if (i4 >= iArr2.length) {
                 return -1;
             }
-            if (iArr[i2] == pattern) {
-                return i2;
+            if (iArr2[i4] == i15) {
+                return i4;
             }
-            i2++;
+            i4++;
         }
     }
 }

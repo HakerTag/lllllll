@@ -8,19 +8,19 @@ class SingleDocumentFile extends DocumentFile {
     private Context mContext;
     private Uri mUri;
 
-    SingleDocumentFile(DocumentFile parent, Context context, Uri uri) {
-        super(parent);
+    SingleDocumentFile(DocumentFile documentFile, Context context, Uri uri) {
+        super(documentFile);
         this.mContext = context;
         this.mUri = uri;
     }
 
     @Override // android.support.v4.provider.DocumentFile
-    public DocumentFile createFile(String mimeType, String displayName) {
+    public DocumentFile createFile(String str, String str2) {
         throw new UnsupportedOperationException();
     }
 
     @Override // android.support.v4.provider.DocumentFile
-    public DocumentFile createDirectory(String displayName) {
+    public DocumentFile createDirectory(String str) {
         throw new UnsupportedOperationException();
     }
 
@@ -78,7 +78,7 @@ class SingleDocumentFile extends DocumentFile {
     public boolean delete() {
         try {
             return DocumentsContract.deleteDocument(this.mContext.getContentResolver(), this.mUri);
-        } catch (Exception e) {
+        } catch (Exception unused) {
             return false;
         }
     }
@@ -94,7 +94,7 @@ class SingleDocumentFile extends DocumentFile {
     }
 
     @Override // android.support.v4.provider.DocumentFile
-    public boolean renameTo(String displayName) {
+    public boolean renameTo(String str) {
         throw new UnsupportedOperationException();
     }
 }

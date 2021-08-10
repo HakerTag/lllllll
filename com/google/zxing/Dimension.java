@@ -4,12 +4,12 @@ public final class Dimension {
     private final int height;
     private final int width;
 
-    public Dimension(int width2, int height2) {
-        if (width2 < 0 || height2 < 0) {
+    public Dimension(int i, int i2) {
+        if (i < 0 || i2 < 0) {
             throw new IllegalArgumentException();
         }
-        this.width = width2;
-        this.height = height2;
+        this.width = i;
+        this.height = i2;
     }
 
     public int getWidth() {
@@ -20,12 +20,12 @@ public final class Dimension {
         return this.height;
     }
 
-    public boolean equals(Object other) {
-        if (!(other instanceof Dimension)) {
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Dimension)) {
             return false;
         }
-        Dimension d = (Dimension) other;
-        if (this.width == d.width && this.height == d.height) {
+        Dimension dimension = (Dimension) obj;
+        if (this.width == dimension.width && this.height == dimension.height) {
             return true;
         }
         return false;

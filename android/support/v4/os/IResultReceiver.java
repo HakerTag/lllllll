@@ -14,42 +14,35 @@ public interface IResultReceiver extends IInterface {
         private static final String DESCRIPTOR = "android.support.v4.os.IResultReceiver";
         static final int TRANSACTION_send = 1;
 
-        public Stub() {
-            attachInterface(this, DESCRIPTOR);
-        }
-
-        public static IResultReceiver asInterface(IBinder obj) {
-            if (obj == null) {
-                return null;
-            }
-            IInterface iin = obj.queryLocalInterface(DESCRIPTOR);
-            if (iin == null || !(iin instanceof IResultReceiver)) {
-                return new Proxy(obj);
-            }
-            return (IResultReceiver) iin;
-        }
-
         public IBinder asBinder() {
             return this;
         }
 
+        public Stub() {
+            attachInterface(this, DESCRIPTOR);
+        }
+
+        public static IResultReceiver asInterface(IBinder iBinder) {
+            if (iBinder == null) {
+                return null;
+            }
+            IInterface queryLocalInterface = iBinder.queryLocalInterface(DESCRIPTOR);
+            if (queryLocalInterface == null || !(queryLocalInterface instanceof IResultReceiver)) {
+                return new Proxy(iBinder);
+            }
+            return (IResultReceiver) queryLocalInterface;
+        }
+
         @Override // android.os.Binder
-        public boolean onTransact(int code, Parcel data, Parcel reply, int flags) throws RemoteException {
-            Bundle _arg1;
-            if (code == 1) {
-                data.enforceInterface(DESCRIPTOR);
-                int _arg0 = data.readInt();
-                if (data.readInt() != 0) {
-                    _arg1 = (Bundle) Bundle.CREATOR.createFromParcel(data);
-                } else {
-                    _arg1 = null;
-                }
-                send(_arg0, _arg1);
+        public boolean onTransact(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
+            if (i == 1) {
+                parcel.enforceInterface(DESCRIPTOR);
+                send(parcel.readInt(), parcel.readInt() != 0 ? (Bundle) Bundle.CREATOR.createFromParcel(parcel) : null);
                 return true;
-            } else if (code != 1598968902) {
-                return super.onTransact(code, data, reply, flags);
+            } else if (i != 1598968902) {
+                return super.onTransact(i, parcel, parcel2, i2);
             } else {
-                reply.writeString(DESCRIPTOR);
+                parcel2.writeString(DESCRIPTOR);
                 return true;
             }
         }
@@ -58,33 +51,33 @@ public interface IResultReceiver extends IInterface {
         public static class Proxy implements IResultReceiver {
             private IBinder mRemote;
 
-            Proxy(IBinder remote) {
-                this.mRemote = remote;
+            public String getInterfaceDescriptor() {
+                return Stub.DESCRIPTOR;
+            }
+
+            Proxy(IBinder iBinder) {
+                this.mRemote = iBinder;
             }
 
             public IBinder asBinder() {
                 return this.mRemote;
             }
 
-            public String getInterfaceDescriptor() {
-                return Stub.DESCRIPTOR;
-            }
-
             @Override // android.support.v4.os.IResultReceiver
-            public void send(int resultCode, Bundle resultData) throws RemoteException {
-                Parcel _data = Parcel.obtain();
+            public void send(int i, Bundle bundle) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    _data.writeInt(resultCode);
-                    if (resultData != null) {
-                        _data.writeInt(1);
-                        resultData.writeToParcel(_data, 0);
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    obtain.writeInt(i);
+                    if (bundle != null) {
+                        obtain.writeInt(1);
+                        bundle.writeToParcel(obtain, 0);
                     } else {
-                        _data.writeInt(0);
+                        obtain.writeInt(0);
                     }
-                    this.mRemote.transact(1, _data, null, 1);
+                    this.mRemote.transact(1, obtain, null, 1);
                 } finally {
-                    _data.recycle();
+                    obtain.recycle();
                 }
             }
         }

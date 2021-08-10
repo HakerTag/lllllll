@@ -10,8 +10,8 @@ public class AccessibilityRecordCompat {
     private final AccessibilityRecord mRecord;
 
     @Deprecated
-    public AccessibilityRecordCompat(Object record) {
-        this.mRecord = (AccessibilityRecord) record;
+    public AccessibilityRecordCompat(Object obj) {
+        this.mRecord = (AccessibilityRecord) obj;
     }
 
     @Deprecated
@@ -20,8 +20,8 @@ public class AccessibilityRecordCompat {
     }
 
     @Deprecated
-    public static AccessibilityRecordCompat obtain(AccessibilityRecordCompat record) {
-        return new AccessibilityRecordCompat(AccessibilityRecord.obtain(record.mRecord));
+    public static AccessibilityRecordCompat obtain(AccessibilityRecordCompat accessibilityRecordCompat) {
+        return new AccessibilityRecordCompat(AccessibilityRecord.obtain(accessibilityRecordCompat.mRecord));
     }
 
     @Deprecated
@@ -30,18 +30,18 @@ public class AccessibilityRecordCompat {
     }
 
     @Deprecated
-    public void setSource(View source) {
-        this.mRecord.setSource(source);
+    public void setSource(View view) {
+        this.mRecord.setSource(view);
     }
 
     @Deprecated
-    public void setSource(View root, int virtualDescendantId) {
-        setSource(this.mRecord, root, virtualDescendantId);
+    public void setSource(View view, int i) {
+        setSource(this.mRecord, view, i);
     }
 
-    public static void setSource(AccessibilityRecord record, View root, int virtualDescendantId) {
+    public static void setSource(AccessibilityRecord accessibilityRecord, View view, int i) {
         if (Build.VERSION.SDK_INT >= 16) {
-            record.setSource(root, virtualDescendantId);
+            accessibilityRecord.setSource(view, i);
         }
     }
 
@@ -61,8 +61,8 @@ public class AccessibilityRecordCompat {
     }
 
     @Deprecated
-    public void setChecked(boolean isChecked) {
-        this.mRecord.setChecked(isChecked);
+    public void setChecked(boolean z) {
+        this.mRecord.setChecked(z);
     }
 
     @Deprecated
@@ -71,8 +71,8 @@ public class AccessibilityRecordCompat {
     }
 
     @Deprecated
-    public void setEnabled(boolean isEnabled) {
-        this.mRecord.setEnabled(isEnabled);
+    public void setEnabled(boolean z) {
+        this.mRecord.setEnabled(z);
     }
 
     @Deprecated
@@ -81,8 +81,8 @@ public class AccessibilityRecordCompat {
     }
 
     @Deprecated
-    public void setPassword(boolean isPassword) {
-        this.mRecord.setPassword(isPassword);
+    public void setPassword(boolean z) {
+        this.mRecord.setPassword(z);
     }
 
     @Deprecated
@@ -91,8 +91,8 @@ public class AccessibilityRecordCompat {
     }
 
     @Deprecated
-    public void setFullScreen(boolean isFullScreen) {
-        this.mRecord.setFullScreen(isFullScreen);
+    public void setFullScreen(boolean z) {
+        this.mRecord.setFullScreen(z);
     }
 
     @Deprecated
@@ -101,8 +101,8 @@ public class AccessibilityRecordCompat {
     }
 
     @Deprecated
-    public void setScrollable(boolean scrollable) {
-        this.mRecord.setScrollable(scrollable);
+    public void setScrollable(boolean z) {
+        this.mRecord.setScrollable(z);
     }
 
     @Deprecated
@@ -111,8 +111,8 @@ public class AccessibilityRecordCompat {
     }
 
     @Deprecated
-    public void setItemCount(int itemCount) {
-        this.mRecord.setItemCount(itemCount);
+    public void setItemCount(int i) {
+        this.mRecord.setItemCount(i);
     }
 
     @Deprecated
@@ -121,8 +121,8 @@ public class AccessibilityRecordCompat {
     }
 
     @Deprecated
-    public void setCurrentItemIndex(int currentItemIndex) {
-        this.mRecord.setCurrentItemIndex(currentItemIndex);
+    public void setCurrentItemIndex(int i) {
+        this.mRecord.setCurrentItemIndex(i);
     }
 
     @Deprecated
@@ -131,8 +131,8 @@ public class AccessibilityRecordCompat {
     }
 
     @Deprecated
-    public void setFromIndex(int fromIndex) {
-        this.mRecord.setFromIndex(fromIndex);
+    public void setFromIndex(int i) {
+        this.mRecord.setFromIndex(i);
     }
 
     @Deprecated
@@ -141,8 +141,8 @@ public class AccessibilityRecordCompat {
     }
 
     @Deprecated
-    public void setToIndex(int toIndex) {
-        this.mRecord.setToIndex(toIndex);
+    public void setToIndex(int i) {
+        this.mRecord.setToIndex(i);
     }
 
     @Deprecated
@@ -151,8 +151,8 @@ public class AccessibilityRecordCompat {
     }
 
     @Deprecated
-    public void setScrollX(int scrollX) {
-        this.mRecord.setScrollX(scrollX);
+    public void setScrollX(int i) {
+        this.mRecord.setScrollX(i);
     }
 
     @Deprecated
@@ -161,8 +161,8 @@ public class AccessibilityRecordCompat {
     }
 
     @Deprecated
-    public void setScrollY(int scrollY) {
-        this.mRecord.setScrollY(scrollY);
+    public void setScrollY(int i) {
+        this.mRecord.setScrollY(i);
     }
 
     @Deprecated
@@ -170,21 +170,21 @@ public class AccessibilityRecordCompat {
         return getMaxScrollX(this.mRecord);
     }
 
-    public static int getMaxScrollX(AccessibilityRecord record) {
+    public static int getMaxScrollX(AccessibilityRecord accessibilityRecord) {
         if (Build.VERSION.SDK_INT >= 15) {
-            return record.getMaxScrollX();
+            return accessibilityRecord.getMaxScrollX();
         }
         return 0;
     }
 
     @Deprecated
-    public void setMaxScrollX(int maxScrollX) {
-        setMaxScrollX(this.mRecord, maxScrollX);
+    public void setMaxScrollX(int i) {
+        setMaxScrollX(this.mRecord, i);
     }
 
-    public static void setMaxScrollX(AccessibilityRecord record, int maxScrollX) {
+    public static void setMaxScrollX(AccessibilityRecord accessibilityRecord, int i) {
         if (Build.VERSION.SDK_INT >= 15) {
-            record.setMaxScrollX(maxScrollX);
+            accessibilityRecord.setMaxScrollX(i);
         }
     }
 
@@ -193,21 +193,21 @@ public class AccessibilityRecordCompat {
         return getMaxScrollY(this.mRecord);
     }
 
-    public static int getMaxScrollY(AccessibilityRecord record) {
+    public static int getMaxScrollY(AccessibilityRecord accessibilityRecord) {
         if (Build.VERSION.SDK_INT >= 15) {
-            return record.getMaxScrollY();
+            return accessibilityRecord.getMaxScrollY();
         }
         return 0;
     }
 
     @Deprecated
-    public void setMaxScrollY(int maxScrollY) {
-        setMaxScrollY(this.mRecord, maxScrollY);
+    public void setMaxScrollY(int i) {
+        setMaxScrollY(this.mRecord, i);
     }
 
-    public static void setMaxScrollY(AccessibilityRecord record, int maxScrollY) {
+    public static void setMaxScrollY(AccessibilityRecord accessibilityRecord, int i) {
         if (Build.VERSION.SDK_INT >= 15) {
-            record.setMaxScrollY(maxScrollY);
+            accessibilityRecord.setMaxScrollY(i);
         }
     }
 
@@ -217,8 +217,8 @@ public class AccessibilityRecordCompat {
     }
 
     @Deprecated
-    public void setAddedCount(int addedCount) {
-        this.mRecord.setAddedCount(addedCount);
+    public void setAddedCount(int i) {
+        this.mRecord.setAddedCount(i);
     }
 
     @Deprecated
@@ -227,8 +227,8 @@ public class AccessibilityRecordCompat {
     }
 
     @Deprecated
-    public void setRemovedCount(int removedCount) {
-        this.mRecord.setRemovedCount(removedCount);
+    public void setRemovedCount(int i) {
+        this.mRecord.setRemovedCount(i);
     }
 
     @Deprecated
@@ -237,8 +237,8 @@ public class AccessibilityRecordCompat {
     }
 
     @Deprecated
-    public void setClassName(CharSequence className) {
-        this.mRecord.setClassName(className);
+    public void setClassName(CharSequence charSequence) {
+        this.mRecord.setClassName(charSequence);
     }
 
     @Deprecated
@@ -252,8 +252,8 @@ public class AccessibilityRecordCompat {
     }
 
     @Deprecated
-    public void setBeforeText(CharSequence beforeText) {
-        this.mRecord.setBeforeText(beforeText);
+    public void setBeforeText(CharSequence charSequence) {
+        this.mRecord.setBeforeText(charSequence);
     }
 
     @Deprecated
@@ -262,8 +262,8 @@ public class AccessibilityRecordCompat {
     }
 
     @Deprecated
-    public void setContentDescription(CharSequence contentDescription) {
-        this.mRecord.setContentDescription(contentDescription);
+    public void setContentDescription(CharSequence charSequence) {
+        this.mRecord.setContentDescription(charSequence);
     }
 
     @Deprecated
@@ -272,8 +272,8 @@ public class AccessibilityRecordCompat {
     }
 
     @Deprecated
-    public void setParcelableData(Parcelable parcelableData) {
-        this.mRecord.setParcelableData(parcelableData);
+    public void setParcelableData(Parcelable parcelable) {
+        this.mRecord.setParcelableData(parcelable);
     }
 
     @Deprecated
@@ -298,13 +298,13 @@ public class AccessibilityRecordCompat {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        AccessibilityRecordCompat other = (AccessibilityRecordCompat) obj;
+        AccessibilityRecordCompat accessibilityRecordCompat = (AccessibilityRecordCompat) obj;
         AccessibilityRecord accessibilityRecord = this.mRecord;
         if (accessibilityRecord == null) {
-            if (other.mRecord != null) {
+            if (accessibilityRecordCompat.mRecord != null) {
                 return false;
             }
-        } else if (!accessibilityRecord.equals(other.mRecord)) {
+        } else if (!accessibilityRecord.equals(accessibilityRecordCompat.mRecord)) {
             return false;
         }
         return true;

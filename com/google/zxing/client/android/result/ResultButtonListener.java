@@ -6,9 +6,9 @@ public final class ResultButtonListener implements View.OnClickListener {
     private final int index;
     private final ResultHandler resultHandler;
 
-    public ResultButtonListener(ResultHandler resultHandler2, int index2) {
+    public ResultButtonListener(ResultHandler resultHandler2, int i) {
         this.resultHandler = resultHandler2;
-        this.index = index2;
+        this.index = i;
     }
 
     public void onClick(View view) {

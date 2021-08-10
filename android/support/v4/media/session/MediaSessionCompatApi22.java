@@ -6,7 +6,7 @@ class MediaSessionCompatApi22 {
     MediaSessionCompatApi22() {
     }
 
-    public static void setRatingType(Object sessionObj, int type) {
-        ((MediaSession) sessionObj).setRatingType(type);
+    public static void setRatingType(Object obj, int i) {
+        ((MediaSession) obj).setRatingType(i);
     }
 }

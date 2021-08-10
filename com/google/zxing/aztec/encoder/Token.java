@@ -9,8 +9,8 @@ abstract class Token {
     /* access modifiers changed from: package-private */
     public abstract void appendTo(BitArray bitArray, byte[] bArr);
 
-    Token(Token previous2) {
-        this.previous = previous2;
+    Token(Token token) {
+        this.previous = token;
     }
 
     /* access modifiers changed from: package-private */
@@ -19,12 +19,12 @@ abstract class Token {
     }
 
     /* access modifiers changed from: package-private */
-    public final Token add(int value, int bitCount) {
-        return new SimpleToken(this, value, bitCount);
+    public final Token add(int i, int i2) {
+        return new SimpleToken(this, i, i2);
     }
 
     /* access modifiers changed from: package-private */
-    public final Token addBinaryShift(int start, int byteCount) {
-        return new BinaryShiftToken(this, start, byteCount);
+    public final Token addBinaryShift(int i, int i2) {
+        return new BinaryShiftToken(this, i, i2);
     }
 }

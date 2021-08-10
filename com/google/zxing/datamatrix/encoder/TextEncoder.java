@@ -2,12 +2,12 @@ package com.google.zxing.datamatrix.encoder;
 
 /* access modifiers changed from: package-private */
 public final class TextEncoder extends C40Encoder {
-    TextEncoder() {
-    }
-
     @Override // com.google.zxing.datamatrix.encoder.Encoder, com.google.zxing.datamatrix.encoder.C40Encoder
     public int getEncodingMode() {
         return 2;
+    }
+
+    TextEncoder() {
     }
 
     /* access modifiers changed from: package-private */
@@ -52,7 +52,7 @@ public final class TextEncoder extends C40Encoder {
             return 2;
         } else if (c >= 128) {
             sb.append("\u0001\u001e");
-            return 2 + encodeChar((char) (c - 128), sb);
+            return encodeChar((char) (c - 128), sb) + 2;
         } else {
             HighLevelEncoder.illegalCharacter(c);
             return -1;

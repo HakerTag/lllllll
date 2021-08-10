@@ -13,39 +13,39 @@ public final class AztecCode {
         return this.compact;
     }
 
-    public void setCompact(boolean compact2) {
-        this.compact = compact2;
+    public void setCompact(boolean z) {
+        this.compact = z;
     }
 
     public int getSize() {
         return this.size;
     }
 
-    public void setSize(int size2) {
-        this.size = size2;
+    public void setSize(int i) {
+        this.size = i;
     }
 
     public int getLayers() {
         return this.layers;
     }
 
-    public void setLayers(int layers2) {
-        this.layers = layers2;
+    public void setLayers(int i) {
+        this.layers = i;
     }
 
     public int getCodeWords() {
         return this.codeWords;
     }
 
-    public void setCodeWords(int codeWords2) {
-        this.codeWords = codeWords2;
+    public void setCodeWords(int i) {
+        this.codeWords = i;
     }
 
     public BitMatrix getMatrix() {
         return this.matrix;
     }
 
-    public void setMatrix(BitMatrix matrix2) {
-        this.matrix = matrix2;
+    public void setMatrix(BitMatrix bitMatrix) {
+        this.matrix = bitMatrix;
     }
 }

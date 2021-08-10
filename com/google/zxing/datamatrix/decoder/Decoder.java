@@ -7,56 +7,57 @@ import com.google.zxing.common.DecoderResult;
 import com.google.zxing.common.reedsolomon.GenericGF;
 import com.google.zxing.common.reedsolomon.ReedSolomonDecoder;
 import com.google.zxing.common.reedsolomon.ReedSolomonException;
+import kotlin.UByte;
 
 public final class Decoder {
     private final ReedSolomonDecoder rsDecoder = new ReedSolomonDecoder(GenericGF.DATA_MATRIX_FIELD_256);
 
-    public DecoderResult decode(boolean[][] image) throws FormatException, ChecksumException {
-        int dimension = image.length;
-        BitMatrix bits = new BitMatrix(dimension);
-        for (int i = 0; i < dimension; i++) {
-            for (int j = 0; j < dimension; j++) {
-                if (image[i][j]) {
-                    bits.set(j, i);
+    public DecoderResult decode(boolean[][] zArr) throws FormatException, ChecksumException {
+        int length = zArr.length;
+        BitMatrix bitMatrix = new BitMatrix(length);
+        for (int i = 0; i < length; i++) {
+            for (int i2 = 0; i2 < length; i2++) {
+                if (zArr[i][i2]) {
+                    bitMatrix.set(i2, i);
                 }
             }
         }
-        return decode(bits);
+        return decode(bitMatrix);
     }
 
-    public DecoderResult decode(BitMatrix bits) throws FormatException, ChecksumException {
-        BitMatrixParser parser = new BitMatrixParser(bits);
-        DataBlock[] dataBlocks = DataBlock.getDataBlocks(parser.readCodewords(), parser.getVersion());
-        int totalBytes = 0;
-        for (DataBlock db : dataBlocks) {
-            totalBytes += db.getNumDataCodewords();
+    public DecoderResult decode(BitMatrix bitMatrix) throws FormatException, ChecksumException {
+        BitMatrixParser bitMatrixParser = new BitMatrixParser(bitMatrix);
+        DataBlock[] dataBlocks = DataBlock.getDataBlocks(bitMatrixParser.readCodewords(), bitMatrixParser.getVersion());
+        int i = 0;
+        for (DataBlock dataBlock : dataBlocks) {
+            i += dataBlock.getNumDataCodewords();
         }
-        byte[] resultBytes = new byte[totalBytes];
-        int dataBlocksCount = dataBlocks.length;
-        for (int j = 0; j < dataBlocksCount; j++) {
-            DataBlock dataBlock = dataBlocks[j];
-            byte[] codewordBytes = dataBlock.getCodewords();
-            int numDataCodewords = dataBlock.getNumDataCodewords();
-            correctErrors(codewordBytes, numDataCodewords);
-            for (int i = 0; i < numDataCodewords; i++) {
-                resultBytes[(i * dataBlocksCount) + j] = codewordBytes[i];
+        byte[] bArr = new byte[i];
+        int length = dataBlocks.length;
+        for (int i2 = 0; i2 < length; i2++) {
+            DataBlock dataBlock2 = dataBlocks[i2];
+            byte[] codewords = dataBlock2.getCodewords();
+            int numDataCodewords = dataBlock2.getNumDataCodewords();
+            correctErrors(codewords, numDataCodewords);
+            for (int i3 = 0; i3 < numDataCodewords; i3++) {
+                bArr[(i3 * length) + i2] = codewords[i3];
             }
         }
-        return DecodedBitStreamParser.decode(resultBytes);
+        return DecodedBitStreamParser.decode(bArr);
     }
 
-    private void correctErrors(byte[] codewordBytes, int numDataCodewords) throws ChecksumException {
-        int numCodewords = codewordBytes.length;
-        int[] codewordsInts = new int[numCodewords];
-        for (int i = 0; i < numCodewords; i++) {
-            codewordsInts[i] = codewordBytes[i] & 255;
+    private void correctErrors(byte[] bArr, int i) throws ChecksumException {
+        int length = bArr.length;
+        int[] iArr = new int[length];
+        for (int i2 = 0; i2 < length; i2++) {
+            iArr[i2] = bArr[i2] & UByte.MAX_VALUE;
         }
         try {
-            this.rsDecoder.decode(codewordsInts, codewordBytes.length - numDataCodewords);
-            for (int i2 = 0; i2 < numDataCodewords; i2++) {
-                codewordBytes[i2] = (byte) codewordsInts[i2];
+            this.rsDecoder.decode(iArr, bArr.length - i);
+            for (int i3 = 0; i3 < i; i3++) {
+                bArr[i3] = (byte) iArr[i3];
             }
-        } catch (ReedSolomonException e) {
+        } catch (ReedSolomonException unused) {
             throw ChecksumException.getChecksumInstance();
         }
     }

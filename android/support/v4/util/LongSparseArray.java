@@ -11,131 +11,136 @@ public class LongSparseArray<E> implements Cloneable {
         this(10);
     }
 
-    public LongSparseArray(int initialCapacity) {
+    public LongSparseArray(int i) {
         this.mGarbage = false;
-        if (initialCapacity == 0) {
+        if (i == 0) {
             this.mKeys = ContainerHelpers.EMPTY_LONGS;
             this.mValues = ContainerHelpers.EMPTY_OBJECTS;
         } else {
-            int initialCapacity2 = ContainerHelpers.idealLongArraySize(initialCapacity);
-            this.mKeys = new long[initialCapacity2];
-            this.mValues = new Object[initialCapacity2];
+            int idealLongArraySize = ContainerHelpers.idealLongArraySize(i);
+            this.mKeys = new long[idealLongArraySize];
+            this.mValues = new Object[idealLongArraySize];
         }
         this.mSize = 0;
     }
 
     @Override // java.lang.Object
     public LongSparseArray<E> clone() {
-        LongSparseArray<E> clone = null;
+        LongSparseArray<E> longSparseArray = null;
         try {
-            clone = (LongSparseArray) super.clone();
-            clone.mKeys = (long[]) this.mKeys.clone();
-            clone.mValues = (Object[]) this.mValues.clone();
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            return clone;
+            LongSparseArray<E> longSparseArray2 = (LongSparseArray) super.clone();
+            try {
+                longSparseArray2.mKeys = (long[]) this.mKeys.clone();
+                longSparseArray2.mValues = (Object[]) this.mValues.clone();
+                return longSparseArray2;
+            } catch (CloneNotSupportedException unused) {
+                longSparseArray = longSparseArray2;
+            }
+        } catch (CloneNotSupportedException unused2) {
+            return longSparseArray;
         }
     }
 
-    public E get(long key) {
-        return get(key, null);
+    public E get(long j) {
+        return get(j, null);
     }
 
-    public E get(long key, E valueIfKeyNotFound) {
-        int i = ContainerHelpers.binarySearch(this.mKeys, this.mSize, key);
-        if (i >= 0) {
+    public E get(long j, E e) {
+        int binarySearch = ContainerHelpers.binarySearch(this.mKeys, this.mSize, j);
+        if (binarySearch >= 0) {
             Object[] objArr = this.mValues;
-            if (objArr[i] != DELETED) {
-                return (E) objArr[i];
+            if (objArr[binarySearch] != DELETED) {
+                return (E) objArr[binarySearch];
             }
         }
-        return valueIfKeyNotFound;
+        return e;
     }
 
-    public void delete(long key) {
+    public void delete(long j) {
         Object[] objArr;
         Object obj;
-        int i = ContainerHelpers.binarySearch(this.mKeys, this.mSize, key);
-        if (i >= 0 && (objArr = this.mValues)[i] != (obj = DELETED)) {
-            objArr[i] = obj;
+        int binarySearch = ContainerHelpers.binarySearch(this.mKeys, this.mSize, j);
+        if (binarySearch >= 0 && (objArr = this.mValues)[binarySearch] != (obj = DELETED)) {
+            objArr[binarySearch] = obj;
             this.mGarbage = true;
         }
     }
 
-    public void remove(long key) {
-        delete(key);
+    public void remove(long j) {
+        delete(j);
     }
 
-    public void removeAt(int index) {
+    public void removeAt(int i) {
         Object[] objArr = this.mValues;
-        Object obj = objArr[index];
+        Object obj = objArr[i];
         Object obj2 = DELETED;
         if (obj != obj2) {
-            objArr[index] = obj2;
+            objArr[i] = obj2;
             this.mGarbage = true;
         }
     }
 
     private void gc() {
-        int n = this.mSize;
-        int o = 0;
-        long[] keys = this.mKeys;
-        Object[] values = this.mValues;
-        for (int i = 0; i < n; i++) {
-            Object val = values[i];
-            if (val != DELETED) {
-                if (i != o) {
-                    keys[o] = keys[i];
-                    values[o] = val;
-                    values[i] = null;
+        int i = this.mSize;
+        long[] jArr = this.mKeys;
+        Object[] objArr = this.mValues;
+        int i2 = 0;
+        for (int i3 = 0; i3 < i; i3++) {
+            Object obj = objArr[i3];
+            if (obj != DELETED) {
+                if (i3 != i2) {
+                    jArr[i2] = jArr[i3];
+                    objArr[i2] = obj;
+                    objArr[i3] = null;
                 }
-                o++;
+                i2++;
             }
         }
         this.mGarbage = false;
-        this.mSize = o;
+        this.mSize = i2;
     }
 
-    public void put(long key, E value) {
-        int i = ContainerHelpers.binarySearch(this.mKeys, this.mSize, key);
-        if (i >= 0) {
-            this.mValues[i] = value;
+    public void put(long j, E e) {
+        int binarySearch = ContainerHelpers.binarySearch(this.mKeys, this.mSize, j);
+        if (binarySearch >= 0) {
+            this.mValues[binarySearch] = e;
             return;
         }
-        int i2 = ~i;
-        if (i2 < this.mSize) {
+        int i = ~binarySearch;
+        if (i < this.mSize) {
             Object[] objArr = this.mValues;
-            if (objArr[i2] == DELETED) {
-                this.mKeys[i2] = key;
-                objArr[i2] = value;
+            if (objArr[i] == DELETED) {
+                this.mKeys[i] = j;
+                objArr[i] = e;
                 return;
             }
         }
         if (this.mGarbage && this.mSize >= this.mKeys.length) {
             gc();
-            i2 = ~ContainerHelpers.binarySearch(this.mKeys, this.mSize, key);
+            i = ~ContainerHelpers.binarySearch(this.mKeys, this.mSize, j);
+        }
+        int i2 = this.mSize;
+        if (i2 >= this.mKeys.length) {
+            int idealLongArraySize = ContainerHelpers.idealLongArraySize(i2 + 1);
+            long[] jArr = new long[idealLongArraySize];
+            Object[] objArr2 = new Object[idealLongArraySize];
+            long[] jArr2 = this.mKeys;
+            System.arraycopy(jArr2, 0, jArr, 0, jArr2.length);
+            Object[] objArr3 = this.mValues;
+            System.arraycopy(objArr3, 0, objArr2, 0, objArr3.length);
+            this.mKeys = jArr;
+            this.mValues = objArr2;
         }
         int i3 = this.mSize;
-        if (i3 >= this.mKeys.length) {
-            int n = ContainerHelpers.idealLongArraySize(i3 + 1);
-            long[] nkeys = new long[n];
-            Object[] nvalues = new Object[n];
-            long[] jArr = this.mKeys;
-            System.arraycopy(jArr, 0, nkeys, 0, jArr.length);
-            Object[] objArr2 = this.mValues;
-            System.arraycopy(objArr2, 0, nvalues, 0, objArr2.length);
-            this.mKeys = nkeys;
-            this.mValues = nvalues;
+        if (i3 - i != 0) {
+            long[] jArr3 = this.mKeys;
+            int i4 = i + 1;
+            System.arraycopy(jArr3, i, jArr3, i4, i3 - i);
+            Object[] objArr4 = this.mValues;
+            System.arraycopy(objArr4, i, objArr4, i4, this.mSize - i);
         }
-        int n2 = this.mSize;
-        if (n2 - i2 != 0) {
-            long[] jArr2 = this.mKeys;
-            System.arraycopy(jArr2, i2, jArr2, i2 + 1, n2 - i2);
-            Object[] objArr3 = this.mValues;
-            System.arraycopy(objArr3, i2, objArr3, i2 + 1, this.mSize - i2);
-        }
-        this.mKeys[i2] = key;
-        this.mValues[i2] = value;
+        this.mKeys[i] = j;
+        this.mValues[i] = e;
         this.mSize++;
     }
 
@@ -146,40 +151,40 @@ public class LongSparseArray<E> implements Cloneable {
         return this.mSize;
     }
 
-    public long keyAt(int index) {
+    public long keyAt(int i) {
         if (this.mGarbage) {
             gc();
         }
-        return this.mKeys[index];
+        return this.mKeys[i];
     }
 
-    public E valueAt(int index) {
+    public E valueAt(int i) {
         if (this.mGarbage) {
             gc();
         }
-        return (E) this.mValues[index];
+        return (E) this.mValues[i];
     }
 
-    public void setValueAt(int index, E value) {
+    public void setValueAt(int i, E e) {
         if (this.mGarbage) {
             gc();
         }
-        this.mValues[index] = value;
+        this.mValues[i] = e;
     }
 
-    public int indexOfKey(long key) {
+    public int indexOfKey(long j) {
         if (this.mGarbage) {
             gc();
         }
-        return ContainerHelpers.binarySearch(this.mKeys, this.mSize, key);
+        return ContainerHelpers.binarySearch(this.mKeys, this.mSize, j);
     }
 
-    public int indexOfValue(E value) {
+    public int indexOfValue(E e) {
         if (this.mGarbage) {
             gc();
         }
         for (int i = 0; i < this.mSize; i++) {
-            if (this.mValues[i] == value) {
+            if (this.mValues[i] == e) {
                 return i;
             }
         }
@@ -187,61 +192,61 @@ public class LongSparseArray<E> implements Cloneable {
     }
 
     public void clear() {
-        int n = this.mSize;
-        Object[] values = this.mValues;
-        for (int i = 0; i < n; i++) {
-            values[i] = null;
+        int i = this.mSize;
+        Object[] objArr = this.mValues;
+        for (int i2 = 0; i2 < i; i2++) {
+            objArr[i2] = null;
         }
         this.mSize = 0;
         this.mGarbage = false;
     }
 
-    public void append(long key, E value) {
+    public void append(long j, E e) {
         int i = this.mSize;
-        if (i == 0 || key > this.mKeys[i - 1]) {
+        if (i == 0 || j > this.mKeys[i - 1]) {
             if (this.mGarbage && this.mSize >= this.mKeys.length) {
                 gc();
             }
-            int pos = this.mSize;
-            if (pos >= this.mKeys.length) {
-                int n = ContainerHelpers.idealLongArraySize(pos + 1);
-                long[] nkeys = new long[n];
-                Object[] nvalues = new Object[n];
-                long[] jArr = this.mKeys;
-                System.arraycopy(jArr, 0, nkeys, 0, jArr.length);
-                Object[] objArr = this.mValues;
-                System.arraycopy(objArr, 0, nvalues, 0, objArr.length);
-                this.mKeys = nkeys;
-                this.mValues = nvalues;
+            int i2 = this.mSize;
+            if (i2 >= this.mKeys.length) {
+                int idealLongArraySize = ContainerHelpers.idealLongArraySize(i2 + 1);
+                long[] jArr = new long[idealLongArraySize];
+                Object[] objArr = new Object[idealLongArraySize];
+                long[] jArr2 = this.mKeys;
+                System.arraycopy(jArr2, 0, jArr, 0, jArr2.length);
+                Object[] objArr2 = this.mValues;
+                System.arraycopy(objArr2, 0, objArr, 0, objArr2.length);
+                this.mKeys = jArr;
+                this.mValues = objArr;
             }
-            this.mKeys[pos] = key;
-            this.mValues[pos] = value;
-            this.mSize = pos + 1;
+            this.mKeys[i2] = j;
+            this.mValues[i2] = e;
+            this.mSize = i2 + 1;
             return;
         }
-        put(key, value);
+        put(j, e);
     }
 
     public String toString() {
         if (size() <= 0) {
             return "{}";
         }
-        StringBuilder buffer = new StringBuilder(this.mSize * 28);
-        buffer.append('{');
+        StringBuilder sb = new StringBuilder(this.mSize * 28);
+        sb.append('{');
         for (int i = 0; i < this.mSize; i++) {
             if (i > 0) {
-                buffer.append(", ");
+                sb.append(", ");
             }
-            buffer.append(keyAt(i));
-            buffer.append('=');
-            Object value = valueAt(i);
-            if (value != this) {
-                buffer.append(value);
+            sb.append(keyAt(i));
+            sb.append('=');
+            E valueAt = valueAt(i);
+            if (valueAt != this) {
+                sb.append((Object) valueAt);
             } else {
-                buffer.append("(this Map)");
+                sb.append("(this Map)");
             }
         }
-        buffer.append('}');
-        return buffer.toString();
+        sb.append('}');
+        return sb.toString();
     }
 }

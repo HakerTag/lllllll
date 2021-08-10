@@ -50,26 +50,26 @@ public final class TextViewCompat {
         TextViewCompatBaseImpl() {
         }
 
-        public void setCompoundDrawablesRelative(TextView textView, Drawable start, Drawable top, Drawable end, Drawable bottom) {
-            textView.setCompoundDrawables(start, top, end, bottom);
+        public void setCompoundDrawablesRelative(TextView textView, Drawable drawable, Drawable drawable2, Drawable drawable3, Drawable drawable4) {
+            textView.setCompoundDrawables(drawable, drawable2, drawable3, drawable4);
         }
 
-        public void setCompoundDrawablesRelativeWithIntrinsicBounds(TextView textView, Drawable start, Drawable top, Drawable end, Drawable bottom) {
-            textView.setCompoundDrawablesWithIntrinsicBounds(start, top, end, bottom);
+        public void setCompoundDrawablesRelativeWithIntrinsicBounds(TextView textView, Drawable drawable, Drawable drawable2, Drawable drawable3, Drawable drawable4) {
+            textView.setCompoundDrawablesWithIntrinsicBounds(drawable, drawable2, drawable3, drawable4);
         }
 
-        public void setCompoundDrawablesRelativeWithIntrinsicBounds(TextView textView, int start, int top, int end, int bottom) {
-            textView.setCompoundDrawablesWithIntrinsicBounds(start, top, end, bottom);
+        public void setCompoundDrawablesRelativeWithIntrinsicBounds(TextView textView, int i, int i2, int i3, int i4) {
+            textView.setCompoundDrawablesWithIntrinsicBounds(i, i2, i3, i4);
         }
 
-        private static Field retrieveField(String fieldName) {
+        private static Field retrieveField(String str) {
             Field field = null;
             try {
-                field = TextView.class.getDeclaredField(fieldName);
+                field = TextView.class.getDeclaredField(str);
                 field.setAccessible(true);
                 return field;
-            } catch (NoSuchFieldException e) {
-                Log.e(LOG_TAG, "Could not retrieve " + fieldName + " field.");
+            } catch (NoSuchFieldException unused) {
+                Log.e(LOG_TAG, "Could not retrieve " + str + " field.");
                 return field;
             }
         }
@@ -77,7 +77,7 @@ public final class TextViewCompat {
         private static int retrieveIntFromField(Field field, TextView textView) {
             try {
                 return field.getInt(textView);
-            } catch (IllegalAccessException e) {
+            } catch (IllegalAccessException unused) {
                 Log.d(LOG_TAG, "Could not retrieve value of " + field.getName() + " field.");
                 return -1;
             }
@@ -123,29 +123,29 @@ public final class TextViewCompat {
             return -1;
         }
 
-        public void setTextAppearance(TextView textView, int resId) {
-            textView.setTextAppearance(textView.getContext(), resId);
+        public void setTextAppearance(TextView textView, int i) {
+            textView.setTextAppearance(textView.getContext(), i);
         }
 
         public Drawable[] getCompoundDrawablesRelative(TextView textView) {
             return textView.getCompoundDrawables();
         }
 
-        public void setAutoSizeTextTypeWithDefaults(TextView textView, int autoSizeTextType) {
+        public void setAutoSizeTextTypeWithDefaults(TextView textView, int i) {
             if (textView instanceof AutoSizeableTextView) {
-                ((AutoSizeableTextView) textView).setAutoSizeTextTypeWithDefaults(autoSizeTextType);
+                ((AutoSizeableTextView) textView).setAutoSizeTextTypeWithDefaults(i);
             }
         }
 
-        public void setAutoSizeTextTypeUniformWithConfiguration(TextView textView, int autoSizeMinTextSize, int autoSizeMaxTextSize, int autoSizeStepGranularity, int unit) throws IllegalArgumentException {
+        public void setAutoSizeTextTypeUniformWithConfiguration(TextView textView, int i, int i2, int i3, int i4) throws IllegalArgumentException {
             if (textView instanceof AutoSizeableTextView) {
-                ((AutoSizeableTextView) textView).setAutoSizeTextTypeUniformWithConfiguration(autoSizeMinTextSize, autoSizeMaxTextSize, autoSizeStepGranularity, unit);
+                ((AutoSizeableTextView) textView).setAutoSizeTextTypeUniformWithConfiguration(i, i2, i3, i4);
             }
         }
 
-        public void setAutoSizeTextTypeUniformWithPresetSizes(TextView textView, int[] presetSizes, int unit) throws IllegalArgumentException {
+        public void setAutoSizeTextTypeUniformWithPresetSizes(TextView textView, int[] iArr, int i) throws IllegalArgumentException {
             if (textView instanceof AutoSizeableTextView) {
-                ((AutoSizeableTextView) textView).setAutoSizeTextTypeUniformWithPresetSizes(presetSizes, unit);
+                ((AutoSizeableTextView) textView).setAutoSizeTextTypeUniformWithPresetSizes(iArr, i);
             }
         }
 
@@ -178,10 +178,7 @@ public final class TextViewCompat {
         }
 
         public int[] getAutoSizeTextAvailableSizes(TextView textView) {
-            if (textView instanceof AutoSizeableTextView) {
-                return ((AutoSizeableTextView) textView).getAutoSizeTextAvailableSizes();
-            }
-            return new int[0];
+            return textView instanceof AutoSizeableTextView ? ((AutoSizeableTextView) textView).getAutoSizeTextAvailableSizes() : new int[0];
         }
 
         public void setCustomSelectionActionModeCallback(TextView textView, ActionMode.Callback callback) {
@@ -209,46 +206,58 @@ public final class TextViewCompat {
         }
 
         @Override // android.support.v4.widget.TextViewCompat.TextViewCompatBaseImpl
-        public void setCompoundDrawablesRelative(TextView textView, Drawable start, Drawable top, Drawable end, Drawable bottom) {
-            boolean rtl = true;
+        public void setCompoundDrawablesRelative(TextView textView, Drawable drawable, Drawable drawable2, Drawable drawable3, Drawable drawable4) {
+            boolean z = true;
             if (textView.getLayoutDirection() != 1) {
-                rtl = false;
+                z = false;
             }
-            textView.setCompoundDrawables(rtl ? end : start, top, rtl ? start : end, bottom);
+            Drawable drawable5 = z ? drawable3 : drawable;
+            if (!z) {
+                drawable = drawable3;
+            }
+            textView.setCompoundDrawables(drawable5, drawable2, drawable, drawable4);
         }
 
         @Override // android.support.v4.widget.TextViewCompat.TextViewCompatBaseImpl
-        public void setCompoundDrawablesRelativeWithIntrinsicBounds(TextView textView, Drawable start, Drawable top, Drawable end, Drawable bottom) {
-            boolean rtl = true;
+        public void setCompoundDrawablesRelativeWithIntrinsicBounds(TextView textView, Drawable drawable, Drawable drawable2, Drawable drawable3, Drawable drawable4) {
+            boolean z = true;
             if (textView.getLayoutDirection() != 1) {
-                rtl = false;
+                z = false;
             }
-            textView.setCompoundDrawablesWithIntrinsicBounds(rtl ? end : start, top, rtl ? start : end, bottom);
+            Drawable drawable5 = z ? drawable3 : drawable;
+            if (!z) {
+                drawable = drawable3;
+            }
+            textView.setCompoundDrawablesWithIntrinsicBounds(drawable5, drawable2, drawable, drawable4);
         }
 
         @Override // android.support.v4.widget.TextViewCompat.TextViewCompatBaseImpl
-        public void setCompoundDrawablesRelativeWithIntrinsicBounds(TextView textView, int start, int top, int end, int bottom) {
-            boolean rtl = true;
+        public void setCompoundDrawablesRelativeWithIntrinsicBounds(TextView textView, int i, int i2, int i3, int i4) {
+            boolean z = true;
             if (textView.getLayoutDirection() != 1) {
-                rtl = false;
+                z = false;
             }
-            textView.setCompoundDrawablesWithIntrinsicBounds(rtl ? end : start, top, rtl ? start : end, bottom);
+            int i5 = z ? i3 : i;
+            if (!z) {
+                i = i3;
+            }
+            textView.setCompoundDrawablesWithIntrinsicBounds(i5, i2, i, i4);
         }
 
         @Override // android.support.v4.widget.TextViewCompat.TextViewCompatBaseImpl
         public Drawable[] getCompoundDrawablesRelative(TextView textView) {
-            boolean rtl = true;
+            boolean z = true;
             if (textView.getLayoutDirection() != 1) {
-                rtl = false;
+                z = false;
             }
-            Drawable[] compounds = textView.getCompoundDrawables();
-            if (rtl) {
-                Drawable start = compounds[2];
-                Drawable end = compounds[0];
-                compounds[0] = start;
-                compounds[2] = end;
+            Drawable[] compoundDrawables = textView.getCompoundDrawables();
+            if (z) {
+                Drawable drawable = compoundDrawables[2];
+                Drawable drawable2 = compoundDrawables[0];
+                compoundDrawables[0] = drawable;
+                compoundDrawables[2] = drawable2;
             }
-            return compounds;
+            return compoundDrawables;
         }
     }
 
@@ -257,18 +266,18 @@ public final class TextViewCompat {
         }
 
         @Override // android.support.v4.widget.TextViewCompat.TextViewCompatBaseImpl, android.support.v4.widget.TextViewCompat.TextViewCompatApi17Impl
-        public void setCompoundDrawablesRelative(TextView textView, Drawable start, Drawable top, Drawable end, Drawable bottom) {
-            textView.setCompoundDrawablesRelative(start, top, end, bottom);
+        public void setCompoundDrawablesRelative(TextView textView, Drawable drawable, Drawable drawable2, Drawable drawable3, Drawable drawable4) {
+            textView.setCompoundDrawablesRelative(drawable, drawable2, drawable3, drawable4);
         }
 
         @Override // android.support.v4.widget.TextViewCompat.TextViewCompatBaseImpl, android.support.v4.widget.TextViewCompat.TextViewCompatApi17Impl
-        public void setCompoundDrawablesRelativeWithIntrinsicBounds(TextView textView, Drawable start, Drawable top, Drawable end, Drawable bottom) {
-            textView.setCompoundDrawablesRelativeWithIntrinsicBounds(start, top, end, bottom);
+        public void setCompoundDrawablesRelativeWithIntrinsicBounds(TextView textView, Drawable drawable, Drawable drawable2, Drawable drawable3, Drawable drawable4) {
+            textView.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, drawable2, drawable3, drawable4);
         }
 
         @Override // android.support.v4.widget.TextViewCompat.TextViewCompatBaseImpl, android.support.v4.widget.TextViewCompat.TextViewCompatApi17Impl
-        public void setCompoundDrawablesRelativeWithIntrinsicBounds(TextView textView, int start, int top, int end, int bottom) {
-            textView.setCompoundDrawablesRelativeWithIntrinsicBounds(start, top, end, bottom);
+        public void setCompoundDrawablesRelativeWithIntrinsicBounds(TextView textView, int i, int i2, int i3, int i4) {
+            textView.setCompoundDrawablesRelativeWithIntrinsicBounds(i, i2, i3, i4);
         }
 
         @Override // android.support.v4.widget.TextViewCompat.TextViewCompatBaseImpl, android.support.v4.widget.TextViewCompat.TextViewCompatApi17Impl
@@ -282,8 +291,8 @@ public final class TextViewCompat {
         }
 
         @Override // android.support.v4.widget.TextViewCompat.TextViewCompatBaseImpl
-        public void setTextAppearance(TextView textView, int resId) {
-            textView.setTextAppearance(resId);
+        public void setTextAppearance(TextView textView, int i) {
+            textView.setTextAppearance(i);
         }
     }
 
@@ -302,25 +311,25 @@ public final class TextViewCompat {
                     private Class mMenuBuilderClass;
                     private Method mMenuBuilderRemoveItemAtMethod;
 
-                    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                        return callback.onCreateActionMode(mode, menu);
+                    public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+                        return callback.onCreateActionMode(actionMode, menu);
                     }
 
-                    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                    public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
                         recomputeProcessTextMenuItems(menu);
-                        return callback.onPrepareActionMode(mode, menu);
+                        return callback.onPrepareActionMode(actionMode, menu);
                     }
 
-                    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                        return callback.onActionItemClicked(mode, item);
+                    public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+                        return callback.onActionItemClicked(actionMode, menuItem);
                     }
 
-                    public void onDestroyActionMode(ActionMode mode) {
-                        callback.onDestroyActionMode(mode);
+                    public void onDestroyActionMode(ActionMode actionMode) {
+                        callback.onDestroyActionMode(actionMode);
                     }
 
                     private void recomputeProcessTextMenuItems(Menu menu) {
-                        Method removeItemAtMethod;
+                        Method method;
                         Context context = textView.getContext();
                         PackageManager packageManager = context.getPackageManager();
                         if (!this.mInitializedMenuBuilderReferences) {
@@ -330,7 +339,7 @@ public final class TextViewCompat {
                                 this.mMenuBuilderClass = cls;
                                 this.mMenuBuilderRemoveItemAtMethod = cls.getDeclaredMethod("removeItemAt", Integer.TYPE);
                                 this.mCanUseMenuBuilderReferences = true;
-                            } catch (ClassNotFoundException | NoSuchMethodException e) {
+                            } catch (ClassNotFoundException | NoSuchMethodException unused) {
                                 this.mMenuBuilderClass = null;
                                 this.mMenuBuilderRemoveItemAtMethod = null;
                                 this.mCanUseMenuBuilderReferences = false;
@@ -338,53 +347,53 @@ public final class TextViewCompat {
                         }
                         try {
                             if (!this.mCanUseMenuBuilderReferences || !this.mMenuBuilderClass.isInstance(menu)) {
-                                removeItemAtMethod = menu.getClass().getDeclaredMethod("removeItemAt", Integer.TYPE);
+                                method = menu.getClass().getDeclaredMethod("removeItemAt", Integer.TYPE);
                             } else {
-                                removeItemAtMethod = this.mMenuBuilderRemoveItemAtMethod;
+                                method = this.mMenuBuilderRemoveItemAtMethod;
                             }
-                            for (int i = menu.size() - 1; i >= 0; i--) {
-                                MenuItem item = menu.getItem(i);
+                            for (int size = menu.size() - 1; size >= 0; size--) {
+                                MenuItem item = menu.getItem(size);
                                 if (item.getIntent() != null && "android.intent.action.PROCESS_TEXT".equals(item.getIntent().getAction())) {
-                                    removeItemAtMethod.invoke(menu, Integer.valueOf(i));
+                                    method.invoke(menu, Integer.valueOf(size));
                                 }
                             }
                             List<ResolveInfo> supportedActivities = getSupportedActivities(context, packageManager);
-                            for (int i2 = 0; i2 < supportedActivities.size(); i2++) {
-                                ResolveInfo info = supportedActivities.get(i2);
-                                menu.add(0, 0, i2 + MENU_ITEM_ORDER_PROCESS_TEXT_INTENT_ACTIONS_START, info.loadLabel(packageManager)).setIntent(createProcessTextIntentForResolveInfo(info, textView)).setShowAsAction(1);
+                            for (int i = 0; i < supportedActivities.size(); i++) {
+                                ResolveInfo resolveInfo = supportedActivities.get(i);
+                                menu.add(0, 0, i + MENU_ITEM_ORDER_PROCESS_TEXT_INTENT_ACTIONS_START, resolveInfo.loadLabel(packageManager)).setIntent(createProcessTextIntentForResolveInfo(resolveInfo, textView)).setShowAsAction(1);
                             }
-                        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e2) {
+                        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException unused2) {
                         }
                     }
 
                     private List<ResolveInfo> getSupportedActivities(Context context, PackageManager packageManager) {
-                        List<ResolveInfo> supportedActivities = new ArrayList<>();
+                        ArrayList arrayList = new ArrayList();
                         if (!(context instanceof Activity)) {
-                            return supportedActivities;
+                            return arrayList;
                         }
-                        for (ResolveInfo info : packageManager.queryIntentActivities(createProcessTextIntent(), 0)) {
-                            if (isSupportedActivity(info, context)) {
-                                supportedActivities.add(info);
+                        for (ResolveInfo resolveInfo : packageManager.queryIntentActivities(createProcessTextIntent(), 0)) {
+                            if (isSupportedActivity(resolveInfo, context)) {
+                                arrayList.add(resolveInfo);
                             }
                         }
-                        return supportedActivities;
+                        return arrayList;
                     }
 
-                    private boolean isSupportedActivity(ResolveInfo info, Context context) {
-                        if (context.getPackageName().equals(info.activityInfo.packageName)) {
+                    private boolean isSupportedActivity(ResolveInfo resolveInfo, Context context) {
+                        if (context.getPackageName().equals(resolveInfo.activityInfo.packageName)) {
                             return true;
                         }
-                        if (!info.activityInfo.exported) {
+                        if (!resolveInfo.activityInfo.exported) {
                             return false;
                         }
-                        if (info.activityInfo.permission == null || context.checkSelfPermission(info.activityInfo.permission) == 0) {
+                        if (resolveInfo.activityInfo.permission == null || context.checkSelfPermission(resolveInfo.activityInfo.permission) == 0) {
                             return true;
                         }
                         return false;
                     }
 
-                    private Intent createProcessTextIntentForResolveInfo(ResolveInfo info, TextView textView) {
-                        return createProcessTextIntent().putExtra("android.intent.extra.PROCESS_TEXT_READONLY", !isEditable(textView)).setClassName(info.activityInfo.packageName, info.activityInfo.name);
+                    private Intent createProcessTextIntentForResolveInfo(ResolveInfo resolveInfo, TextView textView) {
+                        return createProcessTextIntent().putExtra("android.intent.extra.PROCESS_TEXT_READONLY", !isEditable(textView)).setClassName(resolveInfo.activityInfo.packageName, resolveInfo.activityInfo.name);
                     }
 
                     private boolean isEditable(TextView textView) {
@@ -406,18 +415,18 @@ public final class TextViewCompat {
         }
 
         @Override // android.support.v4.widget.TextViewCompat.TextViewCompatBaseImpl
-        public void setAutoSizeTextTypeWithDefaults(TextView textView, int autoSizeTextType) {
-            textView.setAutoSizeTextTypeWithDefaults(autoSizeTextType);
+        public void setAutoSizeTextTypeWithDefaults(TextView textView, int i) {
+            textView.setAutoSizeTextTypeWithDefaults(i);
         }
 
         @Override // android.support.v4.widget.TextViewCompat.TextViewCompatBaseImpl
-        public void setAutoSizeTextTypeUniformWithConfiguration(TextView textView, int autoSizeMinTextSize, int autoSizeMaxTextSize, int autoSizeStepGranularity, int unit) throws IllegalArgumentException {
-            textView.setAutoSizeTextTypeUniformWithConfiguration(autoSizeMinTextSize, autoSizeMaxTextSize, autoSizeStepGranularity, unit);
+        public void setAutoSizeTextTypeUniformWithConfiguration(TextView textView, int i, int i2, int i3, int i4) throws IllegalArgumentException {
+            textView.setAutoSizeTextTypeUniformWithConfiguration(i, i2, i3, i4);
         }
 
         @Override // android.support.v4.widget.TextViewCompat.TextViewCompatBaseImpl
-        public void setAutoSizeTextTypeUniformWithPresetSizes(TextView textView, int[] presetSizes, int unit) throws IllegalArgumentException {
-            textView.setAutoSizeTextTypeUniformWithPresetSizes(presetSizes, unit);
+        public void setAutoSizeTextTypeUniformWithPresetSizes(TextView textView, int[] iArr, int i) throws IllegalArgumentException {
+            textView.setAutoSizeTextTypeUniformWithPresetSizes(iArr, i);
         }
 
         @Override // android.support.v4.widget.TextViewCompat.TextViewCompatBaseImpl
@@ -464,16 +473,16 @@ public final class TextViewCompat {
         }
     }
 
-    public static void setCompoundDrawablesRelative(TextView textView, Drawable start, Drawable top, Drawable end, Drawable bottom) {
-        IMPL.setCompoundDrawablesRelative(textView, start, top, end, bottom);
+    public static void setCompoundDrawablesRelative(TextView textView, Drawable drawable, Drawable drawable2, Drawable drawable3, Drawable drawable4) {
+        IMPL.setCompoundDrawablesRelative(textView, drawable, drawable2, drawable3, drawable4);
     }
 
-    public static void setCompoundDrawablesRelativeWithIntrinsicBounds(TextView textView, Drawable start, Drawable top, Drawable end, Drawable bottom) {
-        IMPL.setCompoundDrawablesRelativeWithIntrinsicBounds(textView, start, top, end, bottom);
+    public static void setCompoundDrawablesRelativeWithIntrinsicBounds(TextView textView, Drawable drawable, Drawable drawable2, Drawable drawable3, Drawable drawable4) {
+        IMPL.setCompoundDrawablesRelativeWithIntrinsicBounds(textView, drawable, drawable2, drawable3, drawable4);
     }
 
-    public static void setCompoundDrawablesRelativeWithIntrinsicBounds(TextView textView, int start, int top, int end, int bottom) {
-        IMPL.setCompoundDrawablesRelativeWithIntrinsicBounds(textView, start, top, end, bottom);
+    public static void setCompoundDrawablesRelativeWithIntrinsicBounds(TextView textView, int i, int i2, int i3, int i4) {
+        IMPL.setCompoundDrawablesRelativeWithIntrinsicBounds(textView, i, i2, i3, i4);
     }
 
     public static int getMaxLines(TextView textView) {
@@ -484,24 +493,24 @@ public final class TextViewCompat {
         return IMPL.getMinLines(textView);
     }
 
-    public static void setTextAppearance(TextView textView, int resId) {
-        IMPL.setTextAppearance(textView, resId);
+    public static void setTextAppearance(TextView textView, int i) {
+        IMPL.setTextAppearance(textView, i);
     }
 
     public static Drawable[] getCompoundDrawablesRelative(TextView textView) {
         return IMPL.getCompoundDrawablesRelative(textView);
     }
 
-    public static void setAutoSizeTextTypeWithDefaults(TextView textView, int autoSizeTextType) {
-        IMPL.setAutoSizeTextTypeWithDefaults(textView, autoSizeTextType);
+    public static void setAutoSizeTextTypeWithDefaults(TextView textView, int i) {
+        IMPL.setAutoSizeTextTypeWithDefaults(textView, i);
     }
 
-    public static void setAutoSizeTextTypeUniformWithConfiguration(TextView textView, int autoSizeMinTextSize, int autoSizeMaxTextSize, int autoSizeStepGranularity, int unit) throws IllegalArgumentException {
-        IMPL.setAutoSizeTextTypeUniformWithConfiguration(textView, autoSizeMinTextSize, autoSizeMaxTextSize, autoSizeStepGranularity, unit);
+    public static void setAutoSizeTextTypeUniformWithConfiguration(TextView textView, int i, int i2, int i3, int i4) throws IllegalArgumentException {
+        IMPL.setAutoSizeTextTypeUniformWithConfiguration(textView, i, i2, i3, i4);
     }
 
-    public static void setAutoSizeTextTypeUniformWithPresetSizes(TextView textView, int[] presetSizes, int unit) throws IllegalArgumentException {
-        IMPL.setAutoSizeTextTypeUniformWithPresetSizes(textView, presetSizes, unit);
+    public static void setAutoSizeTextTypeUniformWithPresetSizes(TextView textView, int[] iArr, int i) throws IllegalArgumentException {
+        IMPL.setAutoSizeTextTypeUniformWithPresetSizes(textView, iArr, i);
     }
 
     public static int getAutoSizeTextType(TextView textView) {

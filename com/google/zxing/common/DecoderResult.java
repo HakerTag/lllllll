@@ -14,18 +14,24 @@ public final class DecoderResult {
     private final int structuredAppendSequenceNumber;
     private final String text;
 
-    public DecoderResult(byte[] rawBytes2, String text2, List<byte[]> byteSegments2, String ecLevel2) {
-        this(rawBytes2, text2, byteSegments2, ecLevel2, -1, -1);
+    public DecoderResult(byte[] bArr, String str, List<byte[]> list, String str2) {
+        this(bArr, str, list, str2, -1, -1);
     }
 
-    public DecoderResult(byte[] rawBytes2, String text2, List<byte[]> byteSegments2, String ecLevel2, int saSequence, int saParity) {
-        this.rawBytes = rawBytes2;
-        this.numBits = rawBytes2 == null ? 0 : rawBytes2.length * 8;
-        this.text = text2;
-        this.byteSegments = byteSegments2;
-        this.ecLevel = ecLevel2;
-        this.structuredAppendParity = saParity;
-        this.structuredAppendSequenceNumber = saSequence;
+    public DecoderResult(byte[] bArr, String str, List<byte[]> list, String str2, int i, int i2) {
+        int i3;
+        this.rawBytes = bArr;
+        if (bArr == null) {
+            i3 = 0;
+        } else {
+            i3 = bArr.length * 8;
+        }
+        this.numBits = i3;
+        this.text = str;
+        this.byteSegments = list;
+        this.ecLevel = str2;
+        this.structuredAppendParity = i2;
+        this.structuredAppendSequenceNumber = i;
     }
 
     public byte[] getRawBytes() {
@@ -36,8 +42,8 @@ public final class DecoderResult {
         return this.numBits;
     }
 
-    public void setNumBits(int numBits2) {
-        this.numBits = numBits2;
+    public void setNumBits(int i) {
+        this.numBits = i;
     }
 
     public String getText() {
@@ -56,24 +62,24 @@ public final class DecoderResult {
         return this.errorsCorrected;
     }
 
-    public void setErrorsCorrected(Integer errorsCorrected2) {
-        this.errorsCorrected = errorsCorrected2;
+    public void setErrorsCorrected(Integer num) {
+        this.errorsCorrected = num;
     }
 
     public Integer getErasures() {
         return this.erasures;
     }
 
-    public void setErasures(Integer erasures2) {
-        this.erasures = erasures2;
+    public void setErasures(Integer num) {
+        this.erasures = num;
     }
 
     public Object getOther() {
         return this.other;
     }
 
-    public void setOther(Object other2) {
-        this.other = other2;
+    public void setOther(Object obj) {
+        this.other = obj;
     }
 
     public boolean hasStructuredAppend() {

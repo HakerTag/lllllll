@@ -6,7 +6,7 @@ public class OperationCanceledException extends RuntimeException {
     }
 
     /* JADX INFO: super call moved to the top of the method (can break code semantics) */
-    public OperationCanceledException(String message) {
-        super(message != null ? message : "The operation has been canceled.");
+    public OperationCanceledException(String str) {
+        super(str == null ? "The operation has been canceled." : str);
     }
 }

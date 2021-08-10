@@ -9,10 +9,10 @@ public final class ExpandedRow {
     private final int rowNumber;
     private final boolean wasReversed;
 
-    ExpandedRow(List<ExpandedPair> pairs2, int rowNumber2, boolean wasReversed2) {
-        this.pairs = new ArrayList(pairs2);
-        this.rowNumber = rowNumber2;
-        this.wasReversed = wasReversed2;
+    ExpandedRow(List<ExpandedPair> list, int i, boolean z) {
+        this.pairs = new ArrayList(list);
+        this.rowNumber = i;
+        this.wasReversed = z;
     }
 
     /* access modifiers changed from: package-private */
@@ -31,20 +31,20 @@ public final class ExpandedRow {
     }
 
     /* access modifiers changed from: package-private */
-    public boolean isEquivalent(List<ExpandedPair> otherPairs) {
-        return this.pairs.equals(otherPairs);
+    public boolean isEquivalent(List<ExpandedPair> list) {
+        return this.pairs.equals(list);
     }
 
     public String toString() {
         return "{ " + this.pairs + " }";
     }
 
-    public boolean equals(Object o) {
-        if (!(o instanceof ExpandedRow)) {
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ExpandedRow)) {
             return false;
         }
-        ExpandedRow that = (ExpandedRow) o;
-        if (!this.pairs.equals(that.getPairs()) || this.wasReversed != that.wasReversed) {
+        ExpandedRow expandedRow = (ExpandedRow) obj;
+        if (!this.pairs.equals(expandedRow.getPairs()) || this.wasReversed != expandedRow.wasReversed) {
             return false;
         }
         return true;

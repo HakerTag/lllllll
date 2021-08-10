@@ -8,12 +8,12 @@ public final class BarcodeMetadata {
     private final int rowCountLowerPart;
     private final int rowCountUpperPart;
 
-    BarcodeMetadata(int columnCount2, int rowCountUpperPart2, int rowCountLowerPart2, int errorCorrectionLevel2) {
-        this.columnCount = columnCount2;
-        this.errorCorrectionLevel = errorCorrectionLevel2;
-        this.rowCountUpperPart = rowCountUpperPart2;
-        this.rowCountLowerPart = rowCountLowerPart2;
-        this.rowCount = rowCountUpperPart2 + rowCountLowerPart2;
+    BarcodeMetadata(int i, int i2, int i3, int i4) {
+        this.columnCount = i;
+        this.errorCorrectionLevel = i4;
+        this.rowCountUpperPart = i2;
+        this.rowCountLowerPart = i3;
+        this.rowCount = i2 + i3;
     }
 
     /* access modifiers changed from: package-private */

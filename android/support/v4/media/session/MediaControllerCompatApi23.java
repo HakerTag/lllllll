@@ -10,8 +10,8 @@ class MediaControllerCompatApi23 {
     }
 
     public static class TransportControls extends MediaControllerCompatApi21.TransportControls {
-        public static void playFromUri(Object controlsObj, Uri uri, Bundle extras) {
-            ((MediaController.TransportControls) controlsObj).playFromUri(uri, extras);
+        public static void playFromUri(Object obj, Uri uri, Bundle bundle) {
+            ((MediaController.TransportControls) obj).playFromUri(uri, bundle);
         }
     }
 }

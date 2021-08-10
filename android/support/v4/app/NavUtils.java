@@ -13,100 +13,100 @@ public final class NavUtils {
     public static final String PARENT_ACTIVITY = "android.support.PARENT_ACTIVITY";
     private static final String TAG = "NavUtils";
 
-    public static boolean shouldUpRecreateTask(Activity sourceActivity, Intent targetIntent) {
+    public static boolean shouldUpRecreateTask(Activity activity, Intent intent) {
         if (Build.VERSION.SDK_INT >= 16) {
-            return sourceActivity.shouldUpRecreateTask(targetIntent);
+            return activity.shouldUpRecreateTask(intent);
         }
-        String action = sourceActivity.getIntent().getAction();
+        String action = activity.getIntent().getAction();
         return action != null && !action.equals("android.intent.action.MAIN");
     }
 
-    public static void navigateUpFromSameTask(Activity sourceActivity) {
-        Intent upIntent = getParentActivityIntent(sourceActivity);
-        if (upIntent != null) {
-            navigateUpTo(sourceActivity, upIntent);
+    public static void navigateUpFromSameTask(Activity activity) {
+        Intent parentActivityIntent = getParentActivityIntent(activity);
+        if (parentActivityIntent != null) {
+            navigateUpTo(activity, parentActivityIntent);
             return;
         }
-        throw new IllegalArgumentException("Activity " + sourceActivity.getClass().getSimpleName() + " does not have a parent activity name specified." + " (Did you forget to add the android.support.PARENT_ACTIVITY <meta-data> " + " element in your manifest?)");
+        throw new IllegalArgumentException("Activity " + activity.getClass().getSimpleName() + " does not have a parent activity name specified." + " (Did you forget to add the android.support.PARENT_ACTIVITY <meta-data> " + " element in your manifest?)");
     }
 
-    public static void navigateUpTo(Activity sourceActivity, Intent upIntent) {
+    public static void navigateUpTo(Activity activity, Intent intent) {
         if (Build.VERSION.SDK_INT >= 16) {
-            sourceActivity.navigateUpTo(upIntent);
+            activity.navigateUpTo(intent);
             return;
         }
-        upIntent.addFlags(67108864);
-        sourceActivity.startActivity(upIntent);
-        sourceActivity.finish();
+        intent.addFlags(67108864);
+        activity.startActivity(intent);
+        activity.finish();
     }
 
-    public static Intent getParentActivityIntent(Activity sourceActivity) {
-        Intent result;
-        if (Build.VERSION.SDK_INT >= 16 && (result = sourceActivity.getParentActivityIntent()) != null) {
-            return result;
+    public static Intent getParentActivityIntent(Activity activity) {
+        Intent parentActivityIntent;
+        if (Build.VERSION.SDK_INT >= 16 && (parentActivityIntent = activity.getParentActivityIntent()) != null) {
+            return parentActivityIntent;
         }
-        String parentName = getParentActivityName(sourceActivity);
-        if (parentName == null) {
+        String parentActivityName = getParentActivityName(activity);
+        if (parentActivityName == null) {
             return null;
         }
-        ComponentName target = new ComponentName(sourceActivity, parentName);
+        ComponentName componentName = new ComponentName(activity, parentActivityName);
         try {
-            if (getParentActivityName(sourceActivity, target) == null) {
-                return Intent.makeMainActivity(target);
+            if (getParentActivityName(activity, componentName) == null) {
+                return Intent.makeMainActivity(componentName);
             }
-            return new Intent().setComponent(target);
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.e(TAG, "getParentActivityIntent: bad parentActivityName '" + parentName + "' in manifest");
+            return new Intent().setComponent(componentName);
+        } catch (PackageManager.NameNotFoundException unused) {
+            Log.e(TAG, "getParentActivityIntent: bad parentActivityName '" + parentActivityName + "' in manifest");
             return null;
         }
     }
 
-    public static Intent getParentActivityIntent(Context context, Class<?> sourceActivityClass) throws PackageManager.NameNotFoundException {
-        String parentActivity = getParentActivityName(context, new ComponentName(context, sourceActivityClass));
-        if (parentActivity == null) {
+    public static Intent getParentActivityIntent(Context context, Class<?> cls) throws PackageManager.NameNotFoundException {
+        String parentActivityName = getParentActivityName(context, new ComponentName(context, cls));
+        if (parentActivityName == null) {
             return null;
         }
-        ComponentName target = new ComponentName(context, parentActivity);
-        if (getParentActivityName(context, target) == null) {
-            return Intent.makeMainActivity(target);
+        ComponentName componentName = new ComponentName(context, parentActivityName);
+        if (getParentActivityName(context, componentName) == null) {
+            return Intent.makeMainActivity(componentName);
         }
-        return new Intent().setComponent(target);
+        return new Intent().setComponent(componentName);
     }
 
     public static Intent getParentActivityIntent(Context context, ComponentName componentName) throws PackageManager.NameNotFoundException {
-        String parentActivity = getParentActivityName(context, componentName);
-        if (parentActivity == null) {
+        String parentActivityName = getParentActivityName(context, componentName);
+        if (parentActivityName == null) {
             return null;
         }
-        ComponentName target = new ComponentName(componentName.getPackageName(), parentActivity);
-        if (getParentActivityName(context, target) == null) {
-            return Intent.makeMainActivity(target);
+        ComponentName componentName2 = new ComponentName(componentName.getPackageName(), parentActivityName);
+        if (getParentActivityName(context, componentName2) == null) {
+            return Intent.makeMainActivity(componentName2);
         }
-        return new Intent().setComponent(target);
+        return new Intent().setComponent(componentName2);
     }
 
-    public static String getParentActivityName(Activity sourceActivity) {
+    public static String getParentActivityName(Activity activity) {
         try {
-            return getParentActivityName(sourceActivity, sourceActivity.getComponentName());
+            return getParentActivityName(activity, activity.getComponentName());
         } catch (PackageManager.NameNotFoundException e) {
             throw new IllegalArgumentException(e);
         }
     }
 
     public static String getParentActivityName(Context context, ComponentName componentName) throws PackageManager.NameNotFoundException {
-        String parentActivity;
-        String result;
-        ActivityInfo info = context.getPackageManager().getActivityInfo(componentName, 128);
-        if (Build.VERSION.SDK_INT >= 16 && (result = info.parentActivityName) != null) {
-            return result;
+        String string;
+        String str;
+        ActivityInfo activityInfo = context.getPackageManager().getActivityInfo(componentName, 128);
+        if (Build.VERSION.SDK_INT >= 16 && (str = activityInfo.parentActivityName) != null) {
+            return str;
         }
-        if (info.metaData == null || (parentActivity = info.metaData.getString(PARENT_ACTIVITY)) == null) {
+        if (activityInfo.metaData == null || (string = activityInfo.metaData.getString(PARENT_ACTIVITY)) == null) {
             return null;
         }
-        if (parentActivity.charAt(0) != '.') {
-            return parentActivity;
+        if (string.charAt(0) != '.') {
+            return string;
         }
-        return context.getPackageName() + parentActivity;
+        return context.getPackageName() + string;
     }
 
     private NavUtils() {

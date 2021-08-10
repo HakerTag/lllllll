@@ -12,7 +12,7 @@ public final class ViewfinderResultPointCallback implements ResultPointCallback 
     }
 
     @Override // com.google.zxing.ResultPointCallback
-    public void foundPossibleResultPoint(ResultPoint point) {
-        this.viewfinderView.addPossibleResultPoint(point);
+    public void foundPossibleResultPoint(ResultPoint resultPoint) {
+        this.viewfinderView.addPossibleResultPoint(resultPoint);
     }
 }

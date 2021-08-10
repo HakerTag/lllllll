@@ -46,9 +46,9 @@ public class FrameMetricsAggregator {
         this(1);
     }
 
-    public FrameMetricsAggregator(int metricTypeFlags) {
+    public FrameMetricsAggregator(int i) {
         if (Build.VERSION.SDK_INT >= 24) {
-            this.mInstance = new FrameMetricsApi24Impl(metricTypeFlags);
+            this.mInstance = new FrameMetricsApi24Impl(i);
         } else {
             this.mInstance = new FrameMetricsBaseImpl();
         }
@@ -75,13 +75,18 @@ public class FrameMetricsAggregator {
     }
 
     private static class FrameMetricsBaseImpl {
-        private FrameMetricsBaseImpl() {
-        }
-
         public void add(Activity activity) {
         }
 
+        public SparseIntArray[] getMetrics() {
+            return null;
+        }
+
         public SparseIntArray[] remove(Activity activity) {
+            return null;
+        }
+
+        public SparseIntArray[] reset() {
             return null;
         }
 
@@ -89,25 +94,20 @@ public class FrameMetricsAggregator {
             return null;
         }
 
-        public SparseIntArray[] getMetrics() {
-            return null;
-        }
-
-        public SparseIntArray[] reset() {
-            return null;
+        private FrameMetricsBaseImpl() {
         }
     }
 
     private static class FrameMetricsApi24Impl extends FrameMetricsBaseImpl {
         private static final int NANOS_PER_MS = 1000000;
         private static final int NANOS_ROUNDING_VALUE = 500000;
-        private static Handler sHandler = null;
-        private static HandlerThread sHandlerThread = null;
+        private static Handler sHandler;
+        private static HandlerThread sHandlerThread;
         private ArrayList<WeakReference<Activity>> mActivities = new ArrayList<>();
         Window.OnFrameMetricsAvailableListener mListener = new Window.OnFrameMetricsAvailableListener() {
             /* class android.support.v4.app.FrameMetricsAggregator.FrameMetricsApi24Impl.AnonymousClass1 */
 
-            public void onFrameMetricsAvailable(Window window, FrameMetrics frameMetrics, int dropCountSinceLastInvocation) {
+            public void onFrameMetricsAvailable(Window window, FrameMetrics frameMetrics, int i) {
                 if ((FrameMetricsApi24Impl.this.mTrackingFlags & 1) != 0) {
                     FrameMetricsApi24Impl frameMetricsApi24Impl = FrameMetricsApi24Impl.this;
                     frameMetricsApi24Impl.addDurationItem(frameMetricsApi24Impl.mMetrics[0], frameMetrics.getMetric(8));
@@ -149,17 +149,17 @@ public class FrameMetricsAggregator {
         private SparseIntArray[] mMetrics = new SparseIntArray[9];
         private int mTrackingFlags;
 
-        FrameMetricsApi24Impl(int trackingFlags) {
+        FrameMetricsApi24Impl(int i) {
             super();
-            this.mTrackingFlags = trackingFlags;
+            this.mTrackingFlags = i;
         }
 
         /* access modifiers changed from: package-private */
-        public void addDurationItem(SparseIntArray buckets, long duration) {
-            if (buckets != null) {
-                int durationMs = (int) ((500000 + duration) / 1000000);
-                if (duration >= 0) {
-                    buckets.put(durationMs, buckets.get(durationMs) + 1);
+        public void addDurationItem(SparseIntArray sparseIntArray, long j) {
+            if (sparseIntArray != null) {
+                int i = (int) ((500000 + j) / 1000000);
+                if (j >= 0) {
+                    sparseIntArray.put(i, sparseIntArray.get(i) + 1);
                 }
             }
         }
@@ -189,9 +189,9 @@ public class FrameMetricsAggregator {
                 if (!it.hasNext()) {
                     break;
                 }
-                WeakReference<Activity> activityRef = it.next();
-                if (activityRef.get() == activity) {
-                    this.mActivities.remove(activityRef);
+                WeakReference<Activity> next = it.next();
+                if (next.get() == activity) {
+                    this.mActivities.remove(next);
                     break;
                 }
             }
@@ -201,12 +201,12 @@ public class FrameMetricsAggregator {
 
         @Override // android.support.v4.app.FrameMetricsAggregator.FrameMetricsBaseImpl
         public SparseIntArray[] stop() {
-            for (int i = this.mActivities.size() - 1; i >= 0; i--) {
-                WeakReference<Activity> ref = this.mActivities.get(i);
-                Activity activity = ref.get();
-                if (ref.get() != null) {
+            for (int size = this.mActivities.size() - 1; size >= 0; size--) {
+                WeakReference<Activity> weakReference = this.mActivities.get(size);
+                Activity activity = weakReference.get();
+                if (weakReference.get() != null) {
                     activity.getWindow().removeOnFrameMetricsAvailableListener(this.mListener);
-                    this.mActivities.remove(i);
+                    this.mActivities.remove(size);
                 }
             }
             return this.mMetrics;
@@ -219,9 +219,9 @@ public class FrameMetricsAggregator {
 
         @Override // android.support.v4.app.FrameMetricsAggregator.FrameMetricsBaseImpl
         public SparseIntArray[] reset() {
-            SparseIntArray[] returnVal = this.mMetrics;
+            SparseIntArray[] sparseIntArrayArr = this.mMetrics;
             this.mMetrics = new SparseIntArray[9];
-            return returnVal;
+            return sparseIntArrayArr;
         }
     }
 }

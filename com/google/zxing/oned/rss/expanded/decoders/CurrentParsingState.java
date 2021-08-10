@@ -21,13 +21,13 @@ public final class CurrentParsingState {
     }
 
     /* access modifiers changed from: package-private */
-    public void setPosition(int position2) {
-        this.position = position2;
+    public void setPosition(int i) {
+        this.position = i;
     }
 
     /* access modifiers changed from: package-private */
-    public void incrementPosition(int delta) {
-        this.position += delta;
+    public void incrementPosition(int i) {
+        this.position += i;
     }
 
     /* access modifiers changed from: package-private */

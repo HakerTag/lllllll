@@ -3,6 +3,7 @@ package com.google.zxing.common;
 import com.google.zxing.Binarizer;
 import com.google.zxing.LuminanceSource;
 import com.google.zxing.NotFoundException;
+import kotlin.UByte;
 
 public class GlobalHistogramBinarizer extends Binarizer {
     private static final byte[] EMPTY = new byte[0];
@@ -12,131 +13,137 @@ public class GlobalHistogramBinarizer extends Binarizer {
     private final int[] buckets = new int[32];
     private byte[] luminances = EMPTY;
 
-    public GlobalHistogramBinarizer(LuminanceSource source) {
-        super(source);
+    public GlobalHistogramBinarizer(LuminanceSource luminanceSource) {
+        super(luminanceSource);
     }
 
     @Override // com.google.zxing.Binarizer
-    public BitArray getBlackRow(int y, BitArray row) throws NotFoundException {
-        LuminanceSource source = getLuminanceSource();
-        int width = source.getWidth();
-        if (row == null || row.getSize() < width) {
-            row = new BitArray(width);
+    public BitArray getBlackRow(int i, BitArray bitArray) throws NotFoundException {
+        LuminanceSource luminanceSource = getLuminanceSource();
+        int width = luminanceSource.getWidth();
+        if (bitArray == null || bitArray.getSize() < width) {
+            bitArray = new BitArray(width);
         } else {
-            row.clear();
+            bitArray.clear();
         }
         initArrays(width);
-        byte[] localLuminances = source.getRow(y, this.luminances);
-        int[] localBuckets = this.buckets;
-        for (int x = 0; x < width; x++) {
-            int i = (localLuminances[x] & 255) >> 3;
-            localBuckets[i] = localBuckets[i] + 1;
+        byte[] row = luminanceSource.getRow(i, this.luminances);
+        int[] iArr = this.buckets;
+        for (int i2 = 0; i2 < width; i2++) {
+            int i3 = (row[i2] & UByte.MAX_VALUE) >> 3;
+            iArr[i3] = iArr[i3] + 1;
         }
-        int blackPoint = estimateBlackPoint(localBuckets);
+        int estimateBlackPoint = estimateBlackPoint(iArr);
         if (width < 3) {
-            for (int x2 = 0; x2 < width; x2++) {
-                if ((localLuminances[x2] & 255) < blackPoint) {
-                    row.set(x2);
+            for (int i4 = 0; i4 < width; i4++) {
+                if ((row[i4] & UByte.MAX_VALUE) < estimateBlackPoint) {
+                    bitArray.set(i4);
                 }
             }
         } else {
-            int left = localLuminances[0] & 255;
-            int center = localLuminances[1] & 255;
-            for (int x3 = 1; x3 < width - 1; x3++) {
-                int right = localLuminances[x3 + 1] & 255;
-                if ((((center * 4) - left) - right) / 2 < blackPoint) {
-                    row.set(x3);
+            int i5 = row[0] & UByte.MAX_VALUE;
+            int i6 = 1;
+            int i7 = i5;
+            int i8 = row[1] & UByte.MAX_VALUE;
+            while (i6 < width - 1) {
+                int i9 = i6 + 1;
+                int i10 = row[i9] & UByte.MAX_VALUE;
+                if ((((i8 * 4) - i7) - i10) / 2 < estimateBlackPoint) {
+                    bitArray.set(i6);
                 }
-                left = center;
-                center = right;
+                i7 = i8;
+                i6 = i9;
+                i8 = i10;
             }
         }
-        return row;
+        return bitArray;
     }
 
     @Override // com.google.zxing.Binarizer
     public BitMatrix getBlackMatrix() throws NotFoundException {
-        LuminanceSource source = getLuminanceSource();
-        int width = source.getWidth();
-        int height = source.getHeight();
-        BitMatrix matrix = new BitMatrix(width, height);
+        LuminanceSource luminanceSource = getLuminanceSource();
+        int width = luminanceSource.getWidth();
+        int height = luminanceSource.getHeight();
+        BitMatrix bitMatrix = new BitMatrix(width, height);
         initArrays(width);
-        int[] localBuckets = this.buckets;
-        for (int y = 1; y < 5; y++) {
-            byte[] localLuminances = source.getRow((height * y) / 5, this.luminances);
-            int right = (width * 4) / 5;
-            for (int x = width / 5; x < right; x++) {
-                int i = (localLuminances[x] & 255) >> 3;
-                localBuckets[i] = localBuckets[i] + 1;
+        int[] iArr = this.buckets;
+        for (int i = 1; i < 5; i++) {
+            byte[] row = luminanceSource.getRow((height * i) / 5, this.luminances);
+            int i2 = (width * 4) / 5;
+            for (int i3 = width / 5; i3 < i2; i3++) {
+                int i4 = (row[i3] & UByte.MAX_VALUE) >> 3;
+                iArr[i4] = iArr[i4] + 1;
             }
         }
-        int blackPoint = estimateBlackPoint(localBuckets);
-        byte[] localLuminances2 = source.getMatrix();
-        for (int y2 = 0; y2 < height; y2++) {
-            int offset = y2 * width;
-            for (int x2 = 0; x2 < width; x2++) {
-                if ((localLuminances2[offset + x2] & 255) < blackPoint) {
-                    matrix.set(x2, y2);
+        int estimateBlackPoint = estimateBlackPoint(iArr);
+        byte[] matrix = luminanceSource.getMatrix();
+        for (int i5 = 0; i5 < height; i5++) {
+            int i6 = i5 * width;
+            for (int i7 = 0; i7 < width; i7++) {
+                if ((matrix[i6 + i7] & UByte.MAX_VALUE) < estimateBlackPoint) {
+                    bitMatrix.set(i7, i5);
                 }
             }
         }
-        return matrix;
+        return bitMatrix;
     }
 
     @Override // com.google.zxing.Binarizer
-    public Binarizer createBinarizer(LuminanceSource source) {
-        return new GlobalHistogramBinarizer(source);
+    public Binarizer createBinarizer(LuminanceSource luminanceSource) {
+        return new GlobalHistogramBinarizer(luminanceSource);
     }
 
-    private void initArrays(int luminanceSize) {
-        if (this.luminances.length < luminanceSize) {
-            this.luminances = new byte[luminanceSize];
+    private void initArrays(int i) {
+        if (this.luminances.length < i) {
+            this.luminances = new byte[i];
         }
-        for (int x = 0; x < 32; x++) {
-            this.buckets[x] = 0;
+        for (int i2 = 0; i2 < 32; i2++) {
+            this.buckets[i2] = 0;
         }
     }
 
-    private static int estimateBlackPoint(int[] buckets2) throws NotFoundException {
-        int numBuckets = buckets2.length;
-        int maxBucketCount = 0;
-        int firstPeak = 0;
-        int firstPeakSize = 0;
-        for (int x = 0; x < numBuckets; x++) {
-            if (buckets2[x] > firstPeakSize) {
-                firstPeak = x;
-                firstPeakSize = buckets2[x];
+    private static int estimateBlackPoint(int[] iArr) throws NotFoundException {
+        int length = iArr.length;
+        int i = 0;
+        int i2 = 0;
+        int i3 = 0;
+        for (int i4 = 0; i4 < length; i4++) {
+            if (iArr[i4] > i) {
+                i = iArr[i4];
+                i3 = i4;
             }
-            if (buckets2[x] > maxBucketCount) {
-                maxBucketCount = buckets2[x];
-            }
-        }
-        int secondPeak = 0;
-        int secondPeakScore = 0;
-        for (int x2 = 0; x2 < numBuckets; x2++) {
-            int distanceToBiggest = x2 - firstPeak;
-            int score = buckets2[x2] * distanceToBiggest * distanceToBiggest;
-            if (score > secondPeakScore) {
-                secondPeak = x2;
-                secondPeakScore = score;
+            if (iArr[i4] > i2) {
+                i2 = iArr[i4];
             }
         }
-        if (firstPeak > secondPeak) {
-            firstPeak = secondPeak;
-            secondPeak = firstPeak;
+        int i5 = 0;
+        int i6 = 0;
+        for (int i7 = 0; i7 < length; i7++) {
+            int i8 = i7 - i3;
+            int i9 = iArr[i7] * i8 * i8;
+            if (i9 > i6) {
+                i5 = i7;
+                i6 = i9;
+            }
         }
-        if (secondPeak - firstPeak > numBuckets / 16) {
-            int bestValley = secondPeak - 1;
-            int bestValleyScore = -1;
-            for (int x3 = secondPeak - 1; x3 > firstPeak; x3--) {
-                int fromFirst = x3 - firstPeak;
-                int score2 = fromFirst * fromFirst * (secondPeak - x3) * (maxBucketCount - buckets2[x3]);
-                if (score2 > bestValleyScore) {
-                    bestValley = x3;
-                    bestValleyScore = score2;
+        if (i3 <= i5) {
+            i3 = i5;
+            i5 = i3;
+        }
+        if (i3 - i5 > length / 16) {
+            int i10 = i3 - 1;
+            int i11 = i10;
+            int i12 = -1;
+            while (i10 > i5) {
+                int i13 = i10 - i5;
+                int i14 = i13 * i13 * (i3 - i10) * (i2 - iArr[i10]);
+                if (i14 > i12) {
+                    i11 = i10;
+                    i12 = i14;
                 }
+                i10--;
             }
-            return bestValley << 3;
+            return i11 << 3;
         }
         throw NotFoundException.getNotFoundInstance();
     }

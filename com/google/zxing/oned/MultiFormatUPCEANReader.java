@@ -3,7 +3,6 @@ package com.google.zxing.oned;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.DecodeHintType;
 import com.google.zxing.NotFoundException;
-import com.google.zxing.Reader;
 import com.google.zxing.ReaderException;
 import com.google.zxing.Result;
 import com.google.zxing.common.BitArray;
@@ -14,61 +13,59 @@ import java.util.Map;
 public final class MultiFormatUPCEANReader extends OneDReader {
     private final UPCEANReader[] readers;
 
-    public MultiFormatUPCEANReader(Map<DecodeHintType, ?> hints) {
-        Collection<BarcodeFormat> possibleFormats;
-        if (hints == null) {
-            possibleFormats = null;
+    public MultiFormatUPCEANReader(Map<DecodeHintType, ?> map) {
+        Collection collection;
+        if (map == null) {
+            collection = null;
         } else {
-            possibleFormats = (Collection) hints.get(DecodeHintType.POSSIBLE_FORMATS);
+            collection = (Collection) map.get(DecodeHintType.POSSIBLE_FORMATS);
         }
-        Collection<UPCEANReader> readers2 = new ArrayList<>();
-        if (possibleFormats != null) {
-            if (possibleFormats.contains(BarcodeFormat.EAN_13)) {
-                readers2.add(new EAN13Reader());
-            } else if (possibleFormats.contains(BarcodeFormat.UPC_A)) {
-                readers2.add(new UPCAReader());
+        ArrayList arrayList = new ArrayList();
+        if (collection != null) {
+            if (collection.contains(BarcodeFormat.EAN_13)) {
+                arrayList.add(new EAN13Reader());
+            } else if (collection.contains(BarcodeFormat.UPC_A)) {
+                arrayList.add(new UPCAReader());
             }
-            if (possibleFormats.contains(BarcodeFormat.EAN_8)) {
-                readers2.add(new EAN8Reader());
+            if (collection.contains(BarcodeFormat.EAN_8)) {
+                arrayList.add(new EAN8Reader());
             }
-            if (possibleFormats.contains(BarcodeFormat.UPC_E)) {
-                readers2.add(new UPCEReader());
+            if (collection.contains(BarcodeFormat.UPC_E)) {
+                arrayList.add(new UPCEReader());
             }
         }
-        if (readers2.isEmpty()) {
-            readers2.add(new EAN13Reader());
-            readers2.add(new EAN8Reader());
-            readers2.add(new UPCEReader());
+        if (arrayList.isEmpty()) {
+            arrayList.add(new EAN13Reader());
+            arrayList.add(new EAN8Reader());
+            arrayList.add(new UPCEReader());
         }
-        this.readers = (UPCEANReader[]) readers2.toArray(new UPCEANReader[readers2.size()]);
+        this.readers = (UPCEANReader[]) arrayList.toArray(new UPCEANReader[arrayList.size()]);
     }
 
     @Override // com.google.zxing.oned.OneDReader
-    public Result decodeRow(int rowNumber, BitArray row, Map<DecodeHintType, ?> hints) throws NotFoundException {
-        Collection<BarcodeFormat> possibleFormats;
-        int[] startGuardPattern = UPCEANReader.findStartGuardPattern(row);
-        UPCEANReader[] uPCEANReaderArr = this.readers;
-        int length = uPCEANReaderArr.length;
-        boolean canReturnUPCA = false;
-        for (int i = 0; i < length; i++) {
+    public Result decodeRow(int i, BitArray bitArray, Map<DecodeHintType, ?> map) throws NotFoundException {
+        Collection collection;
+        int[] findStartGuardPattern = UPCEANReader.findStartGuardPattern(bitArray);
+        boolean z = false;
+        for (UPCEANReader uPCEANReader : this.readers) {
             try {
-                Result result = uPCEANReaderArr[i].decodeRow(rowNumber, row, startGuardPattern, hints);
-                boolean ean13MayBeUPCA = result.getBarcodeFormat() == BarcodeFormat.EAN_13 && result.getText().charAt(0) == '0';
-                if (hints == null) {
-                    possibleFormats = null;
+                Result decodeRow = uPCEANReader.decodeRow(i, bitArray, findStartGuardPattern, map);
+                boolean z2 = decodeRow.getBarcodeFormat() == BarcodeFormat.EAN_13 && decodeRow.getText().charAt(0) == '0';
+                if (map == null) {
+                    collection = null;
                 } else {
-                    possibleFormats = (Collection) hints.get(DecodeHintType.POSSIBLE_FORMATS);
+                    collection = (Collection) map.get(DecodeHintType.POSSIBLE_FORMATS);
                 }
-                if (possibleFormats == null || possibleFormats.contains(BarcodeFormat.UPC_A)) {
-                    canReturnUPCA = true;
+                if (collection == null || collection.contains(BarcodeFormat.UPC_A)) {
+                    z = true;
                 }
-                if (!ean13MayBeUPCA || !canReturnUPCA) {
-                    return result;
+                if (!z2 || !z) {
+                    return decodeRow;
                 }
-                Result resultUPCA = new Result(result.getText().substring(1), result.getRawBytes(), result.getResultPoints(), BarcodeFormat.UPC_A);
-                resultUPCA.putAllMetadata(result.getResultMetadata());
-                return resultUPCA;
-            } catch (ReaderException e) {
+                Result result = new Result(decodeRow.getText().substring(1), decodeRow.getRawBytes(), decodeRow.getResultPoints(), BarcodeFormat.UPC_A);
+                result.putAllMetadata(decodeRow.getResultMetadata());
+                return result;
+            } catch (ReaderException unused) {
             }
         }
         throw NotFoundException.getNotFoundInstance();
@@ -76,8 +73,8 @@ public final class MultiFormatUPCEANReader extends OneDReader {
 
     @Override // com.google.zxing.Reader, com.google.zxing.oned.OneDReader
     public void reset() {
-        for (Reader reader : this.readers) {
-            reader.reset();
+        for (UPCEANReader uPCEANReader : this.readers) {
+            uPCEANReader.reset();
         }
     }
 }

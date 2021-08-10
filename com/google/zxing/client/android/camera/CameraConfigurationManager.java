@@ -28,54 +28,54 @@ public final class CameraConfigurationManager {
     }
 
     /* access modifiers changed from: package-private */
-    public void initFromCameraParameters(OpenCamera camera) {
-        int cwRotationFromNaturalToDisplay;
-        Camera.Parameters parameters = camera.getCamera().getParameters();
-        Display display = ((WindowManager) this.context.getSystemService("window")).getDefaultDisplay();
-        int displayRotation = display.getRotation();
-        boolean isPreviewSizePortrait = true;
-        if (displayRotation == 0) {
-            cwRotationFromNaturalToDisplay = 0;
-        } else if (displayRotation == 1) {
-            cwRotationFromNaturalToDisplay = 90;
-        } else if (displayRotation == 2) {
-            cwRotationFromNaturalToDisplay = 180;
-        } else if (displayRotation == 3) {
-            cwRotationFromNaturalToDisplay = 270;
-        } else if (displayRotation % 90 == 0) {
-            cwRotationFromNaturalToDisplay = (displayRotation + 360) % 360;
+    public void initFromCameraParameters(OpenCamera openCamera) {
+        int i;
+        Camera.Parameters parameters = openCamera.getCamera().getParameters();
+        Display defaultDisplay = ((WindowManager) this.context.getSystemService("window")).getDefaultDisplay();
+        int rotation = defaultDisplay.getRotation();
+        boolean z = false;
+        if (rotation == 0) {
+            i = 0;
+        } else if (rotation == 1) {
+            i = 90;
+        } else if (rotation == 2) {
+            i = 180;
+        } else if (rotation == 3) {
+            i = 270;
+        } else if (rotation % 90 == 0) {
+            i = (rotation + 360) % 360;
         } else {
-            throw new IllegalArgumentException("Bad rotation: " + displayRotation);
+            throw new IllegalArgumentException("Bad rotation: " + rotation);
         }
-        Log.i(TAG, "Display at: " + cwRotationFromNaturalToDisplay);
-        int cwRotationFromNaturalToCamera = camera.getOrientation();
-        Log.i(TAG, "Camera at: " + cwRotationFromNaturalToCamera);
-        if (camera.getFacing() == CameraFacing.FRONT) {
-            cwRotationFromNaturalToCamera = (360 - cwRotationFromNaturalToCamera) % 360;
-            Log.i(TAG, "Front camera overriden to: " + cwRotationFromNaturalToCamera);
+        Log.i(TAG, "Display at: " + i);
+        int orientation = openCamera.getOrientation();
+        Log.i(TAG, "Camera at: " + orientation);
+        if (openCamera.getFacing() == CameraFacing.FRONT) {
+            orientation = (360 - orientation) % 360;
+            Log.i(TAG, "Front camera overriden to: " + orientation);
         }
-        this.cwRotationFromDisplayToCamera = ((cwRotationFromNaturalToCamera + 360) - cwRotationFromNaturalToDisplay) % 360;
+        this.cwRotationFromDisplayToCamera = ((orientation + 360) - i) % 360;
         Log.i(TAG, "Final display orientation: " + this.cwRotationFromDisplayToCamera);
-        if (camera.getFacing() == CameraFacing.FRONT) {
+        if (openCamera.getFacing() == CameraFacing.FRONT) {
             Log.i(TAG, "Compensating rotation for front camera");
             this.cwNeededRotation = (360 - this.cwRotationFromDisplayToCamera) % 360;
         } else {
             this.cwNeededRotation = this.cwRotationFromDisplayToCamera;
         }
         Log.i(TAG, "Clockwise rotation from display to camera: " + this.cwNeededRotation);
-        Point theScreenResolution = new Point();
-        display.getSize(theScreenResolution);
-        this.screenResolution = theScreenResolution;
+        Point point = new Point();
+        defaultDisplay.getSize(point);
+        this.screenResolution = point;
         Log.i(TAG, "Screen resolution in current orientation: " + this.screenResolution);
         this.cameraResolution = CameraConfigurationUtils.findBestPreviewSizeValue(parameters, this.screenResolution);
         Log.i(TAG, "Camera resolution: " + this.cameraResolution);
         this.bestPreviewSize = CameraConfigurationUtils.findBestPreviewSizeValue(parameters, this.screenResolution);
         Log.i(TAG, "Best available preview size: " + this.bestPreviewSize);
-        boolean isScreenPortrait = this.screenResolution.x < this.screenResolution.y;
-        if (this.bestPreviewSize.x >= this.bestPreviewSize.y) {
-            isPreviewSizePortrait = false;
+        boolean z2 = this.screenResolution.x < this.screenResolution.y;
+        if (this.bestPreviewSize.x < this.bestPreviewSize.y) {
+            z = true;
         }
-        if (isScreenPortrait == isPreviewSizePortrait) {
+        if (z2 == z) {
             this.previewSizeOnScreen = this.bestPreviewSize;
         } else {
             this.previewSizeOnScreen = new Point(this.bestPreviewSize.y, this.bestPreviewSize.x);
@@ -84,55 +84,55 @@ public final class CameraConfigurationManager {
     }
 
     /* access modifiers changed from: package-private */
-    public void setDesiredCameraParameters(OpenCamera camera, boolean safeMode) {
-        Camera theCamera = camera.getCamera();
-        int rotation = this.context.getApplicationContext().getResources().getConfiguration().orientation;
-        int deviceSpecificRotation = ((WindowManager) this.context.getSystemService("window")).getDefaultDisplay().getRotation();
-        if (rotation == 1) {
-            if (deviceSpecificRotation == 0 || deviceSpecificRotation == 1) {
-                theCamera.setDisplayOrientation(90);
+    public void setDesiredCameraParameters(OpenCamera openCamera, boolean z) {
+        Camera camera = openCamera.getCamera();
+        int i = this.context.getApplicationContext().getResources().getConfiguration().orientation;
+        int rotation = ((WindowManager) this.context.getSystemService("window")).getDefaultDisplay().getRotation();
+        if (i == 1) {
+            if (rotation == 0 || rotation == 1) {
+                camera.setDisplayOrientation(90);
             } else {
-                theCamera.setDisplayOrientation(270);
+                camera.setDisplayOrientation(270);
             }
-        } else if (deviceSpecificRotation == 2 || deviceSpecificRotation == 3) {
-            theCamera.setDisplayOrientation(180);
+        } else if (rotation == 2 || rotation == 3) {
+            camera.setDisplayOrientation(180);
         }
-        Camera.Parameters parameters = theCamera.getParameters();
+        Camera.Parameters parameters = camera.getParameters();
         if (parameters == null) {
             Log.w(TAG, "Device error: no camera parameters are available. Proceeding without configuration.");
             return;
         }
         Log.i(TAG, "Initial camera parameters: " + parameters.flatten());
-        if (safeMode) {
+        if (z) {
             Log.w(TAG, "In camera config safe mode -- most settings will not be honored");
         }
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.context);
-        initializeTorch(parameters, prefs, safeMode);
-        CameraConfigurationUtils.setFocus(parameters, prefs.getBoolean(PreferencesActivity.KEY_AUTO_FOCUS, true), prefs.getBoolean(PreferencesActivity.KEY_DISABLE_CONTINUOUS_FOCUS, true), safeMode);
-        if (!safeMode) {
-            if (prefs.getBoolean(PreferencesActivity.KEY_INVERT_SCAN, false)) {
+        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context);
+        initializeTorch(parameters, defaultSharedPreferences, z);
+        CameraConfigurationUtils.setFocus(parameters, defaultSharedPreferences.getBoolean(PreferencesActivity.KEY_AUTO_FOCUS, true), defaultSharedPreferences.getBoolean(PreferencesActivity.KEY_DISABLE_CONTINUOUS_FOCUS, true), z);
+        if (!z) {
+            if (defaultSharedPreferences.getBoolean(PreferencesActivity.KEY_INVERT_SCAN, false)) {
                 CameraConfigurationUtils.setInvertColor(parameters);
             }
-            if (!prefs.getBoolean(PreferencesActivity.KEY_DISABLE_BARCODE_SCENE_MODE, true)) {
+            if (!defaultSharedPreferences.getBoolean(PreferencesActivity.KEY_DISABLE_BARCODE_SCENE_MODE, true)) {
                 CameraConfigurationUtils.setBarcodeSceneMode(parameters);
             }
-            if (!prefs.getBoolean(PreferencesActivity.KEY_DISABLE_METERING, true)) {
+            if (!defaultSharedPreferences.getBoolean(PreferencesActivity.KEY_DISABLE_METERING, true)) {
                 CameraConfigurationUtils.setVideoStabilization(parameters);
                 CameraConfigurationUtils.setFocusArea(parameters);
                 CameraConfigurationUtils.setMetering(parameters);
             }
         }
         parameters.setPreviewSize(this.bestPreviewSize.x, this.bestPreviewSize.y);
-        theCamera.setParameters(parameters);
-        theCamera.setDisplayOrientation(this.cwRotationFromDisplayToCamera);
-        Camera.Size afterSize = theCamera.getParameters().getPreviewSize();
-        if (afterSize == null) {
+        camera.setParameters(parameters);
+        camera.setDisplayOrientation(this.cwRotationFromDisplayToCamera);
+        Camera.Size previewSize = camera.getParameters().getPreviewSize();
+        if (previewSize == null) {
             return;
         }
-        if (this.bestPreviewSize.x != afterSize.width || this.bestPreviewSize.y != afterSize.height) {
-            Log.w(TAG, "Camera said it supported preview size " + this.bestPreviewSize.x + 'x' + this.bestPreviewSize.y + ", but after setting it, preview size is " + afterSize.width + 'x' + afterSize.height);
-            this.bestPreviewSize.x = afterSize.width;
-            this.bestPreviewSize.y = afterSize.height;
+        if (this.bestPreviewSize.x != previewSize.width || this.bestPreviewSize.y != previewSize.height) {
+            Log.w(TAG, "Camera said it supported preview size " + this.bestPreviewSize.x + 'x' + this.bestPreviewSize.y + ", but after setting it, preview size is " + previewSize.width + 'x' + previewSize.height);
+            this.bestPreviewSize.x = previewSize.width;
+            this.bestPreviewSize.y = previewSize.height;
         }
     }
 
@@ -175,21 +175,21 @@ public final class CameraConfigurationManager {
     }
 
     /* access modifiers changed from: package-private */
-    public void setTorch(Camera camera, boolean newSetting) {
+    public void setTorch(Camera camera, boolean z) {
         Camera.Parameters parameters = camera.getParameters();
-        doSetTorch(parameters, newSetting, false);
+        doSetTorch(parameters, z, false);
         camera.setParameters(parameters);
     }
 
-    private void initializeTorch(Camera.Parameters parameters, SharedPreferences prefs, boolean safeMode) {
-        doSetTorch(parameters, FrontLightMode.readPref(prefs) == FrontLightMode.ON, safeMode);
+    private void initializeTorch(Camera.Parameters parameters, SharedPreferences sharedPreferences, boolean z) {
+        doSetTorch(parameters, FrontLightMode.readPref(sharedPreferences) == FrontLightMode.ON, z);
     }
 
-    private void doSetTorch(Camera.Parameters parameters, boolean newSetting, boolean safeMode) {
-        CameraConfigurationUtils.setTorch(parameters, newSetting);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.context);
-        if (!safeMode && !prefs.getBoolean(PreferencesActivity.KEY_DISABLE_EXPOSURE, true)) {
-            CameraConfigurationUtils.setBestExposure(parameters, newSetting);
+    private void doSetTorch(Camera.Parameters parameters, boolean z, boolean z2) {
+        CameraConfigurationUtils.setTorch(parameters, z);
+        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context);
+        if (!z2 && !defaultSharedPreferences.getBoolean(PreferencesActivity.KEY_DISABLE_EXPOSURE, true)) {
+            CameraConfigurationUtils.setBestExposure(parameters, z);
         }
     }
 }

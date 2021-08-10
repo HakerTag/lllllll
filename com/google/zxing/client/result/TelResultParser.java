@@ -5,17 +5,17 @@ import com.google.zxing.Result;
 public final class TelResultParser extends ResultParser {
     @Override // com.google.zxing.client.result.ResultParser
     public TelParsedResult parse(Result result) {
-        String telURI;
-        String rawText = getMassagedText(result);
-        if (!rawText.startsWith("tel:") && !rawText.startsWith("TEL:")) {
+        String str;
+        String massagedText = getMassagedText(result);
+        if (!massagedText.startsWith("tel:") && !massagedText.startsWith("TEL:")) {
             return null;
         }
-        if (rawText.startsWith("TEL:")) {
-            telURI = "tel:" + rawText.substring(4);
+        if (massagedText.startsWith("TEL:")) {
+            str = "tel:" + massagedText.substring(4);
         } else {
-            telURI = rawText;
+            str = massagedText;
         }
-        int queryStart = rawText.indexOf(63, 4);
-        return new TelParsedResult(queryStart < 0 ? rawText.substring(4) : rawText.substring(4, queryStart), telURI, null);
+        int indexOf = massagedText.indexOf(63, 4);
+        return new TelParsedResult(indexOf < 0 ? massagedText.substring(4) : massagedText.substring(4, indexOf), str, null);
     }
 }

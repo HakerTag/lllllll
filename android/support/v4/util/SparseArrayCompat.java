@@ -11,138 +11,144 @@ public class SparseArrayCompat<E> implements Cloneable {
         this(10);
     }
 
-    public SparseArrayCompat(int initialCapacity) {
+    public SparseArrayCompat(int i) {
         this.mGarbage = false;
-        if (initialCapacity == 0) {
+        if (i == 0) {
             this.mKeys = ContainerHelpers.EMPTY_INTS;
             this.mValues = ContainerHelpers.EMPTY_OBJECTS;
         } else {
-            int initialCapacity2 = ContainerHelpers.idealIntArraySize(initialCapacity);
-            this.mKeys = new int[initialCapacity2];
-            this.mValues = new Object[initialCapacity2];
+            int idealIntArraySize = ContainerHelpers.idealIntArraySize(i);
+            this.mKeys = new int[idealIntArraySize];
+            this.mValues = new Object[idealIntArraySize];
         }
         this.mSize = 0;
     }
 
     @Override // java.lang.Object
     public SparseArrayCompat<E> clone() {
-        SparseArrayCompat<E> clone = null;
+        SparseArrayCompat<E> sparseArrayCompat = null;
         try {
-            clone = (SparseArrayCompat) super.clone();
-            clone.mKeys = (int[]) this.mKeys.clone();
-            clone.mValues = (Object[]) this.mValues.clone();
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            return clone;
+            SparseArrayCompat<E> sparseArrayCompat2 = (SparseArrayCompat) super.clone();
+            try {
+                sparseArrayCompat2.mKeys = (int[]) this.mKeys.clone();
+                sparseArrayCompat2.mValues = (Object[]) this.mValues.clone();
+                return sparseArrayCompat2;
+            } catch (CloneNotSupportedException unused) {
+                sparseArrayCompat = sparseArrayCompat2;
+            }
+        } catch (CloneNotSupportedException unused2) {
+            return sparseArrayCompat;
         }
     }
 
-    public E get(int key) {
-        return get(key, null);
+    public E get(int i) {
+        return get(i, null);
     }
 
-    public E get(int key, E valueIfKeyNotFound) {
-        int i = ContainerHelpers.binarySearch(this.mKeys, this.mSize, key);
-        if (i >= 0) {
+    public E get(int i, E e) {
+        int binarySearch = ContainerHelpers.binarySearch(this.mKeys, this.mSize, i);
+        if (binarySearch >= 0) {
             Object[] objArr = this.mValues;
-            if (objArr[i] != DELETED) {
-                return (E) objArr[i];
+            if (objArr[binarySearch] != DELETED) {
+                return (E) objArr[binarySearch];
             }
         }
-        return valueIfKeyNotFound;
+        return e;
     }
 
-    public void delete(int key) {
+    public void delete(int i) {
         Object[] objArr;
         Object obj;
-        int i = ContainerHelpers.binarySearch(this.mKeys, this.mSize, key);
-        if (i >= 0 && (objArr = this.mValues)[i] != (obj = DELETED)) {
-            objArr[i] = obj;
+        int binarySearch = ContainerHelpers.binarySearch(this.mKeys, this.mSize, i);
+        if (binarySearch >= 0 && (objArr = this.mValues)[binarySearch] != (obj = DELETED)) {
+            objArr[binarySearch] = obj;
             this.mGarbage = true;
         }
     }
 
-    public void remove(int key) {
-        delete(key);
+    public void remove(int i) {
+        delete(i);
     }
 
-    public void removeAt(int index) {
+    public void removeAt(int i) {
         Object[] objArr = this.mValues;
-        Object obj = objArr[index];
+        Object obj = objArr[i];
         Object obj2 = DELETED;
         if (obj != obj2) {
-            objArr[index] = obj2;
+            objArr[i] = obj2;
             this.mGarbage = true;
         }
     }
 
-    public void removeAtRange(int index, int size) {
-        int end = Math.min(this.mSize, index + size);
-        for (int i = index; i < end; i++) {
+    public void removeAtRange(int i, int i2) {
+        int min = Math.min(this.mSize, i2 + i);
+        while (i < min) {
             removeAt(i);
+            i++;
         }
     }
 
     private void gc() {
-        int n = this.mSize;
-        int o = 0;
-        int[] keys = this.mKeys;
-        Object[] values = this.mValues;
-        for (int i = 0; i < n; i++) {
-            Object val = values[i];
-            if (val != DELETED) {
-                if (i != o) {
-                    keys[o] = keys[i];
-                    values[o] = val;
-                    values[i] = null;
+        int i = this.mSize;
+        int[] iArr = this.mKeys;
+        Object[] objArr = this.mValues;
+        int i2 = 0;
+        for (int i3 = 0; i3 < i; i3++) {
+            Object obj = objArr[i3];
+            if (obj != DELETED) {
+                if (i3 != i2) {
+                    iArr[i2] = iArr[i3];
+                    objArr[i2] = obj;
+                    objArr[i3] = null;
                 }
-                o++;
+                i2++;
             }
         }
         this.mGarbage = false;
-        this.mSize = o;
+        this.mSize = i2;
     }
 
-    public void put(int key, E value) {
-        int i = ContainerHelpers.binarySearch(this.mKeys, this.mSize, key);
-        if (i >= 0) {
-            this.mValues[i] = value;
+    public void put(int i, E e) {
+        int binarySearch = ContainerHelpers.binarySearch(this.mKeys, this.mSize, i);
+        if (binarySearch >= 0) {
+            this.mValues[binarySearch] = e;
             return;
         }
-        int i2 = ~i;
+        int i2 = ~binarySearch;
         if (i2 < this.mSize) {
             Object[] objArr = this.mValues;
             if (objArr[i2] == DELETED) {
-                this.mKeys[i2] = key;
-                objArr[i2] = value;
+                this.mKeys[i2] = i;
+                objArr[i2] = e;
                 return;
             }
         }
         if (this.mGarbage && this.mSize >= this.mKeys.length) {
             gc();
-            i2 = ~ContainerHelpers.binarySearch(this.mKeys, this.mSize, key);
+            i2 = ~ContainerHelpers.binarySearch(this.mKeys, this.mSize, i);
         }
         int i3 = this.mSize;
         if (i3 >= this.mKeys.length) {
-            int n = ContainerHelpers.idealIntArraySize(i3 + 1);
-            int[] nkeys = new int[n];
-            Object[] nvalues = new Object[n];
-            int[] iArr = this.mKeys;
-            System.arraycopy(iArr, 0, nkeys, 0, iArr.length);
-            Object[] objArr2 = this.mValues;
-            System.arraycopy(objArr2, 0, nvalues, 0, objArr2.length);
-            this.mKeys = nkeys;
-            this.mValues = nvalues;
-        }
-        int n2 = this.mSize;
-        if (n2 - i2 != 0) {
+            int idealIntArraySize = ContainerHelpers.idealIntArraySize(i3 + 1);
+            int[] iArr = new int[idealIntArraySize];
+            Object[] objArr2 = new Object[idealIntArraySize];
             int[] iArr2 = this.mKeys;
-            System.arraycopy(iArr2, i2, iArr2, i2 + 1, n2 - i2);
+            System.arraycopy(iArr2, 0, iArr, 0, iArr2.length);
             Object[] objArr3 = this.mValues;
-            System.arraycopy(objArr3, i2, objArr3, i2 + 1, this.mSize - i2);
+            System.arraycopy(objArr3, 0, objArr2, 0, objArr3.length);
+            this.mKeys = iArr;
+            this.mValues = objArr2;
         }
-        this.mKeys[i2] = key;
-        this.mValues[i2] = value;
+        int i4 = this.mSize;
+        if (i4 - i2 != 0) {
+            int[] iArr3 = this.mKeys;
+            int i5 = i2 + 1;
+            System.arraycopy(iArr3, i2, iArr3, i5, i4 - i2);
+            Object[] objArr4 = this.mValues;
+            System.arraycopy(objArr4, i2, objArr4, i5, this.mSize - i2);
+        }
+        this.mKeys[i2] = i;
+        this.mValues[i2] = e;
         this.mSize++;
     }
 
@@ -153,40 +159,40 @@ public class SparseArrayCompat<E> implements Cloneable {
         return this.mSize;
     }
 
-    public int keyAt(int index) {
+    public int keyAt(int i) {
         if (this.mGarbage) {
             gc();
         }
-        return this.mKeys[index];
+        return this.mKeys[i];
     }
 
-    public E valueAt(int index) {
+    public E valueAt(int i) {
         if (this.mGarbage) {
             gc();
         }
-        return (E) this.mValues[index];
+        return (E) this.mValues[i];
     }
 
-    public void setValueAt(int index, E value) {
+    public void setValueAt(int i, E e) {
         if (this.mGarbage) {
             gc();
         }
-        this.mValues[index] = value;
+        this.mValues[i] = e;
     }
 
-    public int indexOfKey(int key) {
+    public int indexOfKey(int i) {
         if (this.mGarbage) {
             gc();
         }
-        return ContainerHelpers.binarySearch(this.mKeys, this.mSize, key);
+        return ContainerHelpers.binarySearch(this.mKeys, this.mSize, i);
     }
 
-    public int indexOfValue(E value) {
+    public int indexOfValue(E e) {
         if (this.mGarbage) {
             gc();
         }
         for (int i = 0; i < this.mSize; i++) {
-            if (this.mValues[i] == value) {
+            if (this.mValues[i] == e) {
                 return i;
             }
         }
@@ -194,61 +200,61 @@ public class SparseArrayCompat<E> implements Cloneable {
     }
 
     public void clear() {
-        int n = this.mSize;
-        Object[] values = this.mValues;
-        for (int i = 0; i < n; i++) {
-            values[i] = null;
+        int i = this.mSize;
+        Object[] objArr = this.mValues;
+        for (int i2 = 0; i2 < i; i2++) {
+            objArr[i2] = null;
         }
         this.mSize = 0;
         this.mGarbage = false;
     }
 
-    public void append(int key, E value) {
-        int i = this.mSize;
-        if (i == 0 || key > this.mKeys[i - 1]) {
+    public void append(int i, E e) {
+        int i2 = this.mSize;
+        if (i2 == 0 || i > this.mKeys[i2 - 1]) {
             if (this.mGarbage && this.mSize >= this.mKeys.length) {
                 gc();
             }
-            int pos = this.mSize;
-            if (pos >= this.mKeys.length) {
-                int n = ContainerHelpers.idealIntArraySize(pos + 1);
-                int[] nkeys = new int[n];
-                Object[] nvalues = new Object[n];
-                int[] iArr = this.mKeys;
-                System.arraycopy(iArr, 0, nkeys, 0, iArr.length);
-                Object[] objArr = this.mValues;
-                System.arraycopy(objArr, 0, nvalues, 0, objArr.length);
-                this.mKeys = nkeys;
-                this.mValues = nvalues;
+            int i3 = this.mSize;
+            if (i3 >= this.mKeys.length) {
+                int idealIntArraySize = ContainerHelpers.idealIntArraySize(i3 + 1);
+                int[] iArr = new int[idealIntArraySize];
+                Object[] objArr = new Object[idealIntArraySize];
+                int[] iArr2 = this.mKeys;
+                System.arraycopy(iArr2, 0, iArr, 0, iArr2.length);
+                Object[] objArr2 = this.mValues;
+                System.arraycopy(objArr2, 0, objArr, 0, objArr2.length);
+                this.mKeys = iArr;
+                this.mValues = objArr;
             }
-            this.mKeys[pos] = key;
-            this.mValues[pos] = value;
-            this.mSize = pos + 1;
+            this.mKeys[i3] = i;
+            this.mValues[i3] = e;
+            this.mSize = i3 + 1;
             return;
         }
-        put(key, value);
+        put(i, e);
     }
 
     public String toString() {
         if (size() <= 0) {
             return "{}";
         }
-        StringBuilder buffer = new StringBuilder(this.mSize * 28);
-        buffer.append('{');
+        StringBuilder sb = new StringBuilder(this.mSize * 28);
+        sb.append('{');
         for (int i = 0; i < this.mSize; i++) {
             if (i > 0) {
-                buffer.append(", ");
+                sb.append(", ");
             }
-            buffer.append(keyAt(i));
-            buffer.append('=');
-            Object value = valueAt(i);
-            if (value != this) {
-                buffer.append(value);
+            sb.append(keyAt(i));
+            sb.append('=');
+            E valueAt = valueAt(i);
+            if (valueAt != this) {
+                sb.append((Object) valueAt);
             } else {
-                buffer.append("(this Map)");
+                sb.append("(this Map)");
             }
         }
-        buffer.append('}');
-        return buffer.toString();
+        sb.append('}');
+        return sb.toString();
     }
 }

@@ -29,9 +29,9 @@ final class BeepManager implements MediaPlayer.OnErrorListener, Closeable {
 
     /* access modifiers changed from: package-private */
     public synchronized void updatePrefs() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.activity);
-        this.playBeep = shouldBeep(prefs, this.activity);
-        this.vibrate = prefs.getBoolean(PreferencesActivity.KEY_VIBRATE, false);
+        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.activity);
+        this.playBeep = shouldBeep(defaultSharedPreferences, this.activity);
+        this.vibrate = defaultSharedPreferences.getBoolean(PreferencesActivity.KEY_VIBRATE, false);
         if (this.playBeep && this.mediaPlayer == null) {
             this.activity.setVolumeControlStream(3);
             this.mediaPlayer = buildMediaPlayer(this.activity);
@@ -48,22 +48,22 @@ final class BeepManager implements MediaPlayer.OnErrorListener, Closeable {
         }
     }
 
-    private static boolean shouldBeep(SharedPreferences prefs, Context activity2) {
-        boolean shouldPlayBeep = prefs.getBoolean(PreferencesActivity.KEY_PLAY_BEEP, true);
-        if (!shouldPlayBeep || ((AudioManager) activity2.getSystemService("audio")).getRingerMode() == 2) {
-            return shouldPlayBeep;
+    private static boolean shouldBeep(SharedPreferences sharedPreferences, Context context) {
+        boolean z = sharedPreferences.getBoolean(PreferencesActivity.KEY_PLAY_BEEP, true);
+        if (!z || ((AudioManager) context.getSystemService("audio")).getRingerMode() == 2) {
+            return z;
         }
         return false;
     }
 
     /* JADX INFO: finally extract failed */
-    private MediaPlayer buildMediaPlayer(Context activity2) {
+    private MediaPlayer buildMediaPlayer(Context context) {
         MediaPlayer mediaPlayer2 = new MediaPlayer();
         try {
-            AssetFileDescriptor file = activity2.getResources().openRawResourceFd(R.raw.beep);
+            AssetFileDescriptor openRawResourceFd = context.getResources().openRawResourceFd(R.raw.beep);
             try {
-                mediaPlayer2.setDataSource(file.getFileDescriptor(), file.getStartOffset(), file.getLength());
-                file.close();
+                mediaPlayer2.setDataSource(openRawResourceFd.getFileDescriptor(), openRawResourceFd.getStartOffset(), openRawResourceFd.getLength());
+                openRawResourceFd.close();
                 mediaPlayer2.setOnErrorListener(this);
                 mediaPlayer2.setAudioStreamType(3);
                 mediaPlayer2.setLooping(false);
@@ -71,18 +71,18 @@ final class BeepManager implements MediaPlayer.OnErrorListener, Closeable {
                 mediaPlayer2.prepare();
                 return mediaPlayer2;
             } catch (Throwable th) {
-                file.close();
+                openRawResourceFd.close();
                 throw th;
             }
-        } catch (IOException ioe) {
-            Log.w(TAG, ioe);
+        } catch (IOException e) {
+            Log.w(TAG, e);
             mediaPlayer2.release();
             return null;
         }
     }
 
-    public synchronized boolean onError(MediaPlayer mp, int what, int extra) {
-        if (what == 100) {
+    public synchronized boolean onError(MediaPlayer mediaPlayer2, int i, int i2) {
+        if (i == 100) {
             this.activity.finish();
         } else {
             close();

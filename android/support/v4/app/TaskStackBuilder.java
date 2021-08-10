@@ -28,9 +28,9 @@ public final class TaskStackBuilder implements Iterable<Intent> {
         TaskStackBuilderBaseImpl() {
         }
 
-        public PendingIntent getPendingIntent(Context context, Intent[] intents, int requestCode, int flags, Bundle options) {
-            intents[0] = new Intent(intents[0]).addFlags(268484608);
-            return PendingIntent.getActivities(context, requestCode, intents, flags);
+        public PendingIntent getPendingIntent(Context context, Intent[] intentArr, int i, int i2, Bundle bundle) {
+            intentArr[0] = new Intent(intentArr[0]).addFlags(268484608);
+            return PendingIntent.getActivities(context, i, intentArr, i2);
         }
     }
 
@@ -39,9 +39,9 @@ public final class TaskStackBuilder implements Iterable<Intent> {
         }
 
         @Override // android.support.v4.app.TaskStackBuilder.TaskStackBuilderBaseImpl
-        public PendingIntent getPendingIntent(Context context, Intent[] intents, int requestCode, int flags, Bundle options) {
-            intents[0] = new Intent(intents[0]).addFlags(268484608);
-            return PendingIntent.getActivities(context, requestCode, intents, flags, options);
+        public PendingIntent getPendingIntent(Context context, Intent[] intentArr, int i, int i2, Bundle bundle) {
+            intentArr[0] = new Intent(intentArr[0]).addFlags(268484608);
+            return PendingIntent.getActivities(context, i, intentArr, i2, bundle);
         }
     }
 
@@ -53,8 +53,8 @@ public final class TaskStackBuilder implements Iterable<Intent> {
         }
     }
 
-    private TaskStackBuilder(Context a) {
-        this.mSourceContext = a;
+    private TaskStackBuilder(Context context) {
+        this.mSourceContext = context;
     }
 
     public static TaskStackBuilder create(Context context) {
@@ -66,53 +66,50 @@ public final class TaskStackBuilder implements Iterable<Intent> {
         return create(context);
     }
 
-    public TaskStackBuilder addNextIntent(Intent nextIntent) {
-        this.mIntents.add(nextIntent);
+    public TaskStackBuilder addNextIntent(Intent intent) {
+        this.mIntents.add(intent);
         return this;
     }
 
-    public TaskStackBuilder addNextIntentWithParentStack(Intent nextIntent) {
-        ComponentName target = nextIntent.getComponent();
-        if (target == null) {
-            target = nextIntent.resolveActivity(this.mSourceContext.getPackageManager());
+    public TaskStackBuilder addNextIntentWithParentStack(Intent intent) {
+        ComponentName component = intent.getComponent();
+        if (component == null) {
+            component = intent.resolveActivity(this.mSourceContext.getPackageManager());
         }
-        if (target != null) {
-            addParentStack(target);
+        if (component != null) {
+            addParentStack(component);
         }
-        addNextIntent(nextIntent);
+        addNextIntent(intent);
         return this;
     }
 
-    public TaskStackBuilder addParentStack(Activity sourceActivity) {
-        Intent parent = null;
-        if (sourceActivity instanceof SupportParentable) {
-            parent = ((SupportParentable) sourceActivity).getSupportParentActivityIntent();
+    public TaskStackBuilder addParentStack(Activity activity) {
+        Intent supportParentActivityIntent = activity instanceof SupportParentable ? ((SupportParentable) activity).getSupportParentActivityIntent() : null;
+        if (supportParentActivityIntent == null) {
+            supportParentActivityIntent = NavUtils.getParentActivityIntent(activity);
         }
-        if (parent == null) {
-            parent = NavUtils.getParentActivityIntent(sourceActivity);
-        }
-        if (parent != null) {
-            ComponentName target = parent.getComponent();
-            if (target == null) {
-                target = parent.resolveActivity(this.mSourceContext.getPackageManager());
+        if (supportParentActivityIntent != null) {
+            ComponentName component = supportParentActivityIntent.getComponent();
+            if (component == null) {
+                component = supportParentActivityIntent.resolveActivity(this.mSourceContext.getPackageManager());
             }
-            addParentStack(target);
-            addNextIntent(parent);
+            addParentStack(component);
+            addNextIntent(supportParentActivityIntent);
         }
         return this;
     }
 
-    public TaskStackBuilder addParentStack(Class<?> sourceActivityClass) {
-        return addParentStack(new ComponentName(this.mSourceContext, sourceActivityClass));
+    public TaskStackBuilder addParentStack(Class<?> cls) {
+        return addParentStack(new ComponentName(this.mSourceContext, cls));
     }
 
-    public TaskStackBuilder addParentStack(ComponentName sourceActivityName) {
-        int insertAt = this.mIntents.size();
+    public TaskStackBuilder addParentStack(ComponentName componentName) {
+        int size = this.mIntents.size();
         try {
-            Intent parent = NavUtils.getParentActivityIntent(this.mSourceContext, sourceActivityName);
-            while (parent != null) {
-                this.mIntents.add(insertAt, parent);
-                parent = NavUtils.getParentActivityIntent(this.mSourceContext, parent.getComponent());
+            Intent parentActivityIntent = NavUtils.getParentActivityIntent(this.mSourceContext, componentName);
+            while (parentActivityIntent != null) {
+                this.mIntents.add(size, parentActivityIntent);
+                parentActivityIntent = NavUtils.getParentActivityIntent(this.mSourceContext, parentActivityIntent.getComponent());
             }
             return this;
         } catch (PackageManager.NameNotFoundException e) {
@@ -126,12 +123,12 @@ public final class TaskStackBuilder implements Iterable<Intent> {
     }
 
     @Deprecated
-    public Intent getIntent(int index) {
-        return editIntentAt(index);
+    public Intent getIntent(int i) {
+        return editIntentAt(i);
     }
 
-    public Intent editIntentAt(int index) {
-        return this.mIntents.get(index);
+    public Intent editIntentAt(int i) {
+        return this.mIntents.get(i);
     }
 
     @Override // java.lang.Iterable
@@ -144,15 +141,15 @@ public final class TaskStackBuilder implements Iterable<Intent> {
         startActivities(null);
     }
 
-    public void startActivities(Bundle options) {
+    public void startActivities(Bundle bundle) {
         if (!this.mIntents.isEmpty()) {
             ArrayList<Intent> arrayList = this.mIntents;
-            Intent[] intents = (Intent[]) arrayList.toArray(new Intent[arrayList.size()]);
-            intents[0] = new Intent(intents[0]).addFlags(268484608);
-            if (!ContextCompat.startActivities(this.mSourceContext, intents, options)) {
-                Intent topIntent = new Intent(intents[intents.length - 1]);
-                topIntent.addFlags(268435456);
-                this.mSourceContext.startActivity(topIntent);
+            Intent[] intentArr = (Intent[]) arrayList.toArray(new Intent[arrayList.size()]);
+            intentArr[0] = new Intent(intentArr[0]).addFlags(268484608);
+            if (!ContextCompat.startActivities(this.mSourceContext, intentArr, bundle)) {
+                Intent intent = new Intent(intentArr[intentArr.length - 1]);
+                intent.addFlags(268435456);
+                this.mSourceContext.startActivity(intent);
                 return;
             }
             return;
@@ -160,29 +157,30 @@ public final class TaskStackBuilder implements Iterable<Intent> {
         throw new IllegalStateException("No intents added to TaskStackBuilder; cannot startActivities");
     }
 
-    public PendingIntent getPendingIntent(int requestCode, int flags) {
-        return getPendingIntent(requestCode, flags, null);
+    public PendingIntent getPendingIntent(int i, int i2) {
+        return getPendingIntent(i, i2, null);
     }
 
-    public PendingIntent getPendingIntent(int requestCode, int flags, Bundle options) {
+    public PendingIntent getPendingIntent(int i, int i2, Bundle bundle) {
         if (!this.mIntents.isEmpty()) {
             ArrayList<Intent> arrayList = this.mIntents;
-            Intent[] intents = (Intent[]) arrayList.toArray(new Intent[arrayList.size()]);
-            intents[0] = new Intent(intents[0]).addFlags(268484608);
-            return IMPL.getPendingIntent(this.mSourceContext, intents, requestCode, flags, options);
+            Intent[] intentArr = (Intent[]) arrayList.toArray(new Intent[arrayList.size()]);
+            intentArr[0] = new Intent(intentArr[0]).addFlags(268484608);
+            return IMPL.getPendingIntent(this.mSourceContext, intentArr, i, i2, bundle);
         }
         throw new IllegalStateException("No intents added to TaskStackBuilder; cannot getPendingIntent");
     }
 
     public Intent[] getIntents() {
-        Intent[] intents = new Intent[this.mIntents.size()];
-        if (intents.length == 0) {
-            return intents;
+        int size = this.mIntents.size();
+        Intent[] intentArr = new Intent[size];
+        if (size == 0) {
+            return intentArr;
         }
-        intents[0] = new Intent(this.mIntents.get(0)).addFlags(268484608);
-        for (int i = 1; i < intents.length; i++) {
-            intents[i] = new Intent(this.mIntents.get(i));
+        intentArr[0] = new Intent(this.mIntents.get(0)).addFlags(268484608);
+        for (int i = 1; i < size; i++) {
+            intentArr[i] = new Intent(this.mIntents.get(i));
         }
-        return intents;
+        return intentArr;
     }
 }

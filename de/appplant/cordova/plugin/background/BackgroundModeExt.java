@@ -24,71 +24,88 @@ import org.json.JSONObject;
 public class BackgroundModeExt extends CordovaPlugin {
     private PowerManager.WakeLock wakeLock;
 
+    static /* synthetic */ void lambda$openAppStart$1(DialogInterface dialogInterface, int i) {
+    }
+
     /* JADX INFO: Can't fix incorrect switch cases order, some code will duplicate */
     @Override // org.apache.cordova.CordovaPlugin
-    public boolean execute(String action, JSONArray args, CallbackContext callback) {
+    public boolean execute(String str, JSONArray jSONArray, CallbackContext callbackContext) {
         char c;
-        boolean validAction = true;
-        switch (action.hashCode()) {
+        boolean z = true;
+        switch (str.hashCode()) {
             case -1332194002:
-                if (action.equals("background")) {
-                    c = 3;
-                    break;
-                }
-                c = 65535;
-                break;
-            case -1331727292:
-                if (action.equals("dimmed")) {
-                    c = 6;
-                    break;
-                }
-                c = 65535;
-                break;
-            case -840442044:
-                if (action.equals("unlock")) {
-                    c = '\b';
-                    break;
-                }
-                c = 65535;
-                break;
-            case -795228353:
-                if (action.equals("wakeup")) {
-                    c = 7;
-                    break;
-                }
-                c = 65535;
-                break;
-            case -409429085:
-                if (action.equals("tasklist")) {
+                if (str.equals("background")) {
                     c = 5;
                     break;
                 }
                 c = 65535;
                 break;
+            case -1331727292:
+                if (str.equals("dimmed")) {
+                    c = '\b';
+                    break;
+                }
+                c = 65535;
+                break;
+            case -1126376545:
+                if (str.equals("optimizationstatus")) {
+                    c = 2;
+                    break;
+                }
+                c = 65535;
+                break;
+            case -840442044:
+                if (str.equals("unlock")) {
+                    c = '\n';
+                    break;
+                }
+                c = 65535;
+                break;
+            case -795228353:
+                if (str.equals("wakeup")) {
+                    c = '\t';
+                    break;
+                }
+                c = 65535;
+                break;
+            case -409429085:
+                if (str.equals("tasklist")) {
+                    c = 7;
+                    break;
+                }
+                c = 65535;
+                break;
             case -331239923:
-                if (action.equals("battery")) {
+                if (str.equals("battery")) {
                     c = 0;
                     break;
                 }
                 c = 65535;
                 break;
             case 1186297569:
-                if (action.equals("appstart")) {
-                    c = 2;
+                if (str.equals("appstart")) {
+                    c = 4;
                     break;
                 }
                 c = 65535;
                 break;
             case 1224424441:
-                if (action.equals("webview")) {
-                    c = 1;
+                if (str.equals("webview")) {
+                    c = 3;
                     break;
                 }
                 c = 65535;
                 break;
             case 1984457027:
-                if (action.equals("foreground")) {
-                    c = 4;
+                if (str.equals("foreground")) {
+                    c = 6;
+                    break;
+                }
+                c = 65535;
+                break;
+            case 2075135280:
+                if (str.equals("batterysettings")) {
+                    c = 1;
                     break;
                 }
                 c = 65535;
@@ -102,40 +119,46 @@ public class BackgroundModeExt extends CordovaPlugin {
                 disableBatteryOptimizations();
                 break;
             case 1:
-                disableWebViewOptimizations();
+                openBatterySettings();
                 break;
             case 2:
-                openAppStart(args.opt(0));
+                isIgnoringBatteryOptimizations(callbackContext);
                 break;
             case 3:
-                moveToBackground();
+                disableWebViewOptimizations();
                 break;
             case 4:
-                moveToForeground();
+                openAppStart(jSONArray.opt(0));
                 break;
             case 5:
-                excludeFromTaskList();
+                moveToBackground();
                 break;
             case 6:
-                isDimmed(callback);
+                moveToForeground();
                 break;
             case 7:
-                wakeup();
+                excludeFromTaskList();
                 break;
             case '\b':
+                isDimmed(callbackContext);
+                break;
+            case '\t':
+                wakeup();
+                break;
+            case '\n':
                 wakeup();
                 unlock();
                 break;
             default:
-                validAction = false;
+                z = false;
                 break;
         }
-        if (validAction) {
-            callback.success();
+        if (z) {
+            callbackContext.success();
         } else {
-            callback.error("Invalid action: " + action);
+            callbackContext.error("Invalid action: " + str);
         }
-        return validAction;
+        return z;
     }
 
     private void moveToBackground() {
@@ -146,10 +169,10 @@ public class BackgroundModeExt extends CordovaPlugin {
 
     private void moveToForeground() {
         Activity app = getApp();
-        Intent intent = getLaunchIntent();
-        intent.addFlags(604110848);
+        Intent launchIntent = getLaunchIntent();
+        launchIntent.addFlags(604110848);
         clearScreenAndKeyguardFlags();
-        app.startActivity(intent);
+        app.startActivity(launchIntent);
     }
 
     private void disableWebViewOptimizations() {
@@ -166,15 +189,15 @@ public class BackgroundModeExt extends CordovaPlugin {
                             BackgroundModeExt.AnonymousClass1.this.lambda$run$0$BackgroundModeExt$1();
                         }
                     });
-                } catch (InterruptedException e) {
+                } catch (InterruptedException unused) {
                 }
             }
 
             public /* synthetic */ void lambda$run$0$BackgroundModeExt$1() {
-                View view = BackgroundModeExt.this.webView.getEngine().getView();
+                View view = BackgroundModeExt.this.webView.getView();
                 try {
                     Class.forName("org.crosswalk.engine.XWalkCordovaView").getMethod("onShow", new Class[0]).invoke(view, new Object[0]);
-                } catch (Exception e) {
+                } catch (Exception unused) {
                     view.dispatchWindowVisibilityChanged(0);
                 }
             }
@@ -184,25 +207,38 @@ public class BackgroundModeExt extends CordovaPlugin {
     private void disableBatteryOptimizations() {
         Activity activity = this.cordova.getActivity();
         Intent intent = new Intent();
-        String pkgName = activity.getPackageName();
-        PowerManager pm = (PowerManager) getService("power");
-        if (Build.VERSION.SDK_INT >= 23 && !pm.isIgnoringBatteryOptimizations(pkgName)) {
+        String packageName = activity.getPackageName();
+        PowerManager powerManager = (PowerManager) getService("power");
+        if (Build.VERSION.SDK_INT >= 23 && !powerManager.isIgnoringBatteryOptimizations(packageName)) {
             intent.setAction("android.settings.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS");
-            intent.setData(Uri.parse("package:" + pkgName));
+            intent.setData(Uri.parse("package:" + packageName));
             this.cordova.getActivity().startActivity(intent);
         }
     }
 
-    private void openAppStart(Object arg) {
+    private void openBatterySettings() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            this.cordova.getActivity();
+            this.cordova.getActivity().startActivity(new Intent("android.settings.IGNORE_BATTERY_OPTIMIZATION_SETTINGS"));
+        }
+    }
+
+    private void isIgnoringBatteryOptimizations(CallbackContext callbackContext) {
+        if (Build.VERSION.SDK_INT >= 23) {
+            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, ((PowerManager) getService("power")).isIgnoringBatteryOptimizations(this.cordova.getActivity().getPackageName())));
+        }
+    }
+
+    private void openAppStart(Object obj) {
         Activity activity = this.cordova.getActivity();
-        PackageManager pm = activity.getPackageManager();
+        PackageManager packageManager = activity.getPackageManager();
         for (Intent intent : getAppStartIntents()) {
-            if (pm.resolveActivity(intent, 65536) != null) {
-                JSONObject spec = arg instanceof JSONObject ? (JSONObject) arg : null;
+            if (packageManager.resolveActivity(intent, 65536) != null) {
+                JSONObject jSONObject = obj instanceof JSONObject ? (JSONObject) obj : null;
                 intent.addFlags(268435456);
-                if (!(arg instanceof Boolean) || ((Boolean) arg).booleanValue()) {
-                    AlertDialog.Builder dialog = new AlertDialog.Builder(activity, 16974130);
-                    dialog.setPositiveButton(17039370, new DialogInterface.OnClickListener(activity, intent) {
+                if (!(obj instanceof Boolean) || ((Boolean) obj).booleanValue()) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(activity, 16974130);
+                    builder.setPositiveButton(17039370, new DialogInterface.OnClickListener(activity, intent) {
                         /* class de.appplant.cordova.plugin.background.$$Lambda$BackgroundModeExt$ERKfr3wD6vup_JSOqk4oaG0vRD8 */
                         public final /* synthetic */ Activity f$0;
                         public final /* synthetic */ Intent f$1;
@@ -216,18 +252,18 @@ public class BackgroundModeExt extends CordovaPlugin {
                             this.f$0.startActivity(this.f$1);
                         }
                     });
-                    dialog.setNegativeButton(17039360, $$Lambda$BackgroundModeExt$bUrtZtagSgT3rMs8xgk8HpHR0ic.INSTANCE);
-                    dialog.setCancelable(true);
-                    if (spec != null && spec.has("title")) {
-                        dialog.setTitle(spec.optString("title"));
+                    builder.setNegativeButton(17039360, $$Lambda$BackgroundModeExt$bUrtZtagSgT3rMs8xgk8HpHR0ic.INSTANCE);
+                    builder.setCancelable(true);
+                    if (jSONObject != null && jSONObject.has("title")) {
+                        builder.setTitle(jSONObject.optString("title"));
                     }
-                    if (spec == null || !spec.has("text")) {
-                        dialog.setMessage("missing text");
+                    if (jSONObject == null || !jSONObject.has("text")) {
+                        builder.setMessage("missing text");
                     } else {
-                        dialog.setMessage(spec.optString("text"));
+                        builder.setMessage(jSONObject.optString("text"));
                     }
-                    dialog.getClass();
-                    activity.runOnUiThread(new Runnable(dialog) {
+                    builder.getClass();
+                    activity.runOnUiThread(new Runnable(builder) {
                         /* class de.appplant.cordova.plugin.background.$$Lambda$3Qlr8fEzXfR35vEnzutL7VyLKKA */
                         public final /* synthetic */ AlertDialog.Builder f$0;
 
@@ -247,33 +283,30 @@ public class BackgroundModeExt extends CordovaPlugin {
         }
     }
 
-    static /* synthetic */ void lambda$openAppStart$1(DialogInterface o, int d) {
-    }
-
     private void excludeFromTaskList() {
-        List<ActivityManager.AppTask> tasks;
-        ActivityManager am = (ActivityManager) getService("activity");
-        if (am != null && Build.VERSION.SDK_INT >= 21 && (tasks = am.getAppTasks()) != null && !tasks.isEmpty()) {
-            tasks.get(0).setExcludeFromRecents(true);
+        List<ActivityManager.AppTask> appTasks;
+        ActivityManager activityManager = (ActivityManager) getService("activity");
+        if (activityManager != null && Build.VERSION.SDK_INT >= 21 && (appTasks = activityManager.getAppTasks()) != null && !appTasks.isEmpty()) {
+            appTasks.get(0).setExcludeFromRecents(true);
         }
     }
 
-    private void isDimmed(CallbackContext callback) {
-        callback.sendPluginResult(new PluginResult(PluginResult.Status.OK, isDimmed()));
+    private void isDimmed(CallbackContext callbackContext) {
+        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, isDimmed()));
     }
 
     private boolean isDimmed() {
-        PowerManager pm = (PowerManager) getService("power");
+        PowerManager powerManager = (PowerManager) getService("power");
         if (Build.VERSION.SDK_INT < 20) {
-            return !pm.isScreenOn();
+            return !powerManager.isScreenOn();
         }
-        return !pm.isInteractive();
+        return !powerManager.isInteractive();
     }
 
     private void wakeup() {
         try {
             acquireWakeLock();
-        } catch (Exception e) {
+        } catch (Exception unused) {
             releaseWakeLock();
         }
     }
@@ -284,10 +317,10 @@ public class BackgroundModeExt extends CordovaPlugin {
     }
 
     private void acquireWakeLock() {
-        PowerManager pm = (PowerManager) getService("power");
+        PowerManager powerManager = (PowerManager) getService("power");
         releaseWakeLock();
         if (isDimmed()) {
-            PowerManager.WakeLock newWakeLock = pm.newWakeLock(268435462, "backgroundmode:wakelock");
+            PowerManager.WakeLock newWakeLock = powerManager.newWakeLock(268435462, "backgroundmode:wakelock");
             this.wakeLock = newWakeLock;
             newWakeLock.setReferenceCounted(false);
             this.wakeLock.acquire(1000);
@@ -330,8 +363,8 @@ public class BackgroundModeExt extends CordovaPlugin {
         getApp().getWindow().clearFlags(6815745);
     }
 
-    static void clearKeyguardFlags(Activity app) {
-        app.runOnUiThread(new Runnable(app) {
+    static void clearKeyguardFlags(Activity activity) {
+        activity.runOnUiThread(new Runnable(activity) {
             /* class de.appplant.cordova.plugin.background.$$Lambda$BackgroundModeExt$dhGWJsWDWa3mV1m10yf3_A_c9oE */
             public final /* synthetic */ Activity f$0;
 
@@ -351,12 +384,12 @@ public class BackgroundModeExt extends CordovaPlugin {
     }
 
     private Intent getLaunchIntent() {
-        Context app = getApp().getApplicationContext();
-        return app.getPackageManager().getLaunchIntentForPackage(app.getPackageName());
+        Context applicationContext = getApp().getApplicationContext();
+        return applicationContext.getPackageManager().getLaunchIntentForPackage(applicationContext.getPackageName());
     }
 
-    private Object getService(String name) {
-        return getApp().getSystemService(name);
+    private Object getService(String str) {
+        return getApp().getSystemService(str);
     }
 
     private List<Intent> getAppStartIntents() {

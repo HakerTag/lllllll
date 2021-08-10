@@ -18,9 +18,9 @@ public final class ScanFromWebPageManager {
     private final boolean returnRaw;
     private final String returnUrlTemplate;
 
-    ScanFromWebPageManager(Uri inputUri) {
-        this.returnUrlTemplate = inputUri.getQueryParameter(RETURN_URL_PARAM);
-        this.returnRaw = inputUri.getQueryParameter(RAW_PARAM) != null;
+    ScanFromWebPageManager(Uri uri) {
+        this.returnUrlTemplate = uri.getQueryParameter(RETURN_URL_PARAM);
+        this.returnRaw = uri.getQueryParameter(RAW_PARAM) != null;
     }
 
     /* access modifiers changed from: package-private */
@@ -29,16 +29,18 @@ public final class ScanFromWebPageManager {
     }
 
     /* access modifiers changed from: package-private */
-    public String buildReplyURL(Result rawResult, ResultHandler resultHandler) {
-        return replace(META_PLACEHOLDER, String.valueOf(rawResult.getResultMetadata()), replace(TYPE_PLACEHOLDER, resultHandler.getType().toString(), replace(FORMAT_PLACEHOLDER, rawResult.getBarcodeFormat().toString(), replace(RAW_CODE_PLACEHOLDER, rawResult.getText(), replace(CODE_PLACEHOLDER, this.returnRaw ? rawResult.getText() : resultHandler.getDisplayContents(), this.returnUrlTemplate)))));
+    public String buildReplyURL(Result result, ResultHandler resultHandler) {
+        return replace(META_PLACEHOLDER, String.valueOf(result.getResultMetadata()), replace(TYPE_PLACEHOLDER, resultHandler.getType().toString(), replace(FORMAT_PLACEHOLDER, result.getBarcodeFormat().toString(), replace(RAW_CODE_PLACEHOLDER, result.getText(), replace(CODE_PLACEHOLDER, this.returnRaw ? result.getText() : resultHandler.getDisplayContents(), this.returnUrlTemplate)))));
     }
 
-    private static String replace(CharSequence placeholder, CharSequence with, String pattern) {
-        String escapedWith = with == null ? "" : with;
-        try {
-            escapedWith = URLEncoder.encode(escapedWith.toString(), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
+    private static String replace(CharSequence charSequence, CharSequence charSequence2, String str) {
+        if (charSequence2 == null) {
+            charSequence2 = "";
         }
-        return pattern.replace(placeholder, escapedWith);
+        try {
+            charSequence2 = URLEncoder.encode(charSequence2.toString(), "UTF-8");
+        } catch (UnsupportedEncodingException unused) {
+        }
+        return str.replace(charSequence, charSequence2);
     }
 }

@@ -20,12 +20,12 @@ public final class DBHelper extends SQLiteOpenHelper {
         super(context, DB_NAME, (SQLiteDatabase.CursorFactory) null, 5);
     }
 
-    public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL("CREATE TABLE history (id INTEGER PRIMARY KEY, text TEXT, format TEXT, display TEXT, timestamp INTEGER, details TEXT);");
+    public void onCreate(SQLiteDatabase sQLiteDatabase) {
+        sQLiteDatabase.execSQL("CREATE TABLE history (id INTEGER PRIMARY KEY, text TEXT, format TEXT, display TEXT, timestamp INTEGER, details TEXT);");
     }
 
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS history");
-        onCreate(sqLiteDatabase);
+    public void onUpgrade(SQLiteDatabase sQLiteDatabase, int i, int i2) {
+        sQLiteDatabase.execSQL("DROP TABLE IF EXISTS history");
+        onCreate(sQLiteDatabase);
     }
 }

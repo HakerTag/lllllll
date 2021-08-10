@@ -15,34 +15,29 @@ import java.util.ArrayList;
 final class HistoryItemAdapter extends ArrayAdapter<HistoryItem> {
     private final Context activity;
 
-    HistoryItemAdapter(Context activity2) {
-        super(activity2, R.layout.history_list_item, new ArrayList());
-        this.activity = activity2;
+    HistoryItemAdapter(Context context) {
+        super(context, R.layout.history_list_item, new ArrayList());
+        this.activity = context;
     }
 
-    public View getView(int position, View view, ViewGroup viewGroup) {
-        View layout;
-        CharSequence title;
-        CharSequence title2;
-        if (view instanceof LinearLayout) {
-            layout = view;
-        } else {
-            layout = LayoutInflater.from(this.activity).inflate(R.layout.history_list_item, viewGroup, false);
+    public View getView(int i, View view, ViewGroup viewGroup) {
+        String str;
+        String str2;
+        if (!(view instanceof LinearLayout)) {
+            view = LayoutInflater.from(this.activity).inflate(R.layout.history_list_item, viewGroup, false);
         }
-        HistoryItem item = (HistoryItem) getItem(position);
-        Result result = item.getResult();
+        HistoryItem historyItem = (HistoryItem) getItem(i);
+        Result result = historyItem.getResult();
         if (result != null) {
-            title2 = result.getText();
-            title = item.getDisplayAndDetails();
+            str = result.getText();
+            str2 = historyItem.getDisplayAndDetails();
         } else {
             Resources resources = getContext().getResources();
-            CharSequence title3 = resources.getString(R.string.history_empty);
-            CharSequence string = resources.getString(R.string.history_empty_detail);
-            title2 = title3;
-            title = string;
+            str = resources.getString(R.string.history_empty);
+            str2 = resources.getString(R.string.history_empty_detail);
         }
-        ((TextView) layout.findViewById(R.id.history_title)).setText(title2);
-        ((TextView) layout.findViewById(R.id.history_detail)).setText(title);
-        return layout;
+        ((TextView) view.findViewById(R.id.history_title)).setText(str);
+        ((TextView) view.findViewById(R.id.history_detail)).setText(str2);
+        return view;
     }
 }

@@ -7,17 +7,22 @@ public final class EmailAddressParsedResult extends ParsedResult {
     private final String subject;
     private final String[] tos;
 
-    EmailAddressParsedResult(String to) {
-        this(new String[]{to}, null, null, null, null);
+    @Deprecated
+    public String getMailtoURI() {
+        return "mailto:";
     }
 
-    EmailAddressParsedResult(String[] tos2, String[] ccs2, String[] bccs2, String subject2, String body2) {
+    EmailAddressParsedResult(String str) {
+        this(new String[]{str}, null, null, null, null);
+    }
+
+    EmailAddressParsedResult(String[] strArr, String[] strArr2, String[] strArr3, String str, String str2) {
         super(ParsedResultType.EMAIL_ADDRESS);
-        this.tos = tos2;
-        this.ccs = ccs2;
-        this.bccs = bccs2;
-        this.subject = subject2;
-        this.body = body2;
+        this.tos = strArr;
+        this.ccs = strArr2;
+        this.bccs = strArr3;
+        this.subject = str;
+        this.body = str2;
     }
 
     @Deprecated
@@ -49,19 +54,14 @@ public final class EmailAddressParsedResult extends ParsedResult {
         return this.body;
     }
 
-    @Deprecated
-    public String getMailtoURI() {
-        return "mailto:";
-    }
-
     @Override // com.google.zxing.client.result.ParsedResult
     public String getDisplayResult() {
-        StringBuilder result = new StringBuilder(30);
-        maybeAppend(this.tos, result);
-        maybeAppend(this.ccs, result);
-        maybeAppend(this.bccs, result);
-        maybeAppend(this.subject, result);
-        maybeAppend(this.body, result);
-        return result.toString();
+        StringBuilder sb = new StringBuilder(30);
+        maybeAppend(this.tos, sb);
+        maybeAppend(this.ccs, sb);
+        maybeAppend(this.bccs, sb);
+        maybeAppend(this.subject, sb);
+        maybeAppend(this.body, sb);
+        return sb.toString();
     }
 }

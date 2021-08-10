@@ -10,123 +10,123 @@ public class LOG {
     public static final int VERBOSE = 2;
     public static final int WARN = 5;
 
-    public static void setLogLevel(int logLevel) {
-        LOGLEVEL = logLevel;
-        Log.i("CordovaLog", "Changing log level to " + logLevel);
+    public static void setLogLevel(int i) {
+        LOGLEVEL = i;
+        Log.i("CordovaLog", "Changing log level to " + i);
     }
 
-    public static void setLogLevel(String logLevel) {
-        if ("VERBOSE".equals(logLevel)) {
+    public static void setLogLevel(String str) {
+        if ("VERBOSE".equals(str)) {
             LOGLEVEL = 2;
-        } else if ("DEBUG".equals(logLevel)) {
+        } else if ("DEBUG".equals(str)) {
             LOGLEVEL = 3;
-        } else if ("INFO".equals(logLevel)) {
+        } else if ("INFO".equals(str)) {
             LOGLEVEL = 4;
-        } else if ("WARN".equals(logLevel)) {
+        } else if ("WARN".equals(str)) {
             LOGLEVEL = 5;
-        } else if ("ERROR".equals(logLevel)) {
+        } else if ("ERROR".equals(str)) {
             LOGLEVEL = 6;
         }
-        Log.i("CordovaLog", "Changing log level to " + logLevel + "(" + LOGLEVEL + ")");
+        Log.i("CordovaLog", "Changing log level to " + str + "(" + LOGLEVEL + ")");
     }
 
-    public static boolean isLoggable(int logLevel) {
-        return logLevel >= LOGLEVEL;
+    public static boolean isLoggable(int i) {
+        return i >= LOGLEVEL;
     }
 
-    public static void v(String tag, String s) {
+    public static void v(String str, String str2) {
         if (2 >= LOGLEVEL) {
-            Log.v(tag, s);
+            Log.v(str, str2);
         }
     }
 
-    public static void d(String tag, String s) {
+    public static void d(String str, String str2) {
         if (3 >= LOGLEVEL) {
-            Log.d(tag, s);
+            Log.d(str, str2);
         }
     }
 
-    public static void i(String tag, String s) {
+    public static void i(String str, String str2) {
         if (4 >= LOGLEVEL) {
-            Log.i(tag, s);
+            Log.i(str, str2);
         }
     }
 
-    public static void w(String tag, String s) {
+    public static void w(String str, String str2) {
         if (5 >= LOGLEVEL) {
-            Log.w(tag, s);
+            Log.w(str, str2);
         }
     }
 
-    public static void e(String tag, String s) {
+    public static void e(String str, String str2) {
         if (6 >= LOGLEVEL) {
-            Log.e(tag, s);
+            Log.e(str, str2);
         }
     }
 
-    public static void v(String tag, String s, Throwable e) {
+    public static void v(String str, String str2, Throwable th) {
         if (2 >= LOGLEVEL) {
-            Log.v(tag, s, e);
+            Log.v(str, str2, th);
         }
     }
 
-    public static void d(String tag, String s, Throwable e) {
+    public static void d(String str, String str2, Throwable th) {
         if (3 >= LOGLEVEL) {
-            Log.d(tag, s, e);
+            Log.d(str, str2, th);
         }
     }
 
-    public static void i(String tag, String s, Throwable e) {
+    public static void i(String str, String str2, Throwable th) {
         if (4 >= LOGLEVEL) {
-            Log.i(tag, s, e);
+            Log.i(str, str2, th);
         }
     }
 
-    public static void w(String tag, Throwable e) {
+    public static void w(String str, Throwable th) {
         if (5 >= LOGLEVEL) {
-            Log.w(tag, e);
+            Log.w(str, th);
         }
     }
 
-    public static void w(String tag, String s, Throwable e) {
+    public static void w(String str, String str2, Throwable th) {
         if (5 >= LOGLEVEL) {
-            Log.w(tag, s, e);
+            Log.w(str, str2, th);
         }
     }
 
-    public static void e(String tag, String s, Throwable e) {
+    public static void e(String str, String str2, Throwable th) {
         if (6 >= LOGLEVEL) {
-            Log.e(tag, s, e);
+            Log.e(str, str2, th);
         }
     }
 
-    public static void v(String tag, String s, Object... args) {
+    public static void v(String str, String str2, Object... objArr) {
         if (2 >= LOGLEVEL) {
-            Log.v(tag, String.format(s, args));
+            Log.v(str, String.format(str2, objArr));
         }
     }
 
-    public static void d(String tag, String s, Object... args) {
+    public static void d(String str, String str2, Object... objArr) {
         if (3 >= LOGLEVEL) {
-            Log.d(tag, String.format(s, args));
+            Log.d(str, String.format(str2, objArr));
         }
     }
 
-    public static void i(String tag, String s, Object... args) {
+    public static void i(String str, String str2, Object... objArr) {
         if (4 >= LOGLEVEL) {
-            Log.i(tag, String.format(s, args));
+            Log.i(str, String.format(str2, objArr));
         }
     }
 
-    public static void w(String tag, String s, Object... args) {
+    public static void w(String str, String str2, Object... objArr) {
         if (5 >= LOGLEVEL) {
-            Log.w(tag, String.format(s, args));
+            Log.w(str, String.format(str2, objArr));
         }
     }
 
-    public static void e(String tag, String s, Object... args) {
+    public static void e(String str, String str2, Object... objArr) {
         if (6 >= LOGLEVEL) {
-            Log.e(tag, String.format(s, args));
+            Log.e(str, String.format(str2, objArr));
         }
     }
 }

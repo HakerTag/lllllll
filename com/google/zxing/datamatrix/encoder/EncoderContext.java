@@ -2,6 +2,7 @@ package com.google.zxing.datamatrix.encoder;
 
 import com.google.zxing.Dimension;
 import java.nio.charset.Charset;
+import kotlin.UByte;
 
 /* access modifiers changed from: package-private */
 public final class EncoderContext {
@@ -15,39 +16,39 @@ public final class EncoderContext {
     private int skipAtEnd;
     private SymbolInfo symbolInfo;
 
-    EncoderContext(String msg2) {
-        byte[] msgBinary = msg2.getBytes(Charset.forName("ISO-8859-1"));
-        StringBuilder sb = new StringBuilder(msgBinary.length);
-        int c = msgBinary.length;
-        for (int i = 0; i < c; i++) {
-            char ch = (char) (msgBinary[i] & 255);
-            if (ch != '?' || msg2.charAt(i) == '?') {
-                sb.append(ch);
+    EncoderContext(String str) {
+        byte[] bytes = str.getBytes(Charset.forName("ISO-8859-1"));
+        StringBuilder sb = new StringBuilder(bytes.length);
+        int length = bytes.length;
+        for (int i = 0; i < length; i++) {
+            char c = (char) (bytes[i] & UByte.MAX_VALUE);
+            if (c != '?' || str.charAt(i) == '?') {
+                sb.append(c);
             } else {
                 throw new IllegalArgumentException("Message contains characters outside ISO-8859-1 encoding.");
             }
         }
         this.msg = sb.toString();
         this.shape = SymbolShapeHint.FORCE_NONE;
-        this.codewords = new StringBuilder(msg2.length());
+        this.codewords = new StringBuilder(str.length());
         this.newEncoding = -1;
     }
 
-    public void setSymbolShape(SymbolShapeHint shape2) {
-        this.shape = shape2;
+    public void setSymbolShape(SymbolShapeHint symbolShapeHint) {
+        this.shape = symbolShapeHint;
     }
 
-    public void setSizeConstraints(Dimension minSize2, Dimension maxSize2) {
-        this.minSize = minSize2;
-        this.maxSize = maxSize2;
+    public void setSizeConstraints(Dimension dimension, Dimension dimension2) {
+        this.minSize = dimension;
+        this.maxSize = dimension2;
     }
 
     public String getMessage() {
         return this.msg;
     }
 
-    public void setSkipAtEnd(int count) {
-        this.skipAtEnd = count;
+    public void setSkipAtEnd(int i) {
+        this.skipAtEnd = i;
     }
 
     public char getCurrentChar() {
@@ -62,12 +63,12 @@ public final class EncoderContext {
         return this.codewords;
     }
 
-    public void writeCodewords(String codewords2) {
-        this.codewords.append(codewords2);
+    public void writeCodewords(String str) {
+        this.codewords.append(str);
     }
 
-    public void writeCodeword(char codeword) {
-        this.codewords.append(codeword);
+    public void writeCodeword(char c) {
+        this.codewords.append(c);
     }
 
     public int getCodewordCount() {
@@ -78,8 +79,8 @@ public final class EncoderContext {
         return this.newEncoding;
     }
 
-    public void signalEncoderChange(int encoding) {
-        this.newEncoding = encoding;
+    public void signalEncoderChange(int i) {
+        this.newEncoding = i;
     }
 
     public void resetEncoderSignal() {
@@ -106,10 +107,10 @@ public final class EncoderContext {
         updateSymbolInfo(getCodewordCount());
     }
 
-    public void updateSymbolInfo(int len) {
+    public void updateSymbolInfo(int i) {
         SymbolInfo symbolInfo2 = this.symbolInfo;
-        if (symbolInfo2 == null || len > symbolInfo2.getDataCapacity()) {
-            this.symbolInfo = SymbolInfo.lookup(len, this.shape, this.minSize, this.maxSize, true);
+        if (symbolInfo2 == null || i > symbolInfo2.getDataCapacity()) {
+            this.symbolInfo = SymbolInfo.lookup(i, this.shape, this.minSize, this.maxSize, true);
         }
     }
 

@@ -14,418 +14,618 @@ public class Sim extends CordovaPlugin {
     private static final String REQUEST_READ_PERMISSION = "requestReadPermission";
     private CallbackContext callback;
 
-    /* JADX DEBUG: Multi-variable search result rejected for r0v12, resolved type: java.lang.String */
+    /* JADX DEBUG: Multi-variable search result rejected for r31v1, resolved type: java.lang.String */
+    /* JADX DEBUG: Multi-variable search result rejected for r32v1, resolved type: java.lang.String */
+    /* JADX DEBUG: Multi-variable search result rejected for r33v1, resolved type: java.lang.String */
+    /* JADX DEBUG: Multi-variable search result rejected for r34v1, resolved type: java.lang.String */
+    /* JADX DEBUG: Multi-variable search result rejected for r35v1, resolved type: java.lang.String */
     /* JADX WARN: Multi-variable type inference failed */
-    /* JADX INFO: Multiple debug info for r0v16 java.lang.String: [D('subscriberId' java.lang.String), D('phoneType' int)] */
-    /* JADX WARNING: Removed duplicated region for block: B:72:0x020b  */
-    /* JADX WARNING: Removed duplicated region for block: B:73:0x022c  */
-    /* JADX WARNING: Removed duplicated region for block: B:76:0x0247  */
-    /* JADX WARNING: Removed duplicated region for block: B:77:0x0255  */
-    /* JADX WARNING: Removed duplicated region for block: B:80:0x0292  */
-    /* JADX WARNING: Removed duplicated region for block: B:82:0x029d  */
-    /* JADX WARNING: Removed duplicated region for block: B:84:0x02a8  */
-    /* JADX WARNING: Removed duplicated region for block: B:87:0x02b9  */
-    /* JADX WARNING: Removed duplicated region for block: B:88:0x02df  */
-    /* JADX WARNING: Removed duplicated region for block: B:90:0x02ed  */
+    /* JADX WARNING: Removed duplicated region for block: B:146:0x0324  */
+    /* JADX WARNING: Removed duplicated region for block: B:147:0x0345  */
+    /* JADX WARNING: Removed duplicated region for block: B:150:0x035a  */
+    /* JADX WARNING: Removed duplicated region for block: B:151:0x0367  */
+    /* JADX WARNING: Removed duplicated region for block: B:154:0x039d  */
+    /* JADX WARNING: Removed duplicated region for block: B:156:0x03a8  */
+    /* JADX WARNING: Removed duplicated region for block: B:158:0x03b3  */
+    /* JADX WARNING: Removed duplicated region for block: B:161:0x03c6  */
     @Override // org.apache.cordova.CordovaPlugin
     /* Code decompiled incorrectly, please refer to instructions dump. */
-    public boolean execute(java.lang.String r43, org.json.JSONArray r44, org.apache.cordova.CallbackContext r45) throws org.json.JSONException {
+    public boolean execute(java.lang.String r37, org.json.JSONArray r38, org.apache.cordova.CallbackContext r39) throws org.json.JSONException {
         /*
-            r42 = this;
-            r1 = r42
-            r2 = r43
-            r3 = r45
-            java.lang.String r4 = "simSerialNumber"
-            java.lang.String r5 = "deviceId"
-            java.lang.String r6 = "phoneNumber"
-            java.lang.String r7 = "isNetworkRoaming"
-            java.lang.String r8 = "mnc"
-            java.lang.String r9 = "mcc"
-            java.lang.String r10 = "countryCode"
-            java.lang.String r11 = "carrierName"
-            java.lang.String r12 = "android.permission.READ_PHONE_STATE"
-            r1.callback = r3
-            java.lang.String r0 = "getSimInfo"
-            boolean r0 = r0.equals(r2)
-            if (r0 == 0) goto L_0x0309
+            r36 = this;
+            r1 = r36
+            r0 = r37
+            r2 = r39
+            java.lang.String r3 = "simSerialNumber"
+            java.lang.String r4 = "deviceId"
+            java.lang.String r5 = "phoneNumber"
+            java.lang.String r6 = "isNetworkRoaming"
+            java.lang.String r7 = "mnc"
+            java.lang.String r8 = "mcc"
+            java.lang.String r9 = "countryCode"
+            java.lang.String r10 = "carrierName"
+            java.lang.String r11 = "android.permission.READ_PHONE_STATE"
+            r1.callback = r2
+            java.lang.String r12 = "getSimInfo"
+            boolean r12 = r12.equals(r0)
+            if (r12 == 0) goto L_0x03ff
             org.apache.cordova.CordovaInterface r0 = r1.cordova
             android.app.Activity r0 = r0.getActivity()
-            android.content.Context r15 = r0.getApplicationContext()
-            java.lang.String r0 = "phone"
-            java.lang.Object r0 = r15.getSystemService(r0)
-            r13 = r0
-            android.telephony.TelephonyManager r13 = (android.telephony.TelephonyManager) r13
-            r17 = 0
-            r18 = 0
-            r19 = 0
-            r20 = 0
-            int r0 = android.os.Build.VERSION.SDK_INT     // Catch:{ JSONException -> 0x01c2, Exception -> 0x01b5 }
-            r14 = 23
-            if (r0 < r14) goto L_0x0060
-            int r0 = r13.getPhoneCount()     // Catch:{ JSONException -> 0x0057, Exception -> 0x004e }
-            java.lang.Integer r0 = java.lang.Integer.valueOf(r0)     // Catch:{ JSONException -> 0x0057, Exception -> 0x004e }
-            r18 = r0
-            goto L_0x0060
-        L_0x004e:
+            android.content.Context r0 = r0.getApplicationContext()
+            java.lang.String r12 = "phone"
+            java.lang.Object r12 = r0.getSystemService(r12)
+            android.telephony.TelephonyManager r12 = (android.telephony.TelephonyManager) r12
+            int r15 = android.os.Build.VERSION.SDK_INT     // Catch:{ JSONException -> 0x02da, Exception -> 0x02c9 }
+            r13 = 23
+            if (r15 < r13) goto L_0x0043
+            int r15 = r12.getPhoneCount()     // Catch:{ JSONException -> 0x02da, Exception -> 0x02c9 }
+            java.lang.Integer r15 = java.lang.Integer.valueOf(r15)     // Catch:{ JSONException -> 0x02da, Exception -> 0x02c9 }
+            goto L_0x0044
+        L_0x0043:
+            r15 = 0
+        L_0x0044:
+            int r14 = android.os.Build.VERSION.SDK_INT     // Catch:{ JSONException -> 0x02ba, Exception -> 0x02ab }
+            r13 = 22
+            if (r14 < r13) goto L_0x029b
+            boolean r13 = r1.simPermissionGranted(r11)     // Catch:{ JSONException -> 0x02ba, Exception -> 0x02ab }
+            if (r13 == 0) goto L_0x029b
+            java.lang.String r13 = "telephony_subscription_service"
+            java.lang.Object r0 = r0.getSystemService(r13)     // Catch:{ JSONException -> 0x02ba, Exception -> 0x02ab }
+            android.telephony.SubscriptionManager r0 = (android.telephony.SubscriptionManager) r0     // Catch:{ JSONException -> 0x02ba, Exception -> 0x02ab }
+            int r13 = r0.getActiveSubscriptionInfoCount()     // Catch:{ JSONException -> 0x02ba, Exception -> 0x02ab }
+            java.lang.Integer r13 = java.lang.Integer.valueOf(r13)     // Catch:{ JSONException -> 0x02ba, Exception -> 0x02ab }
+            int r14 = r0.getActiveSubscriptionInfoCountMax()     // Catch:{ JSONException -> 0x028c, Exception -> 0x027d }
+            java.lang.Integer r14 = java.lang.Integer.valueOf(r14)     // Catch:{ JSONException -> 0x028c, Exception -> 0x027d }
+            r17 = r13
+            org.json.JSONArray r13 = new org.json.JSONArray     // Catch:{ JSONException -> 0x026b, Exception -> 0x0259 }
+            r13.<init>()     // Catch:{ JSONException -> 0x026b, Exception -> 0x0259 }
+            java.util.List r18 = r0.getActiveSubscriptionInfoList()     // Catch:{ JSONException -> 0x0247, Exception -> 0x0235 }
+            java.util.Iterator r18 = r18.iterator()     // Catch:{ JSONException -> 0x0247, Exception -> 0x0235 }
+        L_0x0077:
+            boolean r19 = r18.hasNext()     // Catch:{ JSONException -> 0x0247, Exception -> 0x0235 }
+            if (r19 == 0) goto L_0x0224
+            java.lang.Object r19 = r18.next()     // Catch:{ JSONException -> 0x0247, Exception -> 0x0235 }
+            android.telephony.SubscriptionInfo r19 = (android.telephony.SubscriptionInfo) r19     // Catch:{ JSONException -> 0x0247, Exception -> 0x0235 }
+            java.lang.CharSequence r20 = r19.getCarrierName()     // Catch:{ JSONException -> 0x0247, Exception -> 0x0235 }
+            r21 = r14
+            java.lang.String r14 = r19.getCountryIso()     // Catch:{ JSONException -> 0x0212, Exception -> 0x0200 }
+            r22 = r15
+            int r15 = r19.getDataRoaming()     // Catch:{ JSONException -> 0x01ee, Exception -> 0x01dc }
+            java.lang.CharSequence r23 = r19.getDisplayName()     // Catch:{ JSONException -> 0x01ee, Exception -> 0x01dc }
+            java.lang.String r2 = r19.getIccId()     // Catch:{ JSONException -> 0x01ee, Exception -> 0x01dc }
+            int r1 = r19.getMcc()     // Catch:{ JSONException -> 0x01ee, Exception -> 0x01dc }
+            r24 = r11
+            int r11 = r19.getMnc()     // Catch:{ JSONException -> 0x01d6, Exception -> 0x01d0 }
+            r25 = r13
+            java.lang.String r13 = r19.getNumber()     // Catch:{ JSONException -> 0x01c6, Exception -> 0x01bc }
+            r26 = r2
+            int r2 = r19.getSimSlotIndex()     // Catch:{ JSONException -> 0x01c6, Exception -> 0x01bc }
+            r27 = r3
+            int r3 = r19.getSubscriptionId()     // Catch:{ JSONException -> 0x01b1, Exception -> 0x01a6 }
+            r19 = r3
+            boolean r3 = r0.isNetworkRoaming(r2)     // Catch:{ JSONException -> 0x01b1, Exception -> 0x01a6 }
+            r28 = r0
+            int r0 = android.os.Build.VERSION.SDK_INT     // Catch:{ JSONException -> 0x01b1, Exception -> 0x01a6 }
+            r29 = r4
+            r4 = 23
+            if (r0 < r4) goto L_0x00f2
+            java.lang.String r0 = r12.getDeviceId(r2)     // Catch:{ JSONException -> 0x00df, Exception -> 0x00cc }
+            goto L_0x00f3
+        L_0x00cc:
             r0 = move-exception
-            r28 = r7
-            r34 = r11
-            r29 = r15
-            goto L_0x01bc
-        L_0x0057:
-            r0 = move-exception
-            r28 = r7
-            r34 = r11
-            r29 = r15
-            goto L_0x01c9
-        L_0x0060:
-            int r0 = android.os.Build.VERSION.SDK_INT
-            r14 = 22
-            if (r0 < r14) goto L_0x01ae
-            boolean r0 = r1.simPermissionGranted(r12)
-            if (r0 == 0) goto L_0x01a7
-            java.lang.String r0 = "telephony_subscription_service"
-            java.lang.Object r0 = r15.getSystemService(r0)
-            android.telephony.SubscriptionManager r0 = (android.telephony.SubscriptionManager) r0
-            int r14 = r0.getActiveSubscriptionInfoCount()
-            java.lang.Integer r14 = java.lang.Integer.valueOf(r14)
-            r19 = r14
-            int r14 = r0.getActiveSubscriptionInfoCountMax()
-            java.lang.Integer r14 = java.lang.Integer.valueOf(r14)
-            r20 = r14
-            org.json.JSONArray r14 = new org.json.JSONArray
-            r14.<init>()
-            java.util.List r17 = r0.getActiveSubscriptionInfoList()     // Catch:{ JSONException -> 0x019d, Exception -> 0x0193 }
-            java.util.Iterator r23 = r17.iterator()     // Catch:{ JSONException -> 0x019d, Exception -> 0x0193 }
-        L_0x0095:
-            boolean r24 = r23.hasNext()     // Catch:{ JSONException -> 0x019d, Exception -> 0x0193 }
-            if (r24 == 0) goto L_0x0188
-            java.lang.Object r24 = r23.next()     // Catch:{ JSONException -> 0x019d, Exception -> 0x0193 }
-            android.telephony.SubscriptionInfo r24 = (android.telephony.SubscriptionInfo) r24     // Catch:{ JSONException -> 0x019d, Exception -> 0x0193 }
-            java.lang.CharSequence r25 = r24.getCarrierName()     // Catch:{ JSONException -> 0x019d, Exception -> 0x0193 }
-            java.lang.String r26 = r24.getCountryIso()     // Catch:{ JSONException -> 0x019d, Exception -> 0x0193 }
-            r27 = r26
-            int r26 = r24.getDataRoaming()     // Catch:{ JSONException -> 0x019d, Exception -> 0x0193 }
-            r28 = r26
-            java.lang.CharSequence r26 = r24.getDisplayName()     // Catch:{ JSONException -> 0x019d, Exception -> 0x0193 }
-            java.lang.String r29 = r24.getIccId()     // Catch:{ JSONException -> 0x019d, Exception -> 0x0193 }
-            r30 = r29
-            int r29 = r24.getMcc()     // Catch:{ JSONException -> 0x019d, Exception -> 0x0193 }
-            r31 = r29
-            int r29 = r24.getMnc()     // Catch:{ JSONException -> 0x019d, Exception -> 0x0193 }
-            r32 = r29
-            java.lang.String r29 = r24.getNumber()     // Catch:{ JSONException -> 0x019d, Exception -> 0x0193 }
-            r33 = r29
-            int r29 = r24.getSimSlotIndex()     // Catch:{ JSONException -> 0x019d, Exception -> 0x0193 }
-            r34 = r29
-            int r29 = r24.getSubscriptionId()     // Catch:{ JSONException -> 0x019d, Exception -> 0x0193 }
-            r35 = r29
-            r29 = r15
-            r15 = r34
-            boolean r34 = r0.isNetworkRoaming(r15)     // Catch:{ JSONException -> 0x0180, Exception -> 0x0178 }
-            r36 = r34
-            r34 = 0
-            r37 = r0
-            int r0 = android.os.Build.VERSION.SDK_INT     // Catch:{ JSONException -> 0x0180, Exception -> 0x0178 }
-            r2 = 23
-            if (r0 < r2) goto L_0x00f4
-            java.lang.String r0 = r13.getDeviceId(r15)     // Catch:{ JSONException -> 0x0180, Exception -> 0x0178 }
-            r34 = r0
-            goto L_0x00f6
-        L_0x00f4:
-            r0 = r34
-        L_0x00f6:
-            org.json.JSONObject r22 = new org.json.JSONObject     // Catch:{ JSONException -> 0x0180, Exception -> 0x0178 }
-            r22.<init>()     // Catch:{ JSONException -> 0x0180, Exception -> 0x0178 }
-            r34 = r22
-            java.lang.String r2 = r25.toString()     // Catch:{ JSONException -> 0x0180, Exception -> 0x0178 }
-            r3 = r34
-            r3.put(r11, r2)     // Catch:{ JSONException -> 0x0180, Exception -> 0x0178 }
-            java.lang.String r2 = "displayName"
-            r34 = r11
-            java.lang.String r11 = r26.toString()     // Catch:{ JSONException -> 0x0174, Exception -> 0x0170 }
-            r3.put(r2, r11)     // Catch:{ JSONException -> 0x0174, Exception -> 0x0170 }
+            r20 = r10
+            r30 = r12
+            r13 = r17
+            r14 = r21
+            r15 = r22
+            r3 = r25
             r2 = r27
-            r3.put(r10, r2)     // Catch:{ JSONException -> 0x0174, Exception -> 0x0170 }
-            r11 = r31
-            r3.put(r9, r11)     // Catch:{ JSONException -> 0x0174, Exception -> 0x0170 }
-            r27 = r2
-            r2 = r32
-            r3.put(r8, r2)     // Catch:{ JSONException -> 0x0174, Exception -> 0x0170 }
-            r31 = r2
-            r2 = r36
-            r3.put(r7, r2)     // Catch:{ JSONException -> 0x0174, Exception -> 0x0170 }
-            r32 = r2
-            java.lang.String r2 = "isDataRoaming"
-            r36 = r11
-            r11 = r28
-            r28 = r7
-            r7 = 1
-            if (r11 != r7) goto L_0x0138
-            r7 = 1
-            goto L_0x0139
-        L_0x0138:
-            r7 = 0
-        L_0x0139:
-            r3.put(r2, r7)     // Catch:{ JSONException -> 0x016e, Exception -> 0x016c }
-            java.lang.String r2 = "simSlotIndex"
-            r3.put(r2, r15)     // Catch:{ JSONException -> 0x016e, Exception -> 0x016c }
-            r2 = r33
-            r3.put(r6, r2)     // Catch:{ JSONException -> 0x016e, Exception -> 0x016c }
-            if (r0 == 0) goto L_0x014b
-            r3.put(r5, r0)     // Catch:{ JSONException -> 0x016e, Exception -> 0x016c }
-        L_0x014b:
-            r7 = r30
-            r3.put(r4, r7)     // Catch:{ JSONException -> 0x016e, Exception -> 0x016c }
-            r30 = r0
+            r1 = r29
+            goto L_0x02d6
+        L_0x00df:
+            r0 = move-exception
+            r20 = r10
+            r30 = r12
+            r13 = r17
+            r14 = r21
+            r15 = r22
+            r3 = r25
+            r2 = r27
+            r1 = r29
+            goto L_0x02e7
+        L_0x00f2:
+            r0 = 0
+        L_0x00f3:
+            org.json.JSONObject r4 = new org.json.JSONObject     // Catch:{ JSONException -> 0x0199, Exception -> 0x018c }
+            r4.<init>()     // Catch:{ JSONException -> 0x0199, Exception -> 0x018c }
+            r30 = r12
+            java.lang.String r12 = r20.toString()     // Catch:{ JSONException -> 0x0188, Exception -> 0x0184 }
+            r4.put(r10, r12)     // Catch:{ JSONException -> 0x0188, Exception -> 0x0184 }
+            java.lang.String r12 = "displayName"
+            r20 = r10
+            java.lang.String r10 = r23.toString()     // Catch:{ JSONException -> 0x0182, Exception -> 0x0180 }
+            r4.put(r12, r10)     // Catch:{ JSONException -> 0x0182, Exception -> 0x0180 }
+            r4.put(r9, r14)     // Catch:{ JSONException -> 0x0182, Exception -> 0x0180 }
+            r4.put(r8, r1)     // Catch:{ JSONException -> 0x0182, Exception -> 0x0180 }
+            r4.put(r7, r11)     // Catch:{ JSONException -> 0x0182, Exception -> 0x0180 }
+            r4.put(r6, r3)     // Catch:{ JSONException -> 0x0182, Exception -> 0x0180 }
+            java.lang.String r1 = "isDataRoaming"
+            r3 = 1
+            if (r15 != r3) goto L_0x011f
+            r3 = 1
+            goto L_0x0120
+        L_0x011f:
+            r3 = 0
+        L_0x0120:
+            r4.put(r1, r3)     // Catch:{ JSONException -> 0x0182, Exception -> 0x0180 }
+            java.lang.String r1 = "simSlotIndex"
+            r4.put(r1, r2)     // Catch:{ JSONException -> 0x0182, Exception -> 0x0180 }
+            r4.put(r5, r13)     // Catch:{ JSONException -> 0x0182, Exception -> 0x0180 }
+            r1 = r29
+            if (r0 == 0) goto L_0x014d
+            r4.put(r1, r0)     // Catch:{ JSONException -> 0x0140, Exception -> 0x0133 }
+            goto L_0x014d
+        L_0x0133:
+            r0 = move-exception
+            r13 = r17
+            r14 = r21
+            r15 = r22
+            r3 = r25
+            r2 = r27
+            goto L_0x02d6
+        L_0x0140:
+            r0 = move-exception
+            r13 = r17
+            r14 = r21
+            r15 = r22
+            r3 = r25
+            r2 = r27
+            goto L_0x02e7
+        L_0x014d:
+            r0 = r26
+            r2 = r27
+            r4.put(r2, r0)     // Catch:{ JSONException -> 0x017d, Exception -> 0x017b }
             java.lang.String r0 = "subscriptionId"
-            r33 = r2
-            r2 = r35
-            r3.put(r0, r2)     // Catch:{ JSONException -> 0x016e, Exception -> 0x016c }
-            r14.put(r3)     // Catch:{ JSONException -> 0x016e, Exception -> 0x016c }
-            r2 = r43
-            r3 = r45
-            r7 = r28
-            r15 = r29
-            r11 = r34
-            r0 = r37
-            goto L_0x0095
-        L_0x016c:
+            r3 = r19
+            r4.put(r0, r3)     // Catch:{ JSONException -> 0x017d, Exception -> 0x017b }
+            r3 = r25
+            r3.put(r4)     // Catch:{ JSONException -> 0x0178, Exception -> 0x0175 }
+            r4 = r1
+            r13 = r3
+            r10 = r20
+            r14 = r21
+            r15 = r22
+            r11 = r24
+            r0 = r28
+            r12 = r30
+            r1 = r36
+            r3 = r2
+            r2 = r39
+            goto L_0x0077
+        L_0x0175:
             r0 = move-exception
-            goto L_0x017d
-        L_0x016e:
-            r0 = move-exception
-            goto L_0x0185
-        L_0x0170:
-            r0 = move-exception
-            r28 = r7
-            goto L_0x017d
-        L_0x0174:
-            r0 = move-exception
-            r28 = r7
-            goto L_0x0185
+            goto L_0x01e6
         L_0x0178:
             r0 = move-exception
-            r28 = r7
-            r34 = r11
+            goto L_0x01f8
+        L_0x017b:
+            r0 = move-exception
+            goto L_0x01c3
         L_0x017d:
-            r17 = r14
-            goto L_0x01bc
+            r0 = move-exception
+            goto L_0x01cd
         L_0x0180:
             r0 = move-exception
-            r28 = r7
-            r34 = r11
-        L_0x0185:
-            r17 = r14
-            goto L_0x01c9
+            goto L_0x0191
+        L_0x0182:
+            r0 = move-exception
+            goto L_0x019e
+        L_0x0184:
+            r0 = move-exception
+            r20 = r10
+            goto L_0x0191
         L_0x0188:
-            r37 = r0
-            r28 = r7
-            r34 = r11
-            r29 = r15
-            r17 = r14
-            goto L_0x01cc
-        L_0x0193:
             r0 = move-exception
-            r28 = r7
-            r34 = r11
-            r29 = r15
-            r17 = r14
-            goto L_0x01bc
-        L_0x019d:
+            r20 = r10
+            goto L_0x019e
+        L_0x018c:
             r0 = move-exception
-            r28 = r7
-            r34 = r11
-            r29 = r15
-            r17 = r14
-            goto L_0x01c9
-        L_0x01a7:
-            r28 = r7
-            r34 = r11
-            r29 = r15
-            goto L_0x01cc
-        L_0x01ae:
-            r28 = r7
-            r34 = r11
-            r29 = r15
-            goto L_0x01cc
-        L_0x01b5:
+            r20 = r10
+            r30 = r12
+        L_0x0191:
+            r3 = r25
+            r2 = r27
+            r1 = r29
+            goto L_0x01e6
+        L_0x0199:
             r0 = move-exception
-            r28 = r7
-            r34 = r11
-            r29 = r15
+            r20 = r10
+            r30 = r12
+        L_0x019e:
+            r3 = r25
+            r2 = r27
+            r1 = r29
+            goto L_0x01f8
+        L_0x01a6:
+            r0 = move-exception
+            r1 = r4
+            r20 = r10
+            r30 = r12
+            r3 = r25
+            r2 = r27
+            goto L_0x01e6
+        L_0x01b1:
+            r0 = move-exception
+            r1 = r4
+            r20 = r10
+            r30 = r12
+            r3 = r25
+            r2 = r27
+            goto L_0x01f8
         L_0x01bc:
-            r0.printStackTrace()
-            r0 = r17
-            goto L_0x01ce
-        L_0x01c2:
             r0 = move-exception
-            r28 = r7
-            r34 = r11
-            r29 = r15
-        L_0x01c9:
-            r0.printStackTrace()
-        L_0x01cc:
-            r0 = r17
-        L_0x01ce:
-            r2 = 0
-            java.lang.String r3 = r13.getSimCountryIso()
-            java.lang.String r7 = r13.getSimOperator()
-            java.lang.String r11 = r13.getSimOperatorName()
+            r2 = r3
+            r1 = r4
+            r20 = r10
+            r30 = r12
+        L_0x01c3:
+            r3 = r25
+            goto L_0x01e6
+        L_0x01c6:
+            r0 = move-exception
+            r2 = r3
+            r1 = r4
+            r20 = r10
+            r30 = r12
+        L_0x01cd:
+            r3 = r25
+            goto L_0x01f8
+        L_0x01d0:
+            r0 = move-exception
+            r2 = r3
+            r1 = r4
+            r20 = r10
+            goto L_0x01e3
+        L_0x01d6:
+            r0 = move-exception
+            r2 = r3
+            r1 = r4
+            r20 = r10
+            goto L_0x01f5
+        L_0x01dc:
+            r0 = move-exception
+            r2 = r3
+            r1 = r4
+            r20 = r10
+            r24 = r11
+        L_0x01e3:
+            r30 = r12
+            r3 = r13
+        L_0x01e6:
+            r13 = r17
+            r14 = r21
+            r15 = r22
+            goto L_0x02d6
+        L_0x01ee:
+            r0 = move-exception
+            r2 = r3
+            r1 = r4
+            r20 = r10
+            r24 = r11
+        L_0x01f5:
+            r30 = r12
+            r3 = r13
+        L_0x01f8:
+            r13 = r17
+            r14 = r21
+            r15 = r22
+            goto L_0x02e7
+        L_0x0200:
+            r0 = move-exception
+            r2 = r3
+            r1 = r4
+            r20 = r10
+            r24 = r11
+            r30 = r12
+            r3 = r13
+            r22 = r15
+            r13 = r17
+            r14 = r21
+            goto L_0x02d6
+        L_0x0212:
+            r0 = move-exception
+            r2 = r3
+            r1 = r4
+            r20 = r10
+            r24 = r11
+            r30 = r12
+            r3 = r13
+            r22 = r15
+            r13 = r17
+            r14 = r21
+            goto L_0x02e7
+        L_0x0224:
+            r2 = r3
+            r1 = r4
+            r20 = r10
+            r24 = r11
+            r30 = r12
+            r3 = r13
+            r21 = r14
+            r22 = r15
+            r13 = r17
+            goto L_0x02a8
+        L_0x0235:
+            r0 = move-exception
+            r2 = r3
+            r1 = r4
+            r20 = r10
+            r24 = r11
+            r30 = r12
+            r3 = r13
+            r21 = r14
+            r22 = r15
+            r13 = r17
+            goto L_0x02d6
+        L_0x0247:
+            r0 = move-exception
+            r2 = r3
+            r1 = r4
+            r20 = r10
+            r24 = r11
+            r30 = r12
+            r3 = r13
+            r21 = r14
+            r22 = r15
+            r13 = r17
+            goto L_0x02e7
+        L_0x0259:
+            r0 = move-exception
+            r2 = r3
+            r1 = r4
+            r20 = r10
+            r24 = r11
+            r30 = r12
+            r21 = r14
+            r22 = r15
+            r13 = r17
+            r3 = 0
+            goto L_0x02d6
+        L_0x026b:
+            r0 = move-exception
+            r2 = r3
+            r1 = r4
+            r20 = r10
+            r24 = r11
+            r30 = r12
+            r21 = r14
+            r22 = r15
+            r13 = r17
+            r3 = 0
+            goto L_0x02e7
+        L_0x027d:
+            r0 = move-exception
+            r2 = r3
+            r1 = r4
+            r20 = r10
+            r24 = r11
+            r30 = r12
+            r17 = r13
+            r22 = r15
+            r3 = 0
+            goto L_0x02b8
+        L_0x028c:
+            r0 = move-exception
+            r2 = r3
+            r1 = r4
+            r20 = r10
+            r24 = r11
+            r30 = r12
+            r17 = r13
+            r22 = r15
+            r3 = 0
+            goto L_0x02c7
+        L_0x029b:
+            r2 = r3
+            r1 = r4
+            r20 = r10
+            r24 = r11
+            r30 = r12
+            r22 = r15
+            r3 = 0
+            r13 = 0
+            r14 = 0
+        L_0x02a8:
+            r15 = r22
+            goto L_0x02ea
+        L_0x02ab:
+            r0 = move-exception
+            r2 = r3
+            r1 = r4
+            r20 = r10
+            r24 = r11
+            r30 = r12
+            r22 = r15
+            r3 = 0
+            r13 = 0
+        L_0x02b8:
+            r14 = 0
+            goto L_0x02d6
+        L_0x02ba:
+            r0 = move-exception
+            r2 = r3
+            r1 = r4
+            r20 = r10
+            r24 = r11
+            r30 = r12
+            r22 = r15
+            r3 = 0
+            r13 = 0
+        L_0x02c7:
+            r14 = 0
+            goto L_0x02e7
+        L_0x02c9:
+            r0 = move-exception
+            r2 = r3
+            r1 = r4
+            r20 = r10
+            r24 = r11
+            r30 = r12
+            r3 = 0
+            r13 = 0
             r14 = 0
             r15 = 0
-            r17 = 0
-            r22 = 0
-            r23 = r2
-            int r2 = r13.getCallState()
-            r24 = r14
-            int r14 = r13.getDataActivity()
-            r25 = r15
-            int r15 = r13.getNetworkType()
-            r26 = r0
-            int r0 = r13.getPhoneType()
-            r27 = r4
-            int r4 = r13.getSimState()
-            r30 = r5
-            boolean r5 = r13.isNetworkRoaming()
-            boolean r31 = r1.simPermissionGranted(r12)
-            if (r31 == 0) goto L_0x022c
-            java.lang.String r23 = r13.getLine1Number()
-            java.lang.String r24 = r13.getDeviceId()
-            java.lang.String r25 = r13.getDeviceSoftwareVersion()
-            java.lang.String r17 = r13.getSimSerialNumber()
-            java.lang.String r22 = r13.getSubscriberId()
-            r31 = r13
-            r40 = r17
-            r41 = r22
-            r13 = r23
-            r38 = r24
-            r39 = r25
-            goto L_0x0238
-        L_0x022c:
-            r31 = r13
-            r40 = r17
-            r41 = r22
-            r13 = r23
-            r38 = r24
-            r39 = r25
-        L_0x0238:
-            java.lang.String r17 = ""
-            java.lang.String r22 = ""
-            r23 = r6
-            int r6 = r7.length()
-            r24 = r13
-            r13 = 3
-            if (r6 < r13) goto L_0x0255
-            r6 = 0
-            java.lang.String r17 = r7.substring(r6, r13)
-            java.lang.String r22 = r7.substring(r13)
-            r6 = r17
-            r13 = r22
-            goto L_0x0259
-        L_0x0255:
-            r6 = r17
-            r13 = r22
-        L_0x0259:
-            org.json.JSONObject r16 = new org.json.JSONObject
-            r16.<init>()
-            r17 = r16
-            r16 = r7
-            r7 = r17
-            r1 = r34
-            r7.put(r1, r11)
-            r7.put(r10, r3)
-            r7.put(r9, r6)
-            r7.put(r8, r13)
-            java.lang.String r1 = "callState"
-            r7.put(r1, r2)
-            java.lang.String r1 = "dataActivity"
-            r7.put(r1, r14)
-            java.lang.String r1 = "networkType"
-            r7.put(r1, r15)
-            java.lang.String r1 = "phoneType"
-            r7.put(r1, r0)
-            java.lang.String r1 = "simState"
-            r7.put(r1, r4)
-            r1 = r28
-            r7.put(r1, r5)
-            if (r18 == 0) goto L_0x029b
-            int r1 = r18.intValue()
-            java.lang.String r8 = "phoneCount"
-            r7.put(r8, r1)
-        L_0x029b:
-            if (r19 == 0) goto L_0x02a6
-            int r1 = r19.intValue()
-            java.lang.String r8 = "activeSubscriptionInfoCount"
-            r7.put(r8, r1)
-        L_0x02a6:
-            if (r20 == 0) goto L_0x02b1
-            int r1 = r20.intValue()
-            java.lang.String r8 = "activeSubscriptionInfoCountMax"
-            r7.put(r8, r1)
-        L_0x02b1:
-            r1 = r42
-            boolean r8 = r1.simPermissionGranted(r12)
-            if (r8 == 0) goto L_0x02df
-            r9 = r23
-            r8 = r24
-            r7.put(r9, r8)
-            r10 = r30
-            r9 = r38
-            r7.put(r10, r9)
-            java.lang.String r10 = "deviceSoftwareVersion"
-            r12 = r39
-            r7.put(r10, r12)
-            r1 = r27
-            r10 = r40
-            r7.put(r1, r10)
-            java.lang.String r1 = "subscriberId"
-            r17 = r0
-            r0 = r41
-            r7.put(r1, r0)
-            goto L_0x02eb
-        L_0x02df:
-            r17 = r0
-            r8 = r24
-            r9 = r38
-            r12 = r39
-            r10 = r40
-            r0 = r41
-        L_0x02eb:
-            if (r26 == 0) goto L_0x02fd
-            int r1 = r26.length()
-            if (r1 == 0) goto L_0x02fd
-            java.lang.String r1 = "cards"
-            r22 = r0
-            r0 = r26
-            r7.put(r1, r0)
-            goto L_0x0301
-        L_0x02fd:
-            r22 = r0
-            r0 = r26
-        L_0x0301:
-            r1 = r45
-            r1.success(r7)
-            r21 = 1
-            return r21
-        L_0x0309:
-            r1 = r3
-            r21 = 1
-            java.lang.String r0 = "hasReadPermission"
-            r2 = r43
-            boolean r0 = r0.equals(r2)
-            if (r0 == 0) goto L_0x031a
-            r42.hasReadPermission()
-            return r21
-        L_0x031a:
-            java.lang.String r0 = "requestReadPermission"
-            boolean r0 = r0.equals(r2)
-            if (r0 == 0) goto L_0x0326
-            r42.requestReadPermission()
-            return r21
-        L_0x0326:
+        L_0x02d6:
+            r0.printStackTrace()
+            goto L_0x02ea
+        L_0x02da:
+            r0 = move-exception
+            r2 = r3
+            r1 = r4
+            r20 = r10
+            r24 = r11
+            r30 = r12
             r3 = 0
-            return r3
+            r13 = 0
+            r14 = 0
+            r15 = 0
+        L_0x02e7:
+            r0.printStackTrace()
+        L_0x02ea:
+            java.lang.String r0 = r30.getSimCountryIso()
+            java.lang.String r4 = r30.getSimOperator()
+            java.lang.String r10 = r30.getSimOperatorName()
+            int r11 = r30.getCallState()
+            int r12 = r30.getDataActivity()
+            r16 = r3
+            int r3 = r30.getNetworkType()
+            r27 = r2
+            int r2 = r30.getPhoneType()
+            r29 = r1
+            int r1 = r30.getSimState()
+            r17 = r5
+            boolean r5 = r30.isNetworkRoaming()
+            r19 = r13
+            r18 = r14
+            r13 = r24
+            r14 = r36
+            boolean r21 = r14.simPermissionGranted(r13)
+            if (r21 == 0) goto L_0x0345
+            java.lang.String r21 = r30.getLine1Number()
+            java.lang.String r22 = r30.getDeviceId()
+            java.lang.String r23 = r30.getDeviceSoftwareVersion()
+            java.lang.String r24 = r30.getSimSerialNumber()
+            java.lang.String r25 = r30.getSubscriberId()
+            r31 = r21
+            r32 = r22
+            r33 = r23
+            r34 = r24
+            r35 = r25
+            r24 = r13
+            goto L_0x0351
+        L_0x0345:
+            r24 = r13
+            r31 = 0
+            r32 = 0
+            r33 = 0
+            r34 = 0
+            r35 = 0
+        L_0x0351:
+            int r13 = r4.length()
+            java.lang.String r21 = ""
+            r14 = 3
+            if (r13 < r14) goto L_0x0367
+            r13 = 0
+            java.lang.String r21 = r4.substring(r13, r14)
+            java.lang.String r4 = r4.substring(r14)
+            r13 = r4
+            r4 = r21
+            goto L_0x036a
+        L_0x0367:
+            r4 = r21
+            r13 = r4
+        L_0x036a:
+            org.json.JSONObject r14 = new org.json.JSONObject
+            r14.<init>()
+            r37 = r15
+            r15 = r20
+            r14.put(r15, r10)
+            r14.put(r9, r0)
+            r14.put(r8, r4)
+            r14.put(r7, r13)
+            java.lang.String r0 = "callState"
+            r14.put(r0, r11)
+            java.lang.String r0 = "dataActivity"
+            r14.put(r0, r12)
+            java.lang.String r0 = "networkType"
+            r14.put(r0, r3)
+            java.lang.String r0 = "phoneType"
+            r14.put(r0, r2)
+            java.lang.String r0 = "simState"
+            r14.put(r0, r1)
+            r14.put(r6, r5)
+            if (r37 == 0) goto L_0x03a6
+            int r0 = r37.intValue()
+            java.lang.String r1 = "phoneCount"
+            r14.put(r1, r0)
+        L_0x03a6:
+            if (r19 == 0) goto L_0x03b1
+            int r0 = r19.intValue()
+            java.lang.String r1 = "activeSubscriptionInfoCount"
+            r14.put(r1, r0)
+        L_0x03b1:
+            if (r18 == 0) goto L_0x03bc
+            int r0 = r18.intValue()
+            java.lang.String r1 = "activeSubscriptionInfoCountMax"
+            r14.put(r1, r0)
+        L_0x03bc:
+            r1 = r36
+            r2 = r24
+            boolean r0 = r1.simPermissionGranted(r2)
+            if (r0 == 0) goto L_0x03e9
+            r2 = r17
+            r0 = r31
+            r14.put(r2, r0)
+            r2 = r29
+            r0 = r32
+            r14.put(r2, r0)
+            java.lang.String r0 = "deviceSoftwareVersion"
+            r2 = r33
+            r14.put(r0, r2)
+            r2 = r27
+            r0 = r34
+            r14.put(r2, r0)
+            java.lang.String r0 = "subscriberId"
+            r2 = r35
+            r14.put(r0, r2)
+        L_0x03e9:
+            if (r16 == 0) goto L_0x03f8
+            int r0 = r16.length()
+            if (r0 == 0) goto L_0x03f8
+            java.lang.String r0 = "cards"
+            r3 = r16
+            r14.put(r0, r3)
+        L_0x03f8:
+            r2 = r39
+            r2.success(r14)
+            r2 = 1
+            return r2
+        L_0x03ff:
+            r2 = 1
+            java.lang.String r3 = "hasReadPermission"
+            boolean r3 = r3.equals(r0)
+            if (r3 == 0) goto L_0x040c
+            r36.hasReadPermission()
+            return r2
+        L_0x040c:
+            java.lang.String r3 = "requestReadPermission"
+            boolean r0 = r3.equals(r0)
+            if (r0 == 0) goto L_0x0418
+            r36.requestReadPermission()
+            return r2
+        L_0x0418:
+            r2 = 0
+            return r2
         */
         throw new UnsupportedOperationException("Method not decompiled: com.pbakondy.Sim.execute(java.lang.String, org.json.JSONArray, org.apache.cordova.CallbackContext):boolean");
     }
@@ -438,25 +638,25 @@ public class Sim extends CordovaPlugin {
         requestPermission("android.permission.READ_PHONE_STATE");
     }
 
-    private boolean simPermissionGranted(String type) {
+    private boolean simPermissionGranted(String str) {
         if (Build.VERSION.SDK_INT < 23) {
             return true;
         }
-        return this.cordova.hasPermission(type);
+        return this.cordova.hasPermission(str);
     }
 
-    private void requestPermission(String type) {
+    private void requestPermission(String str) {
         LOG.i(LOG_TAG, "requestPermission");
-        if (!simPermissionGranted(type)) {
-            this.cordova.requestPermission(this, 12345, type);
+        if (!simPermissionGranted(str)) {
+            this.cordova.requestPermission(this, 12345, str);
         } else {
             this.callback.success();
         }
     }
 
     @Override // org.apache.cordova.CordovaPlugin
-    public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
-        if (grantResults.length <= 0 || grantResults[0] != 0) {
+    public void onRequestPermissionResult(int i, String[] strArr, int[] iArr) throws JSONException {
+        if (iArr.length <= 0 || iArr[0] != 0) {
             this.callback.error("Permission denied");
         } else {
             this.callback.success();

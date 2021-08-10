@@ -32,9 +32,9 @@ public final class CaptureActivityHandler extends Handler {
         DONE
     }
 
-    CaptureActivityHandler(CaptureActivity activity2, Collection<BarcodeFormat> decodeFormats, Map<DecodeHintType, ?> baseHints, String characterSet, CameraManager cameraManager2) {
-        this.activity = activity2;
-        DecodeThread decodeThread2 = new DecodeThread(activity2, decodeFormats, baseHints, characterSet, new ViewfinderResultPointCallback(activity2.getViewfinderView()));
+    CaptureActivityHandler(CaptureActivity captureActivity, Collection<BarcodeFormat> collection, Map<DecodeHintType, ?> map, String str, CameraManager cameraManager2) {
+        this.activity = captureActivity;
+        DecodeThread decodeThread2 = new DecodeThread(captureActivity, collection, map, str, new ViewfinderResultPointCallback(captureActivity.getViewfinderView()));
         this.decodeThread = decodeThread2;
         decodeThread2.start();
         this.cameraManager = cameraManager2;
@@ -45,19 +45,24 @@ public final class CaptureActivityHandler extends Handler {
     public void handleMessage(Message message) {
         if (message.what == R.id.restart_preview) {
             restartPreviewAndDecode();
-        } else if (message.what == R.id.decode_succeeded) {
+            return;
+        }
+        String str = null;
+        r2 = null;
+        Bitmap bitmap = null;
+        str = null;
+        if (message.what == R.id.decode_succeeded) {
             this.state = State.SUCCESS;
-            Bundle bundle = message.getData();
-            Bitmap barcode = null;
-            float scaleFactor = 1.0f;
-            if (bundle != null) {
-                byte[] compressedBitmap = bundle.getByteArray(DecodeThread.BARCODE_BITMAP);
-                if (compressedBitmap != null) {
-                    barcode = BitmapFactory.decodeByteArray(compressedBitmap, 0, compressedBitmap.length, null).copy(Bitmap.Config.ARGB_8888, true);
+            Bundle data = message.getData();
+            float f = 1.0f;
+            if (data != null) {
+                byte[] byteArray = data.getByteArray(DecodeThread.BARCODE_BITMAP);
+                if (byteArray != null) {
+                    bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length, null).copy(Bitmap.Config.ARGB_8888, true);
                 }
-                scaleFactor = bundle.getFloat(DecodeThread.BARCODE_SCALED_FACTOR);
+                f = data.getFloat(DecodeThread.BARCODE_SCALED_FACTOR);
             }
-            this.activity.handleDecode((Result) message.obj, barcode, scaleFactor);
+            this.activity.handleDecode((Result) message.obj, bitmap, f);
         } else if (message.what == R.id.decode_failed) {
             this.state = State.PREVIEW;
             this.cameraManager.requestPreviewFrame(this.decodeThread.getHandler(), R.id.decode);
@@ -65,27 +70,26 @@ public final class CaptureActivityHandler extends Handler {
             this.activity.setResult(-1, (Intent) message.obj);
             this.activity.finish();
         } else if (message.what == R.id.launch_product_query) {
-            String url = (String) message.obj;
+            String str2 = (String) message.obj;
             Intent intent = new Intent("android.intent.action.VIEW");
             intent.addFlags(524288);
-            intent.setData(Uri.parse(url));
-            ResolveInfo resolveInfo = this.activity.getPackageManager().resolveActivity(intent, 65536);
-            String browserPackageName = null;
-            if (!(resolveInfo == null || resolveInfo.activityInfo == null)) {
-                browserPackageName = resolveInfo.activityInfo.packageName;
-                String str = TAG;
-                Log.d(str, "Using browser in package " + browserPackageName);
+            intent.setData(Uri.parse(str2));
+            ResolveInfo resolveActivity = this.activity.getPackageManager().resolveActivity(intent, 65536);
+            if (!(resolveActivity == null || resolveActivity.activityInfo == null)) {
+                str = resolveActivity.activityInfo.packageName;
+                String str3 = TAG;
+                Log.d(str3, "Using browser in package " + str);
             }
-            if ("com.android.browser".equals(browserPackageName) || "com.android.chrome".equals(browserPackageName)) {
-                intent.setPackage(browserPackageName);
+            if ("com.android.browser".equals(str) || "com.android.chrome".equals(str)) {
+                intent.setPackage(str);
                 intent.addFlags(268435456);
-                intent.putExtra("com.android.browser.application_id", browserPackageName);
+                intent.putExtra("com.android.browser.application_id", str);
             }
             try {
                 this.activity.startActivity(intent);
-            } catch (ActivityNotFoundException e) {
-                String str2 = TAG;
-                Log.w(str2, "Can't find anything to handle VIEW of URI " + url);
+            } catch (ActivityNotFoundException unused) {
+                String str4 = TAG;
+                Log.w(str4, "Can't find anything to handle VIEW of URI " + str2);
             }
         }
     }
@@ -96,7 +100,7 @@ public final class CaptureActivityHandler extends Handler {
         Message.obtain(this.decodeThread.getHandler(), R.id.quit).sendToTarget();
         try {
             this.decodeThread.join(500);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException unused) {
         }
         removeMessages(R.id.decode_succeeded);
         removeMessages(R.id.decode_failed);

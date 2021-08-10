@@ -5,8 +5,8 @@ import android.webkit.HttpAuthHandler;
 public class CordovaHttpAuthHandler implements ICordovaHttpAuthHandler {
     private final HttpAuthHandler handler;
 
-    public CordovaHttpAuthHandler(HttpAuthHandler handler2) {
-        this.handler = handler2;
+    public CordovaHttpAuthHandler(HttpAuthHandler httpAuthHandler) {
+        this.handler = httpAuthHandler;
     }
 
     @Override // org.apache.cordova.ICordovaHttpAuthHandler
@@ -15,7 +15,7 @@ public class CordovaHttpAuthHandler implements ICordovaHttpAuthHandler {
     }
 
     @Override // org.apache.cordova.ICordovaHttpAuthHandler
-    public void proceed(String username, String password) {
-        this.handler.proceed(username, password);
+    public void proceed(String str, String str2) {
+        this.handler.proceed(str, str2);
     }
 }

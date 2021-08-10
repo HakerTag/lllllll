@@ -23,38 +23,38 @@ public final class DecodeThread extends Thread {
     private final CountDownLatch handlerInitLatch = new CountDownLatch(1);
     private final Map<DecodeHintType, Object> hints;
 
-    DecodeThread(CaptureActivity activity2, Collection<BarcodeFormat> decodeFormats, Map<DecodeHintType, ?> baseHints, String characterSet, ResultPointCallback resultPointCallback) {
-        this.activity = activity2;
+    DecodeThread(CaptureActivity captureActivity, Collection<BarcodeFormat> collection, Map<DecodeHintType, ?> map, String str, ResultPointCallback resultPointCallback) {
+        this.activity = captureActivity;
         EnumMap enumMap = new EnumMap(DecodeHintType.class);
         this.hints = enumMap;
-        if (baseHints != null) {
-            enumMap.putAll(baseHints);
+        if (map != null) {
+            enumMap.putAll(map);
         }
-        if (decodeFormats == null || decodeFormats.isEmpty()) {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity2);
-            decodeFormats = EnumSet.noneOf(BarcodeFormat.class);
-            if (prefs.getBoolean(PreferencesActivity.KEY_DECODE_1D_PRODUCT, true)) {
-                decodeFormats.addAll(DecodeFormatManager.PRODUCT_FORMATS);
+        if (collection == null || collection.isEmpty()) {
+            SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(captureActivity);
+            collection = EnumSet.noneOf(BarcodeFormat.class);
+            if (defaultSharedPreferences.getBoolean(PreferencesActivity.KEY_DECODE_1D_PRODUCT, true)) {
+                collection.addAll(DecodeFormatManager.PRODUCT_FORMATS);
             }
-            if (prefs.getBoolean(PreferencesActivity.KEY_DECODE_1D_INDUSTRIAL, true)) {
-                decodeFormats.addAll(DecodeFormatManager.INDUSTRIAL_FORMATS);
+            if (defaultSharedPreferences.getBoolean(PreferencesActivity.KEY_DECODE_1D_INDUSTRIAL, true)) {
+                collection.addAll(DecodeFormatManager.INDUSTRIAL_FORMATS);
             }
-            if (prefs.getBoolean(PreferencesActivity.KEY_DECODE_QR, true)) {
-                decodeFormats.addAll(DecodeFormatManager.QR_CODE_FORMATS);
+            if (defaultSharedPreferences.getBoolean(PreferencesActivity.KEY_DECODE_QR, true)) {
+                collection.addAll(DecodeFormatManager.QR_CODE_FORMATS);
             }
-            if (prefs.getBoolean(PreferencesActivity.KEY_DECODE_DATA_MATRIX, true)) {
-                decodeFormats.addAll(DecodeFormatManager.DATA_MATRIX_FORMATS);
+            if (defaultSharedPreferences.getBoolean(PreferencesActivity.KEY_DECODE_DATA_MATRIX, true)) {
+                collection.addAll(DecodeFormatManager.DATA_MATRIX_FORMATS);
             }
-            if (prefs.getBoolean(PreferencesActivity.KEY_DECODE_AZTEC, false)) {
-                decodeFormats.addAll(DecodeFormatManager.AZTEC_FORMATS);
+            if (defaultSharedPreferences.getBoolean(PreferencesActivity.KEY_DECODE_AZTEC, false)) {
+                collection.addAll(DecodeFormatManager.AZTEC_FORMATS);
             }
-            if (prefs.getBoolean(PreferencesActivity.KEY_DECODE_PDF417, false)) {
-                decodeFormats.addAll(DecodeFormatManager.PDF417_FORMATS);
+            if (defaultSharedPreferences.getBoolean(PreferencesActivity.KEY_DECODE_PDF417, false)) {
+                collection.addAll(DecodeFormatManager.PDF417_FORMATS);
             }
         }
-        this.hints.put(DecodeHintType.POSSIBLE_FORMATS, decodeFormats);
-        if (characterSet != null) {
-            this.hints.put(DecodeHintType.CHARACTER_SET, characterSet);
+        this.hints.put(DecodeHintType.POSSIBLE_FORMATS, collection);
+        if (str != null) {
+            this.hints.put(DecodeHintType.CHARACTER_SET, str);
         }
         this.hints.put(DecodeHintType.NEED_RESULT_POINT_CALLBACK, resultPointCallback);
         Log.i("DecodeThread", "Hints: " + this.hints);
@@ -64,7 +64,7 @@ public final class DecodeThread extends Thread {
     public Handler getHandler() {
         try {
             this.handlerInitLatch.await();
-        } catch (InterruptedException e) {
+        } catch (InterruptedException unused) {
         }
         return this.handler;
     }

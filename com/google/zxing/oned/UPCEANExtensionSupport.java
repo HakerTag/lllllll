@@ -15,12 +15,12 @@ public final class UPCEANExtensionSupport {
     }
 
     /* access modifiers changed from: package-private */
-    public Result decodeRow(int rowNumber, BitArray row, int rowOffset) throws NotFoundException {
-        int[] extensionStartRange = UPCEANReader.findGuardPattern(row, rowOffset, false, EXTENSION_START_PATTERN);
+    public Result decodeRow(int i, BitArray bitArray, int i2) throws NotFoundException {
+        int[] findGuardPattern = UPCEANReader.findGuardPattern(bitArray, i2, false, EXTENSION_START_PATTERN);
         try {
-            return this.fiveSupport.decodeRow(rowNumber, row, extensionStartRange);
-        } catch (ReaderException e) {
-            return this.twoSupport.decodeRow(rowNumber, row, extensionStartRange);
+            return this.fiveSupport.decodeRow(i, bitArray, findGuardPattern);
+        } catch (ReaderException unused) {
+            return this.twoSupport.decodeRow(i, bitArray, findGuardPattern);
         }
     }
 }

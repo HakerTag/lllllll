@@ -45,43 +45,43 @@ public class NotificationCompatJellybean {
     NotificationCompatJellybean() {
     }
 
-    public static SparseArray<Bundle> buildActionExtrasMap(List<Bundle> actionExtrasList) {
-        SparseArray<Bundle> actionExtrasMap = null;
-        int count = actionExtrasList.size();
-        for (int i = 0; i < count; i++) {
-            Bundle actionExtras = actionExtrasList.get(i);
-            if (actionExtras != null) {
-                if (actionExtrasMap == null) {
-                    actionExtrasMap = new SparseArray<>();
+    public static SparseArray<Bundle> buildActionExtrasMap(List<Bundle> list) {
+        int size = list.size();
+        SparseArray<Bundle> sparseArray = null;
+        for (int i = 0; i < size; i++) {
+            Bundle bundle = list.get(i);
+            if (bundle != null) {
+                if (sparseArray == null) {
+                    sparseArray = new SparseArray<>();
                 }
-                actionExtrasMap.put(i, actionExtras);
+                sparseArray.put(i, bundle);
             }
         }
-        return actionExtrasMap;
+        return sparseArray;
     }
 
-    public static Bundle getExtras(Notification notif) {
+    public static Bundle getExtras(Notification notification) {
         synchronized (sExtrasLock) {
             if (sExtrasFieldAccessFailed) {
                 return null;
             }
             try {
                 if (sExtrasField == null) {
-                    Field extrasField = Notification.class.getDeclaredField(KEY_EXTRAS);
-                    if (!Bundle.class.isAssignableFrom(extrasField.getType())) {
+                    Field declaredField = Notification.class.getDeclaredField(KEY_EXTRAS);
+                    if (!Bundle.class.isAssignableFrom(declaredField.getType())) {
                         Log.e(TAG, "Notification.extras field is not of type Bundle");
                         sExtrasFieldAccessFailed = true;
                         return null;
                     }
-                    extrasField.setAccessible(true);
-                    sExtrasField = extrasField;
+                    declaredField.setAccessible(true);
+                    sExtrasField = declaredField;
                 }
-                Bundle extras = (Bundle) sExtrasField.get(notif);
-                if (extras == null) {
-                    extras = new Bundle();
-                    sExtrasField.set(notif, extras);
+                Bundle bundle = (Bundle) sExtrasField.get(notification);
+                if (bundle == null) {
+                    bundle = new Bundle();
+                    sExtrasField.set(notification, bundle);
                 }
-                return extras;
+                return bundle;
             } catch (IllegalAccessException e) {
                 Log.e(TAG, "Unable to access notification extras", e);
                 sExtrasFieldAccessFailed = true;
@@ -94,71 +94,71 @@ public class NotificationCompatJellybean {
         }
     }
 
-    public static NotificationCompat.Action readAction(int icon, CharSequence title, PendingIntent actionIntent, Bundle extras) {
-        RemoteInput[] remoteInputs = null;
-        RemoteInput[] dataOnlyRemoteInputs = null;
-        boolean allowGeneratedReplies = false;
-        if (extras != null) {
-            remoteInputs = fromBundleArray(getBundleArrayFromBundle(extras, NotificationCompatExtras.EXTRA_REMOTE_INPUTS));
-            dataOnlyRemoteInputs = fromBundleArray(getBundleArrayFromBundle(extras, EXTRA_DATA_ONLY_REMOTE_INPUTS));
-            allowGeneratedReplies = extras.getBoolean(EXTRA_ALLOW_GENERATED_REPLIES);
+    public static NotificationCompat.Action readAction(int i, CharSequence charSequence, PendingIntent pendingIntent, Bundle bundle) {
+        boolean z;
+        RemoteInput[] remoteInputArr;
+        RemoteInput[] remoteInputArr2;
+        if (bundle != null) {
+            remoteInputArr2 = fromBundleArray(getBundleArrayFromBundle(bundle, NotificationCompatExtras.EXTRA_REMOTE_INPUTS));
+            remoteInputArr = fromBundleArray(getBundleArrayFromBundle(bundle, EXTRA_DATA_ONLY_REMOTE_INPUTS));
+            z = bundle.getBoolean(EXTRA_ALLOW_GENERATED_REPLIES);
+        } else {
+            remoteInputArr2 = null;
+            remoteInputArr = null;
+            z = false;
         }
-        return new NotificationCompat.Action(icon, title, actionIntent, extras, remoteInputs, dataOnlyRemoteInputs, allowGeneratedReplies);
+        return new NotificationCompat.Action(i, charSequence, pendingIntent, bundle, remoteInputArr2, remoteInputArr, z);
     }
 
     public static Bundle writeActionAndGetExtras(Notification.Builder builder, NotificationCompat.Action action) {
         builder.addAction(action.getIcon(), action.getTitle(), action.getActionIntent());
-        Bundle actionExtras = new Bundle(action.getExtras());
+        Bundle bundle = new Bundle(action.getExtras());
         if (action.getRemoteInputs() != null) {
-            actionExtras.putParcelableArray(NotificationCompatExtras.EXTRA_REMOTE_INPUTS, toBundleArray(action.getRemoteInputs()));
+            bundle.putParcelableArray(NotificationCompatExtras.EXTRA_REMOTE_INPUTS, toBundleArray(action.getRemoteInputs()));
         }
         if (action.getDataOnlyRemoteInputs() != null) {
-            actionExtras.putParcelableArray(EXTRA_DATA_ONLY_REMOTE_INPUTS, toBundleArray(action.getDataOnlyRemoteInputs()));
+            bundle.putParcelableArray(EXTRA_DATA_ONLY_REMOTE_INPUTS, toBundleArray(action.getDataOnlyRemoteInputs()));
         }
-        actionExtras.putBoolean(EXTRA_ALLOW_GENERATED_REPLIES, action.getAllowGeneratedReplies());
-        return actionExtras;
+        bundle.putBoolean(EXTRA_ALLOW_GENERATED_REPLIES, action.getAllowGeneratedReplies());
+        return bundle;
     }
 
-    public static int getActionCount(Notification notif) {
+    public static int getActionCount(Notification notification) {
         int length;
         synchronized (sActionsLock) {
-            Object[] actionObjects = getActionObjectsLocked(notif);
-            length = actionObjects != null ? actionObjects.length : 0;
+            Object[] actionObjectsLocked = getActionObjectsLocked(notification);
+            length = actionObjectsLocked != null ? actionObjectsLocked.length : 0;
         }
         return length;
     }
 
-    public static NotificationCompat.Action getAction(Notification notif, int actionIndex) {
-        SparseArray<Bundle> actionExtrasMap;
+    public static NotificationCompat.Action getAction(Notification notification, int i) {
+        SparseArray sparseParcelableArray;
         synchronized (sActionsLock) {
             try {
-                Object[] actionObjects = getActionObjectsLocked(notif);
-                if (actionObjects == null) {
-                    return null;
+                Object[] actionObjectsLocked = getActionObjectsLocked(notification);
+                if (actionObjectsLocked != null) {
+                    Object obj = actionObjectsLocked[i];
+                    Bundle extras = getExtras(notification);
+                    return readAction(sActionIconField.getInt(obj), (CharSequence) sActionTitleField.get(obj), (PendingIntent) sActionIntentField.get(obj), (extras == null || (sparseParcelableArray = extras.getSparseParcelableArray(NotificationCompatExtras.EXTRA_ACTION_EXTRAS)) == null) ? null : (Bundle) sparseParcelableArray.get(i));
                 }
-                Object actionObject = actionObjects[actionIndex];
-                Bundle actionExtras = null;
-                Bundle extras = getExtras(notif);
-                if (!(extras == null || (actionExtrasMap = extras.getSparseParcelableArray(NotificationCompatExtras.EXTRA_ACTION_EXTRAS)) == null)) {
-                    actionExtras = actionExtrasMap.get(actionIndex);
-                }
-                return readAction(sActionIconField.getInt(actionObject), (CharSequence) sActionTitleField.get(actionObject), (PendingIntent) sActionIntentField.get(actionObject), actionExtras);
             } catch (IllegalAccessException e) {
                 Log.e(TAG, "Unable to access notification actions", e);
                 sActionsAccessFailed = true;
             } catch (Throwable th) {
                 throw th;
             }
+            return null;
         }
     }
 
-    private static Object[] getActionObjectsLocked(Notification notif) {
+    private static Object[] getActionObjectsLocked(Notification notification) {
         synchronized (sActionsLock) {
             if (!ensureActionReflectionReadyLocked()) {
                 return null;
             }
             try {
-                return (Object[]) sActionsField.get(notif);
+                return (Object[]) sActionsField.get(notification);
             } catch (IllegalAccessException e) {
                 Log.e(TAG, "Unable to access notification actions", e);
                 sActionsAccessFailed = true;
@@ -193,90 +193,86 @@ public class NotificationCompatJellybean {
     }
 
     static NotificationCompat.Action getActionFromBundle(Bundle bundle) {
-        Bundle extras = bundle.getBundle(KEY_EXTRAS);
-        boolean allowGeneratedReplies = false;
-        if (extras != null) {
-            allowGeneratedReplies = extras.getBoolean(EXTRA_ALLOW_GENERATED_REPLIES, false);
-        }
-        return new NotificationCompat.Action(bundle.getInt(KEY_ICON), bundle.getCharSequence(KEY_TITLE), (PendingIntent) bundle.getParcelable(KEY_ACTION_INTENT), bundle.getBundle(KEY_EXTRAS), fromBundleArray(getBundleArrayFromBundle(bundle, KEY_REMOTE_INPUTS)), fromBundleArray(getBundleArrayFromBundle(bundle, KEY_DATA_ONLY_REMOTE_INPUTS)), allowGeneratedReplies);
+        Bundle bundle2 = bundle.getBundle(KEY_EXTRAS);
+        return new NotificationCompat.Action(bundle.getInt(KEY_ICON), bundle.getCharSequence(KEY_TITLE), (PendingIntent) bundle.getParcelable(KEY_ACTION_INTENT), bundle.getBundle(KEY_EXTRAS), fromBundleArray(getBundleArrayFromBundle(bundle, KEY_REMOTE_INPUTS)), fromBundleArray(getBundleArrayFromBundle(bundle, KEY_DATA_ONLY_REMOTE_INPUTS)), bundle2 != null ? bundle2.getBoolean(EXTRA_ALLOW_GENERATED_REPLIES, false) : false);
     }
 
     static Bundle getBundleForAction(NotificationCompat.Action action) {
-        Bundle actionExtras;
-        Bundle bundle = new Bundle();
-        bundle.putInt(KEY_ICON, action.getIcon());
-        bundle.putCharSequence(KEY_TITLE, action.getTitle());
-        bundle.putParcelable(KEY_ACTION_INTENT, action.getActionIntent());
+        Bundle bundle;
+        Bundle bundle2 = new Bundle();
+        bundle2.putInt(KEY_ICON, action.getIcon());
+        bundle2.putCharSequence(KEY_TITLE, action.getTitle());
+        bundle2.putParcelable(KEY_ACTION_INTENT, action.getActionIntent());
         if (action.getExtras() != null) {
-            actionExtras = new Bundle(action.getExtras());
+            bundle = new Bundle(action.getExtras());
         } else {
-            actionExtras = new Bundle();
+            bundle = new Bundle();
         }
-        actionExtras.putBoolean(EXTRA_ALLOW_GENERATED_REPLIES, action.getAllowGeneratedReplies());
-        bundle.putBundle(KEY_EXTRAS, actionExtras);
-        bundle.putParcelableArray(KEY_REMOTE_INPUTS, toBundleArray(action.getRemoteInputs()));
-        return bundle;
+        bundle.putBoolean(EXTRA_ALLOW_GENERATED_REPLIES, action.getAllowGeneratedReplies());
+        bundle2.putBundle(KEY_EXTRAS, bundle);
+        bundle2.putParcelableArray(KEY_REMOTE_INPUTS, toBundleArray(action.getRemoteInputs()));
+        return bundle2;
     }
 
-    private static RemoteInput fromBundle(Bundle data) {
-        ArrayList<String> allowedDataTypesAsList = data.getStringArrayList(KEY_ALLOWED_DATA_TYPES);
-        Set<String> allowedDataTypes = new HashSet<>();
-        if (allowedDataTypesAsList != null) {
-            Iterator<String> it = allowedDataTypesAsList.iterator();
+    private static RemoteInput fromBundle(Bundle bundle) {
+        ArrayList<String> stringArrayList = bundle.getStringArrayList(KEY_ALLOWED_DATA_TYPES);
+        HashSet hashSet = new HashSet();
+        if (stringArrayList != null) {
+            Iterator<String> it = stringArrayList.iterator();
             while (it.hasNext()) {
-                allowedDataTypes.add(it.next());
+                hashSet.add(it.next());
             }
         }
-        return new RemoteInput(data.getString(KEY_RESULT_KEY), data.getCharSequence(KEY_LABEL), data.getCharSequenceArray(KEY_CHOICES), data.getBoolean(KEY_ALLOW_FREE_FORM_INPUT), data.getBundle(KEY_EXTRAS), allowedDataTypes);
+        return new RemoteInput(bundle.getString(KEY_RESULT_KEY), bundle.getCharSequence(KEY_LABEL), bundle.getCharSequenceArray(KEY_CHOICES), bundle.getBoolean(KEY_ALLOW_FREE_FORM_INPUT), bundle.getBundle(KEY_EXTRAS), hashSet);
     }
 
     private static Bundle toBundle(RemoteInput remoteInput) {
-        Bundle data = new Bundle();
-        data.putString(KEY_RESULT_KEY, remoteInput.getResultKey());
-        data.putCharSequence(KEY_LABEL, remoteInput.getLabel());
-        data.putCharSequenceArray(KEY_CHOICES, remoteInput.getChoices());
-        data.putBoolean(KEY_ALLOW_FREE_FORM_INPUT, remoteInput.getAllowFreeFormInput());
-        data.putBundle(KEY_EXTRAS, remoteInput.getExtras());
+        Bundle bundle = new Bundle();
+        bundle.putString(KEY_RESULT_KEY, remoteInput.getResultKey());
+        bundle.putCharSequence(KEY_LABEL, remoteInput.getLabel());
+        bundle.putCharSequenceArray(KEY_CHOICES, remoteInput.getChoices());
+        bundle.putBoolean(KEY_ALLOW_FREE_FORM_INPUT, remoteInput.getAllowFreeFormInput());
+        bundle.putBundle(KEY_EXTRAS, remoteInput.getExtras());
         Set<String> allowedDataTypes = remoteInput.getAllowedDataTypes();
         if (allowedDataTypes != null && !allowedDataTypes.isEmpty()) {
-            ArrayList<String> allowedDataTypesAsList = new ArrayList<>(allowedDataTypes.size());
-            for (String type : allowedDataTypes) {
-                allowedDataTypesAsList.add(type);
+            ArrayList<String> arrayList = new ArrayList<>(allowedDataTypes.size());
+            for (String str : allowedDataTypes) {
+                arrayList.add(str);
             }
-            data.putStringArrayList(KEY_ALLOWED_DATA_TYPES, allowedDataTypesAsList);
+            bundle.putStringArrayList(KEY_ALLOWED_DATA_TYPES, arrayList);
         }
-        return data;
+        return bundle;
     }
 
-    private static RemoteInput[] fromBundleArray(Bundle[] bundles) {
-        if (bundles == null) {
+    private static RemoteInput[] fromBundleArray(Bundle[] bundleArr) {
+        if (bundleArr == null) {
             return null;
         }
-        RemoteInput[] remoteInputs = new RemoteInput[bundles.length];
-        for (int i = 0; i < bundles.length; i++) {
-            remoteInputs[i] = fromBundle(bundles[i]);
+        RemoteInput[] remoteInputArr = new RemoteInput[bundleArr.length];
+        for (int i = 0; i < bundleArr.length; i++) {
+            remoteInputArr[i] = fromBundle(bundleArr[i]);
         }
-        return remoteInputs;
+        return remoteInputArr;
     }
 
-    private static Bundle[] toBundleArray(RemoteInput[] remoteInputs) {
-        if (remoteInputs == null) {
+    private static Bundle[] toBundleArray(RemoteInput[] remoteInputArr) {
+        if (remoteInputArr == null) {
             return null;
         }
-        Bundle[] bundles = new Bundle[remoteInputs.length];
-        for (int i = 0; i < remoteInputs.length; i++) {
-            bundles[i] = toBundle(remoteInputs[i]);
+        Bundle[] bundleArr = new Bundle[remoteInputArr.length];
+        for (int i = 0; i < remoteInputArr.length; i++) {
+            bundleArr[i] = toBundle(remoteInputArr[i]);
         }
-        return bundles;
+        return bundleArr;
     }
 
-    private static Bundle[] getBundleArrayFromBundle(Bundle bundle, String key) {
-        Parcelable[] array = bundle.getParcelableArray(key);
-        if ((array instanceof Bundle[]) || array == null) {
-            return (Bundle[]) array;
+    private static Bundle[] getBundleArrayFromBundle(Bundle bundle, String str) {
+        Parcelable[] parcelableArray = bundle.getParcelableArray(str);
+        if ((parcelableArray instanceof Bundle[]) || parcelableArray == null) {
+            return (Bundle[]) parcelableArray;
         }
-        Bundle[] typedArray = (Bundle[]) Arrays.copyOf(array, array.length, Bundle[].class);
-        bundle.putParcelableArray(key, typedArray);
-        return typedArray;
+        Bundle[] bundleArr = (Bundle[]) Arrays.copyOf(parcelableArray, parcelableArray.length, Bundle[].class);
+        bundle.putParcelableArray(str, bundleArr);
+        return bundleArr;
     }
 }

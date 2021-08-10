@@ -16,30 +16,30 @@ class MediaBrowserCompatApi26 {
     MediaBrowserCompatApi26() {
     }
 
-    static Object createSubscriptionCallback(SubscriptionCallback callback) {
-        return new SubscriptionCallbackProxy(callback);
+    static Object createSubscriptionCallback(SubscriptionCallback subscriptionCallback) {
+        return new SubscriptionCallbackProxy(subscriptionCallback);
     }
 
-    public static void subscribe(Object browserObj, String parentId, Bundle options, Object subscriptionCallbackObj) {
-        ((MediaBrowser) browserObj).subscribe(parentId, options, (MediaBrowser.SubscriptionCallback) subscriptionCallbackObj);
+    public static void subscribe(Object obj, String str, Bundle bundle, Object obj2) {
+        ((MediaBrowser) obj).subscribe(str, bundle, (MediaBrowser.SubscriptionCallback) obj2);
     }
 
-    public static void unsubscribe(Object browserObj, String parentId, Object subscriptionCallbackObj) {
-        ((MediaBrowser) browserObj).unsubscribe(parentId, (MediaBrowser.SubscriptionCallback) subscriptionCallbackObj);
+    public static void unsubscribe(Object obj, String str, Object obj2) {
+        ((MediaBrowser) obj).unsubscribe(str, (MediaBrowser.SubscriptionCallback) obj2);
     }
 
     static class SubscriptionCallbackProxy<T extends SubscriptionCallback> extends MediaBrowserCompatApi21.SubscriptionCallbackProxy<T> {
-        SubscriptionCallbackProxy(T callback) {
-            super(callback);
+        SubscriptionCallbackProxy(T t) {
+            super(t);
         }
 
         @Override // android.media.browse.MediaBrowser.SubscriptionCallback
-        public void onChildrenLoaded(String parentId, List<MediaBrowser.MediaItem> children, Bundle options) {
-            ((SubscriptionCallback) this.mSubscriptionCallback).onChildrenLoaded(parentId, children, options);
+        public void onChildrenLoaded(String str, List<MediaBrowser.MediaItem> list, Bundle bundle) {
+            ((SubscriptionCallback) this.mSubscriptionCallback).onChildrenLoaded(str, list, bundle);
         }
 
-        public void onError(String parentId, Bundle options) {
-            ((SubscriptionCallback) this.mSubscriptionCallback).onError(parentId, options);
+        public void onError(String str, Bundle bundle) {
+            ((SubscriptionCallback) this.mSubscriptionCallback).onError(str, bundle);
         }
     }
 }

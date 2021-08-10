@@ -21,15 +21,15 @@ public abstract class LoaderManager {
 
     public abstract <D> Loader<D> getLoader(int i);
 
+    public boolean hasRunningLoaders() {
+        return false;
+    }
+
     public abstract <D> Loader<D> initLoader(int i, Bundle bundle, LoaderCallbacks<D> loaderCallbacks);
 
     public abstract <D> Loader<D> restartLoader(int i, Bundle bundle, LoaderCallbacks<D> loaderCallbacks);
 
-    public static void enableDebugLogging(boolean enabled) {
-        LoaderManagerImpl.DEBUG = enabled;
-    }
-
-    public boolean hasRunningLoaders() {
-        return false;
+    public static void enableDebugLogging(boolean z) {
+        LoaderManagerImpl.DEBUG = z;
     }
 }

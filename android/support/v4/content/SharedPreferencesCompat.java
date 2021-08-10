@@ -17,7 +17,7 @@ public final class SharedPreferencesCompat {
             public void apply(SharedPreferences.Editor editor) {
                 try {
                     editor.apply();
-                } catch (AbstractMethodError e) {
+                } catch (AbstractMethodError unused) {
                     editor.commit();
                 }
             }

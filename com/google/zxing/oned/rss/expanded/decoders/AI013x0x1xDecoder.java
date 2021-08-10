@@ -11,61 +11,61 @@ public final class AI013x0x1xDecoder extends AI01weightDecoder {
     private final String dateCode;
     private final String firstAIdigits;
 
-    AI013x0x1xDecoder(BitArray information, String firstAIdigits2, String dateCode2) {
-        super(information);
-        this.dateCode = dateCode2;
-        this.firstAIdigits = firstAIdigits2;
+    AI013x0x1xDecoder(BitArray bitArray, String str, String str2) {
+        super(bitArray);
+        this.dateCode = str2;
+        this.firstAIdigits = str;
     }
 
     @Override // com.google.zxing.oned.rss.expanded.decoders.AbstractExpandedDecoder
     public String parseInformation() throws NotFoundException {
         if (getInformation().getSize() == 84) {
-            StringBuilder buf = new StringBuilder();
-            encodeCompressedGtin(buf, 8);
-            encodeCompressedWeight(buf, 48, 20);
-            encodeCompressedDate(buf, 68);
-            return buf.toString();
+            StringBuilder sb = new StringBuilder();
+            encodeCompressedGtin(sb, 8);
+            encodeCompressedWeight(sb, 48, 20);
+            encodeCompressedDate(sb, 68);
+            return sb.toString();
         }
         throw NotFoundException.getNotFoundInstance();
     }
 
-    private void encodeCompressedDate(StringBuilder buf, int currentPos) {
-        int numericDate = getGeneralDecoder().extractNumericValueFromBitArray(currentPos, 16);
-        if (numericDate != 38400) {
-            buf.append('(');
-            buf.append(this.dateCode);
-            buf.append(')');
-            int day = numericDate % 32;
-            int numericDate2 = numericDate / 32;
-            int month = (numericDate2 % 12) + 1;
-            int numericDate3 = numericDate2 / 12;
-            if (numericDate3 / 10 == 0) {
-                buf.append('0');
+    private void encodeCompressedDate(StringBuilder sb, int i) {
+        int extractNumericValueFromBitArray = getGeneralDecoder().extractNumericValueFromBitArray(i, 16);
+        if (extractNumericValueFromBitArray != 38400) {
+            sb.append('(');
+            sb.append(this.dateCode);
+            sb.append(')');
+            int i2 = extractNumericValueFromBitArray % 32;
+            int i3 = extractNumericValueFromBitArray / 32;
+            int i4 = (i3 % 12) + 1;
+            int i5 = i3 / 12;
+            if (i5 / 10 == 0) {
+                sb.append('0');
             }
-            buf.append(numericDate3);
-            if (month / 10 == 0) {
-                buf.append('0');
+            sb.append(i5);
+            if (i4 / 10 == 0) {
+                sb.append('0');
             }
-            buf.append(month);
-            if (day / 10 == 0) {
-                buf.append('0');
+            sb.append(i4);
+            if (i2 / 10 == 0) {
+                sb.append('0');
             }
-            buf.append(day);
+            sb.append(i2);
         }
     }
 
     /* access modifiers changed from: protected */
     @Override // com.google.zxing.oned.rss.expanded.decoders.AI01weightDecoder
-    public void addWeightCode(StringBuilder buf, int weight) {
-        buf.append('(');
-        buf.append(this.firstAIdigits);
-        buf.append(weight / 100000);
-        buf.append(')');
+    public void addWeightCode(StringBuilder sb, int i) {
+        sb.append('(');
+        sb.append(this.firstAIdigits);
+        sb.append(i / 100000);
+        sb.append(')');
     }
 
     /* access modifiers changed from: protected */
     @Override // com.google.zxing.oned.rss.expanded.decoders.AI01weightDecoder
-    public int checkWeight(int weight) {
-        return weight % 100000;
+    public int checkWeight(int i) {
+        return i % 100000;
     }
 }

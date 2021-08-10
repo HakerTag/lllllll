@@ -10,8 +10,8 @@ public final class BitMatrixParser {
     private final Version version;
 
     BitMatrixParser(BitMatrix bitMatrix) throws FormatException {
-        int dimension = bitMatrix.getHeight();
-        if (dimension < 8 || dimension > 144 || (dimension & 1) != 0) {
+        int height = bitMatrix.getHeight();
+        if (height < 8 || height > 144 || (height & 1) != 0) {
             throw FormatException.getFormatInstance();
         }
         this.version = readVersion(bitMatrix);
@@ -31,313 +31,277 @@ public final class BitMatrixParser {
 
     /* access modifiers changed from: package-private */
     public byte[] readCodewords() throws FormatException {
-        byte[] result = new byte[this.version.getTotalCodewords()];
-        int resultOffset = 0;
-        int row = 4;
-        int column = 0;
-        int numRows = this.mappingBitMatrix.getHeight();
-        int numColumns = this.mappingBitMatrix.getWidth();
-        boolean corner1Read = false;
-        boolean corner2Read = false;
-        boolean corner3Read = false;
-        boolean corner4Read = false;
+        byte[] bArr = new byte[this.version.getTotalCodewords()];
+        int height = this.mappingBitMatrix.getHeight();
+        int width = this.mappingBitMatrix.getWidth();
+        int i = 0;
+        boolean z = false;
+        int i2 = 0;
+        boolean z2 = false;
+        boolean z3 = false;
+        boolean z4 = false;
+        int i3 = 4;
         while (true) {
-            if (row == numRows && column == 0 && !corner1Read) {
-                result[resultOffset] = (byte) readCorner1(numRows, numColumns);
-                row -= 2;
-                column += 2;
-                corner1Read = true;
-                resultOffset++;
-            } else if (row == numRows - 2 && column == 0 && (numColumns & 3) != 0 && !corner2Read) {
-                result[resultOffset] = (byte) readCorner2(numRows, numColumns);
-                row -= 2;
-                column += 2;
-                corner2Read = true;
-                resultOffset++;
-            } else if (row == numRows + 4 && column == 2 && (numColumns & 7) == 0 && !corner3Read) {
-                result[resultOffset] = (byte) readCorner3(numRows, numColumns);
-                row -= 2;
-                column += 2;
-                corner3Read = true;
-                resultOffset++;
-            } else if (row == numRows - 2 && column == 0 && (numColumns & 7) == 4 && !corner4Read) {
-                result[resultOffset] = (byte) readCorner4(numRows, numColumns);
-                row -= 2;
-                column += 2;
-                corner4Read = true;
-                resultOffset++;
+            if (i3 == height && i == 0 && !z) {
+                bArr[i2] = (byte) readCorner1(height, width);
+                i3 -= 2;
+                i += 2;
+                i2++;
+                z = true;
             } else {
-                do {
-                    if (row < numRows && column >= 0 && !this.readMappingMatrix.get(column, row)) {
-                        result[resultOffset] = (byte) readUtah(row, column, numRows, numColumns);
-                        resultOffset++;
-                    }
-                    row -= 2;
-                    column += 2;
-                    if (row < 0) {
-                        break;
-                    }
-                } while (column < numColumns);
-                int row2 = row + 1;
-                int column2 = column + 3;
-                do {
-                    if (row2 >= 0 && column2 < numColumns && !this.readMappingMatrix.get(column2, row2)) {
-                        result[resultOffset] = (byte) readUtah(row2, column2, numRows, numColumns);
-                        resultOffset++;
-                    }
-                    row2 += 2;
-                    column2 -= 2;
-                    if (row2 >= numRows) {
-                        break;
-                    }
-                } while (column2 >= 0);
-                row = row2 + 3;
-                column = column2 + 1;
+                int i4 = height - 2;
+                if (i3 == i4 && i == 0 && (width & 3) != 0 && !z2) {
+                    bArr[i2] = (byte) readCorner2(height, width);
+                    i3 -= 2;
+                    i += 2;
+                    i2++;
+                    z2 = true;
+                } else if (i3 == height + 4 && i == 2 && (width & 7) == 0 && !z3) {
+                    bArr[i2] = (byte) readCorner3(height, width);
+                    i3 -= 2;
+                    i += 2;
+                    i2++;
+                    z3 = true;
+                } else if (i3 == i4 && i == 0 && (width & 7) == 4 && !z4) {
+                    bArr[i2] = (byte) readCorner4(height, width);
+                    i3 -= 2;
+                    i += 2;
+                    i2++;
+                    z4 = true;
+                } else {
+                    do {
+                        if (i3 < height && i >= 0 && !this.readMappingMatrix.get(i, i3)) {
+                            bArr[i2] = (byte) readUtah(i3, i, height, width);
+                            i2++;
+                        }
+                        i3 -= 2;
+                        i += 2;
+                        if (i3 < 0) {
+                            break;
+                        }
+                    } while (i < width);
+                    int i5 = i3 + 1;
+                    int i6 = i + 3;
+                    do {
+                        if (i5 >= 0 && i6 < width && !this.readMappingMatrix.get(i6, i5)) {
+                            bArr[i2] = (byte) readUtah(i5, i6, height, width);
+                            i2++;
+                        }
+                        i5 += 2;
+                        i6 -= 2;
+                        if (i5 >= height) {
+                            break;
+                        }
+                    } while (i6 >= 0);
+                    i3 = i5 + 3;
+                    i = i6 + 1;
+                }
             }
-            if (row >= numRows && column >= numColumns) {
+            if (i3 >= height && i >= width) {
                 break;
             }
         }
-        if (resultOffset == this.version.getTotalCodewords()) {
-            return result;
+        if (i2 == this.version.getTotalCodewords()) {
+            return bArr;
         }
         throw FormatException.getFormatInstance();
     }
 
-    private boolean readModule(int row, int column, int numRows, int numColumns) {
-        if (row < 0) {
-            row += numRows;
-            column += 4 - ((numRows + 4) & 7);
+    private boolean readModule(int i, int i2, int i3, int i4) {
+        if (i < 0) {
+            i += i3;
+            i2 += 4 - ((i3 + 4) & 7);
         }
-        if (column < 0) {
-            column += numColumns;
-            row += 4 - ((numColumns + 4) & 7);
+        if (i2 < 0) {
+            i2 += i4;
+            i += 4 - ((i4 + 4) & 7);
         }
-        this.readMappingMatrix.set(column, row);
-        return this.mappingBitMatrix.get(column, row);
+        this.readMappingMatrix.set(i2, i);
+        return this.mappingBitMatrix.get(i2, i);
     }
 
-    private int readUtah(int row, int column, int numRows, int numColumns) {
-        int currentByte = 0;
-        if (readModule(row - 2, column - 2, numRows, numColumns)) {
-            currentByte = 0 | 1;
+    private int readUtah(int i, int i2, int i3, int i4) {
+        int i5 = i - 2;
+        int i6 = i2 - 2;
+        int i7 = (readModule(i5, i6, i3, i4) ? 1 : 0) << 1;
+        int i8 = i2 - 1;
+        if (readModule(i5, i8, i3, i4)) {
+            i7 |= 1;
         }
-        int currentByte2 = currentByte << 1;
-        if (readModule(row - 2, column - 1, numRows, numColumns)) {
-            currentByte2 |= 1;
+        int i9 = i7 << 1;
+        int i10 = i - 1;
+        if (readModule(i10, i6, i3, i4)) {
+            i9 |= 1;
         }
-        int currentByte3 = currentByte2 << 1;
-        if (readModule(row - 1, column - 2, numRows, numColumns)) {
-            currentByte3 |= 1;
+        int i11 = i9 << 1;
+        if (readModule(i10, i8, i3, i4)) {
+            i11 |= 1;
         }
-        int currentByte4 = currentByte3 << 1;
-        if (readModule(row - 1, column - 1, numRows, numColumns)) {
-            currentByte4 |= 1;
+        int i12 = i11 << 1;
+        if (readModule(i10, i2, i3, i4)) {
+            i12 |= 1;
         }
-        int currentByte5 = currentByte4 << 1;
-        if (readModule(row - 1, column, numRows, numColumns)) {
-            currentByte5 |= 1;
+        int i13 = i12 << 1;
+        if (readModule(i, i6, i3, i4)) {
+            i13 |= 1;
         }
-        int currentByte6 = currentByte5 << 1;
-        if (readModule(row, column - 2, numRows, numColumns)) {
-            currentByte6 |= 1;
+        int i14 = i13 << 1;
+        if (readModule(i, i8, i3, i4)) {
+            i14 |= 1;
         }
-        int currentByte7 = currentByte6 << 1;
-        if (readModule(row, column - 1, numRows, numColumns)) {
-            currentByte7 |= 1;
-        }
-        int currentByte8 = currentByte7 << 1;
-        if (readModule(row, column, numRows, numColumns)) {
-            return currentByte8 | 1;
-        }
-        return currentByte8;
+        int i15 = i14 << 1;
+        return readModule(i, i2, i3, i4) ? i15 | 1 : i15;
     }
 
-    private int readCorner1(int numRows, int numColumns) {
-        int currentByte = 0;
-        if (readModule(numRows - 1, 0, numRows, numColumns)) {
-            currentByte = 0 | 1;
+    private int readCorner1(int i, int i2) {
+        int i3 = i - 1;
+        int i4 = (readModule(i3, 0, i, i2) ? 1 : 0) << 1;
+        if (readModule(i3, 1, i, i2)) {
+            i4 |= 1;
         }
-        int currentByte2 = currentByte << 1;
-        if (readModule(numRows - 1, 1, numRows, numColumns)) {
-            currentByte2 |= 1;
+        int i5 = i4 << 1;
+        if (readModule(i3, 2, i, i2)) {
+            i5 |= 1;
         }
-        int currentByte3 = currentByte2 << 1;
-        if (readModule(numRows - 1, 2, numRows, numColumns)) {
-            currentByte3 |= 1;
+        int i6 = i5 << 1;
+        if (readModule(0, i2 - 2, i, i2)) {
+            i6 |= 1;
         }
-        int currentByte4 = currentByte3 << 1;
-        if (readModule(0, numColumns - 2, numRows, numColumns)) {
-            currentByte4 |= 1;
+        int i7 = i6 << 1;
+        int i8 = i2 - 1;
+        if (readModule(0, i8, i, i2)) {
+            i7 |= 1;
         }
-        int currentByte5 = currentByte4 << 1;
-        if (readModule(0, numColumns - 1, numRows, numColumns)) {
-            currentByte5 |= 1;
+        int i9 = i7 << 1;
+        if (readModule(1, i8, i, i2)) {
+            i9 |= 1;
         }
-        int currentByte6 = currentByte5 << 1;
-        if (readModule(1, numColumns - 1, numRows, numColumns)) {
-            currentByte6 |= 1;
+        int i10 = i9 << 1;
+        if (readModule(2, i8, i, i2)) {
+            i10 |= 1;
         }
-        int currentByte7 = currentByte6 << 1;
-        if (readModule(2, numColumns - 1, numRows, numColumns)) {
-            currentByte7 |= 1;
-        }
-        int currentByte8 = currentByte7 << 1;
-        if (readModule(3, numColumns - 1, numRows, numColumns)) {
-            return currentByte8 | 1;
-        }
-        return currentByte8;
+        int i11 = i10 << 1;
+        return readModule(3, i8, i, i2) ? i11 | 1 : i11;
     }
 
-    private int readCorner2(int numRows, int numColumns) {
-        int currentByte = 0;
-        if (readModule(numRows - 3, 0, numRows, numColumns)) {
-            currentByte = 0 | 1;
+    private int readCorner2(int i, int i2) {
+        int i3 = (readModule(i + -3, 0, i, i2) ? 1 : 0) << 1;
+        if (readModule(i - 2, 0, i, i2)) {
+            i3 |= 1;
         }
-        int currentByte2 = currentByte << 1;
-        if (readModule(numRows - 2, 0, numRows, numColumns)) {
-            currentByte2 |= 1;
+        int i4 = i3 << 1;
+        if (readModule(i - 1, 0, i, i2)) {
+            i4 |= 1;
         }
-        int currentByte3 = currentByte2 << 1;
-        if (readModule(numRows - 1, 0, numRows, numColumns)) {
-            currentByte3 |= 1;
+        int i5 = i4 << 1;
+        if (readModule(0, i2 - 4, i, i2)) {
+            i5 |= 1;
         }
-        int currentByte4 = currentByte3 << 1;
-        if (readModule(0, numColumns - 4, numRows, numColumns)) {
-            currentByte4 |= 1;
+        int i6 = i5 << 1;
+        if (readModule(0, i2 - 3, i, i2)) {
+            i6 |= 1;
         }
-        int currentByte5 = currentByte4 << 1;
-        if (readModule(0, numColumns - 3, numRows, numColumns)) {
-            currentByte5 |= 1;
+        int i7 = i6 << 1;
+        if (readModule(0, i2 - 2, i, i2)) {
+            i7 |= 1;
         }
-        int currentByte6 = currentByte5 << 1;
-        if (readModule(0, numColumns - 2, numRows, numColumns)) {
-            currentByte6 |= 1;
+        int i8 = i7 << 1;
+        int i9 = i2 - 1;
+        if (readModule(0, i9, i, i2)) {
+            i8 |= 1;
         }
-        int currentByte7 = currentByte6 << 1;
-        if (readModule(0, numColumns - 1, numRows, numColumns)) {
-            currentByte7 |= 1;
-        }
-        int currentByte8 = currentByte7 << 1;
-        if (readModule(1, numColumns - 1, numRows, numColumns)) {
-            return currentByte8 | 1;
-        }
-        return currentByte8;
+        int i10 = i8 << 1;
+        return readModule(1, i9, i, i2) ? i10 | 1 : i10;
     }
 
-    private int readCorner3(int numRows, int numColumns) {
-        int currentByte = 0;
-        if (readModule(numRows - 1, 0, numRows, numColumns)) {
-            currentByte = 0 | 1;
+    private int readCorner3(int i, int i2) {
+        int i3 = i - 1;
+        int i4 = (readModule(i3, 0, i, i2) ? 1 : 0) << 1;
+        int i5 = i2 - 1;
+        if (readModule(i3, i5, i, i2)) {
+            i4 |= 1;
         }
-        int currentByte2 = currentByte << 1;
-        if (readModule(numRows - 1, numColumns - 1, numRows, numColumns)) {
-            currentByte2 |= 1;
+        int i6 = i4 << 1;
+        int i7 = i2 - 3;
+        if (readModule(0, i7, i, i2)) {
+            i6 |= 1;
         }
-        int currentByte3 = currentByte2 << 1;
-        if (readModule(0, numColumns - 3, numRows, numColumns)) {
-            currentByte3 |= 1;
+        int i8 = i6 << 1;
+        int i9 = i2 - 2;
+        if (readModule(0, i9, i, i2)) {
+            i8 |= 1;
         }
-        int currentByte4 = currentByte3 << 1;
-        if (readModule(0, numColumns - 2, numRows, numColumns)) {
-            currentByte4 |= 1;
+        int i10 = i8 << 1;
+        if (readModule(0, i5, i, i2)) {
+            i10 |= 1;
         }
-        int currentByte5 = currentByte4 << 1;
-        if (readModule(0, numColumns - 1, numRows, numColumns)) {
-            currentByte5 |= 1;
+        int i11 = i10 << 1;
+        if (readModule(1, i7, i, i2)) {
+            i11 |= 1;
         }
-        int currentByte6 = currentByte5 << 1;
-        if (readModule(1, numColumns - 3, numRows, numColumns)) {
-            currentByte6 |= 1;
+        int i12 = i11 << 1;
+        if (readModule(1, i9, i, i2)) {
+            i12 |= 1;
         }
-        int currentByte7 = currentByte6 << 1;
-        if (readModule(1, numColumns - 2, numRows, numColumns)) {
-            currentByte7 |= 1;
-        }
-        int currentByte8 = currentByte7 << 1;
-        if (readModule(1, numColumns - 1, numRows, numColumns)) {
-            return currentByte8 | 1;
-        }
-        return currentByte8;
+        int i13 = i12 << 1;
+        return readModule(1, i5, i, i2) ? i13 | 1 : i13;
     }
 
-    private int readCorner4(int numRows, int numColumns) {
-        int currentByte = 0;
-        if (readModule(numRows - 3, 0, numRows, numColumns)) {
-            currentByte = 0 | 1;
+    private int readCorner4(int i, int i2) {
+        int i3 = (readModule(i + -3, 0, i, i2) ? 1 : 0) << 1;
+        if (readModule(i - 2, 0, i, i2)) {
+            i3 |= 1;
         }
-        int currentByte2 = currentByte << 1;
-        if (readModule(numRows - 2, 0, numRows, numColumns)) {
-            currentByte2 |= 1;
+        int i4 = i3 << 1;
+        if (readModule(i - 1, 0, i, i2)) {
+            i4 |= 1;
         }
-        int currentByte3 = currentByte2 << 1;
-        if (readModule(numRows - 1, 0, numRows, numColumns)) {
-            currentByte3 |= 1;
+        int i5 = i4 << 1;
+        if (readModule(0, i2 - 2, i, i2)) {
+            i5 |= 1;
         }
-        int currentByte4 = currentByte3 << 1;
-        if (readModule(0, numColumns - 2, numRows, numColumns)) {
-            currentByte4 |= 1;
+        int i6 = i5 << 1;
+        int i7 = i2 - 1;
+        if (readModule(0, i7, i, i2)) {
+            i6 |= 1;
         }
-        int currentByte5 = currentByte4 << 1;
-        if (readModule(0, numColumns - 1, numRows, numColumns)) {
-            currentByte5 |= 1;
+        int i8 = i6 << 1;
+        if (readModule(1, i7, i, i2)) {
+            i8 |= 1;
         }
-        int currentByte6 = currentByte5 << 1;
-        if (readModule(1, numColumns - 1, numRows, numColumns)) {
-            currentByte6 |= 1;
+        int i9 = i8 << 1;
+        if (readModule(2, i7, i, i2)) {
+            i9 |= 1;
         }
-        int currentByte7 = currentByte6 << 1;
-        if (readModule(2, numColumns - 1, numRows, numColumns)) {
-            currentByte7 |= 1;
-        }
-        int currentByte8 = currentByte7 << 1;
-        if (readModule(3, numColumns - 1, numRows, numColumns)) {
-            return currentByte8 | 1;
-        }
-        return currentByte8;
+        int i10 = i9 << 1;
+        return readModule(3, i7, i, i2) ? i10 | 1 : i10;
     }
 
-    /* JADX INFO: Multiple debug info for r2v6 int: [D('symbolSizeColumns' int), D('readColumnOffset' int)] */
-    /* JADX INFO: Multiple debug info for r2v8 int: [D('readColumnOffset' int), D('writeColumnOffset' int)] */
     private BitMatrix extractDataRegion(BitMatrix bitMatrix) {
         int symbolSizeRows = this.version.getSymbolSizeRows();
         int symbolSizeColumns = this.version.getSymbolSizeColumns();
         if (bitMatrix.getHeight() == symbolSizeRows) {
             int dataRegionSizeRows = this.version.getDataRegionSizeRows();
             int dataRegionSizeColumns = this.version.getDataRegionSizeColumns();
-            int numDataRegionsRow = symbolSizeRows / dataRegionSizeRows;
-            int numDataRegionsColumn = symbolSizeColumns / dataRegionSizeColumns;
-            BitMatrix bitMatrixWithoutAlignment = new BitMatrix(numDataRegionsColumn * dataRegionSizeColumns, numDataRegionsRow * dataRegionSizeRows);
-            int dataRegionRow = 0;
-            while (dataRegionRow < numDataRegionsRow) {
-                int dataRegionRowOffset = dataRegionRow * dataRegionSizeRows;
-                int dataRegionColumn = 0;
-                while (dataRegionColumn < numDataRegionsColumn) {
-                    int dataRegionColumnOffset = dataRegionColumn * dataRegionSizeColumns;
-                    int i = 0;
-                    while (i < dataRegionSizeRows) {
-                        int readRowOffset = ((dataRegionSizeRows + 2) * dataRegionRow) + 1 + i;
-                        int writeRowOffset = dataRegionRowOffset + i;
-                        int j = 0;
-                        while (j < dataRegionSizeColumns) {
-                            if (bitMatrix.get(((dataRegionSizeColumns + 2) * dataRegionColumn) + 1 + j, readRowOffset)) {
-                                bitMatrixWithoutAlignment.set(dataRegionColumnOffset + j, writeRowOffset);
+            int i = symbolSizeRows / dataRegionSizeRows;
+            int i2 = symbolSizeColumns / dataRegionSizeColumns;
+            BitMatrix bitMatrix2 = new BitMatrix(i2 * dataRegionSizeColumns, i * dataRegionSizeRows);
+            for (int i3 = 0; i3 < i; i3++) {
+                int i4 = i3 * dataRegionSizeRows;
+                for (int i5 = 0; i5 < i2; i5++) {
+                    int i6 = i5 * dataRegionSizeColumns;
+                    for (int i7 = 0; i7 < dataRegionSizeRows; i7++) {
+                        int i8 = ((dataRegionSizeRows + 2) * i3) + 1 + i7;
+                        int i9 = i4 + i7;
+                        for (int i10 = 0; i10 < dataRegionSizeColumns; i10++) {
+                            if (bitMatrix.get(((dataRegionSizeColumns + 2) * i5) + 1 + i10, i8)) {
+                                bitMatrix2.set(i6 + i10, i9);
                             }
-                            j++;
-                            dataRegionSizeRows = dataRegionSizeRows;
-                            symbolSizeColumns = symbolSizeColumns;
                         }
-                        i++;
-                        dataRegionSizeRows = dataRegionSizeRows;
-                        symbolSizeRows = symbolSizeRows;
                     }
-                    dataRegionColumn++;
-                    dataRegionSizeRows = dataRegionSizeRows;
                 }
-                dataRegionRow++;
-                dataRegionSizeRows = dataRegionSizeRows;
             }
-            return bitMatrixWithoutAlignment;
+            return bitMatrix2;
         }
         throw new IllegalArgumentException("Dimension of bitMarix must match the version size");
     }

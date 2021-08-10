@@ -8,9 +8,9 @@ public final class PDF417DetectorResult {
     private final BitMatrix bits;
     private final List<ResultPoint[]> points;
 
-    public PDF417DetectorResult(BitMatrix bits2, List<ResultPoint[]> points2) {
-        this.bits = bits2;
-        this.points = points2;
+    public PDF417DetectorResult(BitMatrix bitMatrix, List<ResultPoint[]> list) {
+        this.bits = bitMatrix;
+        this.points = list;
     }
 
     public BitMatrix getBits() {

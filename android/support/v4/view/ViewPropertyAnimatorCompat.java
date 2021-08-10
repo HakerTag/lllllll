@@ -24,50 +24,50 @@ public final class ViewPropertyAnimatorCompat {
         boolean mAnimEndCalled;
         ViewPropertyAnimatorCompat mVpa;
 
-        ViewPropertyAnimatorListenerApi14(ViewPropertyAnimatorCompat vpa) {
-            this.mVpa = vpa;
+        ViewPropertyAnimatorListenerApi14(ViewPropertyAnimatorCompat viewPropertyAnimatorCompat) {
+            this.mVpa = viewPropertyAnimatorCompat;
         }
 
         @Override // android.support.v4.view.ViewPropertyAnimatorListener
         public void onAnimationStart(View view) {
             this.mAnimEndCalled = false;
+            ViewPropertyAnimatorListener viewPropertyAnimatorListener = null;
             if (this.mVpa.mOldLayerType > -1) {
                 view.setLayerType(2, null);
             }
             if (this.mVpa.mStartAction != null) {
-                Runnable startAction = this.mVpa.mStartAction;
+                Runnable runnable = this.mVpa.mStartAction;
                 this.mVpa.mStartAction = null;
-                startAction.run();
+                runnable.run();
             }
-            Object listenerTag = view.getTag(ViewPropertyAnimatorCompat.LISTENER_TAG_ID);
-            ViewPropertyAnimatorListener listener = null;
-            if (listenerTag instanceof ViewPropertyAnimatorListener) {
-                listener = (ViewPropertyAnimatorListener) listenerTag;
+            Object tag = view.getTag(ViewPropertyAnimatorCompat.LISTENER_TAG_ID);
+            if (tag instanceof ViewPropertyAnimatorListener) {
+                viewPropertyAnimatorListener = (ViewPropertyAnimatorListener) tag;
             }
-            if (listener != null) {
-                listener.onAnimationStart(view);
+            if (viewPropertyAnimatorListener != null) {
+                viewPropertyAnimatorListener.onAnimationStart(view);
             }
         }
 
         @Override // android.support.v4.view.ViewPropertyAnimatorListener
         public void onAnimationEnd(View view) {
+            ViewPropertyAnimatorListener viewPropertyAnimatorListener = null;
             if (this.mVpa.mOldLayerType > -1) {
                 view.setLayerType(this.mVpa.mOldLayerType, null);
                 this.mVpa.mOldLayerType = -1;
             }
             if (Build.VERSION.SDK_INT >= 16 || !this.mAnimEndCalled) {
                 if (this.mVpa.mEndAction != null) {
-                    Runnable endAction = this.mVpa.mEndAction;
+                    Runnable runnable = this.mVpa.mEndAction;
                     this.mVpa.mEndAction = null;
-                    endAction.run();
+                    runnable.run();
                 }
-                Object listenerTag = view.getTag(ViewPropertyAnimatorCompat.LISTENER_TAG_ID);
-                ViewPropertyAnimatorListener listener = null;
-                if (listenerTag instanceof ViewPropertyAnimatorListener) {
-                    listener = (ViewPropertyAnimatorListener) listenerTag;
+                Object tag = view.getTag(ViewPropertyAnimatorCompat.LISTENER_TAG_ID);
+                if (tag instanceof ViewPropertyAnimatorListener) {
+                    viewPropertyAnimatorListener = (ViewPropertyAnimatorListener) tag;
                 }
-                if (listener != null) {
-                    listener.onAnimationEnd(view);
+                if (viewPropertyAnimatorListener != null) {
+                    viewPropertyAnimatorListener.onAnimationEnd(view);
                 }
                 this.mAnimEndCalled = true;
             }
@@ -75,53 +75,50 @@ public final class ViewPropertyAnimatorCompat {
 
         @Override // android.support.v4.view.ViewPropertyAnimatorListener
         public void onAnimationCancel(View view) {
-            Object listenerTag = view.getTag(ViewPropertyAnimatorCompat.LISTENER_TAG_ID);
-            ViewPropertyAnimatorListener listener = null;
-            if (listenerTag instanceof ViewPropertyAnimatorListener) {
-                listener = (ViewPropertyAnimatorListener) listenerTag;
-            }
-            if (listener != null) {
-                listener.onAnimationCancel(view);
+            Object tag = view.getTag(ViewPropertyAnimatorCompat.LISTENER_TAG_ID);
+            ViewPropertyAnimatorListener viewPropertyAnimatorListener = tag instanceof ViewPropertyAnimatorListener ? (ViewPropertyAnimatorListener) tag : null;
+            if (viewPropertyAnimatorListener != null) {
+                viewPropertyAnimatorListener.onAnimationCancel(view);
             }
         }
     }
 
-    public ViewPropertyAnimatorCompat setDuration(long value) {
+    public ViewPropertyAnimatorCompat setDuration(long j) {
         View view = this.mView.get();
         if (view != null) {
-            view.animate().setDuration(value);
+            view.animate().setDuration(j);
         }
         return this;
     }
 
-    public ViewPropertyAnimatorCompat alpha(float value) {
+    public ViewPropertyAnimatorCompat alpha(float f) {
         View view = this.mView.get();
         if (view != null) {
-            view.animate().alpha(value);
+            view.animate().alpha(f);
         }
         return this;
     }
 
-    public ViewPropertyAnimatorCompat alphaBy(float value) {
+    public ViewPropertyAnimatorCompat alphaBy(float f) {
         View view = this.mView.get();
         if (view != null) {
-            view.animate().alphaBy(value);
+            view.animate().alphaBy(f);
         }
         return this;
     }
 
-    public ViewPropertyAnimatorCompat translationX(float value) {
+    public ViewPropertyAnimatorCompat translationX(float f) {
         View view = this.mView.get();
         if (view != null) {
-            view.animate().translationX(value);
+            view.animate().translationX(f);
         }
         return this;
     }
 
-    public ViewPropertyAnimatorCompat translationY(float value) {
+    public ViewPropertyAnimatorCompat translationY(float f) {
         View view = this.mView.get();
         if (view != null) {
-            view.animate().translationY(value);
+            view.animate().translationY(f);
         }
         return this;
     }
@@ -147,10 +144,10 @@ public final class ViewPropertyAnimatorCompat {
         return 0;
     }
 
-    public ViewPropertyAnimatorCompat setInterpolator(Interpolator value) {
+    public ViewPropertyAnimatorCompat setInterpolator(Interpolator interpolator) {
         View view = this.mView.get();
         if (view != null) {
-            view.animate().setInterpolator(value);
+            view.animate().setInterpolator(interpolator);
         }
         return this;
     }
@@ -163,10 +160,10 @@ public final class ViewPropertyAnimatorCompat {
         return (Interpolator) view.animate().getInterpolator();
     }
 
-    public ViewPropertyAnimatorCompat setStartDelay(long value) {
+    public ViewPropertyAnimatorCompat setStartDelay(long j) {
         View view = this.mView.get();
         if (view != null) {
-            view.animate().setStartDelay(value);
+            view.animate().setStartDelay(j);
         }
         return this;
     }
@@ -179,82 +176,82 @@ public final class ViewPropertyAnimatorCompat {
         return 0;
     }
 
-    public ViewPropertyAnimatorCompat rotation(float value) {
+    public ViewPropertyAnimatorCompat rotation(float f) {
         View view = this.mView.get();
         if (view != null) {
-            view.animate().rotation(value);
+            view.animate().rotation(f);
         }
         return this;
     }
 
-    public ViewPropertyAnimatorCompat rotationBy(float value) {
+    public ViewPropertyAnimatorCompat rotationBy(float f) {
         View view = this.mView.get();
         if (view != null) {
-            view.animate().rotationBy(value);
+            view.animate().rotationBy(f);
         }
         return this;
     }
 
-    public ViewPropertyAnimatorCompat rotationX(float value) {
+    public ViewPropertyAnimatorCompat rotationX(float f) {
         View view = this.mView.get();
         if (view != null) {
-            view.animate().rotationX(value);
+            view.animate().rotationX(f);
         }
         return this;
     }
 
-    public ViewPropertyAnimatorCompat rotationXBy(float value) {
+    public ViewPropertyAnimatorCompat rotationXBy(float f) {
         View view = this.mView.get();
         if (view != null) {
-            view.animate().rotationXBy(value);
+            view.animate().rotationXBy(f);
         }
         return this;
     }
 
-    public ViewPropertyAnimatorCompat rotationY(float value) {
+    public ViewPropertyAnimatorCompat rotationY(float f) {
         View view = this.mView.get();
         if (view != null) {
-            view.animate().rotationY(value);
+            view.animate().rotationY(f);
         }
         return this;
     }
 
-    public ViewPropertyAnimatorCompat rotationYBy(float value) {
+    public ViewPropertyAnimatorCompat rotationYBy(float f) {
         View view = this.mView.get();
         if (view != null) {
-            view.animate().rotationYBy(value);
+            view.animate().rotationYBy(f);
         }
         return this;
     }
 
-    public ViewPropertyAnimatorCompat scaleX(float value) {
+    public ViewPropertyAnimatorCompat scaleX(float f) {
         View view = this.mView.get();
         if (view != null) {
-            view.animate().scaleX(value);
+            view.animate().scaleX(f);
         }
         return this;
     }
 
-    public ViewPropertyAnimatorCompat scaleXBy(float value) {
+    public ViewPropertyAnimatorCompat scaleXBy(float f) {
         View view = this.mView.get();
         if (view != null) {
-            view.animate().scaleXBy(value);
+            view.animate().scaleXBy(f);
         }
         return this;
     }
 
-    public ViewPropertyAnimatorCompat scaleY(float value) {
+    public ViewPropertyAnimatorCompat scaleY(float f) {
         View view = this.mView.get();
         if (view != null) {
-            view.animate().scaleY(value);
+            view.animate().scaleY(f);
         }
         return this;
     }
 
-    public ViewPropertyAnimatorCompat scaleYBy(float value) {
+    public ViewPropertyAnimatorCompat scaleYBy(float f) {
         View view = this.mView.get();
         if (view != null) {
-            view.animate().scaleYBy(value);
+            view.animate().scaleYBy(f);
         }
         return this;
     }
@@ -266,82 +263,82 @@ public final class ViewPropertyAnimatorCompat {
         }
     }
 
-    public ViewPropertyAnimatorCompat x(float value) {
+    public ViewPropertyAnimatorCompat x(float f) {
         View view = this.mView.get();
         if (view != null) {
-            view.animate().x(value);
+            view.animate().x(f);
         }
         return this;
     }
 
-    public ViewPropertyAnimatorCompat xBy(float value) {
+    public ViewPropertyAnimatorCompat xBy(float f) {
         View view = this.mView.get();
         if (view != null) {
-            view.animate().xBy(value);
+            view.animate().xBy(f);
         }
         return this;
     }
 
-    public ViewPropertyAnimatorCompat y(float value) {
+    public ViewPropertyAnimatorCompat y(float f) {
         View view = this.mView.get();
         if (view != null) {
-            view.animate().y(value);
+            view.animate().y(f);
         }
         return this;
     }
 
-    public ViewPropertyAnimatorCompat yBy(float value) {
+    public ViewPropertyAnimatorCompat yBy(float f) {
         View view = this.mView.get();
         if (view != null) {
-            view.animate().yBy(value);
+            view.animate().yBy(f);
         }
         return this;
     }
 
-    public ViewPropertyAnimatorCompat translationXBy(float value) {
+    public ViewPropertyAnimatorCompat translationXBy(float f) {
         View view = this.mView.get();
         if (view != null) {
-            view.animate().translationXBy(value);
+            view.animate().translationXBy(f);
         }
         return this;
     }
 
-    public ViewPropertyAnimatorCompat translationYBy(float value) {
+    public ViewPropertyAnimatorCompat translationYBy(float f) {
         View view = this.mView.get();
         if (view != null) {
-            view.animate().translationYBy(value);
+            view.animate().translationYBy(f);
         }
         return this;
     }
 
-    public ViewPropertyAnimatorCompat translationZBy(float value) {
+    public ViewPropertyAnimatorCompat translationZBy(float f) {
         View view = this.mView.get();
         if (view != null && Build.VERSION.SDK_INT >= 21) {
-            view.animate().translationZBy(value);
+            view.animate().translationZBy(f);
         }
         return this;
     }
 
-    public ViewPropertyAnimatorCompat translationZ(float value) {
+    public ViewPropertyAnimatorCompat translationZ(float f) {
         View view = this.mView.get();
         if (view != null && Build.VERSION.SDK_INT >= 21) {
-            view.animate().translationZ(value);
+            view.animate().translationZ(f);
         }
         return this;
     }
 
-    public ViewPropertyAnimatorCompat z(float value) {
+    public ViewPropertyAnimatorCompat z(float f) {
         View view = this.mView.get();
         if (view != null && Build.VERSION.SDK_INT >= 21) {
-            view.animate().z(value);
+            view.animate().z(f);
         }
         return this;
     }
 
-    public ViewPropertyAnimatorCompat zBy(float value) {
+    public ViewPropertyAnimatorCompat zBy(float f) {
         View view = this.mView.get();
         if (view != null && Build.VERSION.SDK_INT >= 21) {
-            view.animate().zBy(value);
+            view.animate().zBy(f);
         }
         return this;
     }
@@ -379,34 +376,34 @@ public final class ViewPropertyAnimatorCompat {
         return this;
     }
 
-    public ViewPropertyAnimatorCompat setListener(ViewPropertyAnimatorListener listener) {
+    public ViewPropertyAnimatorCompat setListener(ViewPropertyAnimatorListener viewPropertyAnimatorListener) {
         View view = this.mView.get();
         if (view != null) {
             if (Build.VERSION.SDK_INT >= 16) {
-                setListenerInternal(view, listener);
+                setListenerInternal(view, viewPropertyAnimatorListener);
             } else {
-                view.setTag(LISTENER_TAG_ID, listener);
+                view.setTag(LISTENER_TAG_ID, viewPropertyAnimatorListener);
                 setListenerInternal(view, new ViewPropertyAnimatorListenerApi14(this));
             }
         }
         return this;
     }
 
-    private void setListenerInternal(final View view, final ViewPropertyAnimatorListener listener) {
-        if (listener != null) {
+    private void setListenerInternal(final View view, final ViewPropertyAnimatorListener viewPropertyAnimatorListener) {
+        if (viewPropertyAnimatorListener != null) {
             view.animate().setListener(new AnimatorListenerAdapter() {
                 /* class android.support.v4.view.ViewPropertyAnimatorCompat.AnonymousClass1 */
 
-                public void onAnimationCancel(Animator animation) {
-                    listener.onAnimationCancel(view);
+                public void onAnimationCancel(Animator animator) {
+                    viewPropertyAnimatorListener.onAnimationCancel(view);
                 }
 
-                public void onAnimationEnd(Animator animation) {
-                    listener.onAnimationEnd(view);
+                public void onAnimationEnd(Animator animator) {
+                    viewPropertyAnimatorListener.onAnimationEnd(view);
                 }
 
-                public void onAnimationStart(Animator animation) {
-                    listener.onAnimationStart(view);
+                public void onAnimationStart(Animator animator) {
+                    viewPropertyAnimatorListener.onAnimationStart(view);
                 }
             });
         } else {
@@ -414,20 +411,20 @@ public final class ViewPropertyAnimatorCompat {
         }
     }
 
-    public ViewPropertyAnimatorCompat setUpdateListener(final ViewPropertyAnimatorUpdateListener listener) {
+    public ViewPropertyAnimatorCompat setUpdateListener(final ViewPropertyAnimatorUpdateListener viewPropertyAnimatorUpdateListener) {
         final View view = this.mView.get();
         if (view != null && Build.VERSION.SDK_INT >= 19) {
-            ValueAnimator.AnimatorUpdateListener wrapped = null;
-            if (listener != null) {
-                wrapped = new ValueAnimator.AnimatorUpdateListener() {
+            AnonymousClass2 r1 = null;
+            if (viewPropertyAnimatorUpdateListener != null) {
+                r1 = new ValueAnimator.AnimatorUpdateListener() {
                     /* class android.support.v4.view.ViewPropertyAnimatorCompat.AnonymousClass2 */
 
                     public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                        listener.onAnimationUpdate(view);
+                        viewPropertyAnimatorUpdateListener.onAnimationUpdate(view);
                     }
                 };
             }
-            view.animate().setUpdateListener(wrapped);
+            view.animate().setUpdateListener(r1);
         }
         return this;
     }

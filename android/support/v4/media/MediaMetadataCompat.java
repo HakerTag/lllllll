@@ -19,13 +19,13 @@ public final class MediaMetadataCompat implements Parcelable {
         /* class android.support.v4.media.MediaMetadataCompat.AnonymousClass1 */
 
         @Override // android.os.Parcelable.Creator
-        public MediaMetadataCompat createFromParcel(Parcel in) {
-            return new MediaMetadataCompat(in);
+        public MediaMetadataCompat createFromParcel(Parcel parcel) {
+            return new MediaMetadataCompat(parcel);
         }
 
         @Override // android.os.Parcelable.Creator
-        public MediaMetadataCompat[] newArray(int size) {
-            return new MediaMetadataCompat[size];
+        public MediaMetadataCompat[] newArray(int i) {
+            return new MediaMetadataCompat[i];
         }
     };
     static final ArrayMap<String, Integer> METADATA_KEYS_TYPE;
@@ -88,6 +88,10 @@ public final class MediaMetadataCompat implements Parcelable {
     public @interface TextKey {
     }
 
+    public int describeContents() {
+        return 0;
+    }
+
     static {
         ArrayMap<String, Integer> arrayMap = new ArrayMap<>();
         METADATA_KEYS_TYPE = arrayMap;
@@ -130,47 +134,47 @@ public final class MediaMetadataCompat implements Parcelable {
         bundle2.setClassLoader(MediaMetadataCompat.class.getClassLoader());
     }
 
-    MediaMetadataCompat(Parcel in) {
-        Bundle readBundle = in.readBundle();
+    MediaMetadataCompat(Parcel parcel) {
+        Bundle readBundle = parcel.readBundle();
         this.mBundle = readBundle;
         readBundle.setClassLoader(MediaMetadataCompat.class.getClassLoader());
     }
 
-    public boolean containsKey(String key) {
-        return this.mBundle.containsKey(key);
+    public boolean containsKey(String str) {
+        return this.mBundle.containsKey(str);
     }
 
-    public CharSequence getText(String key) {
-        return this.mBundle.getCharSequence(key);
+    public CharSequence getText(String str) {
+        return this.mBundle.getCharSequence(str);
     }
 
-    public String getString(String key) {
-        CharSequence text = this.mBundle.getCharSequence(key);
-        if (text != null) {
-            return text.toString();
+    public String getString(String str) {
+        CharSequence charSequence = this.mBundle.getCharSequence(str);
+        if (charSequence != null) {
+            return charSequence.toString();
         }
         return null;
     }
 
-    public long getLong(String key) {
-        return this.mBundle.getLong(key, 0);
+    public long getLong(String str) {
+        return this.mBundle.getLong(str, 0);
     }
 
-    public RatingCompat getRating(String key) {
+    public RatingCompat getRating(String str) {
         try {
             if (Build.VERSION.SDK_INT >= 19) {
-                return RatingCompat.fromRating(this.mBundle.getParcelable(key));
+                return RatingCompat.fromRating(this.mBundle.getParcelable(str));
             }
-            return (RatingCompat) this.mBundle.getParcelable(key);
+            return (RatingCompat) this.mBundle.getParcelable(str);
         } catch (Exception e) {
             Log.w(TAG, "Failed to retrieve a key as Rating.", e);
             return null;
         }
     }
 
-    public Bitmap getBitmap(String key) {
+    public Bitmap getBitmap(String str) {
         try {
-            return (Bitmap) this.mBundle.getParcelable(key);
+            return (Bitmap) this.mBundle.getParcelable(str);
         } catch (Exception e) {
             Log.w(TAG, "Failed to retrieve a key as Bitmap.", e);
             return null;
@@ -178,75 +182,77 @@ public final class MediaMetadataCompat implements Parcelable {
     }
 
     public MediaDescriptionCompat getDescription() {
+        Uri uri;
+        Bitmap bitmap;
+        Uri uri2;
         MediaDescriptionCompat mediaDescriptionCompat = this.mDescription;
         if (mediaDescriptionCompat != null) {
             return mediaDescriptionCompat;
         }
-        String mediaId = getString(METADATA_KEY_MEDIA_ID);
-        CharSequence[] text = new CharSequence[3];
-        Bitmap icon = null;
-        Uri iconUri = null;
-        CharSequence displayText = getText(METADATA_KEY_DISPLAY_TITLE);
-        if (TextUtils.isEmpty(displayText)) {
-            int textIndex = 0;
-            int keyIndex = 0;
-            while (textIndex < text.length) {
+        String string = getString(METADATA_KEY_MEDIA_ID);
+        CharSequence[] charSequenceArr = new CharSequence[3];
+        CharSequence text = getText(METADATA_KEY_DISPLAY_TITLE);
+        if (TextUtils.isEmpty(text)) {
+            int i = 0;
+            int i2 = 0;
+            while (i < 3) {
                 String[] strArr = PREFERRED_DESCRIPTION_ORDER;
-                if (keyIndex >= strArr.length) {
+                if (i2 >= strArr.length) {
                     break;
                 }
-                int keyIndex2 = keyIndex + 1;
-                CharSequence next = getText(strArr[keyIndex]);
-                if (!TextUtils.isEmpty(next)) {
-                    text[textIndex] = next;
-                    textIndex++;
+                int i3 = i2 + 1;
+                CharSequence text2 = getText(strArr[i2]);
+                if (!TextUtils.isEmpty(text2)) {
+                    charSequenceArr[i] = text2;
+                    i++;
                 }
-                keyIndex = keyIndex2;
+                i2 = i3;
             }
         } else {
-            text[0] = displayText;
-            text[1] = getText(METADATA_KEY_DISPLAY_SUBTITLE);
-            text[2] = getText(METADATA_KEY_DISPLAY_DESCRIPTION);
+            charSequenceArr[0] = text;
+            charSequenceArr[1] = getText(METADATA_KEY_DISPLAY_SUBTITLE);
+            charSequenceArr[2] = getText(METADATA_KEY_DISPLAY_DESCRIPTION);
         }
-        int i = 0;
+        int i4 = 0;
         while (true) {
             String[] strArr2 = PREFERRED_BITMAP_ORDER;
-            if (i >= strArr2.length) {
+            uri = null;
+            if (i4 >= strArr2.length) {
+                bitmap = null;
                 break;
             }
-            Bitmap next2 = getBitmap(strArr2[i]);
-            if (next2 != null) {
-                icon = next2;
+            bitmap = getBitmap(strArr2[i4]);
+            if (bitmap != null) {
                 break;
             }
-            i++;
+            i4++;
         }
-        int i2 = 0;
+        int i5 = 0;
         while (true) {
             String[] strArr3 = PREFERRED_URI_ORDER;
-            if (i2 >= strArr3.length) {
+            if (i5 >= strArr3.length) {
+                uri2 = null;
                 break;
             }
-            String next3 = getString(strArr3[i2]);
-            if (!TextUtils.isEmpty(next3)) {
-                iconUri = Uri.parse(next3);
+            String string2 = getString(strArr3[i5]);
+            if (!TextUtils.isEmpty(string2)) {
+                uri2 = Uri.parse(string2);
                 break;
             }
-            i2++;
+            i5++;
         }
-        Uri mediaUri = null;
-        String mediaUriStr = getString(METADATA_KEY_MEDIA_URI);
-        if (!TextUtils.isEmpty(mediaUriStr)) {
-            mediaUri = Uri.parse(mediaUriStr);
+        String string3 = getString(METADATA_KEY_MEDIA_URI);
+        if (!TextUtils.isEmpty(string3)) {
+            uri = Uri.parse(string3);
         }
-        MediaDescriptionCompat.Builder bob = new MediaDescriptionCompat.Builder();
-        bob.setMediaId(mediaId);
-        bob.setTitle(text[0]);
-        bob.setSubtitle(text[1]);
-        bob.setDescription(text[2]);
-        bob.setIconBitmap(icon);
-        bob.setIconUri(iconUri);
-        bob.setMediaUri(mediaUri);
+        MediaDescriptionCompat.Builder builder = new MediaDescriptionCompat.Builder();
+        builder.setMediaId(string);
+        builder.setTitle(charSequenceArr[0]);
+        builder.setSubtitle(charSequenceArr[1]);
+        builder.setDescription(charSequenceArr[2]);
+        builder.setIconBitmap(bitmap);
+        builder.setIconUri(uri2);
+        builder.setMediaUri(uri);
         Bundle bundle = new Bundle();
         if (this.mBundle.containsKey(METADATA_KEY_BT_FOLDER_TYPE)) {
             bundle.putLong(MediaDescriptionCompat.EXTRA_BT_FOLDER_TYPE, getLong(METADATA_KEY_BT_FOLDER_TYPE));
@@ -255,19 +261,15 @@ public final class MediaMetadataCompat implements Parcelable {
             bundle.putLong(MediaDescriptionCompat.EXTRA_DOWNLOAD_STATUS, getLong(METADATA_KEY_DOWNLOAD_STATUS));
         }
         if (!bundle.isEmpty()) {
-            bob.setExtras(bundle);
+            builder.setExtras(bundle);
         }
-        MediaDescriptionCompat build = bob.build();
+        MediaDescriptionCompat build = builder.build();
         this.mDescription = build;
         return build;
     }
 
-    public int describeContents() {
-        return 0;
-    }
-
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeBundle(this.mBundle);
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeBundle(this.mBundle);
     }
 
     public int size() {
@@ -282,26 +284,26 @@ public final class MediaMetadataCompat implements Parcelable {
         return this.mBundle;
     }
 
-    public static MediaMetadataCompat fromMediaMetadata(Object metadataObj) {
-        if (metadataObj == null || Build.VERSION.SDK_INT < 21) {
+    public static MediaMetadataCompat fromMediaMetadata(Object obj) {
+        if (obj == null || Build.VERSION.SDK_INT < 21) {
             return null;
         }
-        Parcel p = Parcel.obtain();
-        MediaMetadataCompatApi21.writeToParcel(metadataObj, p, 0);
-        p.setDataPosition(0);
-        MediaMetadataCompat metadata = CREATOR.createFromParcel(p);
-        p.recycle();
-        metadata.mMetadataObj = metadataObj;
-        return metadata;
+        Parcel obtain = Parcel.obtain();
+        MediaMetadataCompatApi21.writeToParcel(obj, obtain, 0);
+        obtain.setDataPosition(0);
+        MediaMetadataCompat createFromParcel = CREATOR.createFromParcel(obtain);
+        obtain.recycle();
+        createFromParcel.mMetadataObj = obj;
+        return createFromParcel;
     }
 
     public Object getMediaMetadata() {
         if (this.mMetadataObj == null && Build.VERSION.SDK_INT >= 21) {
-            Parcel p = Parcel.obtain();
-            writeToParcel(p, 0);
-            p.setDataPosition(0);
-            this.mMetadataObj = MediaMetadataCompatApi21.createFromParcel(p);
-            p.recycle();
+            Parcel obtain = Parcel.obtain();
+            writeToParcel(obtain, 0);
+            obtain.setDataPosition(0);
+            this.mMetadataObj = MediaMetadataCompatApi21.createFromParcel(obtain);
+            obtain.recycle();
         }
         return this.mMetadataObj;
     }
@@ -313,75 +315,75 @@ public final class MediaMetadataCompat implements Parcelable {
             this.mBundle = new Bundle();
         }
 
-        public Builder(MediaMetadataCompat source) {
-            this.mBundle = new Bundle(source.mBundle);
+        public Builder(MediaMetadataCompat mediaMetadataCompat) {
+            this.mBundle = new Bundle(mediaMetadataCompat.mBundle);
         }
 
-        public Builder(MediaMetadataCompat source, int maxBitmapSize) {
-            this(source);
-            for (String key : this.mBundle.keySet()) {
-                Object value = this.mBundle.get(key);
-                if (value instanceof Bitmap) {
-                    Bitmap bmp = (Bitmap) value;
-                    if (bmp.getHeight() > maxBitmapSize || bmp.getWidth() > maxBitmapSize) {
-                        putBitmap(key, scaleBitmap(bmp, maxBitmapSize));
+        public Builder(MediaMetadataCompat mediaMetadataCompat, int i) {
+            this(mediaMetadataCompat);
+            for (String str : this.mBundle.keySet()) {
+                Object obj = this.mBundle.get(str);
+                if (obj instanceof Bitmap) {
+                    Bitmap bitmap = (Bitmap) obj;
+                    if (bitmap.getHeight() > i || bitmap.getWidth() > i) {
+                        putBitmap(str, scaleBitmap(bitmap, i));
                     }
                 }
             }
         }
 
-        public Builder putText(String key, CharSequence value) {
-            if (!MediaMetadataCompat.METADATA_KEYS_TYPE.containsKey(key) || MediaMetadataCompat.METADATA_KEYS_TYPE.get(key).intValue() == 1) {
-                this.mBundle.putCharSequence(key, value);
+        public Builder putText(String str, CharSequence charSequence) {
+            if (!MediaMetadataCompat.METADATA_KEYS_TYPE.containsKey(str) || MediaMetadataCompat.METADATA_KEYS_TYPE.get(str).intValue() == 1) {
+                this.mBundle.putCharSequence(str, charSequence);
                 return this;
             }
-            throw new IllegalArgumentException("The " + key + " key cannot be used to put a CharSequence");
+            throw new IllegalArgumentException("The " + str + " key cannot be used to put a CharSequence");
         }
 
-        public Builder putString(String key, String value) {
-            if (!MediaMetadataCompat.METADATA_KEYS_TYPE.containsKey(key) || MediaMetadataCompat.METADATA_KEYS_TYPE.get(key).intValue() == 1) {
-                this.mBundle.putCharSequence(key, value);
+        public Builder putString(String str, String str2) {
+            if (!MediaMetadataCompat.METADATA_KEYS_TYPE.containsKey(str) || MediaMetadataCompat.METADATA_KEYS_TYPE.get(str).intValue() == 1) {
+                this.mBundle.putCharSequence(str, str2);
                 return this;
             }
-            throw new IllegalArgumentException("The " + key + " key cannot be used to put a String");
+            throw new IllegalArgumentException("The " + str + " key cannot be used to put a String");
         }
 
-        public Builder putLong(String key, long value) {
-            if (!MediaMetadataCompat.METADATA_KEYS_TYPE.containsKey(key) || MediaMetadataCompat.METADATA_KEYS_TYPE.get(key).intValue() == 0) {
-                this.mBundle.putLong(key, value);
+        public Builder putLong(String str, long j) {
+            if (!MediaMetadataCompat.METADATA_KEYS_TYPE.containsKey(str) || MediaMetadataCompat.METADATA_KEYS_TYPE.get(str).intValue() == 0) {
+                this.mBundle.putLong(str, j);
                 return this;
             }
-            throw new IllegalArgumentException("The " + key + " key cannot be used to put a long");
+            throw new IllegalArgumentException("The " + str + " key cannot be used to put a long");
         }
 
-        public Builder putRating(String key, RatingCompat value) {
-            if (!MediaMetadataCompat.METADATA_KEYS_TYPE.containsKey(key) || MediaMetadataCompat.METADATA_KEYS_TYPE.get(key).intValue() == 3) {
+        public Builder putRating(String str, RatingCompat ratingCompat) {
+            if (!MediaMetadataCompat.METADATA_KEYS_TYPE.containsKey(str) || MediaMetadataCompat.METADATA_KEYS_TYPE.get(str).intValue() == 3) {
                 if (Build.VERSION.SDK_INT >= 19) {
-                    this.mBundle.putParcelable(key, (Parcelable) value.getRating());
+                    this.mBundle.putParcelable(str, (Parcelable) ratingCompat.getRating());
                 } else {
-                    this.mBundle.putParcelable(key, value);
+                    this.mBundle.putParcelable(str, ratingCompat);
                 }
                 return this;
             }
-            throw new IllegalArgumentException("The " + key + " key cannot be used to put a Rating");
+            throw new IllegalArgumentException("The " + str + " key cannot be used to put a Rating");
         }
 
-        public Builder putBitmap(String key, Bitmap value) {
-            if (!MediaMetadataCompat.METADATA_KEYS_TYPE.containsKey(key) || MediaMetadataCompat.METADATA_KEYS_TYPE.get(key).intValue() == 2) {
-                this.mBundle.putParcelable(key, value);
+        public Builder putBitmap(String str, Bitmap bitmap) {
+            if (!MediaMetadataCompat.METADATA_KEYS_TYPE.containsKey(str) || MediaMetadataCompat.METADATA_KEYS_TYPE.get(str).intValue() == 2) {
+                this.mBundle.putParcelable(str, bitmap);
                 return this;
             }
-            throw new IllegalArgumentException("The " + key + " key cannot be used to put a Bitmap");
+            throw new IllegalArgumentException("The " + str + " key cannot be used to put a Bitmap");
         }
 
         public MediaMetadataCompat build() {
             return new MediaMetadataCompat(this.mBundle);
         }
 
-        private Bitmap scaleBitmap(Bitmap bmp, int maxSize) {
-            float maxSizeF = (float) maxSize;
-            float scale = Math.min(maxSizeF / ((float) bmp.getWidth()), maxSizeF / ((float) bmp.getHeight()));
-            return Bitmap.createScaledBitmap(bmp, (int) (((float) bmp.getWidth()) * scale), (int) (((float) bmp.getHeight()) * scale), true);
+        private Bitmap scaleBitmap(Bitmap bitmap, int i) {
+            float f = (float) i;
+            float min = Math.min(f / ((float) bitmap.getWidth()), f / ((float) bitmap.getHeight()));
+            return Bitmap.createScaledBitmap(bitmap, (int) (((float) bitmap.getWidth()) * min), (int) (((float) bitmap.getHeight()) * min), true);
         }
     }
 }

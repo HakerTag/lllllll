@@ -5,117 +5,107 @@ import com.google.zxing.ChecksumException;
 public final class ErrorCorrection {
     private final ModulusGF field = ModulusGF.PDF417_GF;
 
-    public int decode(int[] received, int numECCodewords, int[] erasures) throws ChecksumException {
-        ErrorCorrection errorCorrection = this;
-        ModulusPoly poly = new ModulusPoly(errorCorrection.field, received);
-        int[] S = new int[numECCodewords];
-        boolean error = false;
-        for (int i = numECCodewords; i > 0; i--) {
-            int eval = poly.evaluateAt(errorCorrection.field.exp(i));
-            S[numECCodewords - i] = eval;
-            if (eval != 0) {
-                error = true;
+    public int decode(int[] iArr, int i, int[] iArr2) throws ChecksumException {
+        ModulusPoly modulusPoly = new ModulusPoly(this.field, iArr);
+        int[] iArr3 = new int[i];
+        boolean z = false;
+        for (int i2 = i; i2 > 0; i2--) {
+            int evaluateAt = modulusPoly.evaluateAt(this.field.exp(i2));
+            iArr3[i - i2] = evaluateAt;
+            if (evaluateAt != 0) {
+                z = true;
             }
         }
-        if (!error) {
+        if (!z) {
             return 0;
         }
-        ModulusPoly knownErrors = errorCorrection.field.getOne();
-        int i2 = 1;
-        if (erasures != null) {
-            int length = erasures.length;
-            int i3 = 0;
-            while (i3 < length) {
-                int b = errorCorrection.field.exp((received.length - i2) - erasures[i3]);
-                ModulusGF modulusGF = errorCorrection.field;
-                knownErrors = knownErrors.multiply(new ModulusPoly(modulusGF, new int[]{modulusGF.subtract(0, b), 1}));
-                i3++;
-                i2 = 1;
+        ModulusPoly one = this.field.getOne();
+        if (iArr2 != null) {
+            for (int i3 : iArr2) {
+                int exp = this.field.exp((iArr.length - 1) - i3);
+                ModulusGF modulusGF = this.field;
+                one = one.multiply(new ModulusPoly(modulusGF, new int[]{modulusGF.subtract(0, exp), 1}));
             }
         }
-        ModulusPoly[] sigmaOmega = errorCorrection.runEuclideanAlgorithm(errorCorrection.field.buildMonomial(numECCodewords, 1), new ModulusPoly(errorCorrection.field, S), numECCodewords);
-        ModulusPoly sigma = sigmaOmega[0];
-        ModulusPoly omega = sigmaOmega[1];
-        int[] errorLocations = errorCorrection.findErrorLocations(sigma);
-        int[] errorMagnitudes = errorCorrection.findErrorMagnitudes(omega, sigma, errorLocations);
-        int i4 = 0;
-        while (i4 < errorLocations.length) {
-            int position = (received.length - 1) - errorCorrection.field.log(errorLocations[i4]);
-            if (position >= 0) {
-                received[position] = errorCorrection.field.subtract(received[position], errorMagnitudes[i4]);
-                i4++;
-                errorCorrection = this;
+        ModulusPoly[] runEuclideanAlgorithm = runEuclideanAlgorithm(this.field.buildMonomial(i, 1), new ModulusPoly(this.field, iArr3), i);
+        ModulusPoly modulusPoly2 = runEuclideanAlgorithm[0];
+        ModulusPoly modulusPoly3 = runEuclideanAlgorithm[1];
+        int[] findErrorLocations = findErrorLocations(modulusPoly2);
+        int[] findErrorMagnitudes = findErrorMagnitudes(modulusPoly3, modulusPoly2, findErrorLocations);
+        for (int i4 = 0; i4 < findErrorLocations.length; i4++) {
+            int length = (iArr.length - 1) - this.field.log(findErrorLocations[i4]);
+            if (length >= 0) {
+                iArr[length] = this.field.subtract(iArr[length], findErrorMagnitudes[i4]);
             } else {
                 throw ChecksumException.getChecksumInstance();
             }
         }
-        return errorLocations.length;
+        return findErrorLocations.length;
     }
 
-    private ModulusPoly[] runEuclideanAlgorithm(ModulusPoly a, ModulusPoly b, int R) throws ChecksumException {
-        if (a.getDegree() < b.getDegree()) {
-            a = b;
-            b = a;
+    private ModulusPoly[] runEuclideanAlgorithm(ModulusPoly modulusPoly, ModulusPoly modulusPoly2, int i) throws ChecksumException {
+        if (modulusPoly.getDegree() < modulusPoly2.getDegree()) {
+            modulusPoly2 = modulusPoly;
+            modulusPoly = modulusPoly2;
         }
-        ModulusPoly rLast = a;
-        ModulusPoly r = b;
-        ModulusPoly tLast = this.field.getZero();
-        ModulusPoly t = this.field.getOne();
-        while (r.getDegree() >= R / 2) {
-            rLast = r;
-            tLast = t;
-            if (!rLast.isZero()) {
-                r = rLast;
-                ModulusPoly q = this.field.getZero();
-                int dltInverse = this.field.inverse(rLast.getCoefficient(rLast.getDegree()));
-                while (r.getDegree() >= rLast.getDegree() && !r.isZero()) {
-                    int degreeDiff = r.getDegree() - rLast.getDegree();
-                    int scale = this.field.multiply(r.getCoefficient(r.getDegree()), dltInverse);
-                    q = q.add(this.field.buildMonomial(degreeDiff, scale));
-                    r = r.subtract(rLast.multiplyByMonomial(degreeDiff, scale));
+        ModulusPoly zero = this.field.getZero();
+        ModulusPoly one = this.field.getOne();
+        while (true) {
+            r11 = modulusPoly;
+            modulusPoly = r11;
+            zero = one;
+            if (modulusPoly.getDegree() < i / 2) {
+                int coefficient = zero.getCoefficient(0);
+                if (coefficient != 0) {
+                    int inverse = this.field.inverse(coefficient);
+                    return new ModulusPoly[]{zero.multiply(inverse), modulusPoly.multiply(inverse)};
                 }
-                t = q.multiply(tLast).subtract(tLast).negative();
+                throw ChecksumException.getChecksumInstance();
+            } else if (!modulusPoly.isZero()) {
+                ModulusPoly zero2 = this.field.getZero();
+                int inverse2 = this.field.inverse(modulusPoly.getCoefficient(modulusPoly.getDegree()));
+                while (r11.getDegree() >= modulusPoly.getDegree() && !r11.isZero()) {
+                    int degree = r11.getDegree() - modulusPoly.getDegree();
+                    int multiply = this.field.multiply(r11.getCoefficient(r11.getDegree()), inverse2);
+                    zero2 = zero2.add(this.field.buildMonomial(degree, multiply));
+                    r11 = r11.subtract(modulusPoly.multiplyByMonomial(degree, multiply));
+                }
+                one = zero2.multiply(zero).subtract(zero).negative();
             } else {
                 throw ChecksumException.getChecksumInstance();
             }
         }
-        int sigmaTildeAtZero = t.getCoefficient(0);
-        if (sigmaTildeAtZero != 0) {
-            int inverse = this.field.inverse(sigmaTildeAtZero);
-            return new ModulusPoly[]{t.multiply(inverse), r.multiply(inverse)};
-        }
-        throw ChecksumException.getChecksumInstance();
     }
 
-    private int[] findErrorLocations(ModulusPoly errorLocator) throws ChecksumException {
-        int numErrors = errorLocator.getDegree();
-        int[] result = new int[numErrors];
-        int e = 0;
-        for (int i = 1; i < this.field.getSize() && e < numErrors; i++) {
-            if (errorLocator.evaluateAt(i) == 0) {
-                result[e] = this.field.inverse(i);
-                e++;
+    private int[] findErrorLocations(ModulusPoly modulusPoly) throws ChecksumException {
+        int degree = modulusPoly.getDegree();
+        int[] iArr = new int[degree];
+        int i = 0;
+        for (int i2 = 1; i2 < this.field.getSize() && i < degree; i2++) {
+            if (modulusPoly.evaluateAt(i2) == 0) {
+                iArr[i] = this.field.inverse(i2);
+                i++;
             }
         }
-        if (e == numErrors) {
-            return result;
+        if (i == degree) {
+            return iArr;
         }
         throw ChecksumException.getChecksumInstance();
     }
 
-    private int[] findErrorMagnitudes(ModulusPoly errorEvaluator, ModulusPoly errorLocator, int[] errorLocations) {
-        int errorLocatorDegree = errorLocator.getDegree();
-        int[] formalDerivativeCoefficients = new int[errorLocatorDegree];
-        for (int i = 1; i <= errorLocatorDegree; i++) {
-            formalDerivativeCoefficients[errorLocatorDegree - i] = this.field.multiply(i, errorLocator.getCoefficient(i));
+    private int[] findErrorMagnitudes(ModulusPoly modulusPoly, ModulusPoly modulusPoly2, int[] iArr) {
+        int degree = modulusPoly2.getDegree();
+        int[] iArr2 = new int[degree];
+        for (int i = 1; i <= degree; i++) {
+            iArr2[degree - i] = this.field.multiply(i, modulusPoly2.getCoefficient(i));
         }
-        ModulusPoly formalDerivative = new ModulusPoly(this.field, formalDerivativeCoefficients);
-        int s = errorLocations.length;
-        int[] result = new int[s];
-        for (int i2 = 0; i2 < s; i2++) {
-            int xiInverse = this.field.inverse(errorLocations[i2]);
-            result[i2] = this.field.multiply(this.field.subtract(0, errorEvaluator.evaluateAt(xiInverse)), this.field.inverse(formalDerivative.evaluateAt(xiInverse)));
+        ModulusPoly modulusPoly3 = new ModulusPoly(this.field, iArr2);
+        int length = iArr.length;
+        int[] iArr3 = new int[length];
+        for (int i2 = 0; i2 < length; i2++) {
+            int inverse = this.field.inverse(iArr[i2]);
+            iArr3[i2] = this.field.multiply(this.field.subtract(0, modulusPoly.evaluateAt(inverse)), this.field.inverse(modulusPoly3.evaluateAt(inverse)));
         }
-        return result;
+        return iArr3;
     }
 }

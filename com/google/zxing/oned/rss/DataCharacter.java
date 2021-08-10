@@ -4,9 +4,9 @@ public class DataCharacter {
     private final int checksumPortion;
     private final int value;
 
-    public DataCharacter(int value2, int checksumPortion2) {
-        this.value = value2;
-        this.checksumPortion = checksumPortion2;
+    public DataCharacter(int i, int i2) {
+        this.value = i;
+        this.checksumPortion = i2;
     }
 
     public final int getValue() {
@@ -21,12 +21,12 @@ public class DataCharacter {
         return this.value + "(" + this.checksumPortion + ')';
     }
 
-    public final boolean equals(Object o) {
-        if (!(o instanceof DataCharacter)) {
+    public final boolean equals(Object obj) {
+        if (!(obj instanceof DataCharacter)) {
             return false;
         }
-        DataCharacter that = (DataCharacter) o;
-        if (this.value == that.value && this.checksumPortion == that.checksumPortion) {
+        DataCharacter dataCharacter = (DataCharacter) obj;
+        if (this.value == dataCharacter.value && this.checksumPortion == dataCharacter.checksumPortion) {
             return true;
         }
         return false;

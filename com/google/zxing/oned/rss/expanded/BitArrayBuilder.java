@@ -8,39 +8,39 @@ public final class BitArrayBuilder {
     private BitArrayBuilder() {
     }
 
-    static BitArray buildBitArray(List<ExpandedPair> pairs) {
-        int charNumber = (pairs.size() * 2) - 1;
-        if (pairs.get(pairs.size() - 1).getRightChar() == null) {
-            charNumber--;
+    static BitArray buildBitArray(List<ExpandedPair> list) {
+        int size = (list.size() * 2) - 1;
+        if (list.get(list.size() - 1).getRightChar() == null) {
+            size--;
         }
-        BitArray binary = new BitArray(charNumber * 12);
-        int accPos = 0;
-        int firstValue = pairs.get(0).getRightChar().getValue();
-        for (int i = 11; i >= 0; i--) {
-            if (((1 << i) & firstValue) != 0) {
-                binary.set(accPos);
+        BitArray bitArray = new BitArray(size * 12);
+        int i = 0;
+        int value = list.get(0).getRightChar().getValue();
+        for (int i2 = 11; i2 >= 0; i2--) {
+            if (((1 << i2) & value) != 0) {
+                bitArray.set(i);
             }
-            accPos++;
+            i++;
         }
-        for (int i2 = 1; i2 < pairs.size(); i2++) {
-            ExpandedPair currentPair = pairs.get(i2);
-            int leftValue = currentPair.getLeftChar().getValue();
-            for (int j = 11; j >= 0; j--) {
-                if (((1 << j) & leftValue) != 0) {
-                    binary.set(accPos);
+        for (int i3 = 1; i3 < list.size(); i3++) {
+            ExpandedPair expandedPair = list.get(i3);
+            int value2 = expandedPair.getLeftChar().getValue();
+            for (int i4 = 11; i4 >= 0; i4--) {
+                if (((1 << i4) & value2) != 0) {
+                    bitArray.set(i);
                 }
-                accPos++;
+                i++;
             }
-            if (currentPair.getRightChar() != null) {
-                int rightValue = currentPair.getRightChar().getValue();
-                for (int j2 = 11; j2 >= 0; j2--) {
-                    if (((1 << j2) & rightValue) != 0) {
-                        binary.set(accPos);
+            if (expandedPair.getRightChar() != null) {
+                int value3 = expandedPair.getRightChar().getValue();
+                for (int i5 = 11; i5 >= 0; i5--) {
+                    if (((1 << i5) & value3) != 0) {
+                        bitArray.set(i);
                     }
-                    accPos++;
+                    i++;
                 }
             }
         }
-        return binary;
+        return bitArray;
     }
 }

@@ -1,6 +1,5 @@
 package org.apache.cordova;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -30,18 +29,18 @@ public class CordovaInterfaceImpl implements CordovaInterface {
         this(activity2, Executors.newCachedThreadPool());
     }
 
-    public CordovaInterfaceImpl(Activity activity2, ExecutorService threadPool2) {
+    public CordovaInterfaceImpl(Activity activity2, ExecutorService executorService) {
         this.activityWasDestroyed = false;
         this.activity = activity2;
-        this.threadPool = threadPool2;
+        this.threadPool = executorService;
         this.permissionResultCallbacks = new CallbackMap();
     }
 
     @Override // org.apache.cordova.CordovaInterface
-    public void startActivityForResult(CordovaPlugin command, Intent intent, int requestCode) {
-        setActivityResultCallback(command);
+    public void startActivityForResult(CordovaPlugin cordovaPlugin, Intent intent, int i) {
+        setActivityResultCallback(cordovaPlugin);
         try {
-            this.activity.startActivityForResult(intent, requestCode);
+            this.activity.startActivityForResult(intent, i);
         } catch (RuntimeException e) {
             this.activityResultCallback = null;
             throw e;
@@ -49,12 +48,12 @@ public class CordovaInterfaceImpl implements CordovaInterface {
     }
 
     @Override // org.apache.cordova.CordovaInterface
-    public void setActivityResultCallback(CordovaPlugin plugin) {
-        CordovaPlugin cordovaPlugin = this.activityResultCallback;
-        if (cordovaPlugin != null) {
-            cordovaPlugin.onActivityResult(this.activityResultRequestCode, 0, null);
+    public void setActivityResultCallback(CordovaPlugin cordovaPlugin) {
+        CordovaPlugin cordovaPlugin2 = this.activityResultCallback;
+        if (cordovaPlugin2 != null) {
+            cordovaPlugin2.onActivityResult(this.activityResultRequestCode, 0, null);
         }
-        this.activityResultCallback = plugin;
+        this.activityResultCallback = cordovaPlugin;
     }
 
     @Override // org.apache.cordova.CordovaInterface
@@ -68,8 +67,8 @@ public class CordovaInterfaceImpl implements CordovaInterface {
     }
 
     @Override // org.apache.cordova.CordovaInterface
-    public Object onMessage(String id, Object data) {
-        if (!"exit".equals(id)) {
+    public Object onMessage(String str, Object obj) {
+        if (!"exit".equals(str)) {
             return null;
         }
         this.activity.finish();
@@ -82,40 +81,40 @@ public class CordovaInterfaceImpl implements CordovaInterface {
     }
 
     public void onCordovaInit(PluginManager pluginManager2) {
-        CoreAndroid appPlugin;
+        CoreAndroid coreAndroid;
         this.pluginManager = pluginManager2;
         ActivityResultHolder activityResultHolder = this.savedResult;
         if (activityResultHolder != null) {
             onActivityResult(activityResultHolder.requestCode, this.savedResult.resultCode, this.savedResult.intent);
         } else if (this.activityWasDestroyed) {
             this.activityWasDestroyed = false;
-            if (pluginManager2 != null && (appPlugin = (CoreAndroid) pluginManager2.getPlugin(CoreAndroid.PLUGIN_NAME)) != null) {
-                JSONObject obj = new JSONObject();
+            if (pluginManager2 != null && (coreAndroid = (CoreAndroid) pluginManager2.getPlugin(CoreAndroid.PLUGIN_NAME)) != null) {
+                JSONObject jSONObject = new JSONObject();
                 try {
-                    obj.put("action", "resume");
+                    jSONObject.put("action", "resume");
                 } catch (JSONException e) {
                     LOG.e(TAG, "Failed to create event message", e);
                 }
-                appPlugin.sendResumeEvent(new PluginResult(PluginResult.Status.OK, obj));
+                coreAndroid.sendResumeEvent(new PluginResult(PluginResult.Status.OK, jSONObject));
             }
         }
     }
 
-    public boolean onActivityResult(int requestCode, int resultCode, Intent intent) {
-        CordovaPlugin callback = this.activityResultCallback;
-        if (callback == null && this.initCallbackService != null) {
-            this.savedResult = new ActivityResultHolder(requestCode, resultCode, intent);
+    public boolean onActivityResult(int i, int i2, Intent intent) {
+        CordovaPlugin cordovaPlugin = this.activityResultCallback;
+        if (cordovaPlugin == null && this.initCallbackService != null) {
+            this.savedResult = new ActivityResultHolder(i, i2, intent);
             PluginManager pluginManager2 = this.pluginManager;
-            if (!(pluginManager2 == null || (callback = pluginManager2.getPlugin(this.initCallbackService)) == null)) {
-                callback.onRestoreStateForActivityResult(this.savedPluginState.getBundle(callback.getServiceName()), new ResumeCallback(callback.getServiceName(), this.pluginManager));
+            if (!(pluginManager2 == null || (cordovaPlugin = pluginManager2.getPlugin(this.initCallbackService)) == null)) {
+                cordovaPlugin.onRestoreStateForActivityResult(this.savedPluginState.getBundle(cordovaPlugin.getServiceName()), new ResumeCallback(cordovaPlugin.getServiceName(), this.pluginManager));
             }
         }
         this.activityResultCallback = null;
-        if (callback != null) {
+        if (cordovaPlugin != null) {
             LOG.d(TAG, "Sending activity result to plugin");
             this.initCallbackService = null;
             this.savedResult = null;
-            callback.onActivityResult(requestCode, resultCode, intent);
+            cordovaPlugin.onActivityResult(i, i2, intent);
             return true;
         }
         StringBuilder sb = new StringBuilder();
@@ -125,24 +124,24 @@ public class CordovaInterfaceImpl implements CordovaInterface {
         return false;
     }
 
-    public void setActivityResultRequestCode(int requestCode) {
-        this.activityResultRequestCode = requestCode;
+    public void setActivityResultRequestCode(int i) {
+        this.activityResultRequestCode = i;
     }
 
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(Bundle bundle) {
         CordovaPlugin cordovaPlugin = this.activityResultCallback;
         if (cordovaPlugin != null) {
-            outState.putString("callbackService", cordovaPlugin.getServiceName());
+            bundle.putString("callbackService", cordovaPlugin.getServiceName());
         }
         PluginManager pluginManager2 = this.pluginManager;
         if (pluginManager2 != null) {
-            outState.putBundle("plugin", pluginManager2.onSaveInstanceState());
+            bundle.putBundle("plugin", pluginManager2.onSaveInstanceState());
         }
     }
 
-    public void restoreInstanceState(Bundle savedInstanceState) {
-        this.initCallbackService = savedInstanceState.getString("callbackService");
-        this.savedPluginState = savedInstanceState.getBundle("plugin");
+    public void restoreInstanceState(Bundle bundle) {
+        this.initCallbackService = bundle.getString("callbackService");
+        this.savedPluginState = bundle.getBundle("plugin");
         this.activityWasDestroyed = true;
     }
 
@@ -152,34 +151,33 @@ public class CordovaInterfaceImpl implements CordovaInterface {
         private int requestCode;
         private int resultCode;
 
-        public ActivityResultHolder(int requestCode2, int resultCode2, Intent intent2) {
-            this.requestCode = requestCode2;
-            this.resultCode = resultCode2;
+        public ActivityResultHolder(int i, int i2, Intent intent2) {
+            this.requestCode = i;
+            this.resultCode = i2;
             this.intent = intent2;
         }
     }
 
-    public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
-        Pair<CordovaPlugin, Integer> callback = this.permissionResultCallbacks.getAndRemoveCallback(requestCode);
-        if (callback != null) {
-            ((CordovaPlugin) callback.first).onRequestPermissionResult(((Integer) callback.second).intValue(), permissions, grantResults);
+    public void onRequestPermissionResult(int i, String[] strArr, int[] iArr) throws JSONException {
+        Pair<CordovaPlugin, Integer> andRemoveCallback = this.permissionResultCallbacks.getAndRemoveCallback(i);
+        if (andRemoveCallback != null) {
+            ((CordovaPlugin) andRemoveCallback.first).onRequestPermissionResult(((Integer) andRemoveCallback.second).intValue(), strArr, iArr);
         }
     }
 
     @Override // org.apache.cordova.CordovaInterface
-    public void requestPermission(CordovaPlugin plugin, int requestCode, String permission) {
-        requestPermissions(plugin, requestCode, new String[]{permission});
+    public void requestPermission(CordovaPlugin cordovaPlugin, int i, String str) {
+        requestPermissions(cordovaPlugin, i, new String[]{str});
     }
 
     @Override // org.apache.cordova.CordovaInterface
-    @SuppressLint({"NewApi"})
-    public void requestPermissions(CordovaPlugin plugin, int requestCode, String[] permissions) {
-        getActivity().requestPermissions(permissions, this.permissionResultCallbacks.registerCallback(plugin, requestCode));
+    public void requestPermissions(CordovaPlugin cordovaPlugin, int i, String[] strArr) {
+        getActivity().requestPermissions(strArr, this.permissionResultCallbacks.registerCallback(cordovaPlugin, i));
     }
 
     @Override // org.apache.cordova.CordovaInterface
-    public boolean hasPermission(String permission) {
-        if (Build.VERSION.SDK_INT < 23 || this.activity.checkSelfPermission(permission) == 0) {
+    public boolean hasPermission(String str) {
+        if (Build.VERSION.SDK_INT < 23 || this.activity.checkSelfPermission(str) == 0) {
             return true;
         }
         return false;

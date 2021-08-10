@@ -3,6 +3,7 @@ package com.google.zxing.oned.rss.expanded.decoders;
 import com.google.zxing.FormatException;
 import com.google.zxing.NotFoundException;
 import com.google.zxing.common.BitArray;
+import kotlin.text.Typography;
 
 /* access modifiers changed from: package-private */
 public final class GeneralAppIdDecoder {
@@ -10,128 +11,130 @@ public final class GeneralAppIdDecoder {
     private final CurrentParsingState current = new CurrentParsingState();
     private final BitArray information;
 
-    GeneralAppIdDecoder(BitArray information2) {
-        this.information = information2;
+    GeneralAppIdDecoder(BitArray bitArray) {
+        this.information = bitArray;
     }
 
     /* access modifiers changed from: package-private */
-    public String decodeAllCodes(StringBuilder buff, int initialPosition) throws NotFoundException, FormatException {
-        int currentPosition = initialPosition;
-        String remaining = null;
+    public String decodeAllCodes(StringBuilder sb, int i) throws NotFoundException, FormatException {
+        String str = null;
         while (true) {
-            DecodedInformation info = decodeGeneralPurposeField(currentPosition, remaining);
-            String parsedFields = FieldParser.parseFieldsInGeneralPurpose(info.getNewString());
-            if (parsedFields != null) {
-                buff.append(parsedFields);
+            DecodedInformation decodeGeneralPurposeField = decodeGeneralPurposeField(i, str);
+            String parseFieldsInGeneralPurpose = FieldParser.parseFieldsInGeneralPurpose(decodeGeneralPurposeField.getNewString());
+            if (parseFieldsInGeneralPurpose != null) {
+                sb.append(parseFieldsInGeneralPurpose);
             }
-            if (info.isRemaining()) {
-                remaining = String.valueOf(info.getRemainingValue());
-            } else {
-                remaining = null;
+            String valueOf = decodeGeneralPurposeField.isRemaining() ? String.valueOf(decodeGeneralPurposeField.getRemainingValue()) : null;
+            if (i == decodeGeneralPurposeField.getNewPosition()) {
+                return sb.toString();
             }
-            if (currentPosition == info.getNewPosition()) {
-                return buff.toString();
-            }
-            currentPosition = info.getNewPosition();
+            i = decodeGeneralPurposeField.getNewPosition();
+            str = valueOf;
         }
     }
 
-    private boolean isStillNumeric(int pos) {
-        if (pos + 7 <= this.information.getSize()) {
-            for (int i = pos; i < pos + 3; i++) {
-                if (this.information.get(i)) {
+    private boolean isStillNumeric(int i) {
+        if (i + 7 <= this.information.getSize()) {
+            int i2 = i;
+            while (true) {
+                int i3 = i + 3;
+                if (i2 >= i3) {
+                    return this.information.get(i3);
+                }
+                if (this.information.get(i2)) {
                     return true;
                 }
+                i2++;
             }
-            return this.information.get(pos + 3);
-        } else if (pos + 4 <= this.information.getSize()) {
+        } else if (i + 4 <= this.information.getSize()) {
             return true;
         } else {
             return false;
         }
     }
 
-    private DecodedNumeric decodeNumeric(int pos) throws FormatException {
-        if (pos + 7 > this.information.getSize()) {
-            int numeric = extractNumericValueFromBitArray(pos, 4);
-            if (numeric == 0) {
+    private DecodedNumeric decodeNumeric(int i) throws FormatException {
+        int i2 = i + 7;
+        if (i2 > this.information.getSize()) {
+            int extractNumericValueFromBitArray = extractNumericValueFromBitArray(i, 4);
+            if (extractNumericValueFromBitArray == 0) {
                 return new DecodedNumeric(this.information.getSize(), 10, 10);
             }
-            return new DecodedNumeric(this.information.getSize(), numeric - 1, 10);
+            return new DecodedNumeric(this.information.getSize(), extractNumericValueFromBitArray - 1, 10);
         }
-        int numeric2 = extractNumericValueFromBitArray(pos, 7);
-        return new DecodedNumeric(pos + 7, (numeric2 - 8) / 11, (numeric2 - 8) % 11);
+        int extractNumericValueFromBitArray2 = extractNumericValueFromBitArray(i, 7) - 8;
+        return new DecodedNumeric(i2, extractNumericValueFromBitArray2 / 11, extractNumericValueFromBitArray2 % 11);
     }
 
     /* access modifiers changed from: package-private */
-    public int extractNumericValueFromBitArray(int pos, int bits) {
-        return extractNumericValueFromBitArray(this.information, pos, bits);
+    public int extractNumericValueFromBitArray(int i, int i2) {
+        return extractNumericValueFromBitArray(this.information, i, i2);
     }
 
-    static int extractNumericValueFromBitArray(BitArray information2, int pos, int bits) {
-        int value = 0;
-        for (int i = 0; i < bits; i++) {
-            if (information2.get(pos + i)) {
-                value |= 1 << ((bits - i) - 1);
+    static int extractNumericValueFromBitArray(BitArray bitArray, int i, int i2) {
+        int i3 = 0;
+        for (int i4 = 0; i4 < i2; i4++) {
+            if (bitArray.get(i + i4)) {
+                i3 |= 1 << ((i2 - i4) - 1);
             }
         }
-        return value;
+        return i3;
     }
 
     /* access modifiers changed from: package-private */
-    public DecodedInformation decodeGeneralPurposeField(int pos, String remaining) throws FormatException {
+    public DecodedInformation decodeGeneralPurposeField(int i, String str) throws FormatException {
         this.buffer.setLength(0);
-        if (remaining != null) {
-            this.buffer.append(remaining);
+        if (str != null) {
+            this.buffer.append(str);
         }
-        this.current.setPosition(pos);
-        DecodedInformation lastDecoded = parseBlocks();
-        if (lastDecoded == null || !lastDecoded.isRemaining()) {
+        this.current.setPosition(i);
+        DecodedInformation parseBlocks = parseBlocks();
+        if (parseBlocks == null || !parseBlocks.isRemaining()) {
             return new DecodedInformation(this.current.getPosition(), this.buffer.toString());
         }
-        return new DecodedInformation(this.current.getPosition(), this.buffer.toString(), lastDecoded.getRemainingValue());
+        return new DecodedInformation(this.current.getPosition(), this.buffer.toString(), parseBlocks.getRemainingValue());
     }
 
     private DecodedInformation parseBlocks() throws FormatException {
-        boolean isFinished;
-        BlockParsedResult result;
+        boolean z;
+        BlockParsedResult blockParsedResult;
         do {
-            int initialPosition = this.current.getPosition();
+            int position = this.current.getPosition();
             if (this.current.isAlpha()) {
-                result = parseAlphaBlock();
-                isFinished = result.isFinished();
+                blockParsedResult = parseAlphaBlock();
+                z = blockParsedResult.isFinished();
             } else if (this.current.isIsoIec646()) {
-                result = parseIsoIec646Block();
-                isFinished = result.isFinished();
+                blockParsedResult = parseIsoIec646Block();
+                z = blockParsedResult.isFinished();
             } else {
-                result = parseNumericBlock();
-                isFinished = result.isFinished();
+                blockParsedResult = parseNumericBlock();
+                z = blockParsedResult.isFinished();
             }
-            if (!(initialPosition != this.current.getPosition()) && !isFinished) {
+            if (!(position != this.current.getPosition()) && !z) {
                 break;
             }
-        } while (!isFinished);
-        return result.getDecodedInformation();
+        } while (!z);
+        return blockParsedResult.getDecodedInformation();
     }
 
     private BlockParsedResult parseNumericBlock() throws FormatException {
-        DecodedInformation information2;
+        DecodedInformation decodedInformation;
         while (isStillNumeric(this.current.getPosition())) {
-            DecodedNumeric numeric = decodeNumeric(this.current.getPosition());
-            this.current.setPosition(numeric.getNewPosition());
-            if (numeric.isFirstDigitFNC1()) {
-                if (numeric.isSecondDigitFNC1()) {
-                    information2 = new DecodedInformation(this.current.getPosition(), this.buffer.toString());
+            DecodedNumeric decodeNumeric = decodeNumeric(this.current.getPosition());
+            this.current.setPosition(decodeNumeric.getNewPosition());
+            if (decodeNumeric.isFirstDigitFNC1()) {
+                if (decodeNumeric.isSecondDigitFNC1()) {
+                    decodedInformation = new DecodedInformation(this.current.getPosition(), this.buffer.toString());
                 } else {
-                    information2 = new DecodedInformation(this.current.getPosition(), this.buffer.toString(), numeric.getSecondDigit());
+                    decodedInformation = new DecodedInformation(this.current.getPosition(), this.buffer.toString(), decodeNumeric.getSecondDigit());
                 }
-                return new BlockParsedResult(information2, true);
+                return new BlockParsedResult(decodedInformation, true);
             }
-            this.buffer.append(numeric.getFirstDigit());
-            if (numeric.isSecondDigitFNC1()) {
+            this.buffer.append(decodeNumeric.getFirstDigit());
+            if (decodeNumeric.isSecondDigitFNC1()) {
                 return new BlockParsedResult(new DecodedInformation(this.current.getPosition(), this.buffer.toString()), true);
             }
-            this.buffer.append(numeric.getSecondDigit());
+            this.buffer.append(decodeNumeric.getSecondDigit());
         }
         if (isNumericToAlphaNumericLatch(this.current.getPosition())) {
             this.current.setAlpha();
@@ -142,12 +145,12 @@ public final class GeneralAppIdDecoder {
 
     private BlockParsedResult parseIsoIec646Block() throws FormatException {
         while (isStillIsoIec646(this.current.getPosition())) {
-            DecodedChar iso = decodeIsoIec646(this.current.getPosition());
-            this.current.setPosition(iso.getNewPosition());
-            if (iso.isFNC1()) {
+            DecodedChar decodeIsoIec646 = decodeIsoIec646(this.current.getPosition());
+            this.current.setPosition(decodeIsoIec646.getNewPosition());
+            if (decodeIsoIec646.isFNC1()) {
                 return new BlockParsedResult(new DecodedInformation(this.current.getPosition(), this.buffer.toString()), true);
             }
-            this.buffer.append(iso.getValue());
+            this.buffer.append(decodeIsoIec646.getValue());
         }
         if (isAlphaOr646ToNumericLatch(this.current.getPosition())) {
             this.current.incrementPosition(3);
@@ -165,12 +168,12 @@ public final class GeneralAppIdDecoder {
 
     private BlockParsedResult parseAlphaBlock() {
         while (isStillAlpha(this.current.getPosition())) {
-            DecodedChar alpha = decodeAlphanumeric(this.current.getPosition());
-            this.current.setPosition(alpha.getNewPosition());
-            if (alpha.isFNC1()) {
+            DecodedChar decodeAlphanumeric = decodeAlphanumeric(this.current.getPosition());
+            this.current.setPosition(decodeAlphanumeric.getNewPosition());
+            if (decodeAlphanumeric.isFNC1()) {
                 return new BlockParsedResult(new DecodedInformation(this.current.getPosition(), this.buffer.toString()), true);
             }
-            this.buffer.append(alpha.getValue());
+            this.buffer.append(decodeAlphanumeric.getValue());
         }
         if (isAlphaOr646ToNumericLatch(this.current.getPosition())) {
             this.current.incrementPosition(3);
@@ -186,56 +189,56 @@ public final class GeneralAppIdDecoder {
         return new BlockParsedResult(false);
     }
 
-    private boolean isStillIsoIec646(int pos) {
-        int eightBitValue;
-        if (pos + 5 > this.information.getSize()) {
+    private boolean isStillIsoIec646(int i) {
+        int extractNumericValueFromBitArray;
+        if (i + 5 > this.information.getSize()) {
             return false;
         }
-        int fiveBitValue = extractNumericValueFromBitArray(pos, 5);
-        if (fiveBitValue >= 5 && fiveBitValue < 16) {
+        int extractNumericValueFromBitArray2 = extractNumericValueFromBitArray(i, 5);
+        if (extractNumericValueFromBitArray2 >= 5 && extractNumericValueFromBitArray2 < 16) {
             return true;
         }
-        if (pos + 7 > this.information.getSize()) {
+        if (i + 7 > this.information.getSize()) {
             return false;
         }
-        int sevenBitValue = extractNumericValueFromBitArray(pos, 7);
-        if (sevenBitValue >= 64 && sevenBitValue < 116) {
+        int extractNumericValueFromBitArray3 = extractNumericValueFromBitArray(i, 7);
+        if (extractNumericValueFromBitArray3 >= 64 && extractNumericValueFromBitArray3 < 116) {
             return true;
         }
-        if (pos + 8 <= this.information.getSize() && (eightBitValue = extractNumericValueFromBitArray(pos, 8)) >= 232 && eightBitValue < 253) {
+        if (i + 8 <= this.information.getSize() && (extractNumericValueFromBitArray = extractNumericValueFromBitArray(i, 8)) >= 232 && extractNumericValueFromBitArray < 253) {
             return true;
         }
         return false;
     }
 
-    private DecodedChar decodeIsoIec646(int pos) throws FormatException {
+    private DecodedChar decodeIsoIec646(int i) throws FormatException {
         char c;
-        int fiveBitValue = extractNumericValueFromBitArray(pos, 5);
-        if (fiveBitValue == 15) {
-            return new DecodedChar(pos + 5, '$');
+        int extractNumericValueFromBitArray = extractNumericValueFromBitArray(i, 5);
+        if (extractNumericValueFromBitArray == 15) {
+            return new DecodedChar(i + 5, Typography.dollar);
         }
-        if (fiveBitValue >= 5 && fiveBitValue < 15) {
-            return new DecodedChar(pos + 5, (char) ((fiveBitValue + 48) - 5));
+        if (extractNumericValueFromBitArray >= 5 && extractNumericValueFromBitArray < 15) {
+            return new DecodedChar(i + 5, (char) ((extractNumericValueFromBitArray + 48) - 5));
         }
-        int sevenBitValue = extractNumericValueFromBitArray(pos, 7);
-        if (sevenBitValue >= 64 && sevenBitValue < 90) {
-            return new DecodedChar(pos + 7, (char) (sevenBitValue + 1));
+        int extractNumericValueFromBitArray2 = extractNumericValueFromBitArray(i, 7);
+        if (extractNumericValueFromBitArray2 >= 64 && extractNumericValueFromBitArray2 < 90) {
+            return new DecodedChar(i + 7, (char) (extractNumericValueFromBitArray2 + 1));
         }
-        if (sevenBitValue >= 90 && sevenBitValue < 116) {
-            return new DecodedChar(pos + 7, (char) (sevenBitValue + 7));
+        if (extractNumericValueFromBitArray2 >= 90 && extractNumericValueFromBitArray2 < 116) {
+            return new DecodedChar(i + 7, (char) (extractNumericValueFromBitArray2 + 7));
         }
-        switch (extractNumericValueFromBitArray(pos, 8)) {
+        switch (extractNumericValueFromBitArray(i, 8)) {
             case 232:
                 c = '!';
                 break;
             case 233:
-                c = '\"';
+                c = Typography.quote;
                 break;
             case 234:
                 c = '%';
                 break;
             case 235:
-                c = '&';
+                c = Typography.amp;
                 break;
             case 236:
                 c = '\'';
@@ -271,13 +274,13 @@ public final class GeneralAppIdDecoder {
                 c = ';';
                 break;
             case 247:
-                c = '<';
+                c = Typography.less;
                 break;
             case 248:
                 c = '=';
                 break;
             case 249:
-                c = '>';
+                c = Typography.greater;
                 break;
             case 250:
                 c = '?';
@@ -291,38 +294,38 @@ public final class GeneralAppIdDecoder {
             default:
                 throw FormatException.getFormatInstance();
         }
-        return new DecodedChar(pos + 8, c);
+        return new DecodedChar(i + 8, c);
     }
 
-    private boolean isStillAlpha(int pos) {
-        int sixBitValue;
-        if (pos + 5 > this.information.getSize()) {
+    private boolean isStillAlpha(int i) {
+        int extractNumericValueFromBitArray;
+        if (i + 5 > this.information.getSize()) {
             return false;
         }
-        int fiveBitValue = extractNumericValueFromBitArray(pos, 5);
-        if (fiveBitValue >= 5 && fiveBitValue < 16) {
+        int extractNumericValueFromBitArray2 = extractNumericValueFromBitArray(i, 5);
+        if (extractNumericValueFromBitArray2 >= 5 && extractNumericValueFromBitArray2 < 16) {
             return true;
         }
-        if (pos + 6 <= this.information.getSize() && (sixBitValue = extractNumericValueFromBitArray(pos, 6)) >= 16 && sixBitValue < 63) {
+        if (i + 6 <= this.information.getSize() && (extractNumericValueFromBitArray = extractNumericValueFromBitArray(i, 6)) >= 16 && extractNumericValueFromBitArray < 63) {
             return true;
         }
         return false;
     }
 
-    private DecodedChar decodeAlphanumeric(int pos) {
+    private DecodedChar decodeAlphanumeric(int i) {
         char c;
-        int fiveBitValue = extractNumericValueFromBitArray(pos, 5);
-        if (fiveBitValue == 15) {
-            return new DecodedChar(pos + 5, '$');
+        int extractNumericValueFromBitArray = extractNumericValueFromBitArray(i, 5);
+        if (extractNumericValueFromBitArray == 15) {
+            return new DecodedChar(i + 5, Typography.dollar);
         }
-        if (fiveBitValue >= 5 && fiveBitValue < 15) {
-            return new DecodedChar(pos + 5, (char) ((fiveBitValue + 48) - 5));
+        if (extractNumericValueFromBitArray >= 5 && extractNumericValueFromBitArray < 15) {
+            return new DecodedChar(i + 5, (char) ((extractNumericValueFromBitArray + 48) - 5));
         }
-        int sixBitValue = extractNumericValueFromBitArray(pos, 6);
-        if (sixBitValue >= 32 && sixBitValue < 58) {
-            return new DecodedChar(pos + 6, (char) (sixBitValue + 33));
+        int extractNumericValueFromBitArray2 = extractNumericValueFromBitArray(i, 6);
+        if (extractNumericValueFromBitArray2 >= 32 && extractNumericValueFromBitArray2 < 58) {
+            return new DecodedChar(i + 6, (char) (extractNumericValueFromBitArray2 + 33));
         }
-        switch (sixBitValue) {
+        switch (extractNumericValueFromBitArray2) {
             case 58:
                 c = '*';
                 break;
@@ -339,51 +342,55 @@ public final class GeneralAppIdDecoder {
                 c = '/';
                 break;
             default:
-                throw new IllegalStateException("Decoding invalid alphanumeric value: " + sixBitValue);
+                throw new IllegalStateException("Decoding invalid alphanumeric value: " + extractNumericValueFromBitArray2);
         }
-        return new DecodedChar(pos + 6, c);
+        return new DecodedChar(i + 6, c);
     }
 
-    private boolean isAlphaTo646ToAlphaLatch(int pos) {
-        if (pos + 1 > this.information.getSize()) {
+    private boolean isAlphaTo646ToAlphaLatch(int i) {
+        int i2;
+        if (i + 1 > this.information.getSize()) {
             return false;
         }
-        int i = 0;
-        while (i < 5 && i + pos < this.information.getSize()) {
-            if (i == 2) {
-                if (!this.information.get(pos + 2)) {
+        int i3 = 0;
+        while (i3 < 5 && (i2 = i3 + i) < this.information.getSize()) {
+            if (i3 == 2) {
+                if (!this.information.get(i + 2)) {
                     return false;
                 }
-            } else if (this.information.get(pos + i)) {
+            } else if (this.information.get(i2)) {
                 return false;
             }
-            i++;
+            i3++;
         }
         return true;
     }
 
-    private boolean isAlphaOr646ToNumericLatch(int pos) {
-        if (pos + 3 > this.information.getSize()) {
+    private boolean isAlphaOr646ToNumericLatch(int i) {
+        int i2 = i + 3;
+        if (i2 > this.information.getSize()) {
             return false;
         }
-        for (int i = pos; i < pos + 3; i++) {
+        while (i < i2) {
             if (this.information.get(i)) {
                 return false;
             }
+            i++;
         }
         return true;
     }
 
-    private boolean isNumericToAlphaNumericLatch(int pos) {
-        if (pos + 1 > this.information.getSize()) {
+    private boolean isNumericToAlphaNumericLatch(int i) {
+        int i2;
+        if (i + 1 > this.information.getSize()) {
             return false;
         }
-        int i = 0;
-        while (i < 4 && i + pos < this.information.getSize()) {
-            if (this.information.get(pos + i)) {
+        int i3 = 0;
+        while (i3 < 4 && (i2 = i3 + i) < this.information.getSize()) {
+            if (this.information.get(i2)) {
                 return false;
             }
-            i++;
+            i3++;
         }
         return true;
     }

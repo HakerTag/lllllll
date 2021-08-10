@@ -7,13 +7,13 @@ public final class ByteMatrix {
     private final int height;
     private final int width;
 
-    public ByteMatrix(int width2, int height2) {
+    public ByteMatrix(int i, int i2) {
         int[] iArr = new int[2];
-        iArr[1] = width2;
-        iArr[0] = height2;
+        iArr[1] = i;
+        iArr[0] = i2;
         this.bytes = (byte[][]) Array.newInstance(byte.class, iArr);
-        this.width = width2;
-        this.height = height2;
+        this.width = i;
+        this.height = i2;
     }
 
     public int getHeight() {
@@ -24,49 +24,49 @@ public final class ByteMatrix {
         return this.width;
     }
 
-    public byte get(int x, int y) {
-        return this.bytes[y][x];
+    public byte get(int i, int i2) {
+        return this.bytes[i2][i];
     }
 
     public byte[][] getArray() {
         return this.bytes;
     }
 
-    public void set(int x, int y, byte value) {
-        this.bytes[y][x] = value;
+    public void set(int i, int i2, byte b) {
+        this.bytes[i2][i] = b;
     }
 
-    public void set(int x, int y, int value) {
-        this.bytes[y][x] = (byte) value;
+    public void set(int i, int i2, int i3) {
+        this.bytes[i2][i] = (byte) i3;
     }
 
-    public void set(int x, int y, boolean value) {
-        this.bytes[y][x] = value ? (byte) 1 : 0;
+    public void set(int i, int i2, boolean z) {
+        this.bytes[i2][i] = z ? (byte) 1 : 0;
     }
 
-    public void clear(byte value) {
-        for (int y = 0; y < this.height; y++) {
-            for (int x = 0; x < this.width; x++) {
-                this.bytes[y][x] = value;
+    public void clear(byte b) {
+        for (int i = 0; i < this.height; i++) {
+            for (int i2 = 0; i2 < this.width; i2++) {
+                this.bytes[i][i2] = b;
             }
         }
     }
 
     public String toString() {
-        StringBuilder result = new StringBuilder((this.width * 2 * this.height) + 2);
-        for (int y = 0; y < this.height; y++) {
-            for (int x = 0; x < this.width; x++) {
-                byte b = this.bytes[y][x];
+        StringBuilder sb = new StringBuilder((this.width * 2 * this.height) + 2);
+        for (int i = 0; i < this.height; i++) {
+            for (int i2 = 0; i2 < this.width; i2++) {
+                byte b = this.bytes[i][i2];
                 if (b == 0) {
-                    result.append(" 0");
+                    sb.append(" 0");
                 } else if (b != 1) {
-                    result.append("  ");
+                    sb.append("  ");
                 } else {
-                    result.append(" 1");
+                    sb.append(" 1");
                 }
             }
-            result.append('\n');
+            sb.append('\n');
         }
-        return result.toString();
+        return sb.toString();
     }
 }

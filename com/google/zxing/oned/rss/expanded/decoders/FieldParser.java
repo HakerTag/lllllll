@@ -13,53 +13,53 @@ public final class FieldParser {
     private FieldParser() {
     }
 
-    static String parseFieldsInGeneralPurpose(String rawInformation) throws NotFoundException {
-        if (rawInformation.isEmpty()) {
+    static String parseFieldsInGeneralPurpose(String str) throws NotFoundException {
+        if (str.isEmpty()) {
             return null;
         }
-        if (rawInformation.length() >= 2) {
-            String firstTwoDigits = rawInformation.substring(0, 2);
+        if (str.length() >= 2) {
+            String substring = str.substring(0, 2);
             Object[][] objArr = TWO_DIGIT_DATA_LENGTH;
-            for (Object[] dataLength : objArr) {
-                if (dataLength[0].equals(firstTwoDigits)) {
-                    if (dataLength[1] == VARIABLE_LENGTH) {
-                        return processVariableAI(2, ((Integer) dataLength[2]).intValue(), rawInformation);
+            for (Object[] objArr2 : objArr) {
+                if (objArr2[0].equals(substring)) {
+                    if (objArr2[1] == VARIABLE_LENGTH) {
+                        return processVariableAI(2, ((Integer) objArr2[2]).intValue(), str);
                     } else {
-                        return processFixedAI(2, ((Integer) dataLength[1]).intValue(), rawInformation);
+                        return processFixedAI(2, ((Integer) objArr2[1]).intValue(), str);
                     }
                 }
             }
-            if (rawInformation.length() >= 3) {
-                String firstThreeDigits = rawInformation.substring(0, 3);
-                Object[][] objArr2 = THREE_DIGIT_DATA_LENGTH;
-                for (Object[] dataLength2 : objArr2) {
-                    if (dataLength2[0].equals(firstThreeDigits)) {
-                        if (dataLength2[1] == VARIABLE_LENGTH) {
-                            return processVariableAI(3, ((Integer) dataLength2[2]).intValue(), rawInformation);
+            if (str.length() >= 3) {
+                String substring2 = str.substring(0, 3);
+                Object[][] objArr3 = THREE_DIGIT_DATA_LENGTH;
+                for (Object[] objArr4 : objArr3) {
+                    if (objArr4[0].equals(substring2)) {
+                        if (objArr4[1] == VARIABLE_LENGTH) {
+                            return processVariableAI(3, ((Integer) objArr4[2]).intValue(), str);
                         } else {
-                            return processFixedAI(3, ((Integer) dataLength2[1]).intValue(), rawInformation);
+                            return processFixedAI(3, ((Integer) objArr4[1]).intValue(), str);
                         }
                     }
                 }
-                Object[][] objArr3 = THREE_DIGIT_PLUS_DIGIT_DATA_LENGTH;
-                for (Object[] dataLength3 : objArr3) {
-                    if (dataLength3[0].equals(firstThreeDigits)) {
-                        if (dataLength3[1] == VARIABLE_LENGTH) {
-                            return processVariableAI(4, ((Integer) dataLength3[2]).intValue(), rawInformation);
+                Object[][] objArr5 = THREE_DIGIT_PLUS_DIGIT_DATA_LENGTH;
+                for (Object[] objArr6 : objArr5) {
+                    if (objArr6[0].equals(substring2)) {
+                        if (objArr6[1] == VARIABLE_LENGTH) {
+                            return processVariableAI(4, ((Integer) objArr6[2]).intValue(), str);
                         } else {
-                            return processFixedAI(4, ((Integer) dataLength3[1]).intValue(), rawInformation);
+                            return processFixedAI(4, ((Integer) objArr6[1]).intValue(), str);
                         }
                     }
                 }
-                if (rawInformation.length() >= 4) {
-                    String firstFourDigits = rawInformation.substring(0, 4);
-                    Object[][] objArr4 = FOUR_DIGIT_DATA_LENGTH;
-                    for (Object[] dataLength4 : objArr4) {
-                        if (dataLength4[0].equals(firstFourDigits)) {
-                            if (dataLength4[1] == VARIABLE_LENGTH) {
-                                return processVariableAI(4, ((Integer) dataLength4[2]).intValue(), rawInformation);
+                if (str.length() >= 4) {
+                    String substring3 = str.substring(0, 4);
+                    Object[][] objArr7 = FOUR_DIGIT_DATA_LENGTH;
+                    for (Object[] objArr8 : objArr7) {
+                        if (objArr8[0].equals(substring3)) {
+                            if (objArr8[1] == VARIABLE_LENGTH) {
+                                return processVariableAI(4, ((Integer) objArr8[2]).intValue(), str);
                             } else {
-                                return processFixedAI(4, ((Integer) dataLength4[1]).intValue(), rawInformation);
+                                return processFixedAI(4, ((Integer) objArr8[1]).intValue(), str);
                             }
                         }
                     }
@@ -72,37 +72,36 @@ public final class FieldParser {
         throw NotFoundException.getNotFoundInstance();
     }
 
-    private static String processFixedAI(int aiSize, int fieldSize, String rawInformation) throws NotFoundException {
-        if (rawInformation.length() >= aiSize) {
-            String ai = rawInformation.substring(0, aiSize);
-            if (rawInformation.length() >= aiSize + fieldSize) {
-                String field = rawInformation.substring(aiSize, aiSize + fieldSize);
-                String result = '(' + ai + ')' + field;
-                String parsedAI = parseFieldsInGeneralPurpose(rawInformation.substring(aiSize + fieldSize));
-                if (parsedAI == null) {
-                    return result;
+    private static String processFixedAI(int i, int i2, String str) throws NotFoundException {
+        if (str.length() >= i) {
+            String substring = str.substring(0, i);
+            int i3 = i2 + i;
+            if (str.length() >= i3) {
+                String substring2 = str.substring(i, i3);
+                String str2 = '(' + substring + ')' + substring2;
+                String parseFieldsInGeneralPurpose = parseFieldsInGeneralPurpose(str.substring(i3));
+                if (parseFieldsInGeneralPurpose == null) {
+                    return str2;
                 }
-                return result + parsedAI;
+                return str2 + parseFieldsInGeneralPurpose;
             }
             throw NotFoundException.getNotFoundInstance();
         }
         throw NotFoundException.getNotFoundInstance();
     }
 
-    private static String processVariableAI(int aiSize, int variableFieldSize, String rawInformation) throws NotFoundException {
-        int maxSize;
-        String ai = rawInformation.substring(0, aiSize);
-        if (rawInformation.length() < aiSize + variableFieldSize) {
-            maxSize = rawInformation.length();
-        } else {
-            maxSize = aiSize + variableFieldSize;
+    private static String processVariableAI(int i, int i2, String str) throws NotFoundException {
+        String substring = str.substring(0, i);
+        int i3 = i2 + i;
+        if (str.length() < i3) {
+            i3 = str.length();
         }
-        String field = rawInformation.substring(aiSize, maxSize);
-        String result = '(' + ai + ')' + field;
-        String parsedAI = parseFieldsInGeneralPurpose(rawInformation.substring(maxSize));
-        if (parsedAI == null) {
-            return result;
+        String substring2 = str.substring(i, i3);
+        String str2 = '(' + substring + ')' + substring2;
+        String parseFieldsInGeneralPurpose = parseFieldsInGeneralPurpose(str.substring(i3));
+        if (parseFieldsInGeneralPurpose == null) {
+            return str2;
         }
-        return result + parsedAI;
+        return str2 + parseFieldsInGeneralPurpose;
     }
 }

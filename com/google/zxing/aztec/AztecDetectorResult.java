@@ -9,11 +9,11 @@ public final class AztecDetectorResult extends DetectorResult {
     private final int nbDatablocks;
     private final int nbLayers;
 
-    public AztecDetectorResult(BitMatrix bits, ResultPoint[] points, boolean compact2, int nbDatablocks2, int nbLayers2) {
-        super(bits, points);
-        this.compact = compact2;
-        this.nbDatablocks = nbDatablocks2;
-        this.nbLayers = nbLayers2;
+    public AztecDetectorResult(BitMatrix bitMatrix, ResultPoint[] resultPointArr, boolean z, int i, int i2) {
+        super(bitMatrix, resultPointArr);
+        this.compact = z;
+        this.nbDatablocks = i;
+        this.nbLayers = i2;
     }
 
     public int getNbLayers() {

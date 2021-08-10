@@ -10,31 +10,31 @@ public final class PDF417ResultMetadata {
         return this.segmentIndex;
     }
 
-    public void setSegmentIndex(int segmentIndex2) {
-        this.segmentIndex = segmentIndex2;
+    public void setSegmentIndex(int i) {
+        this.segmentIndex = i;
     }
 
     public String getFileId() {
         return this.fileId;
     }
 
-    public void setFileId(String fileId2) {
-        this.fileId = fileId2;
+    public void setFileId(String str) {
+        this.fileId = str;
     }
 
     public int[] getOptionalData() {
         return this.optionalData;
     }
 
-    public void setOptionalData(int[] optionalData2) {
-        this.optionalData = optionalData2;
+    public void setOptionalData(int[] iArr) {
+        this.optionalData = iArr;
     }
 
     public boolean isLastSegment() {
         return this.lastSegment;
     }
 
-    public void setLastSegment(boolean lastSegment2) {
-        this.lastSegment = lastSegment2;
+    public void setLastSegment(boolean z) {
+        this.lastSegment = z;
     }
 }

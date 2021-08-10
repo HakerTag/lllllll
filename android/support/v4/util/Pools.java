@@ -15,9 +15,9 @@ public final class Pools {
         private final Object[] mPool;
         private int mPoolSize;
 
-        public SimplePool(int maxPoolSize) {
-            if (maxPoolSize > 0) {
-                this.mPool = new Object[maxPoolSize];
+        public SimplePool(int i) {
+            if (i > 0) {
+                this.mPool = new Object[i];
                 return;
             }
             throw new IllegalArgumentException("The max pool size must be > 0");
@@ -29,32 +29,32 @@ public final class Pools {
             if (i <= 0) {
                 return null;
             }
-            int lastPooledIndex = i - 1;
+            int i2 = i - 1;
             Object[] objArr = this.mPool;
-            T instance = (T) objArr[lastPooledIndex];
-            objArr[lastPooledIndex] = null;
+            T t = (T) objArr[i2];
+            objArr[i2] = null;
             this.mPoolSize = i - 1;
-            return instance;
+            return t;
         }
 
         @Override // android.support.v4.util.Pools.Pool
-        public boolean release(T instance) {
-            if (!isInPool(instance)) {
+        public boolean release(T t) {
+            if (!isInPool(t)) {
                 int i = this.mPoolSize;
                 Object[] objArr = this.mPool;
                 if (i >= objArr.length) {
                     return false;
                 }
-                objArr[i] = instance;
+                objArr[i] = t;
                 this.mPoolSize = i + 1;
                 return true;
             }
             throw new IllegalStateException("Already in the pool!");
         }
 
-        private boolean isInPool(T instance) {
+        private boolean isInPool(T t) {
             for (int i = 0; i < this.mPoolSize; i++) {
-                if (this.mPool[i] == instance) {
+                if (this.mPool[i] == t) {
                     return true;
                 }
             }
@@ -65,8 +65,8 @@ public final class Pools {
     public static class SynchronizedPool<T> extends SimplePool<T> {
         private final Object mLock = new Object();
 
-        public SynchronizedPool(int maxPoolSize) {
-            super(maxPoolSize);
+        public SynchronizedPool(int i) {
+            super(i);
         }
 
         @Override // android.support.v4.util.Pools.SimplePool, android.support.v4.util.Pools.Pool
@@ -79,10 +79,10 @@ public final class Pools {
         }
 
         @Override // android.support.v4.util.Pools.SimplePool, android.support.v4.util.Pools.Pool
-        public boolean release(T element) {
+        public boolean release(T t) {
             boolean release;
             synchronized (this.mLock) {
-                release = super.release(element);
+                release = super.release(t);
             }
             return release;
         }

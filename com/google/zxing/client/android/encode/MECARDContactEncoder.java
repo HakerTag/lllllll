@@ -3,6 +3,7 @@ package com.google.zxing.client.android.encode;
 import android.telephony.PhoneNumberUtils;
 import java.util.List;
 import java.util.regex.Pattern;
+import kotlin.jvm.internal.IntCompanionObject;
 
 /* access modifiers changed from: package-private */
 public final class MECARDContactEncoder extends ContactEncoder {
@@ -12,20 +13,20 @@ public final class MECARDContactEncoder extends ContactEncoder {
     }
 
     @Override // com.google.zxing.client.android.encode.ContactEncoder
-    public String[] encode(List<String> names, String organization, List<String> addresses, List<String> phones, List<String> list, List<String> emails, List<String> urls, String note) {
-        StringBuilder newContents = new StringBuilder(100);
-        newContents.append("MECARD:");
-        StringBuilder newDisplayContents = new StringBuilder(100);
-        Formatter fieldFormatter = new MECARDFieldFormatter();
-        appendUpToUnique(newContents, newDisplayContents, "N", names, 1, new MECARDNameDisplayFormatter(), fieldFormatter, TERMINATOR);
-        append(newContents, newDisplayContents, "ORG", organization, fieldFormatter, TERMINATOR);
-        appendUpToUnique(newContents, newDisplayContents, "ADR", addresses, 1, null, fieldFormatter, TERMINATOR);
-        appendUpToUnique(newContents, newDisplayContents, "TEL", phones, Integer.MAX_VALUE, new MECARDTelDisplayFormatter(), fieldFormatter, TERMINATOR);
-        appendUpToUnique(newContents, newDisplayContents, "EMAIL", emails, Integer.MAX_VALUE, null, fieldFormatter, TERMINATOR);
-        appendUpToUnique(newContents, newDisplayContents, "URL", urls, Integer.MAX_VALUE, null, fieldFormatter, TERMINATOR);
-        append(newContents, newDisplayContents, "NOTE", note, fieldFormatter, TERMINATOR);
-        newContents.append(TERMINATOR);
-        return new String[]{newContents.toString(), newDisplayContents.toString()};
+    public String[] encode(List<String> list, String str, List<String> list2, List<String> list3, List<String> list4, List<String> list5, List<String> list6, String str2) {
+        StringBuilder sb = new StringBuilder(100);
+        sb.append("MECARD:");
+        StringBuilder sb2 = new StringBuilder(100);
+        MECARDFieldFormatter mECARDFieldFormatter = new MECARDFieldFormatter();
+        appendUpToUnique(sb, sb2, "N", list, 1, new MECARDNameDisplayFormatter(), mECARDFieldFormatter, TERMINATOR);
+        append(sb, sb2, "ORG", str, mECARDFieldFormatter, TERMINATOR);
+        appendUpToUnique(sb, sb2, "ADR", list2, 1, null, mECARDFieldFormatter, TERMINATOR);
+        appendUpToUnique(sb, sb2, "TEL", list3, IntCompanionObject.MAX_VALUE, new MECARDTelDisplayFormatter(), mECARDFieldFormatter, TERMINATOR);
+        appendUpToUnique(sb, sb2, "EMAIL", list5, IntCompanionObject.MAX_VALUE, null, mECARDFieldFormatter, TERMINATOR);
+        appendUpToUnique(sb, sb2, "URL", list6, IntCompanionObject.MAX_VALUE, null, mECARDFieldFormatter, TERMINATOR);
+        append(sb, sb2, "NOTE", str2, mECARDFieldFormatter, TERMINATOR);
+        sb.append(TERMINATOR);
+        return new String[]{sb.toString(), sb2.toString()};
     }
 
     private static class MECARDFieldFormatter implements Formatter {
@@ -36,8 +37,8 @@ public final class MECARDContactEncoder extends ContactEncoder {
         }
 
         @Override // com.google.zxing.client.android.encode.Formatter
-        public CharSequence format(CharSequence value, int index) {
-            return ':' + NEWLINE.matcher(RESERVED_MECARD_CHARS.matcher(value).replaceAll("\\\\$1")).replaceAll("");
+        public CharSequence format(CharSequence charSequence, int i) {
+            return ':' + NEWLINE.matcher(RESERVED_MECARD_CHARS.matcher(charSequence).replaceAll("\\\\$1")).replaceAll("");
         }
     }
 
@@ -48,8 +49,8 @@ public final class MECARDContactEncoder extends ContactEncoder {
         }
 
         @Override // com.google.zxing.client.android.encode.Formatter
-        public CharSequence format(CharSequence value, int index) {
-            return NOT_DIGITS.matcher(PhoneNumberUtils.formatNumber(value.toString())).replaceAll("");
+        public CharSequence format(CharSequence charSequence, int i) {
+            return NOT_DIGITS.matcher(PhoneNumberUtils.formatNumber(charSequence.toString())).replaceAll("");
         }
     }
 
@@ -60,8 +61,8 @@ public final class MECARDContactEncoder extends ContactEncoder {
         }
 
         @Override // com.google.zxing.client.android.encode.Formatter
-        public CharSequence format(CharSequence value, int index) {
-            return COMMA.matcher(value).replaceAll("");
+        public CharSequence format(CharSequence charSequence, int i) {
+            return COMMA.matcher(charSequence).replaceAll("");
         }
     }
 }

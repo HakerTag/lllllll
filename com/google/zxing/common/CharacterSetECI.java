@@ -40,43 +40,43 @@ public enum CharacterSetECI {
 
     static {
         CharacterSetECI[] values2 = values();
-        for (CharacterSetECI eci : values2) {
-            for (int value : eci.values) {
-                VALUE_TO_ECI.put(Integer.valueOf(value), eci);
+        for (CharacterSetECI characterSetECI : values2) {
+            for (int i : characterSetECI.values) {
+                VALUE_TO_ECI.put(Integer.valueOf(i), characterSetECI);
             }
-            NAME_TO_ECI.put(eci.name(), eci);
-            for (String name : eci.otherEncodingNames) {
-                NAME_TO_ECI.put(name, eci);
+            NAME_TO_ECI.put(characterSetECI.name(), characterSetECI);
+            for (String str : characterSetECI.otherEncodingNames) {
+                NAME_TO_ECI.put(str, characterSetECI);
             }
         }
     }
 
-    private CharacterSetECI(int value) {
-        this(new int[]{value}, new String[0]);
+    private CharacterSetECI(int i) {
+        this(new int[]{i}, new String[0]);
     }
 
-    private CharacterSetECI(int value, String... otherEncodingNames2) {
-        this.values = new int[]{value};
-        this.otherEncodingNames = otherEncodingNames2;
+    private CharacterSetECI(int i, String... strArr) {
+        this.values = new int[]{i};
+        this.otherEncodingNames = strArr;
     }
 
-    private CharacterSetECI(int[] values2, String... otherEncodingNames2) {
-        this.values = values2;
-        this.otherEncodingNames = otherEncodingNames2;
+    private CharacterSetECI(int[] iArr, String... strArr) {
+        this.values = iArr;
+        this.otherEncodingNames = strArr;
     }
 
     public int getValue() {
         return this.values[0];
     }
 
-    public static CharacterSetECI getCharacterSetECIByValue(int value) throws FormatException {
-        if (value >= 0 && value < 900) {
-            return VALUE_TO_ECI.get(Integer.valueOf(value));
+    public static CharacterSetECI getCharacterSetECIByValue(int i) throws FormatException {
+        if (i >= 0 && i < 900) {
+            return VALUE_TO_ECI.get(Integer.valueOf(i));
         }
         throw FormatException.getFormatInstance();
     }
 
-    public static CharacterSetECI getCharacterSetECIByName(String name) {
-        return NAME_TO_ECI.get(name);
+    public static CharacterSetECI getCharacterSetECIByName(String str) {
+        return NAME_TO_ECI.get(str);
     }
 }

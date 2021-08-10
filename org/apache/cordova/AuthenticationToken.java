@@ -8,15 +8,15 @@ public class AuthenticationToken {
         return this.userName;
     }
 
-    public void setUserName(String userName2) {
-        this.userName = userName2;
+    public void setUserName(String str) {
+        this.userName = str;
     }
 
     public String getPassword() {
         return this.password;
     }
 
-    public void setPassword(String password2) {
-        this.password = password2;
+    public void setPassword(String str) {
+        this.password = str;
     }
 }

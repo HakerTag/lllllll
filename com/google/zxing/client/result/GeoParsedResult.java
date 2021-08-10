@@ -6,29 +6,29 @@ public final class GeoParsedResult extends ParsedResult {
     private final double longitude;
     private final String query;
 
-    GeoParsedResult(double latitude2, double longitude2, double altitude2, String query2) {
+    GeoParsedResult(double d, double d2, double d3, String str) {
         super(ParsedResultType.GEO);
-        this.latitude = latitude2;
-        this.longitude = longitude2;
-        this.altitude = altitude2;
-        this.query = query2;
+        this.latitude = d;
+        this.longitude = d2;
+        this.altitude = d3;
+        this.query = str;
     }
 
     public String getGeoURI() {
-        StringBuilder result = new StringBuilder();
-        result.append("geo:");
-        result.append(this.latitude);
-        result.append(',');
-        result.append(this.longitude);
+        StringBuilder sb = new StringBuilder();
+        sb.append("geo:");
+        sb.append(this.latitude);
+        sb.append(',');
+        sb.append(this.longitude);
         if (this.altitude > 0.0d) {
-            result.append(',');
-            result.append(this.altitude);
+            sb.append(',');
+            sb.append(this.altitude);
         }
         if (this.query != null) {
-            result.append('?');
-            result.append(this.query);
+            sb.append('?');
+            sb.append(this.query);
         }
-        return result.toString();
+        return sb.toString();
     }
 
     public double getLatitude() {
@@ -49,20 +49,20 @@ public final class GeoParsedResult extends ParsedResult {
 
     @Override // com.google.zxing.client.result.ParsedResult
     public String getDisplayResult() {
-        StringBuilder result = new StringBuilder(20);
-        result.append(this.latitude);
-        result.append(", ");
-        result.append(this.longitude);
+        StringBuilder sb = new StringBuilder(20);
+        sb.append(this.latitude);
+        sb.append(", ");
+        sb.append(this.longitude);
         if (this.altitude > 0.0d) {
-            result.append(", ");
-            result.append(this.altitude);
-            result.append('m');
+            sb.append(", ");
+            sb.append(this.altitude);
+            sb.append('m');
         }
         if (this.query != null) {
-            result.append(" (");
-            result.append(this.query);
-            result.append(')');
+            sb.append(" (");
+            sb.append(this.query);
+            sb.append(')');
         }
-        return result.toString();
+        return sb.toString();
     }
 }

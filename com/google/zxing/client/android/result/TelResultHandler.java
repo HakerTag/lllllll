@@ -9,8 +9,8 @@ import com.google.zxing.client.result.TelParsedResult;
 public final class TelResultHandler extends ResultHandler {
     private static final int[] buttons = {R.string.button_dial, R.string.button_add_contact};
 
-    public TelResultHandler(Activity activity, ParsedResult result) {
-        super(activity, result);
+    public TelResultHandler(Activity activity, ParsedResult parsedResult) {
+        super(activity, parsedResult);
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler
@@ -19,18 +19,18 @@ public final class TelResultHandler extends ResultHandler {
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler
-    public int getButtonText(int index) {
-        return buttons[index];
+    public int getButtonText(int i) {
+        return buttons[i];
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler
-    public void handleButtonPress(int index) {
-        TelParsedResult telResult = (TelParsedResult) getResult();
-        if (index == 0) {
-            dialPhoneFromUri(telResult.getTelURI());
+    public void handleButtonPress(int i) {
+        TelParsedResult telParsedResult = (TelParsedResult) getResult();
+        if (i == 0) {
+            dialPhoneFromUri(telParsedResult.getTelURI());
             getActivity().finish();
-        } else if (index == 1) {
-            addPhoneOnlyContact(new String[]{telResult.getNumber()}, null);
+        } else if (i == 1) {
+            addPhoneOnlyContact(new String[]{telParsedResult.getNumber()}, null);
         }
     }
 

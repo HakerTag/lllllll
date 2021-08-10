@@ -9,51 +9,54 @@ public final class EmailAddressResultParser extends ResultParser {
 
     @Override // com.google.zxing.client.result.ResultParser
     public EmailAddressParsedResult parse(Result result) {
-        String hostEmail;
-        String tosString;
-        String rawText = getMassagedText(result);
-        if (rawText.startsWith("mailto:") || rawText.startsWith("MAILTO:")) {
-            String hostEmail2 = rawText.substring(7);
-            int queryStart = hostEmail2.indexOf(63);
-            if (queryStart >= 0) {
-                hostEmail = hostEmail2.substring(0, queryStart);
-            } else {
-                hostEmail = hostEmail2;
+        String str;
+        String str2;
+        String[] strArr;
+        String[] strArr2;
+        String[] strArr3;
+        String str3;
+        String massagedText = getMassagedText(result);
+        String[] strArr4 = null;
+        if (massagedText.startsWith("mailto:") || massagedText.startsWith("MAILTO:")) {
+            String substring = massagedText.substring(7);
+            int indexOf = substring.indexOf(63);
+            if (indexOf >= 0) {
+                substring = substring.substring(0, indexOf);
             }
             try {
-                String hostEmail3 = urlDecode(hostEmail);
-                String[] tos = null;
-                if (!hostEmail3.isEmpty()) {
-                    tos = COMMA.split(hostEmail3);
+                String urlDecode = urlDecode(substring);
+                String[] split = !urlDecode.isEmpty() ? COMMA.split(urlDecode) : null;
+                Map<String, String> parseNameValuePairs = parseNameValuePairs(massagedText);
+                if (parseNameValuePairs != null) {
+                    if (split == null && (str3 = parseNameValuePairs.get("to")) != null) {
+                        split = COMMA.split(str3);
+                    }
+                    String str4 = parseNameValuePairs.get("cc");
+                    String[] split2 = str4 != null ? COMMA.split(str4) : null;
+                    String str5 = parseNameValuePairs.get("bcc");
+                    if (str5 != null) {
+                        strArr4 = COMMA.split(str5);
+                    }
+                    str = parseNameValuePairs.get("body");
+                    strArr3 = split;
+                    strArr = strArr4;
+                    strArr2 = split2;
+                    str2 = parseNameValuePairs.get("subject");
+                } else {
+                    strArr3 = split;
+                    strArr2 = null;
+                    strArr = null;
+                    str2 = null;
+                    str = null;
                 }
-                Map<String, String> nameValues = parseNameValuePairs(rawText);
-                String[] ccs = null;
-                String[] bccs = null;
-                String subject = null;
-                String body = null;
-                if (nameValues != null) {
-                    if (tos == null && (tosString = nameValues.get("to")) != null) {
-                        tos = COMMA.split(tosString);
-                    }
-                    String ccString = nameValues.get("cc");
-                    if (ccString != null) {
-                        ccs = COMMA.split(ccString);
-                    }
-                    String bccString = nameValues.get("bcc");
-                    if (bccString != null) {
-                        bccs = COMMA.split(bccString);
-                    }
-                    subject = nameValues.get("subject");
-                    body = nameValues.get("body");
-                }
-                return new EmailAddressParsedResult(tos, ccs, bccs, subject, body);
-            } catch (IllegalArgumentException e) {
+                return new EmailAddressParsedResult(strArr3, strArr2, strArr, str2, str);
+            } catch (IllegalArgumentException unused) {
                 return null;
             }
-        } else if (!EmailDoCoMoResultParser.isBasicallyValidEmailAddress(rawText)) {
+        } else if (!EmailDoCoMoResultParser.isBasicallyValidEmailAddress(massagedText)) {
             return null;
         } else {
-            return new EmailAddressParsedResult(rawText);
+            return new EmailAddressParsedResult(massagedText);
         }
     }
 }

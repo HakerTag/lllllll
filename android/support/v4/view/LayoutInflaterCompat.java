@@ -18,16 +18,16 @@ public final class LayoutInflaterCompat {
     public static class Factory2Wrapper implements LayoutInflater.Factory2 {
         final LayoutInflaterFactory mDelegateFactory;
 
-        Factory2Wrapper(LayoutInflaterFactory delegateFactory) {
-            this.mDelegateFactory = delegateFactory;
+        Factory2Wrapper(LayoutInflaterFactory layoutInflaterFactory) {
+            this.mDelegateFactory = layoutInflaterFactory;
         }
 
-        public View onCreateView(String name, Context context, AttributeSet attrs) {
-            return this.mDelegateFactory.onCreateView(null, name, context, attrs);
+        public View onCreateView(String str, Context context, AttributeSet attributeSet) {
+            return this.mDelegateFactory.onCreateView(null, str, context, attributeSet);
         }
 
-        public View onCreateView(View parent, String name, Context context, AttributeSet attributeSet) {
-            return this.mDelegateFactory.onCreateView(parent, name, context, attributeSet);
+        public View onCreateView(View view, String str, Context context, AttributeSet attributeSet) {
+            return this.mDelegateFactory.onCreateView(view, str, context, attributeSet);
         }
 
         public String toString() {
@@ -35,7 +35,7 @@ public final class LayoutInflaterCompat {
         }
     }
 
-    static void forceSetFactory2(LayoutInflater inflater, LayoutInflater.Factory2 factory) {
+    static void forceSetFactory2(LayoutInflater layoutInflater, LayoutInflater.Factory2 factory2) {
         if (!sCheckedField) {
             try {
                 Field declaredField = LayoutInflater.class.getDeclaredField("mFactory2");
@@ -49,9 +49,9 @@ public final class LayoutInflaterCompat {
         Field field = sLayoutInflaterFactory2Field;
         if (field != null) {
             try {
-                field.set(inflater, factory);
+                field.set(layoutInflater, factory2);
             } catch (IllegalAccessException e2) {
-                Log.e(TAG, "forceSetFactory2 could not set the Factory2 on LayoutInflater " + inflater + "; inflation may have unexpected results.", e2);
+                Log.e(TAG, "forceSetFactory2 could not set the Factory2 on LayoutInflater " + layoutInflater + "; inflation may have unexpected results.", e2);
             }
         }
     }
@@ -61,22 +61,22 @@ public final class LayoutInflaterCompat {
         LayoutInflaterCompatBaseImpl() {
         }
 
-        public void setFactory(LayoutInflater inflater, LayoutInflaterFactory factory) {
-            setFactory2(inflater, factory != null ? new Factory2Wrapper(factory) : null);
+        public void setFactory(LayoutInflater layoutInflater, LayoutInflaterFactory layoutInflaterFactory) {
+            setFactory2(layoutInflater, layoutInflaterFactory != null ? new Factory2Wrapper(layoutInflaterFactory) : null);
         }
 
-        public void setFactory2(LayoutInflater inflater, LayoutInflater.Factory2 factory) {
-            inflater.setFactory2(factory);
-            LayoutInflater.Factory f = inflater.getFactory();
-            if (f instanceof LayoutInflater.Factory2) {
-                LayoutInflaterCompat.forceSetFactory2(inflater, (LayoutInflater.Factory2) f);
+        public void setFactory2(LayoutInflater layoutInflater, LayoutInflater.Factory2 factory2) {
+            layoutInflater.setFactory2(factory2);
+            LayoutInflater.Factory factory = layoutInflater.getFactory();
+            if (factory instanceof LayoutInflater.Factory2) {
+                LayoutInflaterCompat.forceSetFactory2(layoutInflater, (LayoutInflater.Factory2) factory);
             } else {
-                LayoutInflaterCompat.forceSetFactory2(inflater, factory);
+                LayoutInflaterCompat.forceSetFactory2(layoutInflater, factory2);
             }
         }
 
-        public LayoutInflaterFactory getFactory(LayoutInflater inflater) {
-            LayoutInflater.Factory factory = inflater.getFactory();
+        public LayoutInflaterFactory getFactory(LayoutInflater layoutInflater) {
+            LayoutInflater.Factory factory = layoutInflater.getFactory();
             if (factory instanceof Factory2Wrapper) {
                 return ((Factory2Wrapper) factory).mDelegateFactory;
             }
@@ -89,13 +89,13 @@ public final class LayoutInflaterCompat {
         }
 
         @Override // android.support.v4.view.LayoutInflaterCompat.LayoutInflaterCompatBaseImpl
-        public void setFactory(LayoutInflater inflater, LayoutInflaterFactory factory) {
-            inflater.setFactory2(factory != null ? new Factory2Wrapper(factory) : null);
+        public void setFactory(LayoutInflater layoutInflater, LayoutInflaterFactory layoutInflaterFactory) {
+            layoutInflater.setFactory2(layoutInflaterFactory != null ? new Factory2Wrapper(layoutInflaterFactory) : null);
         }
 
         @Override // android.support.v4.view.LayoutInflaterCompat.LayoutInflaterCompatBaseImpl
-        public void setFactory2(LayoutInflater inflater, LayoutInflater.Factory2 factory) {
-            inflater.setFactory2(factory);
+        public void setFactory2(LayoutInflater layoutInflater, LayoutInflater.Factory2 factory2) {
+            layoutInflater.setFactory2(factory2);
         }
     }
 
@@ -111,16 +111,16 @@ public final class LayoutInflaterCompat {
     }
 
     @Deprecated
-    public static void setFactory(LayoutInflater inflater, LayoutInflaterFactory factory) {
-        IMPL.setFactory(inflater, factory);
+    public static void setFactory(LayoutInflater layoutInflater, LayoutInflaterFactory layoutInflaterFactory) {
+        IMPL.setFactory(layoutInflater, layoutInflaterFactory);
     }
 
-    public static void setFactory2(LayoutInflater inflater, LayoutInflater.Factory2 factory) {
-        IMPL.setFactory2(inflater, factory);
+    public static void setFactory2(LayoutInflater layoutInflater, LayoutInflater.Factory2 factory2) {
+        IMPL.setFactory2(layoutInflater, factory2);
     }
 
     @Deprecated
-    public static LayoutInflaterFactory getFactory(LayoutInflater inflater) {
-        return IMPL.getFactory(inflater);
+    public static LayoutInflaterFactory getFactory(LayoutInflater layoutInflater) {
+        return IMPL.getFactory(layoutInflater);
     }
 }

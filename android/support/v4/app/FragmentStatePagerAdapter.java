@@ -20,58 +20,58 @@ public abstract class FragmentStatePagerAdapter extends PagerAdapter {
 
     public abstract Fragment getItem(int i);
 
-    public FragmentStatePagerAdapter(FragmentManager fm) {
-        this.mFragmentManager = fm;
+    public FragmentStatePagerAdapter(FragmentManager fragmentManager) {
+        this.mFragmentManager = fragmentManager;
     }
 
     @Override // android.support.v4.view.PagerAdapter
-    public void startUpdate(ViewGroup container) {
-        if (container.getId() == -1) {
+    public void startUpdate(ViewGroup viewGroup) {
+        if (viewGroup.getId() == -1) {
             throw new IllegalStateException("ViewPager with adapter " + this + " requires a view id");
         }
     }
 
     @Override // android.support.v4.view.PagerAdapter
-    public Object instantiateItem(ViewGroup container, int position) {
-        Fragment.SavedState fss;
-        Fragment f;
-        if (this.mFragments.size() > position && (f = this.mFragments.get(position)) != null) {
-            return f;
+    public Object instantiateItem(ViewGroup viewGroup, int i) {
+        Fragment.SavedState savedState;
+        Fragment fragment;
+        if (this.mFragments.size() > i && (fragment = this.mFragments.get(i)) != null) {
+            return fragment;
         }
         if (this.mCurTransaction == null) {
             this.mCurTransaction = this.mFragmentManager.beginTransaction();
         }
-        Fragment fragment = getItem(position);
-        if (this.mSavedState.size() > position && (fss = this.mSavedState.get(position)) != null) {
-            fragment.setInitialSavedState(fss);
+        Fragment item = getItem(i);
+        if (this.mSavedState.size() > i && (savedState = this.mSavedState.get(i)) != null) {
+            item.setInitialSavedState(savedState);
         }
-        while (this.mFragments.size() <= position) {
+        while (this.mFragments.size() <= i) {
             this.mFragments.add(null);
         }
-        fragment.setMenuVisibility(false);
-        fragment.setUserVisibleHint(false);
-        this.mFragments.set(position, fragment);
-        this.mCurTransaction.add(container.getId(), fragment);
-        return fragment;
+        item.setMenuVisibility(false);
+        item.setUserVisibleHint(false);
+        this.mFragments.set(i, item);
+        this.mCurTransaction.add(viewGroup.getId(), item);
+        return item;
     }
 
     @Override // android.support.v4.view.PagerAdapter
-    public void destroyItem(ViewGroup container, int position, Object object) {
-        Fragment fragment = (Fragment) object;
+    public void destroyItem(ViewGroup viewGroup, int i, Object obj) {
+        Fragment fragment = (Fragment) obj;
         if (this.mCurTransaction == null) {
             this.mCurTransaction = this.mFragmentManager.beginTransaction();
         }
-        while (this.mSavedState.size() <= position) {
+        while (this.mSavedState.size() <= i) {
             this.mSavedState.add(null);
         }
-        this.mSavedState.set(position, fragment.isAdded() ? this.mFragmentManager.saveFragmentInstanceState(fragment) : null);
-        this.mFragments.set(position, null);
+        this.mSavedState.set(i, fragment.isAdded() ? this.mFragmentManager.saveFragmentInstanceState(fragment) : null);
+        this.mFragments.set(i, null);
         this.mCurTransaction.remove(fragment);
     }
 
     @Override // android.support.v4.view.PagerAdapter
-    public void setPrimaryItem(ViewGroup container, int position, Object object) {
-        Fragment fragment = (Fragment) object;
+    public void setPrimaryItem(ViewGroup viewGroup, int i, Object obj) {
+        Fragment fragment = (Fragment) obj;
         Fragment fragment2 = this.mCurrentPrimaryItem;
         if (fragment != fragment2) {
             if (fragment2 != null) {
@@ -87,7 +87,7 @@ public abstract class FragmentStatePagerAdapter extends PagerAdapter {
     }
 
     @Override // android.support.v4.view.PagerAdapter
-    public void finishUpdate(ViewGroup container) {
+    public void finishUpdate(ViewGroup viewGroup) {
         FragmentTransaction fragmentTransaction = this.mCurTransaction;
         if (fragmentTransaction != null) {
             fragmentTransaction.commitNowAllowingStateLoss();
@@ -96,56 +96,58 @@ public abstract class FragmentStatePagerAdapter extends PagerAdapter {
     }
 
     @Override // android.support.v4.view.PagerAdapter
-    public boolean isViewFromObject(View view, Object object) {
-        return ((Fragment) object).getView() == view;
+    public boolean isViewFromObject(View view, Object obj) {
+        return ((Fragment) obj).getView() == view;
     }
 
     @Override // android.support.v4.view.PagerAdapter
     public Parcelable saveState() {
-        Bundle state = null;
+        Bundle bundle;
         if (this.mSavedState.size() > 0) {
-            state = new Bundle();
-            Fragment.SavedState[] fss = new Fragment.SavedState[this.mSavedState.size()];
-            this.mSavedState.toArray(fss);
-            state.putParcelableArray("states", fss);
+            bundle = new Bundle();
+            Fragment.SavedState[] savedStateArr = new Fragment.SavedState[this.mSavedState.size()];
+            this.mSavedState.toArray(savedStateArr);
+            bundle.putParcelableArray("states", savedStateArr);
+        } else {
+            bundle = null;
         }
         for (int i = 0; i < this.mFragments.size(); i++) {
-            Fragment f = this.mFragments.get(i);
-            if (f != null && f.isAdded()) {
-                if (state == null) {
-                    state = new Bundle();
+            Fragment fragment = this.mFragments.get(i);
+            if (fragment != null && fragment.isAdded()) {
+                if (bundle == null) {
+                    bundle = new Bundle();
                 }
-                this.mFragmentManager.putFragment(state, "f" + i, f);
+                this.mFragmentManager.putFragment(bundle, "f" + i, fragment);
             }
         }
-        return state;
+        return bundle;
     }
 
     @Override // android.support.v4.view.PagerAdapter
-    public void restoreState(Parcelable state, ClassLoader loader) {
-        if (state != null) {
-            Bundle bundle = (Bundle) state;
-            bundle.setClassLoader(loader);
-            Parcelable[] fss = bundle.getParcelableArray("states");
+    public void restoreState(Parcelable parcelable, ClassLoader classLoader) {
+        if (parcelable != null) {
+            Bundle bundle = (Bundle) parcelable;
+            bundle.setClassLoader(classLoader);
+            Parcelable[] parcelableArray = bundle.getParcelableArray("states");
             this.mSavedState.clear();
             this.mFragments.clear();
-            if (fss != null) {
-                for (Parcelable parcelable : fss) {
-                    this.mSavedState.add((Fragment.SavedState) parcelable);
+            if (parcelableArray != null) {
+                for (Parcelable parcelable2 : parcelableArray) {
+                    this.mSavedState.add((Fragment.SavedState) parcelable2);
                 }
             }
-            for (String key : bundle.keySet()) {
-                if (key.startsWith("f")) {
-                    int index = Integer.parseInt(key.substring(1));
-                    Fragment f = this.mFragmentManager.getFragment(bundle, key);
-                    if (f != null) {
-                        while (this.mFragments.size() <= index) {
+            for (T t : bundle.keySet()) {
+                if (t.startsWith("f")) {
+                    int parseInt = Integer.parseInt(t.substring(1));
+                    Fragment fragment = this.mFragmentManager.getFragment(bundle, t);
+                    if (fragment != null) {
+                        while (this.mFragments.size() <= parseInt) {
                             this.mFragments.add(null);
                         }
-                        f.setMenuVisibility(false);
-                        this.mFragments.set(index, f);
+                        fragment.setMenuVisibility(false);
+                        this.mFragments.set(parseInt, fragment);
                     } else {
-                        Log.w(TAG, "Bad fragment at key " + key);
+                        Log.w(TAG, "Bad fragment at key " + ((String) t));
                     }
                 }
             }

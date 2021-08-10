@@ -9,13 +9,13 @@ public final class ListPopupWindowCompat {
     }
 
     @Deprecated
-    public static View.OnTouchListener createDragToOpenListener(Object listPopupWindow, View src) {
-        return createDragToOpenListener((ListPopupWindow) listPopupWindow, src);
+    public static View.OnTouchListener createDragToOpenListener(Object obj, View view) {
+        return createDragToOpenListener((ListPopupWindow) obj, view);
     }
 
-    public static View.OnTouchListener createDragToOpenListener(ListPopupWindow listPopupWindow, View src) {
+    public static View.OnTouchListener createDragToOpenListener(ListPopupWindow listPopupWindow, View view) {
         if (Build.VERSION.SDK_INT >= 19) {
-            return listPopupWindow.createDragToOpenListener(src);
+            return listPopupWindow.createDragToOpenListener(view);
         }
         return null;
     }

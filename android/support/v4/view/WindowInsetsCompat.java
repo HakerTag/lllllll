@@ -7,14 +7,14 @@ import android.view.WindowInsets;
 public class WindowInsetsCompat {
     private final Object mInsets;
 
-    private WindowInsetsCompat(Object insets) {
-        this.mInsets = insets;
+    private WindowInsetsCompat(Object obj) {
+        this.mInsets = obj;
     }
 
-    public WindowInsetsCompat(WindowInsetsCompat src) {
+    public WindowInsetsCompat(WindowInsetsCompat windowInsetsCompat) {
         WindowInsets windowInsets = null;
         if (Build.VERSION.SDK_INT >= 20) {
-            this.mInsets = src != null ? new WindowInsets((WindowInsets) src.mInsets) : windowInsets;
+            this.mInsets = windowInsetsCompat != null ? new WindowInsets((WindowInsets) windowInsetsCompat.mInsets) : windowInsets;
         } else {
             this.mInsets = null;
         }
@@ -83,16 +83,16 @@ public class WindowInsetsCompat {
         return null;
     }
 
-    public WindowInsetsCompat replaceSystemWindowInsets(int left, int top, int right, int bottom) {
+    public WindowInsetsCompat replaceSystemWindowInsets(int i, int i2, int i3, int i4) {
         if (Build.VERSION.SDK_INT >= 20) {
-            return new WindowInsetsCompat(((WindowInsets) this.mInsets).replaceSystemWindowInsets(left, top, right, bottom));
+            return new WindowInsetsCompat(((WindowInsets) this.mInsets).replaceSystemWindowInsets(i, i2, i3, i4));
         }
         return null;
     }
 
-    public WindowInsetsCompat replaceSystemWindowInsets(Rect systemWindowInsets) {
+    public WindowInsetsCompat replaceSystemWindowInsets(Rect rect) {
         if (Build.VERSION.SDK_INT >= 21) {
-            return new WindowInsetsCompat(((WindowInsets) this.mInsets).replaceSystemWindowInsets(systemWindowInsets));
+            return new WindowInsetsCompat(((WindowInsets) this.mInsets).replaceSystemWindowInsets(rect));
         }
         return null;
     }
@@ -139,19 +139,19 @@ public class WindowInsetsCompat {
         return null;
     }
 
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        WindowInsetsCompat other = (WindowInsetsCompat) o;
-        Object obj = this.mInsets;
-        if (obj != null) {
-            return obj.equals(other.mInsets);
+        Object obj2 = this.mInsets;
+        Object obj3 = ((WindowInsetsCompat) obj).mInsets;
+        if (obj2 != null) {
+            return obj2.equals(obj3);
         }
-        if (other.mInsets == null) {
+        if (obj3 == null) {
             return true;
         }
         return false;
@@ -165,17 +165,17 @@ public class WindowInsetsCompat {
         return obj.hashCode();
     }
 
-    static WindowInsetsCompat wrap(Object insets) {
-        if (insets == null) {
+    static WindowInsetsCompat wrap(Object obj) {
+        if (obj == null) {
             return null;
         }
-        return new WindowInsetsCompat(insets);
+        return new WindowInsetsCompat(obj);
     }
 
-    static Object unwrap(WindowInsetsCompat insets) {
-        if (insets == null) {
+    static Object unwrap(WindowInsetsCompat windowInsetsCompat) {
+        if (windowInsetsCompat == null) {
             return null;
         }
-        return insets.mInsets;
+        return windowInsetsCompat.mInsets;
     }
 }

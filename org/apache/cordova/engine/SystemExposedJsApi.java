@@ -9,25 +9,25 @@ import org.json.JSONException;
 public class SystemExposedJsApi implements ExposedJsApi {
     private final CordovaBridge bridge;
 
-    SystemExposedJsApi(CordovaBridge bridge2) {
-        this.bridge = bridge2;
+    SystemExposedJsApi(CordovaBridge cordovaBridge) {
+        this.bridge = cordovaBridge;
     }
 
     @Override // org.apache.cordova.ExposedJsApi
     @JavascriptInterface
-    public String exec(int bridgeSecret, String service, String action, String callbackId, String arguments) throws JSONException, IllegalAccessException {
-        return this.bridge.jsExec(bridgeSecret, service, action, callbackId, arguments);
+    public String exec(int i, String str, String str2, String str3, String str4) throws JSONException, IllegalAccessException {
+        return this.bridge.jsExec(i, str, str2, str3, str4);
     }
 
     @Override // org.apache.cordova.ExposedJsApi
     @JavascriptInterface
-    public void setNativeToJsBridgeMode(int bridgeSecret, int value) throws IllegalAccessException {
-        this.bridge.jsSetNativeToJsBridgeMode(bridgeSecret, value);
+    public void setNativeToJsBridgeMode(int i, int i2) throws IllegalAccessException {
+        this.bridge.jsSetNativeToJsBridgeMode(i, i2);
     }
 
     @Override // org.apache.cordova.ExposedJsApi
     @JavascriptInterface
-    public String retrieveJsMessages(int bridgeSecret, boolean fromOnlineEvent) throws IllegalAccessException {
-        return this.bridge.jsRetrieveJsMessages(bridgeSecret, fromOnlineEvent);
+    public String retrieveJsMessages(int i, boolean z) throws IllegalAccessException {
+        return this.bridge.jsRetrieveJsMessages(i, z);
     }
 }

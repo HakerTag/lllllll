@@ -12,19 +12,19 @@ import java.net.SocketException;
 import java.net.SocketImpl;
 
 class DatagramSocketWrapper extends Socket {
-    DatagramSocketWrapper(DatagramSocket socket, FileDescriptor fd) throws SocketException {
-        super(new DatagramSocketImplWrapper(socket, fd));
+    DatagramSocketWrapper(DatagramSocket datagramSocket, FileDescriptor fileDescriptor) throws SocketException {
+        super(new DatagramSocketImplWrapper(datagramSocket, fileDescriptor));
     }
 
     private static class DatagramSocketImplWrapper extends SocketImpl {
-        DatagramSocketImplWrapper(DatagramSocket socket, FileDescriptor fd) {
-            this.localport = socket.getLocalPort();
-            this.fd = fd;
+        DatagramSocketImplWrapper(DatagramSocket datagramSocket, FileDescriptor fileDescriptor) {
+            this.localport = datagramSocket.getLocalPort();
+            this.fd = fileDescriptor;
         }
 
         /* access modifiers changed from: protected */
         @Override // java.net.SocketImpl
-        public void accept(SocketImpl newSocket) throws IOException {
+        public void accept(SocketImpl socketImpl) throws IOException {
             throw new UnsupportedOperationException();
         }
 
@@ -36,7 +36,7 @@ class DatagramSocketWrapper extends Socket {
 
         /* access modifiers changed from: protected */
         @Override // java.net.SocketImpl
-        public void bind(InetAddress address, int port) throws IOException {
+        public void bind(InetAddress inetAddress, int i) throws IOException {
             throw new UnsupportedOperationException();
         }
 
@@ -48,19 +48,19 @@ class DatagramSocketWrapper extends Socket {
 
         /* access modifiers changed from: protected */
         @Override // java.net.SocketImpl
-        public void connect(String host, int port) throws IOException {
+        public void connect(String str, int i) throws IOException {
             throw new UnsupportedOperationException();
         }
 
         /* access modifiers changed from: protected */
         @Override // java.net.SocketImpl
-        public void connect(InetAddress address, int port) throws IOException {
+        public void connect(InetAddress inetAddress, int i) throws IOException {
             throw new UnsupportedOperationException();
         }
 
         /* access modifiers changed from: protected */
         @Override // java.net.SocketImpl
-        public void create(boolean isStreaming) throws IOException {
+        public void create(boolean z) throws IOException {
             throw new UnsupportedOperationException();
         }
 
@@ -78,29 +78,29 @@ class DatagramSocketWrapper extends Socket {
 
         /* access modifiers changed from: protected */
         @Override // java.net.SocketImpl
-        public void listen(int backlog) throws IOException {
+        public void listen(int i) throws IOException {
             throw new UnsupportedOperationException();
         }
 
         /* access modifiers changed from: protected */
         @Override // java.net.SocketImpl
-        public void connect(SocketAddress remoteAddr, int timeout) throws IOException {
+        public void connect(SocketAddress socketAddress, int i) throws IOException {
             throw new UnsupportedOperationException();
         }
 
         /* access modifiers changed from: protected */
         @Override // java.net.SocketImpl
-        public void sendUrgentData(int value) throws IOException {
+        public void sendUrgentData(int i) throws IOException {
             throw new UnsupportedOperationException();
         }
 
         @Override // java.net.SocketOptions
-        public Object getOption(int optID) throws SocketException {
+        public Object getOption(int i) throws SocketException {
             throw new UnsupportedOperationException();
         }
 
         @Override // java.net.SocketOptions
-        public void setOption(int optID, Object val) throws SocketException {
+        public void setOption(int i, Object obj) throws SocketException {
             throw new UnsupportedOperationException();
         }
     }

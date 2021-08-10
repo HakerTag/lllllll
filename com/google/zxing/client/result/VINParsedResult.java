@@ -11,17 +11,17 @@ public final class VINParsedResult extends ParsedResult {
     private final String vin;
     private final String worldManufacturerID;
 
-    public VINParsedResult(String vin2, String worldManufacturerID2, String vehicleDescriptorSection2, String vehicleIdentifierSection2, String countryCode2, String vehicleAttributes2, int modelYear2, char plantCode2, String sequentialNumber2) {
+    public VINParsedResult(String str, String str2, String str3, String str4, String str5, String str6, int i, char c, String str7) {
         super(ParsedResultType.VIN);
-        this.vin = vin2;
-        this.worldManufacturerID = worldManufacturerID2;
-        this.vehicleDescriptorSection = vehicleDescriptorSection2;
-        this.vehicleIdentifierSection = vehicleIdentifierSection2;
-        this.countryCode = countryCode2;
-        this.vehicleAttributes = vehicleAttributes2;
-        this.modelYear = modelYear2;
-        this.plantCode = plantCode2;
-        this.sequentialNumber = sequentialNumber2;
+        this.vin = str;
+        this.worldManufacturerID = str2;
+        this.vehicleDescriptorSection = str3;
+        this.vehicleIdentifierSection = str4;
+        this.countryCode = str5;
+        this.vehicleAttributes = str6;
+        this.modelYear = i;
+        this.plantCode = c;
+        this.sequentialNumber = str7;
     }
 
     public String getVIN() {
@@ -62,24 +62,24 @@ public final class VINParsedResult extends ParsedResult {
 
     @Override // com.google.zxing.client.result.ParsedResult
     public String getDisplayResult() {
-        StringBuilder result = new StringBuilder(50);
-        result.append(this.worldManufacturerID);
-        result.append(' ');
-        result.append(this.vehicleDescriptorSection);
-        result.append(' ');
-        result.append(this.vehicleIdentifierSection);
-        result.append('\n');
+        StringBuilder sb = new StringBuilder(50);
+        sb.append(this.worldManufacturerID);
+        sb.append(' ');
+        sb.append(this.vehicleDescriptorSection);
+        sb.append(' ');
+        sb.append(this.vehicleIdentifierSection);
+        sb.append('\n');
         String str = this.countryCode;
         if (str != null) {
-            result.append(str);
-            result.append(' ');
+            sb.append(str);
+            sb.append(' ');
         }
-        result.append(this.modelYear);
-        result.append(' ');
-        result.append(this.plantCode);
-        result.append(' ');
-        result.append(this.sequentialNumber);
-        result.append('\n');
-        return result.toString();
+        sb.append(this.modelYear);
+        sb.append(' ');
+        sb.append(this.plantCode);
+        sb.append(' ');
+        sb.append(this.sequentialNumber);
+        sb.append('\n');
+        return sb.toString();
     }
 }

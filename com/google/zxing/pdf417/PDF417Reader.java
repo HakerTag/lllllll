@@ -16,77 +16,74 @@ import com.google.zxing.pdf417.decoder.PDF417ScanningDecoder;
 import com.google.zxing.pdf417.detector.Detector;
 import com.google.zxing.pdf417.detector.PDF417DetectorResult;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
+import kotlin.jvm.internal.IntCompanionObject;
 
 public final class PDF417Reader implements Reader, MultipleBarcodeReader {
     @Override // com.google.zxing.Reader
-    public Result decode(BinaryBitmap image) throws NotFoundException, FormatException, ChecksumException {
-        return decode(image, null);
+    public void reset() {
     }
 
     @Override // com.google.zxing.Reader
-    public Result decode(BinaryBitmap image, Map<DecodeHintType, ?> hints) throws NotFoundException, FormatException, ChecksumException {
-        Result[] result = decode(image, hints, false);
-        if (result != null && result.length != 0 && result[0] != null) {
-            return result[0];
+    public Result decode(BinaryBitmap binaryBitmap) throws NotFoundException, FormatException, ChecksumException {
+        return decode(binaryBitmap, null);
+    }
+
+    @Override // com.google.zxing.Reader
+    public Result decode(BinaryBitmap binaryBitmap, Map<DecodeHintType, ?> map) throws NotFoundException, FormatException, ChecksumException {
+        Result[] decode = decode(binaryBitmap, map, false);
+        if (decode != null && decode.length != 0 && decode[0] != null) {
+            return decode[0];
         }
         throw NotFoundException.getNotFoundInstance();
     }
 
     @Override // com.google.zxing.multi.MultipleBarcodeReader
-    public Result[] decodeMultiple(BinaryBitmap image) throws NotFoundException {
-        return decodeMultiple(image, null);
+    public Result[] decodeMultiple(BinaryBitmap binaryBitmap) throws NotFoundException {
+        return decodeMultiple(binaryBitmap, null);
     }
 
     @Override // com.google.zxing.multi.MultipleBarcodeReader
-    public Result[] decodeMultiple(BinaryBitmap image, Map<DecodeHintType, ?> hints) throws NotFoundException {
+    public Result[] decodeMultiple(BinaryBitmap binaryBitmap, Map<DecodeHintType, ?> map) throws NotFoundException {
         try {
-            return decode(image, hints, true);
-        } catch (ChecksumException | FormatException e) {
+            return decode(binaryBitmap, map, true);
+        } catch (ChecksumException | FormatException unused) {
             throw NotFoundException.getNotFoundInstance();
         }
     }
 
-    private static Result[] decode(BinaryBitmap image, Map<DecodeHintType, ?> hints, boolean multiple) throws NotFoundException, FormatException, ChecksumException {
-        List<Result> results = new ArrayList<>();
-        PDF417DetectorResult detectorResult = Detector.detect(image, hints, multiple);
-        for (ResultPoint[] points : detectorResult.getPoints()) {
-            DecoderResult decoderResult = PDF417ScanningDecoder.decode(detectorResult.getBits(), points[4], points[5], points[6], points[7], getMinCodewordWidth(points), getMaxCodewordWidth(points));
-            Result result = new Result(decoderResult.getText(), decoderResult.getRawBytes(), points, BarcodeFormat.PDF_417);
-            result.putMetadata(ResultMetadataType.ERROR_CORRECTION_LEVEL, decoderResult.getECLevel());
-            PDF417ResultMetadata pdf417ResultMetadata = (PDF417ResultMetadata) decoderResult.getOther();
-            if (pdf417ResultMetadata != null) {
-                result.putMetadata(ResultMetadataType.PDF417_EXTRA_METADATA, pdf417ResultMetadata);
+    private static Result[] decode(BinaryBitmap binaryBitmap, Map<DecodeHintType, ?> map, boolean z) throws NotFoundException, FormatException, ChecksumException {
+        ArrayList arrayList = new ArrayList();
+        PDF417DetectorResult detect = Detector.detect(binaryBitmap, map, z);
+        for (ResultPoint[] resultPointArr : detect.getPoints()) {
+            DecoderResult decode = PDF417ScanningDecoder.decode(detect.getBits(), resultPointArr[4], resultPointArr[5], resultPointArr[6], resultPointArr[7], getMinCodewordWidth(resultPointArr), getMaxCodewordWidth(resultPointArr));
+            Result result = new Result(decode.getText(), decode.getRawBytes(), resultPointArr, BarcodeFormat.PDF_417);
+            result.putMetadata(ResultMetadataType.ERROR_CORRECTION_LEVEL, decode.getECLevel());
+            PDF417ResultMetadata pDF417ResultMetadata = (PDF417ResultMetadata) decode.getOther();
+            if (pDF417ResultMetadata != null) {
+                result.putMetadata(ResultMetadataType.PDF417_EXTRA_METADATA, pDF417ResultMetadata);
             }
-            results.add(result);
+            arrayList.add(result);
         }
-        return (Result[]) results.toArray(new Result[results.size()]);
+        return (Result[]) arrayList.toArray(new Result[arrayList.size()]);
     }
 
-    private static int getMaxWidth(ResultPoint p1, ResultPoint p2) {
-        if (p1 == null || p2 == null) {
+    private static int getMaxWidth(ResultPoint resultPoint, ResultPoint resultPoint2) {
+        if (resultPoint == null || resultPoint2 == null) {
             return 0;
         }
-        return (int) Math.abs(p1.getX() - p2.getX());
+        return (int) Math.abs(resultPoint.getX() - resultPoint2.getX());
     }
 
-    private static int getMinWidth(ResultPoint p1, ResultPoint p2) {
-        if (p1 == null || p2 == null) {
-            return Integer.MAX_VALUE;
-        }
-        return (int) Math.abs(p1.getX() - p2.getX());
+    private static int getMinWidth(ResultPoint resultPoint, ResultPoint resultPoint2) {
+        return (resultPoint == null || resultPoint2 == null) ? IntCompanionObject.MAX_VALUE : (int) Math.abs(resultPoint.getX() - resultPoint2.getX());
     }
 
-    private static int getMaxCodewordWidth(ResultPoint[] p) {
-        return Math.max(Math.max(getMaxWidth(p[0], p[4]), (getMaxWidth(p[6], p[2]) * 17) / 18), Math.max(getMaxWidth(p[1], p[5]), (getMaxWidth(p[7], p[3]) * 17) / 18));
+    private static int getMaxCodewordWidth(ResultPoint[] resultPointArr) {
+        return Math.max(Math.max(getMaxWidth(resultPointArr[0], resultPointArr[4]), (getMaxWidth(resultPointArr[6], resultPointArr[2]) * 17) / 18), Math.max(getMaxWidth(resultPointArr[1], resultPointArr[5]), (getMaxWidth(resultPointArr[7], resultPointArr[3]) * 17) / 18));
     }
 
-    private static int getMinCodewordWidth(ResultPoint[] p) {
-        return Math.min(Math.min(getMinWidth(p[0], p[4]), (getMinWidth(p[6], p[2]) * 17) / 18), Math.min(getMinWidth(p[1], p[5]), (getMinWidth(p[7], p[3]) * 17) / 18));
-    }
-
-    @Override // com.google.zxing.Reader
-    public void reset() {
+    private static int getMinCodewordWidth(ResultPoint[] resultPointArr) {
+        return Math.min(Math.min(getMinWidth(resultPointArr[0], resultPointArr[4]), (getMinWidth(resultPointArr[6], resultPointArr[2]) * 17) / 18), Math.min(getMinWidth(resultPointArr[1], resultPointArr[5]), (getMinWidth(resultPointArr[7], resultPointArr[3]) * 17) / 18));
     }
 }

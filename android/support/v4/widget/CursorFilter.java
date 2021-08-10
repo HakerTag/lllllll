@@ -16,33 +16,33 @@ class CursorFilter extends Filter {
         Cursor runQueryOnBackgroundThread(CharSequence charSequence);
     }
 
-    CursorFilter(CursorFilterClient client) {
-        this.mClient = client;
+    CursorFilter(CursorFilterClient cursorFilterClient) {
+        this.mClient = cursorFilterClient;
     }
 
-    public CharSequence convertResultToString(Object resultValue) {
-        return this.mClient.convertToString((Cursor) resultValue);
+    public CharSequence convertResultToString(Object obj) {
+        return this.mClient.convertToString((Cursor) obj);
     }
 
     /* access modifiers changed from: protected */
-    public Filter.FilterResults performFiltering(CharSequence constraint) {
-        Cursor cursor = this.mClient.runQueryOnBackgroundThread(constraint);
-        Filter.FilterResults results = new Filter.FilterResults();
-        if (cursor != null) {
-            results.count = cursor.getCount();
-            results.values = cursor;
+    public Filter.FilterResults performFiltering(CharSequence charSequence) {
+        Cursor runQueryOnBackgroundThread = this.mClient.runQueryOnBackgroundThread(charSequence);
+        Filter.FilterResults filterResults = new Filter.FilterResults();
+        if (runQueryOnBackgroundThread != null) {
+            filterResults.count = runQueryOnBackgroundThread.getCount();
+            filterResults.values = runQueryOnBackgroundThread;
         } else {
-            results.count = 0;
-            results.values = null;
+            filterResults.count = 0;
+            filterResults.values = null;
         }
-        return results;
+        return filterResults;
     }
 
     /* access modifiers changed from: protected */
-    public void publishResults(CharSequence constraint, Filter.FilterResults results) {
-        Cursor oldCursor = this.mClient.getCursor();
-        if (results.values != null && results.values != oldCursor) {
-            this.mClient.changeCursor((Cursor) results.values);
+    public void publishResults(CharSequence charSequence, Filter.FilterResults filterResults) {
+        Cursor cursor = this.mClient.getCursor();
+        if (filterResults.values != null && filterResults.values != cursor) {
+            this.mClient.changeCursor((Cursor) filterResults.values);
         }
     }
 }

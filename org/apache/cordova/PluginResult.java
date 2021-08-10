@@ -39,25 +39,25 @@ public class PluginResult {
         this(status2, StatusMessages[status2.ordinal()]);
     }
 
-    public PluginResult(Status status2, String message) {
+    public PluginResult(Status status2, String str) {
         this.keepCallback = false;
         this.status = status2.ordinal();
-        this.messageType = message == null ? 5 : 1;
-        this.strMessage = message;
+        this.messageType = str == null ? 5 : 1;
+        this.strMessage = str;
     }
 
-    public PluginResult(Status status2, JSONArray message) {
+    public PluginResult(Status status2, JSONArray jSONArray) {
         this.keepCallback = false;
         this.status = status2.ordinal();
         this.messageType = 2;
-        this.encodedMessage = message.toString();
+        this.encodedMessage = jSONArray.toString();
     }
 
-    public PluginResult(Status status2, JSONObject message) {
+    public PluginResult(Status status2, JSONObject jSONObject) {
         this.keepCallback = false;
         this.status = status2.ordinal();
         this.messageType = 2;
-        this.encodedMessage = message.toString();
+        this.encodedMessage = jSONObject.toString();
     }
 
     public PluginResult(Status status2, int i) {
@@ -74,33 +74,33 @@ public class PluginResult {
         this.encodedMessage = "" + f;
     }
 
-    public PluginResult(Status status2, boolean b) {
+    public PluginResult(Status status2, boolean z) {
         this.keepCallback = false;
         this.status = status2.ordinal();
         this.messageType = 4;
-        this.encodedMessage = Boolean.toString(b);
+        this.encodedMessage = Boolean.toString(z);
     }
 
-    public PluginResult(Status status2, byte[] data) {
-        this(status2, data, false);
+    public PluginResult(Status status2, byte[] bArr) {
+        this(status2, bArr, false);
     }
 
-    public PluginResult(Status status2, byte[] data, boolean binaryString) {
+    public PluginResult(Status status2, byte[] bArr, boolean z) {
         this.keepCallback = false;
         this.status = status2.ordinal();
-        this.messageType = binaryString ? 7 : 6;
-        this.encodedMessage = Base64.encodeToString(data, 2);
+        this.messageType = z ? 7 : 6;
+        this.encodedMessage = Base64.encodeToString(bArr, 2);
     }
 
-    public PluginResult(Status status2, List<PluginResult> multipartMessages2) {
+    public PluginResult(Status status2, List<PluginResult> list) {
         this.keepCallback = false;
         this.status = status2.ordinal();
         this.messageType = 8;
-        this.multipartMessages = multipartMessages2;
+        this.multipartMessages = list;
     }
 
-    public void setKeepCallback(boolean b) {
-        this.keepCallback = b;
+    public void setKeepCallback(boolean z) {
+        this.keepCallback = z;
     }
 
     public int getStatus() {
@@ -122,8 +122,8 @@ public class PluginResult {
         return this.multipartMessages.size();
     }
 
-    public PluginResult getMultipartMessage(int index) {
-        return this.multipartMessages.get(index);
+    public PluginResult getMultipartMessage(int i) {
+        return this.multipartMessages.get(i);
     }
 
     public String getStrMessage() {
@@ -140,23 +140,23 @@ public class PluginResult {
     }
 
     @Deprecated
-    public String toCallbackString(String callbackId) {
+    public String toCallbackString(String str) {
         if (this.status == Status.NO_RESULT.ordinal() && this.keepCallback) {
             return null;
         }
         if (this.status == Status.OK.ordinal() || this.status == Status.NO_RESULT.ordinal()) {
-            return toSuccessCallbackString(callbackId);
+            return toSuccessCallbackString(str);
         }
-        return toErrorCallbackString(callbackId);
+        return toErrorCallbackString(str);
     }
 
     @Deprecated
-    public String toSuccessCallbackString(String callbackId) {
-        return "cordova.callbackSuccess('" + callbackId + "'," + getJSONString() + ");";
+    public String toSuccessCallbackString(String str) {
+        return "cordova.callbackSuccess('" + str + "'," + getJSONString() + ");";
     }
 
     @Deprecated
-    public String toErrorCallbackString(String callbackId) {
-        return "cordova.callbackError('" + callbackId + "', " + getJSONString() + ");";
+    public String toErrorCallbackString(String str) {
+        return "cordova.callbackError('" + str + "', " + getJSONString() + ");";
     }
 }

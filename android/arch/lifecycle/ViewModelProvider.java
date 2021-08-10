@@ -12,42 +12,42 @@ public class ViewModelProvider {
         <T extends ViewModel> T create(Class<T> cls);
     }
 
-    public ViewModelProvider(ViewModelStoreOwner owner, Factory factory) {
-        this(owner.getViewModelStore(), factory);
+    public ViewModelProvider(ViewModelStoreOwner viewModelStoreOwner, Factory factory) {
+        this(viewModelStoreOwner.getViewModelStore(), factory);
     }
 
-    public ViewModelProvider(ViewModelStore store, Factory factory) {
+    public ViewModelProvider(ViewModelStore viewModelStore, Factory factory) {
         this.mFactory = factory;
-        this.mViewModelStore = store;
+        this.mViewModelStore = viewModelStore;
     }
 
-    public <T extends ViewModel> T get(Class<T> modelClass) {
-        String canonicalName = modelClass.getCanonicalName();
+    public <T extends ViewModel> T get(Class<T> cls) {
+        String canonicalName = cls.getCanonicalName();
         if (canonicalName != null) {
-            return (T) get("android.arch.lifecycle.ViewModelProvider.DefaultKey:" + canonicalName, modelClass);
+            return (T) get("android.arch.lifecycle.ViewModelProvider.DefaultKey:" + canonicalName, cls);
         }
         throw new IllegalArgumentException("Local and anonymous classes can not be ViewModels");
     }
 
-    public <T extends ViewModel> T get(String key, Class<T> modelClass) {
-        T t = (T) this.mViewModelStore.get(key);
-        if (modelClass.isInstance(t)) {
+    public <T extends ViewModel> T get(String str, Class<T> cls) {
+        T t = (T) this.mViewModelStore.get(str);
+        if (cls.isInstance(t)) {
             return t;
         }
-        T t2 = (T) this.mFactory.create(modelClass);
-        this.mViewModelStore.put(key, t2);
+        T t2 = (T) this.mFactory.create(cls);
+        this.mViewModelStore.put(str, t2);
         return t2;
     }
 
     public static class NewInstanceFactory implements Factory {
         @Override // android.arch.lifecycle.ViewModelProvider.Factory
-        public <T extends ViewModel> T create(Class<T> modelClass) {
+        public <T extends ViewModel> T create(Class<T> cls) {
             try {
-                return modelClass.newInstance();
+                return cls.newInstance();
             } catch (InstantiationException e) {
-                throw new RuntimeException("Cannot create an instance of " + modelClass, e);
+                throw new RuntimeException("Cannot create an instance of " + cls, e);
             } catch (IllegalAccessException e2) {
-                throw new RuntimeException("Cannot create an instance of " + modelClass, e2);
+                throw new RuntimeException("Cannot create an instance of " + cls, e2);
             }
         }
     }
@@ -68,20 +68,20 @@ public class ViewModelProvider {
         }
 
         @Override // android.arch.lifecycle.ViewModelProvider.Factory, android.arch.lifecycle.ViewModelProvider.NewInstanceFactory
-        public <T extends ViewModel> T create(Class<T> modelClass) {
-            if (!AndroidViewModel.class.isAssignableFrom(modelClass)) {
-                return (T) super.create(modelClass);
+        public <T extends ViewModel> T create(Class<T> cls) {
+            if (!AndroidViewModel.class.isAssignableFrom(cls)) {
+                return (T) super.create(cls);
             }
             try {
-                return modelClass.getConstructor(Application.class).newInstance(this.mApplication);
+                return cls.getConstructor(Application.class).newInstance(this.mApplication);
             } catch (NoSuchMethodException e) {
-                throw new RuntimeException("Cannot create an instance of " + modelClass, e);
+                throw new RuntimeException("Cannot create an instance of " + cls, e);
             } catch (IllegalAccessException e2) {
-                throw new RuntimeException("Cannot create an instance of " + modelClass, e2);
+                throw new RuntimeException("Cannot create an instance of " + cls, e2);
             } catch (InstantiationException e3) {
-                throw new RuntimeException("Cannot create an instance of " + modelClass, e3);
+                throw new RuntimeException("Cannot create an instance of " + cls, e3);
             } catch (InvocationTargetException e4) {
-                throw new RuntimeException("Cannot create an instance of " + modelClass, e4);
+                throw new RuntimeException("Cannot create an instance of " + cls, e4);
             }
         }
     }

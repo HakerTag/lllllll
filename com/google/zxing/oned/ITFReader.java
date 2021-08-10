@@ -21,155 +21,155 @@ public final class ITFReader extends OneDReader {
     private int narrowLineWidth = -1;
 
     @Override // com.google.zxing.oned.OneDReader
-    public Result decodeRow(int rowNumber, BitArray row, Map<DecodeHintType, ?> hints) throws FormatException, NotFoundException {
-        int[] startRange = decodeStart(row);
-        int[] endRange = decodeEnd(row);
-        StringBuilder result = new StringBuilder(20);
-        decodeMiddle(row, startRange[1], endRange[0], result);
-        String resultString = result.toString();
-        int[] allowedLengths = null;
-        if (hints != null) {
-            allowedLengths = (int[]) hints.get(DecodeHintType.ALLOWED_LENGTHS);
+    public Result decodeRow(int i, BitArray bitArray, Map<DecodeHintType, ?> map) throws FormatException, NotFoundException {
+        boolean z;
+        int[] decodeStart = decodeStart(bitArray);
+        int[] decodeEnd = decodeEnd(bitArray);
+        StringBuilder sb = new StringBuilder(20);
+        decodeMiddle(bitArray, decodeStart[1], decodeEnd[0], sb);
+        String sb2 = sb.toString();
+        int[] iArr = map != null ? (int[]) map.get(DecodeHintType.ALLOWED_LENGTHS) : null;
+        if (iArr == null) {
+            iArr = DEFAULT_ALLOWED_LENGTHS;
         }
-        if (allowedLengths == null) {
-            allowedLengths = DEFAULT_ALLOWED_LENGTHS;
-        }
-        int length = resultString.length();
-        boolean lengthOK = false;
-        int maxAllowedLength = 0;
-        int length2 = allowedLengths.length;
-        int i = 0;
+        int length = sb2.length();
+        int length2 = iArr.length;
+        int i2 = 0;
+        int i3 = 0;
         while (true) {
-            if (i >= length2) {
+            if (i2 >= length2) {
+                z = false;
                 break;
             }
-            int allowedLength = allowedLengths[i];
-            if (length == allowedLength) {
-                lengthOK = true;
+            int i4 = iArr[i2];
+            if (length == i4) {
+                z = true;
                 break;
             }
-            if (allowedLength > maxAllowedLength) {
-                maxAllowedLength = allowedLength;
+            if (i4 > i3) {
+                i3 = i4;
             }
-            i++;
+            i2++;
         }
-        if (!lengthOK && length > maxAllowedLength) {
-            lengthOK = true;
+        if (!z && length > i3) {
+            z = true;
         }
-        if (lengthOK) {
-            return new Result(resultString, null, new ResultPoint[]{new ResultPoint((float) startRange[1], (float) rowNumber), new ResultPoint((float) endRange[0], (float) rowNumber)}, BarcodeFormat.ITF);
+        if (z) {
+            float f = (float) i;
+            return new Result(sb2, null, new ResultPoint[]{new ResultPoint((float) decodeStart[1], f), new ResultPoint((float) decodeEnd[0], f)}, BarcodeFormat.ITF);
         }
         throw FormatException.getFormatInstance();
     }
 
-    private static void decodeMiddle(BitArray row, int payloadStart, int payloadEnd, StringBuilder resultString) throws NotFoundException {
-        int[] counterDigitPair = new int[10];
-        int[] counterBlack = new int[5];
-        int[] counterWhite = new int[5];
-        while (payloadStart < payloadEnd) {
-            recordPattern(row, payloadStart, counterDigitPair);
-            for (int k = 0; k < 5; k++) {
-                int twoK = k * 2;
-                counterBlack[k] = counterDigitPair[twoK];
-                counterWhite[k] = counterDigitPair[twoK + 1];
+    private static void decodeMiddle(BitArray bitArray, int i, int i2, StringBuilder sb) throws NotFoundException {
+        int[] iArr = new int[10];
+        int[] iArr2 = new int[5];
+        int[] iArr3 = new int[5];
+        while (i < i2) {
+            recordPattern(bitArray, i, iArr);
+            for (int i3 = 0; i3 < 5; i3++) {
+                int i4 = i3 * 2;
+                iArr2[i3] = iArr[i4];
+                iArr3[i3] = iArr[i4 + 1];
             }
-            resultString.append((char) (decodeDigit(counterBlack) + 48));
-            resultString.append((char) (decodeDigit(counterWhite) + 48));
-            for (int counterDigit : counterDigitPair) {
-                payloadStart += counterDigit;
+            sb.append((char) (decodeDigit(iArr2) + 48));
+            sb.append((char) (decodeDigit(iArr3) + 48));
+            for (int i5 = 0; i5 < 10; i5++) {
+                i += iArr[i5];
             }
         }
     }
 
-    private int[] decodeStart(BitArray row) throws NotFoundException {
-        int[] startPattern = findGuardPattern(row, skipWhiteSpace(row), START_PATTERN);
-        this.narrowLineWidth = (startPattern[1] - startPattern[0]) / 4;
-        validateQuietZone(row, startPattern[0]);
-        return startPattern;
+    private int[] decodeStart(BitArray bitArray) throws NotFoundException {
+        int[] findGuardPattern = findGuardPattern(bitArray, skipWhiteSpace(bitArray), START_PATTERN);
+        this.narrowLineWidth = (findGuardPattern[1] - findGuardPattern[0]) / 4;
+        validateQuietZone(bitArray, findGuardPattern[0]);
+        return findGuardPattern;
     }
 
-    private void validateQuietZone(BitArray row, int startPattern) throws NotFoundException {
-        int quietCount = this.narrowLineWidth * 10;
-        int quietCount2 = quietCount < startPattern ? quietCount : startPattern;
-        int i = startPattern - 1;
-        while (quietCount2 > 0 && i >= 0 && !row.get(i)) {
-            quietCount2--;
-            i--;
+    private void validateQuietZone(BitArray bitArray, int i) throws NotFoundException {
+        int i2 = this.narrowLineWidth * 10;
+        if (i2 >= i) {
+            i2 = i;
         }
-        if (quietCount2 != 0) {
+        int i3 = i - 1;
+        while (i2 > 0 && i3 >= 0 && !bitArray.get(i3)) {
+            i2--;
+            i3--;
+        }
+        if (i2 != 0) {
             throw NotFoundException.getNotFoundInstance();
         }
     }
 
-    private static int skipWhiteSpace(BitArray row) throws NotFoundException {
-        int width = row.getSize();
-        int endStart = row.getNextSet(0);
-        if (endStart != width) {
-            return endStart;
+    private static int skipWhiteSpace(BitArray bitArray) throws NotFoundException {
+        int size = bitArray.getSize();
+        int nextSet = bitArray.getNextSet(0);
+        if (nextSet != size) {
+            return nextSet;
         }
         throw NotFoundException.getNotFoundInstance();
     }
 
-    private int[] decodeEnd(BitArray row) throws NotFoundException {
-        row.reverse();
+    private int[] decodeEnd(BitArray bitArray) throws NotFoundException {
+        bitArray.reverse();
         try {
-            int[] endPattern = findGuardPattern(row, skipWhiteSpace(row), END_PATTERN_REVERSED);
-            validateQuietZone(row, endPattern[0]);
-            int temp = endPattern[0];
-            endPattern[0] = row.getSize() - endPattern[1];
-            endPattern[1] = row.getSize() - temp;
-            return endPattern;
+            int[] findGuardPattern = findGuardPattern(bitArray, skipWhiteSpace(bitArray), END_PATTERN_REVERSED);
+            validateQuietZone(bitArray, findGuardPattern[0]);
+            int i = findGuardPattern[0];
+            findGuardPattern[0] = bitArray.getSize() - findGuardPattern[1];
+            findGuardPattern[1] = bitArray.getSize() - i;
+            return findGuardPattern;
         } finally {
-            row.reverse();
+            bitArray.reverse();
         }
     }
 
-    private static int[] findGuardPattern(BitArray row, int rowOffset, int[] pattern) throws NotFoundException {
-        int patternLength = pattern.length;
-        int[] counters = new int[patternLength];
-        int width = row.getSize();
-        boolean isWhite = false;
-        int counterPosition = 0;
-        int patternStart = rowOffset;
-        for (int x = rowOffset; x < width; x++) {
-            boolean z = true;
-            if (row.get(x) ^ isWhite) {
-                counters[counterPosition] = counters[counterPosition] + 1;
+    private static int[] findGuardPattern(BitArray bitArray, int i, int[] iArr) throws NotFoundException {
+        int length = iArr.length;
+        int[] iArr2 = new int[length];
+        int size = bitArray.getSize();
+        int i2 = i;
+        boolean z = false;
+        int i3 = 0;
+        while (i < size) {
+            if (bitArray.get(i) ^ z) {
+                iArr2[i3] = iArr2[i3] + 1;
             } else {
-                if (counterPosition != patternLength - 1) {
-                    counterPosition++;
-                } else if (patternMatchVariance(counters, pattern, MAX_INDIVIDUAL_VARIANCE) < MAX_AVG_VARIANCE) {
-                    return new int[]{patternStart, x};
+                int i4 = length - 1;
+                if (i3 != i4) {
+                    i3++;
+                } else if (patternMatchVariance(iArr2, iArr, MAX_INDIVIDUAL_VARIANCE) < MAX_AVG_VARIANCE) {
+                    return new int[]{i2, i};
                 } else {
-                    patternStart += counters[0] + counters[1];
-                    System.arraycopy(counters, 2, counters, 0, patternLength - 2);
-                    counters[patternLength - 2] = 0;
-                    counters[patternLength - 1] = 0;
-                    counterPosition--;
+                    i2 += iArr2[0] + iArr2[1];
+                    int i5 = length - 2;
+                    System.arraycopy(iArr2, 2, iArr2, 0, i5);
+                    iArr2[i5] = 0;
+                    iArr2[i4] = 0;
+                    i3--;
                 }
-                counters[counterPosition] = 1;
-                if (isWhite) {
-                    z = false;
-                }
-                isWhite = z;
+                iArr2[i3] = 1;
+                z = !z;
             }
+            i++;
         }
         throw NotFoundException.getNotFoundInstance();
     }
 
-    private static int decodeDigit(int[] counters) throws NotFoundException {
-        float bestVariance = MAX_AVG_VARIANCE;
-        int bestMatch = -1;
-        int max = PATTERNS.length;
-        for (int i = 0; i < max; i++) {
-            float variance = patternMatchVariance(counters, PATTERNS[i], MAX_INDIVIDUAL_VARIANCE);
-            if (variance < bestVariance) {
-                bestVariance = variance;
-                bestMatch = i;
+    private static int decodeDigit(int[] iArr) throws NotFoundException {
+        int length = PATTERNS.length;
+        float f = MAX_AVG_VARIANCE;
+        int i = -1;
+        for (int i2 = 0; i2 < length; i2++) {
+            float patternMatchVariance = patternMatchVariance(iArr, PATTERNS[i2], MAX_INDIVIDUAL_VARIANCE);
+            if (patternMatchVariance < f) {
+                i = i2;
+                f = patternMatchVariance;
             }
         }
-        if (bestMatch >= 0) {
-            return bestMatch;
+        if (i >= 0) {
+            return i;
         }
         throw NotFoundException.getNotFoundInstance();
     }

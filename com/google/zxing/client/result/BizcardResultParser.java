@@ -2,46 +2,45 @@ package com.google.zxing.client.result;
 
 import com.google.zxing.Result;
 import java.util.ArrayList;
-import java.util.List;
 
 public final class BizcardResultParser extends AbstractDoCoMoResultParser {
     @Override // com.google.zxing.client.result.ResultParser
     public AddressBookParsedResult parse(Result result) {
-        String rawText = getMassagedText(result);
-        if (!rawText.startsWith("BIZCARD:")) {
+        String massagedText = getMassagedText(result);
+        if (!massagedText.startsWith("BIZCARD:")) {
             return null;
         }
-        String fullName = buildName(matchSingleDoCoMoPrefixedField("N:", rawText, true), matchSingleDoCoMoPrefixedField("X:", rawText, true));
-        String title = matchSingleDoCoMoPrefixedField("T:", rawText, true);
-        String org2 = matchSingleDoCoMoPrefixedField("C:", rawText, true);
-        return new AddressBookParsedResult(maybeWrap(fullName), null, null, buildPhoneNumbers(matchSingleDoCoMoPrefixedField("B:", rawText, true), matchSingleDoCoMoPrefixedField("M:", rawText, true), matchSingleDoCoMoPrefixedField("F:", rawText, true)), null, maybeWrap(matchSingleDoCoMoPrefixedField("E:", rawText, true)), null, null, null, matchDoCoMoPrefixedField("A:", rawText, true), null, org2, null, title, null, null);
+        String buildName = buildName(matchSingleDoCoMoPrefixedField("N:", massagedText, true), matchSingleDoCoMoPrefixedField("X:", massagedText, true));
+        String matchSingleDoCoMoPrefixedField = matchSingleDoCoMoPrefixedField("T:", massagedText, true);
+        String matchSingleDoCoMoPrefixedField2 = matchSingleDoCoMoPrefixedField("C:", massagedText, true);
+        return new AddressBookParsedResult(maybeWrap(buildName), null, null, buildPhoneNumbers(matchSingleDoCoMoPrefixedField("B:", massagedText, true), matchSingleDoCoMoPrefixedField("M:", massagedText, true), matchSingleDoCoMoPrefixedField("F:", massagedText, true)), null, maybeWrap(matchSingleDoCoMoPrefixedField("E:", massagedText, true)), null, null, null, matchDoCoMoPrefixedField("A:", massagedText, true), null, matchSingleDoCoMoPrefixedField2, null, matchSingleDoCoMoPrefixedField, null, null);
     }
 
-    private static String[] buildPhoneNumbers(String number1, String number2, String number3) {
-        List<String> numbers = new ArrayList<>(3);
-        if (number1 != null) {
-            numbers.add(number1);
+    private static String[] buildPhoneNumbers(String str, String str2, String str3) {
+        ArrayList arrayList = new ArrayList(3);
+        if (str != null) {
+            arrayList.add(str);
         }
-        if (number2 != null) {
-            numbers.add(number2);
+        if (str2 != null) {
+            arrayList.add(str2);
         }
-        if (number3 != null) {
-            numbers.add(number3);
+        if (str3 != null) {
+            arrayList.add(str3);
         }
-        int size = numbers.size();
+        int size = arrayList.size();
         if (size == 0) {
             return null;
         }
-        return (String[]) numbers.toArray(new String[size]);
+        return (String[]) arrayList.toArray(new String[size]);
     }
 
-    private static String buildName(String firstName, String lastName) {
-        if (firstName == null) {
-            return lastName;
+    private static String buildName(String str, String str2) {
+        if (str == null) {
+            return str2;
         }
-        if (lastName == null) {
-            return firstName;
+        if (str2 == null) {
+            return str;
         }
-        return firstName + ' ' + lastName;
+        return str + ' ' + str2;
     }
 }

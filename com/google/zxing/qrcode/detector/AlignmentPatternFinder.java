@@ -18,59 +18,59 @@ public final class AlignmentPatternFinder {
     private final int startY;
     private final int width;
 
-    AlignmentPatternFinder(BitMatrix image2, int startX2, int startY2, int width2, int height2, float moduleSize2, ResultPointCallback resultPointCallback2) {
-        this.image = image2;
-        this.startX = startX2;
-        this.startY = startY2;
-        this.width = width2;
-        this.height = height2;
-        this.moduleSize = moduleSize2;
+    AlignmentPatternFinder(BitMatrix bitMatrix, int i, int i2, int i3, int i4, float f, ResultPointCallback resultPointCallback2) {
+        this.image = bitMatrix;
+        this.startX = i;
+        this.startY = i2;
+        this.width = i3;
+        this.height = i4;
+        this.moduleSize = f;
         this.crossCheckStateCount = new int[3];
         this.resultPointCallback = resultPointCallback2;
     }
 
     /* access modifiers changed from: package-private */
     public AlignmentPattern find() throws NotFoundException {
-        AlignmentPattern confirmed;
-        AlignmentPattern confirmed2;
-        int startX2 = this.startX;
-        int height2 = this.height;
-        int maxJ = this.width + startX2;
-        int middleI = this.startY + (height2 / 2);
-        int[] stateCount = new int[3];
-        for (int iGen = 0; iGen < height2; iGen++) {
-            int i = ((iGen & 1) == 0 ? (iGen + 1) / 2 : -((iGen + 1) / 2)) + middleI;
-            stateCount[0] = 0;
-            stateCount[1] = 0;
-            stateCount[2] = 0;
-            int j = startX2;
-            while (j < maxJ && !this.image.get(j, i)) {
-                j++;
+        AlignmentPattern handlePossibleCenter;
+        AlignmentPattern handlePossibleCenter2;
+        int i = this.startX;
+        int i2 = this.height;
+        int i3 = this.width + i;
+        int i4 = this.startY + (i2 / 2);
+        int[] iArr = new int[3];
+        for (int i5 = 0; i5 < i2; i5++) {
+            int i6 = ((i5 & 1) == 0 ? (i5 + 1) / 2 : -((i5 + 1) / 2)) + i4;
+            iArr[0] = 0;
+            iArr[1] = 0;
+            iArr[2] = 0;
+            int i7 = i;
+            while (i7 < i3 && !this.image.get(i7, i6)) {
+                i7++;
             }
-            int currentState = 0;
-            while (j < maxJ) {
-                if (!this.image.get(j, i)) {
-                    if (currentState == 1) {
-                        currentState++;
+            int i8 = 0;
+            while (i7 < i3) {
+                if (!this.image.get(i7, i6)) {
+                    if (i8 == 1) {
+                        i8++;
                     }
-                    stateCount[currentState] = stateCount[currentState] + 1;
-                } else if (currentState == 1) {
-                    stateCount[1] = stateCount[1] + 1;
-                } else if (currentState != 2) {
-                    currentState++;
-                    stateCount[currentState] = stateCount[currentState] + 1;
-                } else if (foundPatternCross(stateCount) && (confirmed2 = handlePossibleCenter(stateCount, i, j)) != null) {
-                    return confirmed2;
+                    iArr[i8] = iArr[i8] + 1;
+                } else if (i8 == 1) {
+                    iArr[1] = iArr[1] + 1;
+                } else if (i8 != 2) {
+                    i8++;
+                    iArr[i8] = iArr[i8] + 1;
+                } else if (foundPatternCross(iArr) && (handlePossibleCenter2 = handlePossibleCenter(iArr, i6, i7)) != null) {
+                    return handlePossibleCenter2;
                 } else {
-                    stateCount[0] = stateCount[2];
-                    stateCount[1] = 1;
-                    stateCount[2] = 0;
-                    currentState = 1;
+                    iArr[0] = iArr[2];
+                    iArr[1] = 1;
+                    iArr[2] = 0;
+                    i8 = 1;
                 }
-                j++;
+                i7++;
             }
-            if (foundPatternCross(stateCount) && (confirmed = handlePossibleCenter(stateCount, i, maxJ)) != null) {
-                return confirmed;
+            if (foundPatternCross(iArr) && (handlePossibleCenter = handlePossibleCenter(iArr, i6, i3)) != null) {
+                return handlePossibleCenter;
             }
         }
         if (!this.possibleCenters.isEmpty()) {
@@ -79,81 +79,81 @@ public final class AlignmentPatternFinder {
         throw NotFoundException.getNotFoundInstance();
     }
 
-    private static float centerFromEnd(int[] stateCount, int end) {
-        return ((float) (end - stateCount[2])) - (((float) stateCount[1]) / 2.0f);
+    private static float centerFromEnd(int[] iArr, int i) {
+        return ((float) (i - iArr[2])) - (((float) iArr[1]) / 2.0f);
     }
 
-    private boolean foundPatternCross(int[] stateCount) {
-        float moduleSize2 = this.moduleSize;
-        float maxVariance = moduleSize2 / 2.0f;
+    private boolean foundPatternCross(int[] iArr) {
+        float f = this.moduleSize;
+        float f2 = f / 2.0f;
         for (int i = 0; i < 3; i++) {
-            if (Math.abs(moduleSize2 - ((float) stateCount[i])) >= maxVariance) {
+            if (Math.abs(f - ((float) iArr[i])) >= f2) {
                 return false;
             }
         }
         return true;
     }
 
-    private float crossCheckVertical(int startI, int centerJ, int maxCount, int originalStateCountTotal) {
-        BitMatrix image2 = this.image;
-        int maxI = image2.getHeight();
-        int[] stateCount = this.crossCheckStateCount;
-        stateCount[0] = 0;
-        stateCount[1] = 0;
-        stateCount[2] = 0;
-        int i = startI;
-        while (i >= 0 && image2.get(centerJ, i) && stateCount[1] <= maxCount) {
-            stateCount[1] = stateCount[1] + 1;
-            i--;
+    private float crossCheckVertical(int i, int i2, int i3, int i4) {
+        BitMatrix bitMatrix = this.image;
+        int height2 = bitMatrix.getHeight();
+        int[] iArr = this.crossCheckStateCount;
+        iArr[0] = 0;
+        iArr[1] = 0;
+        iArr[2] = 0;
+        int i5 = i;
+        while (i5 >= 0 && bitMatrix.get(i2, i5) && iArr[1] <= i3) {
+            iArr[1] = iArr[1] + 1;
+            i5--;
         }
-        if (i < 0 || stateCount[1] > maxCount) {
+        if (i5 < 0 || iArr[1] > i3) {
             return Float.NaN;
         }
-        while (i >= 0 && !image2.get(centerJ, i) && stateCount[0] <= maxCount) {
-            stateCount[0] = stateCount[0] + 1;
-            i--;
+        while (i5 >= 0 && !bitMatrix.get(i2, i5) && iArr[0] <= i3) {
+            iArr[0] = iArr[0] + 1;
+            i5--;
         }
-        if (stateCount[0] > maxCount) {
+        if (iArr[0] > i3) {
             return Float.NaN;
         }
-        int i2 = startI + 1;
-        while (i2 < maxI && image2.get(centerJ, i2) && stateCount[1] <= maxCount) {
-            stateCount[1] = stateCount[1] + 1;
-            i2++;
+        int i6 = i + 1;
+        while (i6 < height2 && bitMatrix.get(i2, i6) && iArr[1] <= i3) {
+            iArr[1] = iArr[1] + 1;
+            i6++;
         }
-        if (i2 == maxI || stateCount[1] > maxCount) {
+        if (i6 == height2 || iArr[1] > i3) {
             return Float.NaN;
         }
-        while (i2 < maxI && !image2.get(centerJ, i2) && stateCount[2] <= maxCount) {
-            stateCount[2] = stateCount[2] + 1;
-            i2++;
+        while (i6 < height2 && !bitMatrix.get(i2, i6) && iArr[2] <= i3) {
+            iArr[2] = iArr[2] + 1;
+            i6++;
         }
-        if (stateCount[2] <= maxCount && Math.abs(((stateCount[0] + stateCount[1]) + stateCount[2]) - originalStateCountTotal) * 5 < originalStateCountTotal * 2 && foundPatternCross(stateCount)) {
-            return centerFromEnd(stateCount, i2);
+        if (iArr[2] <= i3 && Math.abs(((iArr[0] + iArr[1]) + iArr[2]) - i4) * 5 < i4 * 2 && foundPatternCross(iArr)) {
+            return centerFromEnd(iArr, i6);
         }
         return Float.NaN;
     }
 
-    private AlignmentPattern handlePossibleCenter(int[] stateCount, int i, int j) {
-        int stateCountTotal = stateCount[0] + stateCount[1] + stateCount[2];
-        float centerJ = centerFromEnd(stateCount, j);
-        float centerI = crossCheckVertical(i, (int) centerJ, stateCount[1] * 2, stateCountTotal);
-        if (Float.isNaN(centerI)) {
+    private AlignmentPattern handlePossibleCenter(int[] iArr, int i, int i2) {
+        int i3 = iArr[0] + iArr[1] + iArr[2];
+        float centerFromEnd = centerFromEnd(iArr, i2);
+        float crossCheckVertical = crossCheckVertical(i, (int) centerFromEnd, iArr[1] * 2, i3);
+        if (Float.isNaN(crossCheckVertical)) {
             return null;
         }
-        float estimatedModuleSize = ((float) ((stateCount[0] + stateCount[1]) + stateCount[2])) / 3.0f;
-        for (AlignmentPattern center : this.possibleCenters) {
-            if (center.aboutEquals(estimatedModuleSize, centerI, centerJ)) {
-                return center.combineEstimate(centerI, centerJ, estimatedModuleSize);
+        float f = ((float) ((iArr[0] + iArr[1]) + iArr[2])) / 3.0f;
+        for (AlignmentPattern alignmentPattern : this.possibleCenters) {
+            if (alignmentPattern.aboutEquals(f, crossCheckVertical, centerFromEnd)) {
+                return alignmentPattern.combineEstimate(crossCheckVertical, centerFromEnd, f);
             }
         }
-        AlignmentPattern point = new AlignmentPattern(centerJ, centerI, estimatedModuleSize);
-        this.possibleCenters.add(point);
+        AlignmentPattern alignmentPattern2 = new AlignmentPattern(centerFromEnd, crossCheckVertical, f);
+        this.possibleCenters.add(alignmentPattern2);
         ResultPointCallback resultPointCallback2 = this.resultPointCallback;
         if (resultPointCallback2 == null) {
             return null;
         }
-        resultPointCallback2.foundPossibleResultPoint(point);
+        resultPointCallback2.foundPossibleResultPoint(alignmentPattern2);
         return null;
     }
 }

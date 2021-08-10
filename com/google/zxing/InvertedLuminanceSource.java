@@ -1,32 +1,34 @@
 package com.google.zxing;
 
+import kotlin.UByte;
+
 public final class InvertedLuminanceSource extends LuminanceSource {
     private final LuminanceSource delegate;
 
-    public InvertedLuminanceSource(LuminanceSource delegate2) {
-        super(delegate2.getWidth(), delegate2.getHeight());
-        this.delegate = delegate2;
+    public InvertedLuminanceSource(LuminanceSource luminanceSource) {
+        super(luminanceSource.getWidth(), luminanceSource.getHeight());
+        this.delegate = luminanceSource;
     }
 
     @Override // com.google.zxing.LuminanceSource
-    public byte[] getRow(int y, byte[] row) {
-        byte[] row2 = this.delegate.getRow(y, row);
+    public byte[] getRow(int i, byte[] bArr) {
+        byte[] row = this.delegate.getRow(i, bArr);
         int width = getWidth();
-        for (int i = 0; i < width; i++) {
-            row2[i] = (byte) (255 - (row2[i] & 255));
+        for (int i2 = 0; i2 < width; i2++) {
+            row[i2] = (byte) (255 - (row[i2] & UByte.MAX_VALUE));
         }
-        return row2;
+        return row;
     }
 
     @Override // com.google.zxing.LuminanceSource
     public byte[] getMatrix() {
         byte[] matrix = this.delegate.getMatrix();
-        int length = getWidth() * getHeight();
-        byte[] invertedMatrix = new byte[length];
-        for (int i = 0; i < length; i++) {
-            invertedMatrix[i] = (byte) (255 - (matrix[i] & 255));
+        int width = getWidth() * getHeight();
+        byte[] bArr = new byte[width];
+        for (int i = 0; i < width; i++) {
+            bArr[i] = (byte) (255 - (matrix[i] & UByte.MAX_VALUE));
         }
-        return invertedMatrix;
+        return bArr;
     }
 
     @Override // com.google.zxing.LuminanceSource
@@ -35,8 +37,8 @@ public final class InvertedLuminanceSource extends LuminanceSource {
     }
 
     @Override // com.google.zxing.LuminanceSource
-    public LuminanceSource crop(int left, int top, int width, int height) {
-        return new InvertedLuminanceSource(this.delegate.crop(left, top, width, height));
+    public LuminanceSource crop(int i, int i2, int i3, int i4) {
+        return new InvertedLuminanceSource(this.delegate.crop(i, i2, i3, i4));
     }
 
     @Override // com.google.zxing.LuminanceSource

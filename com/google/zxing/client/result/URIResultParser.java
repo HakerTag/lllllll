@@ -10,27 +10,27 @@ public final class URIResultParser extends ResultParser {
 
     @Override // com.google.zxing.client.result.ResultParser
     public URIParsedResult parse(Result result) {
-        String rawText = getMassagedText(result);
-        if (rawText.startsWith("URL:") || rawText.startsWith("URI:")) {
-            return new URIParsedResult(rawText.substring(4).trim(), null);
+        String massagedText = getMassagedText(result);
+        if (massagedText.startsWith("URL:") || massagedText.startsWith("URI:")) {
+            return new URIParsedResult(massagedText.substring(4).trim(), null);
         }
-        String rawText2 = rawText.trim();
-        if (isBasicallyValidURI(rawText2)) {
-            return new URIParsedResult(rawText2, null);
+        String trim = massagedText.trim();
+        if (isBasicallyValidURI(trim)) {
+            return new URIParsedResult(trim, null);
         }
         return null;
     }
 
-    static boolean isBasicallyValidURI(String uri) {
-        if (uri.contains(" ")) {
+    static boolean isBasicallyValidURI(String str) {
+        if (str.contains(" ")) {
             return false;
         }
-        Matcher m = URL_WITH_PROTOCOL_PATTERN.matcher(uri);
-        if (m.find() && m.start() == 0) {
+        Matcher matcher = URL_WITH_PROTOCOL_PATTERN.matcher(str);
+        if (matcher.find() && matcher.start() == 0) {
             return true;
         }
-        Matcher m2 = URL_WITHOUT_PROTOCOL_PATTERN.matcher(uri);
-        if (!m2.find() || m2.start() != 0) {
+        Matcher matcher2 = URL_WITHOUT_PROTOCOL_PATTERN.matcher(str);
+        if (!matcher2.find() || matcher2.start() != 0) {
             return false;
         }
         return true;

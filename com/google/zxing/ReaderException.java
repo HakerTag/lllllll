@@ -7,8 +7,8 @@ public abstract class ReaderException extends Exception {
     ReaderException() {
     }
 
-    ReaderException(Throwable cause) {
-        super(cause);
+    ReaderException(Throwable th) {
+        super(th);
     }
 
     public final synchronized Throwable fillInStackTrace() {

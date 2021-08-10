@@ -5,8 +5,8 @@ public abstract class ParsedResult {
 
     public abstract String getDisplayResult();
 
-    protected ParsedResult(ParsedResultType type2) {
-        this.type = type2;
+    protected ParsedResult(ParsedResultType parsedResultType) {
+        this.type = parsedResultType;
     }
 
     public final ParsedResultType getType() {
@@ -17,19 +17,19 @@ public abstract class ParsedResult {
         return getDisplayResult();
     }
 
-    public static void maybeAppend(String value, StringBuilder result) {
-        if (value != null && !value.isEmpty()) {
-            if (result.length() > 0) {
-                result.append('\n');
+    public static void maybeAppend(String str, StringBuilder sb) {
+        if (str != null && !str.isEmpty()) {
+            if (sb.length() > 0) {
+                sb.append('\n');
             }
-            result.append(value);
+            sb.append(str);
         }
     }
 
-    public static void maybeAppend(String[] values, StringBuilder result) {
-        if (values != null) {
-            for (String value : values) {
-                maybeAppend(value, result);
+    public static void maybeAppend(String[] strArr, StringBuilder sb) {
+        if (strArr != null) {
+            for (String str : strArr) {
+                maybeAppend(str, sb);
             }
         }
     }

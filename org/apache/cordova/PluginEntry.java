@@ -6,18 +6,18 @@ public final class PluginEntry {
     public final String pluginClass;
     public final String service;
 
-    public PluginEntry(String service2, CordovaPlugin plugin2) {
-        this(service2, plugin2.getClass().getName(), true, plugin2);
+    public PluginEntry(String str, CordovaPlugin cordovaPlugin) {
+        this(str, cordovaPlugin.getClass().getName(), true, cordovaPlugin);
     }
 
-    public PluginEntry(String service2, String pluginClass2, boolean onload2) {
-        this(service2, pluginClass2, onload2, null);
+    public PluginEntry(String str, String str2, boolean z) {
+        this(str, str2, z, null);
     }
 
-    private PluginEntry(String service2, String pluginClass2, boolean onload2, CordovaPlugin plugin2) {
-        this.service = service2;
-        this.pluginClass = pluginClass2;
-        this.onload = onload2;
-        this.plugin = plugin2;
+    private PluginEntry(String str, String str2, boolean z, CordovaPlugin cordovaPlugin) {
+        this.service = str;
+        this.pluginClass = str2;
+        this.onload = z;
+        this.plugin = cordovaPlugin;
     }
 }

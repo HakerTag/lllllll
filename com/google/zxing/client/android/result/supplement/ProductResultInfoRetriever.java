@@ -19,9 +19,9 @@ public final class ProductResultInfoRetriever extends SupplementalInfoRetriever 
     private final String productID;
     private final String source;
 
-    ProductResultInfoRetriever(TextView textView, String productID2, HistoryManager historyManager, Context context2) {
+    ProductResultInfoRetriever(TextView textView, String str, HistoryManager historyManager, Context context2) {
         super(textView, historyManager);
-        this.productID = productID2;
+        this.productID = str;
         this.source = context2.getString(R.string.msg_google_product);
         this.context = context2;
     }
@@ -29,18 +29,18 @@ public final class ProductResultInfoRetriever extends SupplementalInfoRetriever 
     /* access modifiers changed from: package-private */
     @Override // com.google.zxing.client.android.result.supplement.SupplementalInfoRetriever
     public void retrieveSupplementalInfo() throws IOException {
-        String uri = "https://www.google." + LocaleManager.getProductSearchCountryTLD(this.context) + "/m/products?ie=utf8&oe=utf8&scoring=p&source=zxing&q=" + URLEncoder.encode(this.productID, "UTF-8");
-        CharSequence content = HttpHelper.downloadViaHttp(uri, HttpHelper.ContentType.HTML);
-        for (Pattern p : PRODUCT_NAME_PRICE_PATTERNS) {
-            Matcher matcher = p.matcher(content);
+        String str = "https://www.google." + LocaleManager.getProductSearchCountryTLD(this.context) + "/m/products?ie=utf8&oe=utf8&scoring=p&source=zxing&q=" + URLEncoder.encode(this.productID, "UTF-8");
+        CharSequence downloadViaHttp = HttpHelper.downloadViaHttp(str, HttpHelper.ContentType.HTML);
+        for (Pattern pattern : PRODUCT_NAME_PRICE_PATTERNS) {
+            Matcher matcher = pattern.matcher(downloadViaHttp);
             if (matcher.find()) {
-                append(this.productID, this.source, new String[]{unescapeHTML(matcher.group(1)), unescapeHTML(matcher.group(2))}, uri);
+                append(this.productID, this.source, new String[]{unescapeHTML(matcher.group(1)), unescapeHTML(matcher.group(2))}, str);
                 return;
             }
         }
     }
 
-    private static String unescapeHTML(String raw) {
-        return Html.fromHtml(raw).toString();
+    private static String unescapeHTML(String str) {
+        return Html.fromHtml(str).toString();
     }
 }

@@ -4,10 +4,10 @@ public final class TextParsedResult extends ParsedResult {
     private final String language;
     private final String text;
 
-    public TextParsedResult(String text2, String language2) {
+    public TextParsedResult(String str, String str2) {
         super(ParsedResultType.TEXT);
-        this.text = text2;
-        this.language = language2;
+        this.text = str;
+        this.language = str2;
     }
 
     public String getText() {

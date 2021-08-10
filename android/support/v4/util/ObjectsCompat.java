@@ -8,24 +8,24 @@ public class ObjectsCompat {
     private ObjectsCompat() {
     }
 
-    public static boolean equals(Object a, Object b) {
+    public static boolean equals(Object obj, Object obj2) {
         if (Build.VERSION.SDK_INT >= 19) {
-            return Objects.equals(a, b);
+            return Objects.equals(obj, obj2);
         }
-        return a == b || (a != null && a.equals(b));
+        return obj == obj2 || (obj != null && obj.equals(obj2));
     }
 
-    public static int hashCode(Object o) {
-        if (o != null) {
-            return o.hashCode();
+    public static int hashCode(Object obj) {
+        if (obj != null) {
+            return obj.hashCode();
         }
         return 0;
     }
 
-    public static int hash(Object... values) {
+    public static int hash(Object... objArr) {
         if (Build.VERSION.SDK_INT >= 19) {
-            return Objects.hash(values);
+            return Objects.hash(objArr);
         }
-        return Arrays.hashCode(values);
+        return Arrays.hashCode(objArr);
     }
 }

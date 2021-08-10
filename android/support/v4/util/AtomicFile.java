@@ -11,9 +11,9 @@ public class AtomicFile {
     private final File mBackupName;
     private final File mBaseName;
 
-    public AtomicFile(File baseName) {
-        this.mBaseName = baseName;
-        this.mBackupName = new File(baseName.getPath() + ".bak");
+    public AtomicFile(File file) {
+        this.mBaseName = file;
+        this.mBackupName = new File(file.getPath() + ".bak");
     }
 
     public File getBaseFile() {
@@ -35,11 +35,11 @@ public class AtomicFile {
         }
         try {
             return new FileOutputStream(this.mBaseName);
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException unused) {
             if (this.mBaseName.getParentFile().mkdirs()) {
                 try {
                     return new FileOutputStream(this.mBaseName);
-                } catch (FileNotFoundException e2) {
+                } catch (FileNotFoundException unused2) {
                     throw new IOException("Couldn't create " + this.mBaseName);
                 }
             } else {
@@ -48,11 +48,11 @@ public class AtomicFile {
         }
     }
 
-    public void finishWrite(FileOutputStream str) {
-        if (str != null) {
-            sync(str);
+    public void finishWrite(FileOutputStream fileOutputStream) {
+        if (fileOutputStream != null) {
+            sync(fileOutputStream);
             try {
-                str.close();
+                fileOutputStream.close();
                 this.mBackupName.delete();
             } catch (IOException e) {
                 Log.w("AtomicFile", "finishWrite: Got exception:", e);
@@ -60,11 +60,11 @@ public class AtomicFile {
         }
     }
 
-    public void failWrite(FileOutputStream str) {
-        if (str != null) {
-            sync(str);
+    public void failWrite(FileOutputStream fileOutputStream) {
+        if (fileOutputStream != null) {
+            sync(fileOutputStream);
             try {
-                str.close();
+                fileOutputStream.close();
                 this.mBaseName.delete();
                 this.mBackupName.renameTo(this.mBaseName);
             } catch (IOException e) {
@@ -82,33 +82,33 @@ public class AtomicFile {
     }
 
     public byte[] readFully() throws IOException {
-        FileInputStream stream = openRead();
-        int pos = 0;
+        FileInputStream openRead = openRead();
         try {
-            byte[] data = new byte[stream.available()];
+            byte[] bArr = new byte[openRead.available()];
+            int i = 0;
             while (true) {
-                int amt = stream.read(data, pos, data.length - pos);
-                if (amt <= 0) {
-                    return data;
+                int read = openRead.read(bArr, i, bArr.length - i);
+                if (read <= 0) {
+                    return bArr;
                 }
-                pos += amt;
-                int avail = stream.available();
-                if (avail > data.length - pos) {
-                    byte[] newData = new byte[(pos + avail)];
-                    System.arraycopy(data, 0, newData, 0, pos);
-                    data = newData;
+                i += read;
+                int available = openRead.available();
+                if (available > bArr.length - i) {
+                    byte[] bArr2 = new byte[(available + i)];
+                    System.arraycopy(bArr, 0, bArr2, 0, i);
+                    bArr = bArr2;
                 }
             }
         } finally {
-            stream.close();
+            openRead.close();
         }
     }
 
-    private static boolean sync(FileOutputStream stream) {
+    private static boolean sync(FileOutputStream fileOutputStream) {
         try {
-            stream.getFD().sync();
+            fileOutputStream.getFD().sync();
             return true;
-        } catch (IOException e) {
+        } catch (IOException unused) {
             return false;
         }
     }

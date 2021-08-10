@@ -34,50 +34,50 @@ public class IconCompat {
     private Object mObj1;
     private final int mType;
 
-    public static IconCompat createWithResource(Context context, int resId) {
+    public static IconCompat createWithResource(Context context, int i) {
         if (context != null) {
-            IconCompat rep = new IconCompat(2);
-            rep.mInt1 = resId;
-            rep.mObj1 = context;
-            return rep;
+            IconCompat iconCompat = new IconCompat(2);
+            iconCompat.mInt1 = i;
+            iconCompat.mObj1 = context;
+            return iconCompat;
         }
         throw new IllegalArgumentException("Context must not be null.");
     }
 
-    public static IconCompat createWithBitmap(Bitmap bits) {
-        if (bits != null) {
-            IconCompat rep = new IconCompat(1);
-            rep.mObj1 = bits;
-            return rep;
+    public static IconCompat createWithBitmap(Bitmap bitmap) {
+        if (bitmap != null) {
+            IconCompat iconCompat = new IconCompat(1);
+            iconCompat.mObj1 = bitmap;
+            return iconCompat;
         }
         throw new IllegalArgumentException("Bitmap must not be null.");
     }
 
-    public static IconCompat createWithAdaptiveBitmap(Bitmap bits) {
-        if (bits != null) {
-            IconCompat rep = new IconCompat(5);
-            rep.mObj1 = bits;
-            return rep;
+    public static IconCompat createWithAdaptiveBitmap(Bitmap bitmap) {
+        if (bitmap != null) {
+            IconCompat iconCompat = new IconCompat(5);
+            iconCompat.mObj1 = bitmap;
+            return iconCompat;
         }
         throw new IllegalArgumentException("Bitmap must not be null.");
     }
 
-    public static IconCompat createWithData(byte[] data, int offset, int length) {
-        if (data != null) {
-            IconCompat rep = new IconCompat(3);
-            rep.mObj1 = data;
-            rep.mInt1 = offset;
-            rep.mInt2 = length;
-            return rep;
+    public static IconCompat createWithData(byte[] bArr, int i, int i2) {
+        if (bArr != null) {
+            IconCompat iconCompat = new IconCompat(3);
+            iconCompat.mObj1 = bArr;
+            iconCompat.mInt1 = i;
+            iconCompat.mInt2 = i2;
+            return iconCompat;
         }
         throw new IllegalArgumentException("Data must not be null.");
     }
 
-    public static IconCompat createWithContentUri(String uri) {
-        if (uri != null) {
-            IconCompat rep = new IconCompat(4);
-            rep.mObj1 = uri;
-            return rep;
+    public static IconCompat createWithContentUri(String str) {
+        if (str != null) {
+            IconCompat iconCompat = new IconCompat(4);
+            iconCompat.mObj1 = str;
+            return iconCompat;
         }
         throw new IllegalArgumentException("Uri must not be null.");
     }
@@ -89,8 +89,8 @@ public class IconCompat {
         throw new IllegalArgumentException("Uri must not be null.");
     }
 
-    private IconCompat(int mType2) {
-        this.mType = mType2;
+    private IconCompat(int i) {
+        this.mType = i;
     }
 
     public Icon toIcon() {
@@ -117,74 +117,73 @@ public class IconCompat {
     }
 
     @Deprecated
-    public void addToShortcutIntent(Intent outIntent) {
-        addToShortcutIntent(outIntent, null);
+    public void addToShortcutIntent(Intent intent) {
+        addToShortcutIntent(intent, null);
     }
 
-    public void addToShortcutIntent(Intent outIntent, Drawable badge) {
-        Bitmap icon;
-        Bitmap icon2;
+    public void addToShortcutIntent(Intent intent, Drawable drawable) {
+        Bitmap bitmap;
         int i = this.mType;
         if (i == 1) {
-            icon = (Bitmap) this.mObj1;
-            if (badge != null) {
-                icon = icon.copy(icon.getConfig(), true);
+            bitmap = (Bitmap) this.mObj1;
+            if (drawable != null) {
+                bitmap = bitmap.copy(bitmap.getConfig(), true);
             }
         } else if (i != 2) {
             if (i == 5) {
-                icon = createLegacyIconFromAdaptiveIcon((Bitmap) this.mObj1, true);
+                bitmap = createLegacyIconFromAdaptiveIcon((Bitmap) this.mObj1, true);
             } else {
                 throw new IllegalArgumentException("Icon type not supported for intent shortcuts");
             }
-        } else if (badge == null) {
-            outIntent.putExtra("android.intent.extra.shortcut.ICON_RESOURCE", Intent.ShortcutIconResource.fromContext((Context) this.mObj1, this.mInt1));
+        } else if (drawable == null) {
+            intent.putExtra("android.intent.extra.shortcut.ICON_RESOURCE", Intent.ShortcutIconResource.fromContext((Context) this.mObj1, this.mInt1));
             return;
         } else {
             Context context = (Context) this.mObj1;
-            Drawable dr = ContextCompat.getDrawable(context, this.mInt1);
-            if (dr.getIntrinsicWidth() <= 0 || dr.getIntrinsicHeight() <= 0) {
-                int size = ((ActivityManager) context.getSystemService("activity")).getLauncherLargeIconSize();
-                icon2 = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+            Drawable drawable2 = ContextCompat.getDrawable(context, this.mInt1);
+            if (drawable2.getIntrinsicWidth() <= 0 || drawable2.getIntrinsicHeight() <= 0) {
+                int launcherLargeIconSize = ((ActivityManager) context.getSystemService("activity")).getLauncherLargeIconSize();
+                bitmap = Bitmap.createBitmap(launcherLargeIconSize, launcherLargeIconSize, Bitmap.Config.ARGB_8888);
             } else {
-                icon2 = Bitmap.createBitmap(dr.getIntrinsicWidth(), dr.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+                bitmap = Bitmap.createBitmap(drawable2.getIntrinsicWidth(), drawable2.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
             }
-            dr.setBounds(0, 0, icon2.getWidth(), icon2.getHeight());
-            dr.draw(new Canvas(icon2));
-            icon = icon2;
+            drawable2.setBounds(0, 0, bitmap.getWidth(), bitmap.getHeight());
+            drawable2.draw(new Canvas(bitmap));
         }
-        if (badge != null) {
-            int w = icon.getWidth();
-            int h = icon.getHeight();
-            badge.setBounds(w / 2, h / 2, w, h);
-            badge.draw(new Canvas(icon));
+        if (drawable != null) {
+            int width = bitmap.getWidth();
+            int height = bitmap.getHeight();
+            drawable.setBounds(width / 2, height / 2, width, height);
+            drawable.draw(new Canvas(bitmap));
         }
-        outIntent.putExtra("android.intent.extra.shortcut.ICON", icon);
+        intent.putExtra("android.intent.extra.shortcut.ICON", bitmap);
     }
 
-    static Bitmap createLegacyIconFromAdaptiveIcon(Bitmap adaptiveIconBitmap, boolean addShadow) {
-        int size = (int) (((float) Math.min(adaptiveIconBitmap.getWidth(), adaptiveIconBitmap.getHeight())) * DEFAULT_VIEW_PORT_SCALE);
-        Bitmap icon = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(icon);
+    static Bitmap createLegacyIconFromAdaptiveIcon(Bitmap bitmap, boolean z) {
+        int min = (int) (((float) Math.min(bitmap.getWidth(), bitmap.getHeight())) * DEFAULT_VIEW_PORT_SCALE);
+        Bitmap createBitmap = Bitmap.createBitmap(min, min, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(createBitmap);
         Paint paint = new Paint(3);
-        float center = ((float) size) * 0.5f;
-        float radius = ICON_DIAMETER_FACTOR * center;
-        if (addShadow) {
-            float blur = ((float) size) * BLUR_FACTOR;
+        float f = (float) min;
+        float f2 = 0.5f * f;
+        float f3 = ICON_DIAMETER_FACTOR * f2;
+        if (z) {
+            float f4 = BLUR_FACTOR * f;
             paint.setColor(0);
-            paint.setShadowLayer(blur, 0.0f, ((float) size) * KEY_SHADOW_OFFSET_FACTOR, 1023410176);
-            canvas.drawCircle(center, center, radius, paint);
-            paint.setShadowLayer(blur, 0.0f, 0.0f, 503316480);
-            canvas.drawCircle(center, center, radius, paint);
+            paint.setShadowLayer(f4, 0.0f, f * KEY_SHADOW_OFFSET_FACTOR, 1023410176);
+            canvas.drawCircle(f2, f2, f3, paint);
+            paint.setShadowLayer(f4, 0.0f, 0.0f, 503316480);
+            canvas.drawCircle(f2, f2, f3, paint);
             paint.clearShadowLayer();
         }
         paint.setColor(ViewCompat.MEASURED_STATE_MASK);
-        BitmapShader shader = new BitmapShader(adaptiveIconBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
-        Matrix shift = new Matrix();
-        shift.setTranslate((float) ((-(adaptiveIconBitmap.getWidth() - size)) / 2), (float) ((-(adaptiveIconBitmap.getHeight() - size)) / 2));
-        shader.setLocalMatrix(shift);
-        paint.setShader(shader);
-        canvas.drawCircle(center, center, radius, paint);
+        BitmapShader bitmapShader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+        Matrix matrix = new Matrix();
+        matrix.setTranslate((float) ((-(bitmap.getWidth() - min)) / 2), (float) ((-(bitmap.getHeight() - min)) / 2));
+        bitmapShader.setLocalMatrix(matrix);
+        paint.setShader(bitmapShader);
+        canvas.drawCircle(f2, f2, f3, paint);
         canvas.setBitmap(null);
-        return icon;
+        return createBitmap;
     }
 }

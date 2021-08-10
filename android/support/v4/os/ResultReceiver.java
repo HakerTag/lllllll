@@ -12,26 +12,34 @@ public class ResultReceiver implements Parcelable {
         /* class android.support.v4.os.ResultReceiver.AnonymousClass1 */
 
         @Override // android.os.Parcelable.Creator
-        public ResultReceiver createFromParcel(Parcel in) {
-            return new ResultReceiver(in);
+        public ResultReceiver createFromParcel(Parcel parcel) {
+            return new ResultReceiver(parcel);
         }
 
         @Override // android.os.Parcelable.Creator
-        public ResultReceiver[] newArray(int size) {
-            return new ResultReceiver[size];
+        public ResultReceiver[] newArray(int i) {
+            return new ResultReceiver[i];
         }
     };
     final Handler mHandler;
     final boolean mLocal;
     IResultReceiver mReceiver;
 
+    public int describeContents() {
+        return 0;
+    }
+
+    /* access modifiers changed from: protected */
+    public void onReceiveResult(int i, Bundle bundle) {
+    }
+
     class MyRunnable implements Runnable {
         final int mResultCode;
         final Bundle mResultData;
 
-        MyRunnable(int resultCode, Bundle resultData) {
-            this.mResultCode = resultCode;
-            this.mResultData = resultData;
+        MyRunnable(int i, Bundle bundle) {
+            this.mResultCode = i;
+            this.mResultData = bundle;
         }
 
         public void run() {
@@ -44,11 +52,11 @@ public class ResultReceiver implements Parcelable {
         }
 
         @Override // android.support.v4.os.IResultReceiver
-        public void send(int resultCode, Bundle resultData) {
+        public void send(int i, Bundle bundle) {
             if (ResultReceiver.this.mHandler != null) {
-                ResultReceiver.this.mHandler.post(new MyRunnable(resultCode, resultData));
+                ResultReceiver.this.mHandler.post(new MyRunnable(i, bundle));
             } else {
-                ResultReceiver.this.onReceiveResult(resultCode, resultData);
+                ResultReceiver.this.onReceiveResult(i, bundle);
             }
         }
     }
@@ -58,45 +66,37 @@ public class ResultReceiver implements Parcelable {
         this.mHandler = handler;
     }
 
-    public void send(int resultCode, Bundle resultData) {
+    public void send(int i, Bundle bundle) {
         if (this.mLocal) {
             Handler handler = this.mHandler;
             if (handler != null) {
-                handler.post(new MyRunnable(resultCode, resultData));
+                handler.post(new MyRunnable(i, bundle));
             } else {
-                onReceiveResult(resultCode, resultData);
+                onReceiveResult(i, bundle);
             }
         } else {
             IResultReceiver iResultReceiver = this.mReceiver;
             if (iResultReceiver != null) {
                 try {
-                    iResultReceiver.send(resultCode, resultData);
-                } catch (RemoteException e) {
+                    iResultReceiver.send(i, bundle);
+                } catch (RemoteException unused) {
                 }
             }
         }
     }
 
-    /* access modifiers changed from: protected */
-    public void onReceiveResult(int resultCode, Bundle resultData) {
-    }
-
-    public int describeContents() {
-        return 0;
-    }
-
-    public void writeToParcel(Parcel out, int flags) {
+    public void writeToParcel(Parcel parcel, int i) {
         synchronized (this) {
             if (this.mReceiver == null) {
                 this.mReceiver = new MyResultReceiver();
             }
-            out.writeStrongBinder(this.mReceiver.asBinder());
+            parcel.writeStrongBinder(this.mReceiver.asBinder());
         }
     }
 
-    ResultReceiver(Parcel in) {
+    ResultReceiver(Parcel parcel) {
         this.mLocal = false;
         this.mHandler = null;
-        this.mReceiver = IResultReceiver.Stub.asInterface(in.readStrongBinder());
+        this.mReceiver = IResultReceiver.Stub.asInterface(parcel.readStrongBinder());
     }
 }

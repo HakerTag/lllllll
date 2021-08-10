@@ -7,40 +7,39 @@ public final class ReedSolomonEncoder {
     private final List<GenericGFPoly> cachedGenerators;
     private final GenericGF field;
 
-    public ReedSolomonEncoder(GenericGF field2) {
-        this.field = field2;
+    public ReedSolomonEncoder(GenericGF genericGF) {
+        this.field = genericGF;
         ArrayList arrayList = new ArrayList();
         this.cachedGenerators = arrayList;
-        arrayList.add(new GenericGFPoly(field2, new int[]{1}));
+        arrayList.add(new GenericGFPoly(genericGF, new int[]{1}));
     }
 
-    private GenericGFPoly buildGenerator(int degree) {
-        if (degree >= this.cachedGenerators.size()) {
+    private GenericGFPoly buildGenerator(int i) {
+        if (i >= this.cachedGenerators.size()) {
             List<GenericGFPoly> list = this.cachedGenerators;
-            GenericGFPoly lastGenerator = list.get(list.size() - 1);
-            for (int d = this.cachedGenerators.size(); d <= degree; d++) {
+            GenericGFPoly genericGFPoly = list.get(list.size() - 1);
+            for (int size = this.cachedGenerators.size(); size <= i; size++) {
                 GenericGF genericGF = this.field;
-                GenericGFPoly nextGenerator = lastGenerator.multiply(new GenericGFPoly(genericGF, new int[]{1, genericGF.exp((d - 1) + genericGF.getGeneratorBase())}));
-                this.cachedGenerators.add(nextGenerator);
-                lastGenerator = nextGenerator;
+                genericGFPoly = genericGFPoly.multiply(new GenericGFPoly(genericGF, new int[]{1, genericGF.exp((size - 1) + genericGF.getGeneratorBase())}));
+                this.cachedGenerators.add(genericGFPoly);
             }
         }
-        return this.cachedGenerators.get(degree);
+        return this.cachedGenerators.get(i);
     }
 
-    public void encode(int[] toEncode, int ecBytes) {
-        if (ecBytes != 0) {
-            int dataBytes = toEncode.length - ecBytes;
-            if (dataBytes > 0) {
-                GenericGFPoly generator = buildGenerator(ecBytes);
-                int[] infoCoefficients = new int[dataBytes];
-                System.arraycopy(toEncode, 0, infoCoefficients, 0, dataBytes);
-                int[] coefficients = new GenericGFPoly(this.field, infoCoefficients).multiplyByMonomial(ecBytes, 1).divide(generator)[1].getCoefficients();
-                int numZeroCoefficients = ecBytes - coefficients.length;
-                for (int i = 0; i < numZeroCoefficients; i++) {
-                    toEncode[dataBytes + i] = 0;
+    public void encode(int[] iArr, int i) {
+        if (i != 0) {
+            int length = iArr.length - i;
+            if (length > 0) {
+                GenericGFPoly buildGenerator = buildGenerator(i);
+                int[] iArr2 = new int[length];
+                System.arraycopy(iArr, 0, iArr2, 0, length);
+                int[] coefficients = new GenericGFPoly(this.field, iArr2).multiplyByMonomial(i, 1).divide(buildGenerator)[1].getCoefficients();
+                int length2 = i - coefficients.length;
+                for (int i2 = 0; i2 < length2; i2++) {
+                    iArr[length + i2] = 0;
                 }
-                System.arraycopy(coefficients, 0, toEncode, dataBytes + numZeroCoefficients, coefficients.length);
+                System.arraycopy(coefficients, 0, iArr, length + length2, coefficients.length);
                 return;
             }
             throw new IllegalArgumentException("No data bytes provided");

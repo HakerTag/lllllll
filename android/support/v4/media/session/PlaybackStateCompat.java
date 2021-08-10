@@ -40,13 +40,13 @@ public final class PlaybackStateCompat implements Parcelable {
         /* class android.support.v4.media.session.PlaybackStateCompat.AnonymousClass1 */
 
         @Override // android.os.Parcelable.Creator
-        public PlaybackStateCompat createFromParcel(Parcel in) {
-            return new PlaybackStateCompat(in);
+        public PlaybackStateCompat createFromParcel(Parcel parcel) {
+            return new PlaybackStateCompat(parcel);
         }
 
         @Override // android.os.Parcelable.Creator
-        public PlaybackStateCompat[] newArray(int size) {
-            return new PlaybackStateCompat[size];
+        public PlaybackStateCompat[] newArray(int i) {
+            return new PlaybackStateCompat[i];
         }
     };
     public static final int ERROR_CODE_ACTION_ABORTED = 10;
@@ -122,82 +122,79 @@ public final class PlaybackStateCompat implements Parcelable {
     public @interface State {
     }
 
-    public static int toKeyCode(long action) {
-        if (action == 4) {
+    public static int toKeyCode(long j) {
+        if (j == 4) {
             return KEYCODE_MEDIA_PLAY;
         }
-        if (action == 2) {
+        if (j == 2) {
             return KEYCODE_MEDIA_PAUSE;
         }
-        if (action == 32) {
+        if (j == 32) {
             return 87;
         }
-        if (action == 16) {
+        if (j == 16) {
             return 88;
         }
-        if (action == 1) {
+        if (j == 1) {
             return 86;
         }
-        if (action == 64) {
+        if (j == 64) {
             return 90;
         }
-        if (action == 8) {
+        if (j == 8) {
             return 89;
         }
-        if (action == 512) {
-            return 85;
-        }
-        return 0;
-    }
-
-    PlaybackStateCompat(int state, long position, long bufferedPosition, float rate, long actions, int errorCode, CharSequence errorMessage, long updateTime, List<CustomAction> customActions, long activeItemId, Bundle extras) {
-        this.mState = state;
-        this.mPosition = position;
-        this.mBufferedPosition = bufferedPosition;
-        this.mSpeed = rate;
-        this.mActions = actions;
-        this.mErrorCode = errorCode;
-        this.mErrorMessage = errorMessage;
-        this.mUpdateTime = updateTime;
-        this.mCustomActions = new ArrayList(customActions);
-        this.mActiveItemId = activeItemId;
-        this.mExtras = extras;
-    }
-
-    PlaybackStateCompat(Parcel in) {
-        this.mState = in.readInt();
-        this.mPosition = in.readLong();
-        this.mSpeed = in.readFloat();
-        this.mUpdateTime = in.readLong();
-        this.mBufferedPosition = in.readLong();
-        this.mActions = in.readLong();
-        this.mErrorMessage = (CharSequence) TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(in);
-        this.mCustomActions = in.createTypedArrayList(CustomAction.CREATOR);
-        this.mActiveItemId = in.readLong();
-        this.mExtras = in.readBundle();
-        this.mErrorCode = in.readInt();
-    }
-
-    public String toString() {
-        return "PlaybackState {" + "state=" + this.mState + ", position=" + this.mPosition + ", buffered position=" + this.mBufferedPosition + ", speed=" + this.mSpeed + ", updated=" + this.mUpdateTime + ", actions=" + this.mActions + ", error code=" + this.mErrorCode + ", error message=" + this.mErrorMessage + ", custom actions=" + this.mCustomActions + ", active item id=" + this.mActiveItemId + "}";
+        return j == 512 ? 85 : 0;
     }
 
     public int describeContents() {
         return 0;
     }
 
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(this.mState);
-        dest.writeLong(this.mPosition);
-        dest.writeFloat(this.mSpeed);
-        dest.writeLong(this.mUpdateTime);
-        dest.writeLong(this.mBufferedPosition);
-        dest.writeLong(this.mActions);
-        TextUtils.writeToParcel(this.mErrorMessage, dest, flags);
-        dest.writeTypedList(this.mCustomActions);
-        dest.writeLong(this.mActiveItemId);
-        dest.writeBundle(this.mExtras);
-        dest.writeInt(this.mErrorCode);
+    PlaybackStateCompat(int i, long j, long j2, float f, long j3, int i2, CharSequence charSequence, long j4, List<CustomAction> list, long j5, Bundle bundle) {
+        this.mState = i;
+        this.mPosition = j;
+        this.mBufferedPosition = j2;
+        this.mSpeed = f;
+        this.mActions = j3;
+        this.mErrorCode = i2;
+        this.mErrorMessage = charSequence;
+        this.mUpdateTime = j4;
+        this.mCustomActions = new ArrayList(list);
+        this.mActiveItemId = j5;
+        this.mExtras = bundle;
+    }
+
+    PlaybackStateCompat(Parcel parcel) {
+        this.mState = parcel.readInt();
+        this.mPosition = parcel.readLong();
+        this.mSpeed = parcel.readFloat();
+        this.mUpdateTime = parcel.readLong();
+        this.mBufferedPosition = parcel.readLong();
+        this.mActions = parcel.readLong();
+        this.mErrorMessage = (CharSequence) TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel);
+        this.mCustomActions = parcel.createTypedArrayList(CustomAction.CREATOR);
+        this.mActiveItemId = parcel.readLong();
+        this.mExtras = parcel.readBundle();
+        this.mErrorCode = parcel.readInt();
+    }
+
+    public String toString() {
+        return "PlaybackState {" + "state=" + this.mState + ", position=" + this.mPosition + ", buffered position=" + this.mBufferedPosition + ", speed=" + this.mSpeed + ", updated=" + this.mUpdateTime + ", actions=" + this.mActions + ", error code=" + this.mErrorCode + ", error message=" + this.mErrorMessage + ", custom actions=" + this.mCustomActions + ", active item id=" + this.mActiveItemId + "}";
+    }
+
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(this.mState);
+        parcel.writeLong(this.mPosition);
+        parcel.writeFloat(this.mSpeed);
+        parcel.writeLong(this.mUpdateTime);
+        parcel.writeLong(this.mBufferedPosition);
+        parcel.writeLong(this.mActions);
+        TextUtils.writeToParcel(this.mErrorMessage, parcel, i);
+        parcel.writeTypedList(this.mCustomActions);
+        parcel.writeLong(this.mActiveItemId);
+        parcel.writeBundle(this.mExtras);
+        parcel.writeInt(this.mErrorCode);
     }
 
     public int getState() {
@@ -244,42 +241,43 @@ public final class PlaybackStateCompat implements Parcelable {
         return this.mExtras;
     }
 
-    public static PlaybackStateCompat fromPlaybackState(Object stateObj) {
-        Bundle extras;
-        if (stateObj == null || Build.VERSION.SDK_INT < 21) {
+    public static PlaybackStateCompat fromPlaybackState(Object obj) {
+        ArrayList arrayList;
+        Bundle bundle = null;
+        if (obj == null || Build.VERSION.SDK_INT < 21) {
             return null;
         }
-        List<Object> customActionObjs = PlaybackStateCompatApi21.getCustomActions(stateObj);
-        List<CustomAction> customActions = null;
-        if (customActionObjs != null) {
-            customActions = new ArrayList<>(customActionObjs.size());
-            for (Object customActionObj : customActionObjs) {
-                customActions.add(CustomAction.fromCustomAction(customActionObj));
+        List<Object> customActions = PlaybackStateCompatApi21.getCustomActions(obj);
+        if (customActions != null) {
+            ArrayList arrayList2 = new ArrayList(customActions.size());
+            for (Object obj2 : customActions) {
+                arrayList2.add(CustomAction.fromCustomAction(obj2));
             }
+            arrayList = arrayList2;
+        } else {
+            arrayList = null;
         }
         if (Build.VERSION.SDK_INT >= 22) {
-            extras = PlaybackStateCompatApi22.getExtras(stateObj);
-        } else {
-            extras = null;
+            bundle = PlaybackStateCompatApi22.getExtras(obj);
         }
-        PlaybackStateCompat state = new PlaybackStateCompat(PlaybackStateCompatApi21.getState(stateObj), PlaybackStateCompatApi21.getPosition(stateObj), PlaybackStateCompatApi21.getBufferedPosition(stateObj), PlaybackStateCompatApi21.getPlaybackSpeed(stateObj), PlaybackStateCompatApi21.getActions(stateObj), 0, PlaybackStateCompatApi21.getErrorMessage(stateObj), PlaybackStateCompatApi21.getLastPositionUpdateTime(stateObj), customActions, PlaybackStateCompatApi21.getActiveQueueItemId(stateObj), extras);
-        state.mStateObj = stateObj;
-        return state;
+        PlaybackStateCompat playbackStateCompat = new PlaybackStateCompat(PlaybackStateCompatApi21.getState(obj), PlaybackStateCompatApi21.getPosition(obj), PlaybackStateCompatApi21.getBufferedPosition(obj), PlaybackStateCompatApi21.getPlaybackSpeed(obj), PlaybackStateCompatApi21.getActions(obj), 0, PlaybackStateCompatApi21.getErrorMessage(obj), PlaybackStateCompatApi21.getLastPositionUpdateTime(obj), arrayList, PlaybackStateCompatApi21.getActiveQueueItemId(obj), bundle);
+        playbackStateCompat.mStateObj = obj;
+        return playbackStateCompat;
     }
 
     public Object getPlaybackState() {
         if (this.mStateObj == null && Build.VERSION.SDK_INT >= 21) {
-            List<Object> customActions = null;
+            ArrayList arrayList = null;
             if (this.mCustomActions != null) {
-                customActions = new ArrayList<>(this.mCustomActions.size());
+                arrayList = new ArrayList(this.mCustomActions.size());
                 for (CustomAction customAction : this.mCustomActions) {
-                    customActions.add(customAction.getCustomAction());
+                    arrayList.add(customAction.getCustomAction());
                 }
             }
             if (Build.VERSION.SDK_INT >= 22) {
-                this.mStateObj = PlaybackStateCompatApi22.newInstance(this.mState, this.mPosition, this.mBufferedPosition, this.mSpeed, this.mActions, this.mErrorMessage, this.mUpdateTime, customActions, this.mActiveItemId, this.mExtras);
+                this.mStateObj = PlaybackStateCompatApi22.newInstance(this.mState, this.mPosition, this.mBufferedPosition, this.mSpeed, this.mActions, this.mErrorMessage, this.mUpdateTime, arrayList, this.mActiveItemId, this.mExtras);
             } else {
-                this.mStateObj = PlaybackStateCompatApi21.newInstance(this.mState, this.mPosition, this.mBufferedPosition, this.mSpeed, this.mActions, this.mErrorMessage, this.mUpdateTime, customActions, this.mActiveItemId);
+                this.mStateObj = PlaybackStateCompatApi21.newInstance(this.mState, this.mPosition, this.mBufferedPosition, this.mSpeed, this.mActions, this.mErrorMessage, this.mUpdateTime, arrayList, this.mActiveItemId);
             }
         }
         return this.mStateObj;
@@ -290,13 +288,13 @@ public final class PlaybackStateCompat implements Parcelable {
             /* class android.support.v4.media.session.PlaybackStateCompat.CustomAction.AnonymousClass1 */
 
             @Override // android.os.Parcelable.Creator
-            public CustomAction createFromParcel(Parcel p) {
-                return new CustomAction(p);
+            public CustomAction createFromParcel(Parcel parcel) {
+                return new CustomAction(parcel);
             }
 
             @Override // android.os.Parcelable.Creator
-            public CustomAction[] newArray(int size) {
-                return new CustomAction[size];
+            public CustomAction[] newArray(int i) {
+                return new CustomAction[i];
             }
         };
         private final String mAction;
@@ -305,37 +303,37 @@ public final class PlaybackStateCompat implements Parcelable {
         private final int mIcon;
         private final CharSequence mName;
 
-        CustomAction(String action, CharSequence name, int icon, Bundle extras) {
-            this.mAction = action;
-            this.mName = name;
-            this.mIcon = icon;
-            this.mExtras = extras;
-        }
-
-        CustomAction(Parcel in) {
-            this.mAction = in.readString();
-            this.mName = (CharSequence) TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(in);
-            this.mIcon = in.readInt();
-            this.mExtras = in.readBundle();
-        }
-
-        public void writeToParcel(Parcel dest, int flags) {
-            dest.writeString(this.mAction);
-            TextUtils.writeToParcel(this.mName, dest, flags);
-            dest.writeInt(this.mIcon);
-            dest.writeBundle(this.mExtras);
-        }
-
         public int describeContents() {
             return 0;
         }
 
-        public static CustomAction fromCustomAction(Object customActionObj) {
-            if (customActionObj == null || Build.VERSION.SDK_INT < 21) {
+        CustomAction(String str, CharSequence charSequence, int i, Bundle bundle) {
+            this.mAction = str;
+            this.mName = charSequence;
+            this.mIcon = i;
+            this.mExtras = bundle;
+        }
+
+        CustomAction(Parcel parcel) {
+            this.mAction = parcel.readString();
+            this.mName = (CharSequence) TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel);
+            this.mIcon = parcel.readInt();
+            this.mExtras = parcel.readBundle();
+        }
+
+        public void writeToParcel(Parcel parcel, int i) {
+            parcel.writeString(this.mAction);
+            TextUtils.writeToParcel(this.mName, parcel, i);
+            parcel.writeInt(this.mIcon);
+            parcel.writeBundle(this.mExtras);
+        }
+
+        public static CustomAction fromCustomAction(Object obj) {
+            if (obj == null || Build.VERSION.SDK_INT < 21) {
                 return null;
             }
-            CustomAction customAction = new CustomAction(PlaybackStateCompatApi21.CustomAction.getAction(customActionObj), PlaybackStateCompatApi21.CustomAction.getName(customActionObj), PlaybackStateCompatApi21.CustomAction.getIcon(customActionObj), PlaybackStateCompatApi21.CustomAction.getExtras(customActionObj));
-            customAction.mCustomActionObj = customActionObj;
+            CustomAction customAction = new CustomAction(PlaybackStateCompatApi21.CustomAction.getAction(obj), PlaybackStateCompatApi21.CustomAction.getName(obj), PlaybackStateCompatApi21.CustomAction.getIcon(obj), PlaybackStateCompatApi21.CustomAction.getExtras(obj));
+            customAction.mCustomActionObj = obj;
             return customAction;
         }
 
@@ -374,22 +372,22 @@ public final class PlaybackStateCompat implements Parcelable {
             private final int mIcon;
             private final CharSequence mName;
 
-            public Builder(String action, CharSequence name, int icon) {
-                if (TextUtils.isEmpty(action)) {
+            public Builder(String str, CharSequence charSequence, int i) {
+                if (TextUtils.isEmpty(str)) {
                     throw new IllegalArgumentException("You must specify an action to build a CustomAction.");
-                } else if (TextUtils.isEmpty(name)) {
+                } else if (TextUtils.isEmpty(charSequence)) {
                     throw new IllegalArgumentException("You must specify a name to build a CustomAction.");
-                } else if (icon != 0) {
-                    this.mAction = action;
-                    this.mName = name;
-                    this.mIcon = icon;
+                } else if (i != 0) {
+                    this.mAction = str;
+                    this.mName = charSequence;
+                    this.mIcon = i;
                 } else {
                     throw new IllegalArgumentException("You must specify an icon resource id to build a CustomAction.");
                 }
             }
 
-            public Builder setExtras(Bundle extras) {
-                this.mExtras = extras;
+            public Builder setExtras(Bundle bundle) {
+                this.mExtras = bundle;
                 return this;
             }
 
@@ -415,46 +413,46 @@ public final class PlaybackStateCompat implements Parcelable {
         public Builder() {
         }
 
-        public Builder(PlaybackStateCompat source) {
-            this.mState = source.mState;
-            this.mPosition = source.mPosition;
-            this.mRate = source.mSpeed;
-            this.mUpdateTime = source.mUpdateTime;
-            this.mBufferedPosition = source.mBufferedPosition;
-            this.mActions = source.mActions;
-            this.mErrorCode = source.mErrorCode;
-            this.mErrorMessage = source.mErrorMessage;
-            if (source.mCustomActions != null) {
-                this.mCustomActions.addAll(source.mCustomActions);
+        public Builder(PlaybackStateCompat playbackStateCompat) {
+            this.mState = playbackStateCompat.mState;
+            this.mPosition = playbackStateCompat.mPosition;
+            this.mRate = playbackStateCompat.mSpeed;
+            this.mUpdateTime = playbackStateCompat.mUpdateTime;
+            this.mBufferedPosition = playbackStateCompat.mBufferedPosition;
+            this.mActions = playbackStateCompat.mActions;
+            this.mErrorCode = playbackStateCompat.mErrorCode;
+            this.mErrorMessage = playbackStateCompat.mErrorMessage;
+            if (playbackStateCompat.mCustomActions != null) {
+                this.mCustomActions.addAll(playbackStateCompat.mCustomActions);
             }
-            this.mActiveItemId = source.mActiveItemId;
-            this.mExtras = source.mExtras;
+            this.mActiveItemId = playbackStateCompat.mActiveItemId;
+            this.mExtras = playbackStateCompat.mExtras;
         }
 
-        public Builder setState(int state, long position, float playbackSpeed) {
-            return setState(state, position, playbackSpeed, SystemClock.elapsedRealtime());
+        public Builder setState(int i, long j, float f) {
+            return setState(i, j, f, SystemClock.elapsedRealtime());
         }
 
-        public Builder setState(int state, long position, float playbackSpeed, long updateTime) {
-            this.mState = state;
-            this.mPosition = position;
-            this.mUpdateTime = updateTime;
-            this.mRate = playbackSpeed;
+        public Builder setState(int i, long j, float f, long j2) {
+            this.mState = i;
+            this.mPosition = j;
+            this.mUpdateTime = j2;
+            this.mRate = f;
             return this;
         }
 
-        public Builder setBufferedPosition(long bufferPosition) {
-            this.mBufferedPosition = bufferPosition;
+        public Builder setBufferedPosition(long j) {
+            this.mBufferedPosition = j;
             return this;
         }
 
-        public Builder setActions(long capabilities) {
-            this.mActions = capabilities;
+        public Builder setActions(long j) {
+            this.mActions = j;
             return this;
         }
 
-        public Builder addCustomAction(String action, String name, int icon) {
-            return addCustomAction(new CustomAction(action, name, icon, null));
+        public Builder addCustomAction(String str, String str2, int i) {
+            return addCustomAction(new CustomAction(str, str2, i, null));
         }
 
         public Builder addCustomAction(CustomAction customAction) {
@@ -465,24 +463,24 @@ public final class PlaybackStateCompat implements Parcelable {
             throw new IllegalArgumentException("You may not add a null CustomAction to PlaybackStateCompat.");
         }
 
-        public Builder setActiveQueueItemId(long id) {
-            this.mActiveItemId = id;
+        public Builder setActiveQueueItemId(long j) {
+            this.mActiveItemId = j;
             return this;
         }
 
-        public Builder setErrorMessage(CharSequence errorMessage) {
-            this.mErrorMessage = errorMessage;
+        public Builder setErrorMessage(CharSequence charSequence) {
+            this.mErrorMessage = charSequence;
             return this;
         }
 
-        public Builder setErrorMessage(int errorCode, CharSequence errorMessage) {
-            this.mErrorCode = errorCode;
-            this.mErrorMessage = errorMessage;
+        public Builder setErrorMessage(int i, CharSequence charSequence) {
+            this.mErrorCode = i;
+            this.mErrorMessage = charSequence;
             return this;
         }
 
-        public Builder setExtras(Bundle extras) {
-            this.mExtras = extras;
+        public Builder setExtras(Bundle bundle) {
+            this.mExtras = bundle;
             return this;
         }
 

@@ -1,6 +1,5 @@
 package org.apache.cordova;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -29,7 +28,7 @@ public class CordovaActivity extends Activity {
     protected ArrayList<PluginEntry> pluginEntries;
     protected CordovaPreferences preferences;
 
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle bundle) {
         loadConfig();
         LOG.setLogLevel(this.preferences.getString("loglevel", "ERROR"));
         LOG.i(TAG, "Apache Cordova native platform version 9.1.0 is starting");
@@ -49,11 +48,11 @@ public class CordovaActivity extends Activity {
         } else {
             getWindow().setFlags(1024, 1024);
         }
-        super.onCreate(savedInstanceState);
+        super.onCreate(bundle);
         CordovaInterfaceImpl makeCordovaInterface = makeCordovaInterface();
         this.cordovaInterface = makeCordovaInterface;
-        if (savedInstanceState != null) {
-            makeCordovaInterface.restoreInstanceState(savedInstanceState);
+        if (bundle != null) {
+            makeCordovaInterface.restoreInstanceState(bundle);
         }
     }
 
@@ -72,14 +71,14 @@ public class CordovaActivity extends Activity {
 
     /* access modifiers changed from: protected */
     public void loadConfig() {
-        ConfigXmlParser parser = new ConfigXmlParser();
-        parser.parse(this);
-        CordovaPreferences preferences2 = parser.getPreferences();
+        ConfigXmlParser configXmlParser = new ConfigXmlParser();
+        configXmlParser.parse(this);
+        CordovaPreferences preferences2 = configXmlParser.getPreferences();
         this.preferences = preferences2;
         preferences2.setPreferencesBundle(getIntent().getExtras());
-        this.launchUrl = parser.getLaunchUrl();
-        this.pluginEntries = parser.getPluginEntries();
-        Config.parser = parser;
+        this.launchUrl = configXmlParser.getLaunchUrl();
+        this.pluginEntries = configXmlParser.getPluginEntries();
+        Config.parser = configXmlParser;
     }
 
     /* access modifiers changed from: protected */
@@ -113,18 +112,18 @@ public class CordovaActivity extends Activity {
             /* class org.apache.cordova.CordovaActivity.AnonymousClass1 */
 
             @Override // org.apache.cordova.CordovaInterfaceImpl, org.apache.cordova.CordovaInterface
-            public Object onMessage(String id, Object data) {
-                return CordovaActivity.this.onMessage(id, data);
+            public Object onMessage(String str, Object obj) {
+                return CordovaActivity.this.onMessage(str, obj);
             }
         };
     }
 
-    public void loadUrl(String url) {
+    public void loadUrl(String str) {
         if (this.appView == null) {
             init();
         }
         this.keepRunning = this.preferences.getBoolean("KeepRunning", true);
-        this.appView.loadUrlIntoView(url, true);
+        this.appView.loadUrlIntoView(str, true);
     }
 
     /* access modifiers changed from: protected */
@@ -186,45 +185,43 @@ public class CordovaActivity extends Activity {
         }
     }
 
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        if (hasFocus && this.immersiveMode) {
+    public void onWindowFocusChanged(boolean z) {
+        super.onWindowFocusChanged(z);
+        if (z && this.immersiveMode) {
             setImmersiveUiVisibility();
         }
     }
 
     /* access modifiers changed from: protected */
-    @SuppressLint({"InlinedApi"})
     public void setImmersiveUiVisibility() {
         getWindow().getDecorView().setSystemUiVisibility(5894);
     }
 
-    @SuppressLint({"NewApi"})
-    public void startActivityForResult(Intent intent, int requestCode, Bundle options) {
-        this.cordovaInterface.setActivityResultRequestCode(requestCode);
-        super.startActivityForResult(intent, requestCode, options);
+    public void startActivityForResult(Intent intent, int i, Bundle bundle) {
+        this.cordovaInterface.setActivityResultRequestCode(i);
+        super.startActivityForResult(intent, i, bundle);
     }
 
     /* access modifiers changed from: protected */
-    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+    public void onActivityResult(int i, int i2, Intent intent) {
         String str = TAG;
-        LOG.d(str, "Incoming Result. Request code = " + requestCode);
-        super.onActivityResult(requestCode, resultCode, intent);
-        this.cordovaInterface.onActivityResult(requestCode, resultCode, intent);
+        LOG.d(str, "Incoming Result. Request code = " + i);
+        super.onActivityResult(i, i2, intent);
+        this.cordovaInterface.onActivityResult(i, i2, intent);
     }
 
-    public void onReceivedError(int errorCode, final String description, final String failingUrl) {
-        final String errorUrl = this.preferences.getString("errorUrl", null);
-        if (errorUrl == null || failingUrl.equals(errorUrl) || this.appView == null) {
-            final boolean exit = errorCode != -2;
+    public void onReceivedError(int i, final String str, final String str2) {
+        final String string = this.preferences.getString("errorUrl", null);
+        if (string == null || str2.equals(string) || this.appView == null) {
+            final boolean z = i != -2;
             runOnUiThread(new Runnable() {
                 /* class org.apache.cordova.CordovaActivity.AnonymousClass3 */
 
                 public void run() {
-                    if (exit) {
+                    if (z) {
                         this.appView.getView().setVisibility(8);
                         CordovaActivity cordovaActivity = this;
-                        cordovaActivity.displayError("Application Error", description + " (" + failingUrl + ")", "OK", exit);
+                        cordovaActivity.displayError("Application Error", str + " (" + str2 + ")", "OK", z);
                     }
                 }
             });
@@ -234,34 +231,34 @@ public class CordovaActivity extends Activity {
             /* class org.apache.cordova.CordovaActivity.AnonymousClass2 */
 
             public void run() {
-                this.appView.showWebPage(errorUrl, false, true, null);
+                this.appView.showWebPage(string, false, true, null);
             }
         });
     }
 
-    public void displayError(final String title, final String message, final String button, final boolean exit) {
+    public void displayError(final String str, final String str2, final String str3, final boolean z) {
         runOnUiThread(new Runnable() {
             /* class org.apache.cordova.CordovaActivity.AnonymousClass4 */
 
             public void run() {
                 try {
-                    AlertDialog.Builder dlg = new AlertDialog.Builder(this);
-                    dlg.setMessage(message);
-                    dlg.setTitle(title);
-                    dlg.setCancelable(false);
-                    dlg.setPositiveButton(button, new DialogInterface.OnClickListener() {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage(str2);
+                    builder.setTitle(str);
+                    builder.setCancelable(false);
+                    builder.setPositiveButton(str3, new DialogInterface.OnClickListener() {
                         /* class org.apache.cordova.CordovaActivity.AnonymousClass4.AnonymousClass1 */
 
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                            if (exit) {
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                            if (z) {
                                 CordovaActivity.this.finish();
                             }
                         }
                     });
-                    dlg.create();
-                    dlg.show();
-                } catch (Exception e) {
+                    builder.create();
+                    builder.show();
+                } catch (Exception unused) {
                     CordovaActivity.this.finish();
                 }
             }
@@ -285,26 +282,26 @@ public class CordovaActivity extends Activity {
         return true;
     }
 
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
         CordovaWebView cordovaWebView = this.appView;
         if (cordovaWebView == null) {
             return true;
         }
-        cordovaWebView.getPluginManager().postMessage("onOptionsItemSelected", item);
+        cordovaWebView.getPluginManager().postMessage("onOptionsItemSelected", menuItem);
         return true;
     }
 
-    public Object onMessage(String id, Object data) {
-        if ("onReceivedError".equals(id)) {
-            JSONObject d = (JSONObject) data;
+    public Object onMessage(String str, Object obj) {
+        if ("onReceivedError".equals(str)) {
+            JSONObject jSONObject = (JSONObject) obj;
             try {
-                onReceivedError(d.getInt("errorCode"), d.getString("description"), d.getString("url"));
+                onReceivedError(jSONObject.getInt("errorCode"), jSONObject.getString("description"), jSONObject.getString("url"));
                 return null;
             } catch (JSONException e) {
                 e.printStackTrace();
                 return null;
             }
-        } else if (!"exit".equals(id)) {
+        } else if (!"exit".equals(str)) {
             return null;
         } else {
             finish();
@@ -313,23 +310,23 @@ public class CordovaActivity extends Activity {
     }
 
     /* access modifiers changed from: protected */
-    public void onSaveInstanceState(Bundle outState) {
-        this.cordovaInterface.onSaveInstanceState(outState);
-        super.onSaveInstanceState(outState);
+    public void onSaveInstanceState(Bundle bundle) {
+        this.cordovaInterface.onSaveInstanceState(bundle);
+        super.onSaveInstanceState(bundle);
     }
 
-    public void onConfigurationChanged(Configuration newConfig) {
-        PluginManager pm;
-        super.onConfigurationChanged(newConfig);
+    public void onConfigurationChanged(Configuration configuration) {
+        PluginManager pluginManager;
+        super.onConfigurationChanged(configuration);
         CordovaWebView cordovaWebView = this.appView;
-        if (cordovaWebView != null && (pm = cordovaWebView.getPluginManager()) != null) {
-            pm.onConfigurationChanged(newConfig);
+        if (cordovaWebView != null && (pluginManager = cordovaWebView.getPluginManager()) != null) {
+            pluginManager.onConfigurationChanged(configuration);
         }
     }
 
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int i, String[] strArr, int[] iArr) {
         try {
-            this.cordovaInterface.onRequestPermissionResult(requestCode, permissions, grantResults);
+            this.cordovaInterface.onRequestPermissionResult(i, strArr, iArr);
         } catch (JSONException e) {
             LOG.d(TAG, "JSONException: Parameters fed into the method are not valid");
             e.printStackTrace();

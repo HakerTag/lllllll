@@ -17,11 +17,15 @@ public final class ServiceCompat {
     private ServiceCompat() {
     }
 
-    public static void stopForeground(Service service, int flags) {
+    public static void stopForeground(Service service, int i) {
         if (Build.VERSION.SDK_INT >= 24) {
-            service.stopForeground(flags);
-        } else {
-            service.stopForeground((flags & 1) != 0);
+            service.stopForeground(i);
+            return;
         }
+        boolean z = true;
+        if ((i & 1) == 0) {
+            z = false;
+        }
+        service.stopForeground(z);
     }
 }

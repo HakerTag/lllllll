@@ -12,15 +12,15 @@ public final class ChecksumException extends ReaderException {
     private ChecksumException() {
     }
 
-    private ChecksumException(Throwable cause) {
-        super(cause);
+    private ChecksumException(Throwable th) {
+        super(th);
     }
 
     public static ChecksumException getChecksumInstance() {
         return isStackTrace ? new ChecksumException() : INSTANCE;
     }
 
-    public static ChecksumException getChecksumInstance(Throwable cause) {
-        return isStackTrace ? new ChecksumException(cause) : INSTANCE;
+    public static ChecksumException getChecksumInstance(Throwable th) {
+        return isStackTrace ? new ChecksumException(th) : INSTANCE;
     }
 }

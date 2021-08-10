@@ -11,12 +11,12 @@ public final class IntentCompat {
     private IntentCompat() {
     }
 
-    public static Intent makeMainSelectorActivity(String selectorAction, String selectorCategory) {
+    public static Intent makeMainSelectorActivity(String str, String str2) {
         if (Build.VERSION.SDK_INT >= 15) {
-            return Intent.makeMainSelectorActivity(selectorAction, selectorCategory);
+            return Intent.makeMainSelectorActivity(str, str2);
         }
-        Intent intent = new Intent(selectorAction);
-        intent.addCategory(selectorCategory);
+        Intent intent = new Intent(str);
+        intent.addCategory(str2);
         return intent;
     }
 }

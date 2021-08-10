@@ -7,78 +7,61 @@ public final class DataBlock {
     private final byte[] codewords;
     private final int numDataCodewords;
 
-    private DataBlock(int numDataCodewords2, byte[] codewords2) {
-        this.numDataCodewords = numDataCodewords2;
-        this.codewords = codewords2;
+    private DataBlock(int i, byte[] bArr) {
+        this.numDataCodewords = i;
+        this.codewords = bArr;
     }
 
-    static DataBlock[] getDataBlocks(byte[] rawCodewords, Version version) {
-        Version.ECBlocks ecBlocks;
-        int iOffset;
-        Version.ECBlocks ecBlocks2 = version.getECBlocks();
-        int totalBlocks = 0;
-        Version.ECB[] ecBlockArray = ecBlocks2.getECBlocks();
-        for (Version.ECB ecBlock : ecBlockArray) {
-            totalBlocks += ecBlock.getCount();
+    static DataBlock[] getDataBlocks(byte[] bArr, Version version) {
+        Version.ECBlocks eCBlocks = version.getECBlocks();
+        Version.ECB[] eCBlocks2 = eCBlocks.getECBlocks();
+        int i = 0;
+        for (Version.ECB ecb : eCBlocks2) {
+            i += ecb.getCount();
         }
-        DataBlock[] result = new DataBlock[totalBlocks];
-        int numResultBlocks = 0;
-        for (Version.ECB ecBlock2 : ecBlockArray) {
-            int i = 0;
-            while (i < ecBlock2.getCount()) {
-                int numDataCodewords2 = ecBlock2.getDataCodewords();
-                result[numResultBlocks] = new DataBlock(numDataCodewords2, new byte[(ecBlocks2.getECCodewords() + numDataCodewords2)]);
-                i++;
-                numResultBlocks++;
+        DataBlock[] dataBlockArr = new DataBlock[i];
+        int i2 = 0;
+        for (Version.ECB ecb2 : eCBlocks2) {
+            int i3 = 0;
+            while (i3 < ecb2.getCount()) {
+                int dataCodewords = ecb2.getDataCodewords();
+                dataBlockArr[i2] = new DataBlock(dataCodewords, new byte[(eCBlocks.getECCodewords() + dataCodewords)]);
+                i3++;
+                i2++;
             }
         }
-        int longerBlocksNumDataCodewords = result[0].codewords.length - ecBlocks2.getECCodewords();
-        int shorterBlocksNumDataCodewords = longerBlocksNumDataCodewords - 1;
-        int rawCodewordsOffset = 0;
-        for (int i2 = 0; i2 < shorterBlocksNumDataCodewords; i2++) {
-            int j = 0;
-            while (j < numResultBlocks) {
-                result[j].codewords[i2] = rawCodewords[rawCodewordsOffset];
-                j++;
-                rawCodewordsOffset++;
+        int length = dataBlockArr[0].codewords.length - eCBlocks.getECCodewords();
+        int i4 = length - 1;
+        int i5 = 0;
+        for (int i6 = 0; i6 < i4; i6++) {
+            int i7 = 0;
+            while (i7 < i2) {
+                dataBlockArr[i7].codewords[i6] = bArr[i5];
+                i7++;
+                i5++;
             }
         }
-        boolean specialVersion = version.getVersionNumber() == 24;
-        int numLongerBlocks = specialVersion ? 8 : numResultBlocks;
-        int j2 = 0;
-        while (j2 < numLongerBlocks) {
-            result[j2].codewords[longerBlocksNumDataCodewords - 1] = rawCodewords[rawCodewordsOffset];
-            j2++;
-            rawCodewordsOffset++;
+        boolean z = version.getVersionNumber() == 24;
+        int i8 = z ? 8 : i2;
+        int i9 = 0;
+        while (i9 < i8) {
+            dataBlockArr[i9].codewords[i4] = bArr[i5];
+            i9++;
+            i5++;
         }
-        int max = result[0].codewords.length;
-        for (int i3 = longerBlocksNumDataCodewords; i3 < max; i3++) {
-            int j3 = 0;
-            while (j3 < numResultBlocks) {
-                int jOffset = specialVersion ? (j3 + 8) % numResultBlocks : j3;
-                if (specialVersion) {
-                    ecBlocks = ecBlocks2;
-                    if (jOffset > 7) {
-                        iOffset = i3 - 1;
-                        result[jOffset].codewords[iOffset] = rawCodewords[rawCodewordsOffset];
-                        j3++;
-                        ecBlocks2 = ecBlocks;
-                        totalBlocks = totalBlocks;
-                        rawCodewordsOffset++;
-                    }
-                } else {
-                    ecBlocks = ecBlocks2;
-                }
-                iOffset = i3;
-                result[jOffset].codewords[iOffset] = rawCodewords[rawCodewordsOffset];
-                j3++;
-                ecBlocks2 = ecBlocks;
-                totalBlocks = totalBlocks;
-                rawCodewordsOffset++;
+        int length2 = dataBlockArr[0].codewords.length;
+        while (length < length2) {
+            int i10 = 0;
+            while (i10 < i2) {
+                int i11 = z ? (i10 + 8) % i2 : i10;
+                dataBlockArr[i11].codewords[(!z || i11 <= 7) ? length : length - 1] = bArr[i5];
+                i10++;
+                i5++;
             }
+            length++;
         }
-        if (rawCodewordsOffset == rawCodewords.length) {
-            return result;
+        if (i5 == bArr.length) {
+            return dataBlockArr;
         }
         throw new IllegalArgumentException();
     }

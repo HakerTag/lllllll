@@ -41,35 +41,31 @@ final class DecodeFormatManager {
     }
 
     static Set<BarcodeFormat> parseDecodeFormats(Intent intent) {
-        Iterable<String> scanFormats = null;
-        CharSequence scanFormatsString = intent.getStringExtra(Intents.Scan.FORMATS);
-        if (scanFormatsString != null) {
-            scanFormats = Arrays.asList(COMMA_PATTERN.split(scanFormatsString));
-        }
-        return parseDecodeFormats(scanFormats, intent.getStringExtra(Intents.Scan.MODE));
+        String stringExtra = intent.getStringExtra(Intents.Scan.FORMATS);
+        return parseDecodeFormats(stringExtra != null ? Arrays.asList(COMMA_PATTERN.split(stringExtra)) : null, intent.getStringExtra(Intents.Scan.MODE));
     }
 
-    static Set<BarcodeFormat> parseDecodeFormats(Uri inputUri) {
-        List<String> formats = inputUri.getQueryParameters(Intents.Scan.FORMATS);
-        if (!(formats == null || formats.size() != 1 || formats.get(0) == null)) {
-            formats = Arrays.asList(COMMA_PATTERN.split(formats.get(0)));
+    static Set<BarcodeFormat> parseDecodeFormats(Uri uri) {
+        List<String> queryParameters = uri.getQueryParameters(Intents.Scan.FORMATS);
+        if (!(queryParameters == null || queryParameters.size() != 1 || queryParameters.get(0) == null)) {
+            queryParameters = Arrays.asList(COMMA_PATTERN.split(queryParameters.get(0)));
         }
-        return parseDecodeFormats(formats, inputUri.getQueryParameter(Intents.Scan.MODE));
+        return parseDecodeFormats(queryParameters, uri.getQueryParameter(Intents.Scan.MODE));
     }
 
-    private static Set<BarcodeFormat> parseDecodeFormats(Iterable<String> scanFormats, String decodeMode) {
-        if (scanFormats != null) {
-            Set<BarcodeFormat> formats = EnumSet.noneOf(BarcodeFormat.class);
+    private static Set<BarcodeFormat> parseDecodeFormats(Iterable<String> iterable, String str) {
+        if (iterable != null) {
+            EnumSet noneOf = EnumSet.noneOf(BarcodeFormat.class);
             try {
-                for (String format : scanFormats) {
-                    formats.add(BarcodeFormat.valueOf(format));
+                for (String str2 : iterable) {
+                    noneOf.add(BarcodeFormat.valueOf(str2));
                 }
-                return formats;
-            } catch (IllegalArgumentException e) {
+                return noneOf;
+            } catch (IllegalArgumentException unused) {
             }
         }
-        if (decodeMode != null) {
-            return FORMATS_FOR_MODE.get(decodeMode);
+        if (str != null) {
+            return FORMATS_FOR_MODE.get(str);
         }
         return null;
     }

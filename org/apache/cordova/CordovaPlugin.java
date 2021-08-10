@@ -17,42 +17,62 @@ public class CordovaPlugin {
     private String serviceName;
     public CordovaWebView webView;
 
-    public final void privateInitialize(String serviceName2, CordovaInterface cordova2, CordovaWebView webView2, CordovaPreferences preferences2) {
-        this.serviceName = serviceName2;
-        this.cordova = cordova2;
-        this.webView = webView2;
-        this.preferences = preferences2;
-        initialize(cordova2, webView2);
-        pluginInitialize();
-    }
-
-    public void initialize(CordovaInterface cordova2, CordovaWebView webView2) {
-    }
-
-    /* access modifiers changed from: protected */
-    public void pluginInitialize() {
-    }
-
-    public String getServiceName() {
-        return this.serviceName;
-    }
-
-    public boolean execute(String action, String rawArgs, CallbackContext callbackContext) throws JSONException {
-        return execute(action, new JSONArray(rawArgs), callbackContext);
-    }
-
-    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        return execute(action, new CordovaArgs(args), callbackContext);
-    }
-
-    public boolean execute(String action, CordovaArgs args, CallbackContext callbackContext) throws JSONException {
+    public boolean execute(String str, CordovaArgs cordovaArgs, CallbackContext callbackContext) throws JSONException {
         return false;
     }
 
-    public void onPause(boolean multitasking) {
+    public boolean hasPermisssion() {
+        return true;
     }
 
-    public void onResume(boolean multitasking) {
+    public void initialize(CordovaInterface cordovaInterface, CordovaWebView cordovaWebView) {
+    }
+
+    public void onActivityResult(int i, int i2, Intent intent) {
+    }
+
+    public void onConfigurationChanged(Configuration configuration) {
+    }
+
+    public void onDestroy() {
+    }
+
+    public Object onMessage(String str, Object obj) {
+        return null;
+    }
+
+    public void onNewIntent(Intent intent) {
+    }
+
+    public boolean onOverrideUrlLoading(String str) {
+        return false;
+    }
+
+    public void onPause(boolean z) {
+    }
+
+    public boolean onReceivedClientCertRequest(CordovaWebView cordovaWebView, ICordovaClientCertRequest iCordovaClientCertRequest) {
+        return false;
+    }
+
+    public boolean onReceivedHttpAuthRequest(CordovaWebView cordovaWebView, ICordovaHttpAuthHandler iCordovaHttpAuthHandler, String str, String str2) {
+        return false;
+    }
+
+    public void onRequestPermissionResult(int i, String[] strArr, int[] iArr) throws JSONException {
+    }
+
+    public void onReset() {
+    }
+
+    public void onRestoreStateForActivityResult(Bundle bundle, CallbackContext callbackContext) {
+    }
+
+    public void onResume(boolean z) {
+    }
+
+    public Bundle onSaveInstanceState() {
+        return null;
     }
 
     public void onStart() {
@@ -61,48 +81,52 @@ public class CordovaPlugin {
     public void onStop() {
     }
 
-    public void onNewIntent(Intent intent) {
-    }
-
-    public void onDestroy() {
-    }
-
-    public Bundle onSaveInstanceState() {
-        return null;
-    }
-
-    public void onRestoreStateForActivityResult(Bundle state, CallbackContext callbackContext) {
-    }
-
-    public Object onMessage(String id, Object data) {
-        return null;
-    }
-
-    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-    }
-
-    public Boolean shouldAllowRequest(String url) {
-        return null;
-    }
-
-    public Boolean shouldAllowNavigation(String url) {
-        return null;
-    }
-
-    public Boolean shouldAllowBridgeAccess(String url) {
-        return shouldAllowNavigation(url);
-    }
-
-    public Boolean shouldOpenExternalUrl(String url) {
-        return null;
-    }
-
-    public boolean onOverrideUrlLoading(String url) {
-        return false;
+    /* access modifiers changed from: protected */
+    public void pluginInitialize() {
     }
 
     public Uri remapUri(Uri uri) {
         return null;
+    }
+
+    public void requestPermissions(int i) {
+    }
+
+    public Boolean shouldAllowNavigation(String str) {
+        return null;
+    }
+
+    public Boolean shouldAllowRequest(String str) {
+        return null;
+    }
+
+    public Boolean shouldOpenExternalUrl(String str) {
+        return null;
+    }
+
+    public final void privateInitialize(String str, CordovaInterface cordovaInterface, CordovaWebView cordovaWebView, CordovaPreferences cordovaPreferences) {
+        this.serviceName = str;
+        this.cordova = cordovaInterface;
+        this.webView = cordovaWebView;
+        this.preferences = cordovaPreferences;
+        initialize(cordovaInterface, cordovaWebView);
+        pluginInitialize();
+    }
+
+    public String getServiceName() {
+        return this.serviceName;
+    }
+
+    public boolean execute(String str, String str2, CallbackContext callbackContext) throws JSONException {
+        return execute(str, new JSONArray(str2), callbackContext);
+    }
+
+    public boolean execute(String str, JSONArray jSONArray, CallbackContext callbackContext) throws JSONException {
+        return execute(str, new CordovaArgs(jSONArray), callbackContext);
+    }
+
+    public Boolean shouldAllowBridgeAccess(String str) {
+        return shouldAllowNavigation(str);
     }
 
     public CordovaResourceApi.OpenForReadResult handleOpenForRead(Uri uri) throws IOException {
@@ -110,36 +134,12 @@ public class CordovaPlugin {
     }
 
     /* access modifiers changed from: protected */
-    public Uri toPluginUri(Uri origUri) {
-        return new Uri.Builder().scheme(CordovaResourceApi.PLUGIN_URI_SCHEME).authority(this.serviceName).appendQueryParameter("origUri", origUri.toString()).build();
+    public Uri toPluginUri(Uri uri) {
+        return new Uri.Builder().scheme(CordovaResourceApi.PLUGIN_URI_SCHEME).authority(this.serviceName).appendQueryParameter("origUri", uri.toString()).build();
     }
 
     /* access modifiers changed from: protected */
-    public Uri fromPluginUri(Uri pluginUri) {
-        return Uri.parse(pluginUri.getQueryParameter("origUri"));
-    }
-
-    public void onReset() {
-    }
-
-    public boolean onReceivedHttpAuthRequest(CordovaWebView view, ICordovaHttpAuthHandler handler, String host, String realm) {
-        return false;
-    }
-
-    public boolean onReceivedClientCertRequest(CordovaWebView view, ICordovaClientCertRequest request) {
-        return false;
-    }
-
-    public void onConfigurationChanged(Configuration newConfig) {
-    }
-
-    public void requestPermissions(int requestCode) {
-    }
-
-    public boolean hasPermisssion() {
-        return true;
-    }
-
-    public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
+    public Uri fromPluginUri(Uri uri) {
+        return Uri.parse(uri.getQueryParameter("origUri"));
     }
 }

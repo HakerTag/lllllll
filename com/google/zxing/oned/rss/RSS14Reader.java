@@ -26,16 +26,16 @@ public final class RSS14Reader extends AbstractRSSReader {
     private final List<Pair> possibleRightPairs = new ArrayList();
 
     @Override // com.google.zxing.oned.OneDReader
-    public Result decodeRow(int rowNumber, BitArray row, Map<DecodeHintType, ?> hints) throws NotFoundException {
-        addOrTally(this.possibleLeftPairs, decodePair(row, false, rowNumber, hints));
-        row.reverse();
-        addOrTally(this.possibleRightPairs, decodePair(row, true, rowNumber, hints));
-        row.reverse();
-        for (Pair left : this.possibleLeftPairs) {
-            if (left.getCount() > 1) {
-                for (Pair right : this.possibleRightPairs) {
-                    if (right.getCount() > 1 && checkChecksum(left, right)) {
-                        return constructResult(left, right);
+    public Result decodeRow(int i, BitArray bitArray, Map<DecodeHintType, ?> map) throws NotFoundException {
+        addOrTally(this.possibleLeftPairs, decodePair(bitArray, false, i, map));
+        bitArray.reverse();
+        addOrTally(this.possibleRightPairs, decodePair(bitArray, true, i, map));
+        bitArray.reverse();
+        for (Pair pair : this.possibleLeftPairs) {
+            if (pair.getCount() > 1) {
+                for (Pair pair2 : this.possibleRightPairs) {
+                    if (pair2.getCount() > 1 && checkChecksum(pair, pair2)) {
+                        return constructResult(pair, pair2);
                     }
                 }
                 continue;
@@ -44,23 +44,23 @@ public final class RSS14Reader extends AbstractRSSReader {
         throw NotFoundException.getNotFoundInstance();
     }
 
-    private static void addOrTally(Collection<Pair> possiblePairs, Pair pair) {
+    private static void addOrTally(Collection<Pair> collection, Pair pair) {
         if (pair != null) {
-            boolean found = false;
-            Iterator<Pair> it = possiblePairs.iterator();
+            boolean z = false;
+            Iterator<Pair> it = collection.iterator();
             while (true) {
                 if (!it.hasNext()) {
                     break;
                 }
-                Pair other = it.next();
-                if (other.getValue() == pair.getValue()) {
-                    other.incrementCount();
-                    found = true;
+                Pair next = it.next();
+                if (next.getValue() == pair.getValue()) {
+                    next.incrementCount();
+                    z = true;
                     break;
                 }
             }
-            if (!found) {
-                possiblePairs.add(pair);
+            if (!z) {
+                collection.add(pair);
             }
         }
     }
@@ -71,298 +71,395 @@ public final class RSS14Reader extends AbstractRSSReader {
         this.possibleRightPairs.clear();
     }
 
-    private static Result constructResult(Pair leftPair, Pair rightPair) {
-        String text = String.valueOf((((long) leftPair.getValue()) * 4537077) + ((long) rightPair.getValue()));
-        StringBuilder buffer = new StringBuilder(14);
-        for (int i = 13 - text.length(); i > 0; i--) {
-            buffer.append('0');
+    private static Result constructResult(Pair pair, Pair pair2) {
+        String valueOf = String.valueOf((((long) pair.getValue()) * 4537077) + ((long) pair2.getValue()));
+        StringBuilder sb = new StringBuilder(14);
+        for (int length = 13 - valueOf.length(); length > 0; length--) {
+            sb.append('0');
         }
-        buffer.append(text);
-        int checkDigit = 0;
+        sb.append(valueOf);
+        int i = 0;
         for (int i2 = 0; i2 < 13; i2++) {
-            int digit = buffer.charAt(i2) - '0';
-            checkDigit += (i2 & 1) == 0 ? digit * 3 : digit;
+            int charAt = sb.charAt(i2) - '0';
+            if ((i2 & 1) == 0) {
+                charAt *= 3;
+            }
+            i += charAt;
         }
-        int checkDigit2 = 10 - (checkDigit % 10);
-        if (checkDigit2 == 10) {
-            checkDigit2 = 0;
+        int i3 = 10 - (i % 10);
+        if (i3 == 10) {
+            i3 = 0;
         }
-        buffer.append(checkDigit2);
-        ResultPoint[] leftPoints = leftPair.getFinderPattern().getResultPoints();
-        ResultPoint[] rightPoints = rightPair.getFinderPattern().getResultPoints();
-        return new Result(String.valueOf(buffer.toString()), null, new ResultPoint[]{leftPoints[0], leftPoints[1], rightPoints[0], rightPoints[1]}, BarcodeFormat.RSS_14);
+        sb.append(i3);
+        ResultPoint[] resultPoints = pair.getFinderPattern().getResultPoints();
+        ResultPoint[] resultPoints2 = pair2.getFinderPattern().getResultPoints();
+        return new Result(String.valueOf(sb.toString()), null, new ResultPoint[]{resultPoints[0], resultPoints[1], resultPoints2[0], resultPoints2[1]}, BarcodeFormat.RSS_14);
     }
 
-    private static boolean checkChecksum(Pair leftPair, Pair rightPair) {
-        int checkValue = (leftPair.getChecksumPortion() + (rightPair.getChecksumPortion() * 16)) % 79;
-        int targetCheckValue = (leftPair.getFinderPattern().getValue() * 9) + rightPair.getFinderPattern().getValue();
-        if (targetCheckValue > 72) {
-            targetCheckValue--;
+    private static boolean checkChecksum(Pair pair, Pair pair2) {
+        int checksumPortion = (pair.getChecksumPortion() + (pair2.getChecksumPortion() * 16)) % 79;
+        int value = (pair.getFinderPattern().getValue() * 9) + pair2.getFinderPattern().getValue();
+        if (value > 72) {
+            value--;
         }
-        if (targetCheckValue > 8) {
-            targetCheckValue--;
+        if (value > 8) {
+            value--;
         }
-        return checkValue == targetCheckValue;
+        return checksumPortion == value;
     }
 
-    private Pair decodePair(BitArray row, boolean right, int rowNumber, Map<DecodeHintType, ?> hints) {
+    private Pair decodePair(BitArray bitArray, boolean z, int i, Map<DecodeHintType, ?> map) {
         ResultPointCallback resultPointCallback;
         try {
-            int[] startEnd = findFinderPattern(row, 0, right);
-            FinderPattern pattern = parseFoundFinderPattern(row, rowNumber, right, startEnd);
-            if (hints == null) {
+            int[] findFinderPattern = findFinderPattern(bitArray, 0, z);
+            FinderPattern parseFoundFinderPattern = parseFoundFinderPattern(bitArray, i, z, findFinderPattern);
+            if (map == null) {
                 resultPointCallback = null;
             } else {
-                resultPointCallback = (ResultPointCallback) hints.get(DecodeHintType.NEED_RESULT_POINT_CALLBACK);
+                resultPointCallback = (ResultPointCallback) map.get(DecodeHintType.NEED_RESULT_POINT_CALLBACK);
             }
             if (resultPointCallback != null) {
-                float center = ((float) (startEnd[0] + startEnd[1])) / 2.0f;
-                if (right) {
-                    center = ((float) (row.getSize() - 1)) - center;
+                float f = ((float) (findFinderPattern[0] + findFinderPattern[1])) / 2.0f;
+                if (z) {
+                    f = ((float) (bitArray.getSize() - 1)) - f;
                 }
-                resultPointCallback.foundPossibleResultPoint(new ResultPoint(center, (float) rowNumber));
+                resultPointCallback.foundPossibleResultPoint(new ResultPoint(f, (float) i));
             }
-            DataCharacter outside = decodeDataCharacter(row, pattern, true);
-            DataCharacter inside = decodeDataCharacter(row, pattern, false);
-            return new Pair((outside.getValue() * 1597) + inside.getValue(), outside.getChecksumPortion() + (inside.getChecksumPortion() * 4), pattern);
-        } catch (NotFoundException e) {
+            DataCharacter decodeDataCharacter = decodeDataCharacter(bitArray, parseFoundFinderPattern, true);
+            DataCharacter decodeDataCharacter2 = decodeDataCharacter(bitArray, parseFoundFinderPattern, false);
+            return new Pair((decodeDataCharacter.getValue() * 1597) + decodeDataCharacter2.getValue(), decodeDataCharacter.getChecksumPortion() + (decodeDataCharacter2.getChecksumPortion() * 4), parseFoundFinderPattern);
+        } catch (NotFoundException unused) {
             return null;
         }
     }
 
-    private DataCharacter decodeDataCharacter(BitArray row, FinderPattern pattern, boolean outsideChar) throws NotFoundException {
-        int[] counters = getDataCharacterCounters();
-        counters[0] = 0;
-        counters[1] = 0;
-        counters[2] = 0;
-        counters[3] = 0;
-        counters[4] = 0;
-        counters[5] = 0;
-        counters[6] = 0;
-        counters[7] = 0;
-        if (outsideChar) {
-            recordPatternInReverse(row, pattern.getStartEnd()[0], counters);
+    private DataCharacter decodeDataCharacter(BitArray bitArray, FinderPattern finderPattern, boolean z) throws NotFoundException {
+        int[] dataCharacterCounters = getDataCharacterCounters();
+        dataCharacterCounters[0] = 0;
+        dataCharacterCounters[1] = 0;
+        dataCharacterCounters[2] = 0;
+        dataCharacterCounters[3] = 0;
+        dataCharacterCounters[4] = 0;
+        dataCharacterCounters[5] = 0;
+        dataCharacterCounters[6] = 0;
+        dataCharacterCounters[7] = 0;
+        if (z) {
+            recordPatternInReverse(bitArray, finderPattern.getStartEnd()[0], dataCharacterCounters);
         } else {
-            recordPattern(row, pattern.getStartEnd()[1] + 1, counters);
+            recordPattern(bitArray, finderPattern.getStartEnd()[1] + 1, dataCharacterCounters);
             int i = 0;
-            for (int j = counters.length - 1; i < j; j--) {
-                int temp = counters[i];
-                counters[i] = counters[j];
-                counters[j] = temp;
+            for (int length = dataCharacterCounters.length - 1; i < length; length--) {
+                int i2 = dataCharacterCounters[i];
+                dataCharacterCounters[i] = dataCharacterCounters[length];
+                dataCharacterCounters[length] = i2;
                 i++;
             }
         }
-        int numModules = outsideChar ? 16 : 15;
-        float elementWidth = ((float) MathUtils.sum(counters)) / ((float) numModules);
+        int i3 = z ? 16 : 15;
+        float sum = ((float) MathUtils.sum(dataCharacterCounters)) / ((float) i3);
         int[] oddCounts = getOddCounts();
         int[] evenCounts = getEvenCounts();
         float[] oddRoundingErrors = getOddRoundingErrors();
         float[] evenRoundingErrors = getEvenRoundingErrors();
-        for (int i2 = 0; i2 < counters.length; i2++) {
-            float value = ((float) counters[i2]) / elementWidth;
-            int count = (int) (0.5f + value);
-            if (count < 1) {
-                count = 1;
-            } else if (count > 8) {
-                count = 8;
+        for (int i4 = 0; i4 < dataCharacterCounters.length; i4++) {
+            float f = ((float) dataCharacterCounters[i4]) / sum;
+            int i5 = (int) (0.5f + f);
+            if (i5 < 1) {
+                i5 = 1;
+            } else if (i5 > 8) {
+                i5 = 8;
             }
-            int offset = i2 / 2;
-            if ((i2 & 1) == 0) {
-                oddCounts[offset] = count;
-                oddRoundingErrors[offset] = value - ((float) count);
+            int i6 = i4 / 2;
+            if ((i4 & 1) == 0) {
+                oddCounts[i6] = i5;
+                oddRoundingErrors[i6] = f - ((float) i5);
             } else {
-                evenCounts[offset] = count;
-                evenRoundingErrors[offset] = value - ((float) count);
+                evenCounts[i6] = i5;
+                evenRoundingErrors[i6] = f - ((float) i5);
             }
         }
-        adjustOddEvenCounts(outsideChar, numModules);
-        int oddSum = 0;
-        int oddChecksumPortion = 0;
-        for (int i3 = oddCounts.length - 1; i3 >= 0; i3--) {
-            oddChecksumPortion = (oddChecksumPortion * 9) + oddCounts[i3];
-            oddSum += oddCounts[i3];
+        adjustOddEvenCounts(z, i3);
+        int i7 = 0;
+        int i8 = 0;
+        for (int length2 = oddCounts.length - 1; length2 >= 0; length2--) {
+            i7 = (i7 * 9) + oddCounts[length2];
+            i8 += oddCounts[length2];
         }
-        int evenChecksumPortion = 0;
-        int evenSum = 0;
-        for (int i4 = evenCounts.length - 1; i4 >= 0; i4--) {
-            evenChecksumPortion = (evenChecksumPortion * 9) + evenCounts[i4];
-            evenSum += evenCounts[i4];
+        int i9 = 0;
+        int i10 = 0;
+        for (int length3 = evenCounts.length - 1; length3 >= 0; length3--) {
+            i9 = (i9 * 9) + evenCounts[length3];
+            i10 += evenCounts[length3];
         }
-        int checksumPortion = (evenChecksumPortion * 3) + oddChecksumPortion;
-        if (outsideChar) {
-            if ((oddSum & 1) != 0 || oddSum > 12 || oddSum < 4) {
+        int i11 = i7 + (i9 * 3);
+        if (z) {
+            if ((i8 & 1) != 0 || i8 > 12 || i8 < 4) {
                 throw NotFoundException.getNotFoundInstance();
             }
-            int group = (12 - oddSum) / 2;
-            int oddWidest = OUTSIDE_ODD_WIDEST[group];
-            return new DataCharacter((RSSUtils.getRSSvalue(oddCounts, oddWidest, false) * OUTSIDE_EVEN_TOTAL_SUBSET[group]) + RSSUtils.getRSSvalue(evenCounts, 9 - oddWidest, true) + OUTSIDE_GSUM[group], checksumPortion);
-        } else if ((evenSum & 1) != 0 || evenSum > 10 || evenSum < 4) {
+            int i12 = (12 - i8) / 2;
+            int i13 = OUTSIDE_ODD_WIDEST[i12];
+            return new DataCharacter((RSSUtils.getRSSvalue(oddCounts, i13, false) * OUTSIDE_EVEN_TOTAL_SUBSET[i12]) + RSSUtils.getRSSvalue(evenCounts, 9 - i13, true) + OUTSIDE_GSUM[i12], i11);
+        } else if ((i10 & 1) != 0 || i10 > 10 || i10 < 4) {
             throw NotFoundException.getNotFoundInstance();
         } else {
-            int group2 = (10 - evenSum) / 2;
-            int oddWidest2 = INSIDE_ODD_WIDEST[group2];
-            return new DataCharacter((RSSUtils.getRSSvalue(evenCounts, 9 - oddWidest2, false) * INSIDE_ODD_TOTAL_SUBSET[group2]) + RSSUtils.getRSSvalue(oddCounts, oddWidest2, true) + INSIDE_GSUM[group2], checksumPortion);
+            int i14 = (10 - i10) / 2;
+            int i15 = INSIDE_ODD_WIDEST[i14];
+            return new DataCharacter((RSSUtils.getRSSvalue(evenCounts, 9 - i15, false) * INSIDE_ODD_TOTAL_SUBSET[i14]) + RSSUtils.getRSSvalue(oddCounts, i15, true) + INSIDE_GSUM[i14], i11);
         }
     }
 
-    private int[] findFinderPattern(BitArray row, int rowOffset, boolean rightFinderPattern) throws NotFoundException {
-        int[] counters = getDecodeFinderCounters();
-        counters[0] = 0;
-        counters[1] = 0;
-        counters[2] = 0;
-        counters[3] = 0;
-        int width = row.getSize();
-        boolean isWhite = false;
-        while (rowOffset < width) {
-            isWhite = !row.get(rowOffset);
-            if (rightFinderPattern == isWhite) {
+    private int[] findFinderPattern(BitArray bitArray, int i, boolean z) throws NotFoundException {
+        int[] decodeFinderCounters = getDecodeFinderCounters();
+        decodeFinderCounters[0] = 0;
+        decodeFinderCounters[1] = 0;
+        decodeFinderCounters[2] = 0;
+        decodeFinderCounters[3] = 0;
+        int size = bitArray.getSize();
+        boolean z2 = false;
+        while (i < size) {
+            z2 = !bitArray.get(i);
+            if (z == z2) {
                 break;
             }
-            rowOffset++;
+            i++;
         }
-        int counterPosition = 0;
-        int patternStart = rowOffset;
-        for (int x = rowOffset; x < width; x++) {
-            if (row.get(x) ^ isWhite) {
-                counters[counterPosition] = counters[counterPosition] + 1;
+        int i2 = i;
+        int i3 = 0;
+        while (i < size) {
+            if (bitArray.get(i) ^ z2) {
+                decodeFinderCounters[i3] = decodeFinderCounters[i3] + 1;
             } else {
-                if (counterPosition != 3) {
-                    counterPosition++;
-                } else if (isFinderPattern(counters)) {
-                    return new int[]{patternStart, x};
+                if (i3 != 3) {
+                    i3++;
+                } else if (isFinderPattern(decodeFinderCounters)) {
+                    return new int[]{i2, i};
                 } else {
-                    patternStart += counters[0] + counters[1];
-                    counters[0] = counters[2];
-                    counters[1] = counters[3];
-                    counters[2] = 0;
-                    counters[3] = 0;
-                    counterPosition--;
+                    i2 += decodeFinderCounters[0] + decodeFinderCounters[1];
+                    decodeFinderCounters[0] = decodeFinderCounters[2];
+                    decodeFinderCounters[1] = decodeFinderCounters[3];
+                    decodeFinderCounters[2] = 0;
+                    decodeFinderCounters[3] = 0;
+                    i3--;
                 }
-                counters[counterPosition] = 1;
-                isWhite = !isWhite;
+                decodeFinderCounters[i3] = 1;
+                z2 = !z2;
             }
+            i++;
         }
         throw NotFoundException.getNotFoundInstance();
     }
 
-    private FinderPattern parseFoundFinderPattern(BitArray row, int rowNumber, boolean right, int[] startEnd) throws NotFoundException {
-        int end;
-        int start;
-        boolean firstIsBlack = row.get(startEnd[0]);
-        int firstElementStart = startEnd[0] - 1;
-        while (firstElementStart >= 0 && (row.get(firstElementStart) ^ firstIsBlack)) {
-            firstElementStart--;
+    private FinderPattern parseFoundFinderPattern(BitArray bitArray, int i, boolean z, int[] iArr) throws NotFoundException {
+        int i2;
+        int i3;
+        boolean z2 = bitArray.get(iArr[0]);
+        int i4 = iArr[0] - 1;
+        while (i4 >= 0 && (bitArray.get(i4) ^ z2)) {
+            i4--;
         }
-        int firstElementStart2 = firstElementStart + 1;
-        int[] counters = getDecodeFinderCounters();
-        System.arraycopy(counters, 0, counters, 1, counters.length - 1);
-        counters[0] = startEnd[0] - firstElementStart2;
-        int value = parseFinderValue(counters, FINDER_PATTERNS);
-        int end2 = startEnd[1];
-        if (right) {
-            start = (row.getSize() - 1) - firstElementStart2;
-            end = (row.getSize() - 1) - end2;
+        int i5 = i4 + 1;
+        int[] decodeFinderCounters = getDecodeFinderCounters();
+        System.arraycopy(decodeFinderCounters, 0, decodeFinderCounters, 1, decodeFinderCounters.length - 1);
+        decodeFinderCounters[0] = iArr[0] - i5;
+        int parseFinderValue = parseFinderValue(decodeFinderCounters, FINDER_PATTERNS);
+        int i6 = iArr[1];
+        if (z) {
+            i2 = (bitArray.getSize() - 1) - i6;
+            i3 = (bitArray.getSize() - 1) - i5;
         } else {
-            start = firstElementStart2;
-            end = end2;
+            i2 = i6;
+            i3 = i5;
         }
-        return new FinderPattern(value, new int[]{firstElementStart2, startEnd[1]}, start, end, rowNumber);
+        return new FinderPattern(parseFinderValue, new int[]{i5, iArr[1]}, i3, i2, i);
     }
 
-    private void adjustOddEvenCounts(boolean outsideChar, int numModules) throws NotFoundException {
-        int oddSum = MathUtils.sum(getOddCounts());
-        int evenSum = MathUtils.sum(getEvenCounts());
-        boolean incrementOdd = false;
-        boolean decrementOdd = false;
-        boolean incrementEven = false;
-        boolean decrementEven = false;
-        if (outsideChar) {
-            if (oddSum > 12) {
-                decrementOdd = true;
-            } else if (oddSum < 4) {
-                incrementOdd = true;
-            }
-            if (evenSum > 12) {
-                decrementEven = true;
-            } else if (evenSum < 4) {
-                incrementEven = true;
-            }
-        } else {
-            if (oddSum > 11) {
-                decrementOdd = true;
-            } else if (oddSum < 5) {
-                incrementOdd = true;
-            }
-            if (evenSum > 10) {
-                decrementEven = true;
-            } else if (evenSum < 4) {
-                incrementEven = true;
-            }
-        }
-        int mismatch = (oddSum + evenSum) - numModules;
-        boolean evenParityBad = false;
-        boolean oddParityBad = (oddSum & 1) == outsideChar;
-        if ((evenSum & 1) == 1) {
-            evenParityBad = true;
-        }
-        if (mismatch == 1) {
-            if (oddParityBad) {
-                if (!evenParityBad) {
-                    decrementOdd = true;
-                } else {
-                    throw NotFoundException.getNotFoundInstance();
-                }
-            } else if (evenParityBad) {
-                decrementEven = true;
-            } else {
-                throw NotFoundException.getNotFoundInstance();
-            }
-        } else if (mismatch == -1) {
-            if (oddParityBad) {
-                if (!evenParityBad) {
-                    incrementOdd = true;
-                } else {
-                    throw NotFoundException.getNotFoundInstance();
-                }
-            } else if (evenParityBad) {
-                incrementEven = true;
-            } else {
-                throw NotFoundException.getNotFoundInstance();
-            }
-        } else if (mismatch != 0) {
-            throw NotFoundException.getNotFoundInstance();
-        } else if (oddParityBad) {
-            if (!evenParityBad) {
-                throw NotFoundException.getNotFoundInstance();
-            } else if (oddSum < evenSum) {
-                incrementOdd = true;
-                decrementEven = true;
-            } else {
-                decrementOdd = true;
-                incrementEven = true;
-            }
-        } else if (evenParityBad) {
-            throw NotFoundException.getNotFoundInstance();
-        }
-        if (incrementOdd) {
-            if (!decrementOdd) {
-                increment(getOddCounts(), getOddRoundingErrors());
-            } else {
-                throw NotFoundException.getNotFoundInstance();
-            }
-        }
-        if (decrementOdd) {
-            decrement(getOddCounts(), getOddRoundingErrors());
-        }
-        if (incrementEven) {
-            if (!decrementEven) {
-                increment(getEvenCounts(), getOddRoundingErrors());
-            } else {
-                throw NotFoundException.getNotFoundInstance();
-            }
-        }
-        if (decrementEven) {
-            decrement(getEvenCounts(), getEvenRoundingErrors());
-        }
+    /* JADX WARNING: Code restructure failed: missing block: B:10:0x0025, code lost:
+        if (r1 < 4) goto L_0x003f;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:22:0x003d, code lost:
+        if (r1 < 4) goto L_0x003f;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:23:0x003f, code lost:
+        r2 = true;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:24:0x0041, code lost:
+        r2 = false;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:25:0x0042, code lost:
+        r5 = false;
+     */
+    /* JADX WARNING: Removed duplicated region for block: B:65:0x0097  */
+    /* JADX WARNING: Removed duplicated region for block: B:70:0x00ac  */
+    /* JADX WARNING: Removed duplicated region for block: B:72:0x00b9  */
+    /* JADX WARNING: Removed duplicated region for block: B:77:0x00ce  */
+    /* JADX WARNING: Removed duplicated region for block: B:83:? A[RETURN, SYNTHETIC] */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    private void adjustOddEvenCounts(boolean r10, int r11) throws com.google.zxing.NotFoundException {
+        /*
+            r9 = this;
+            int[] r0 = r9.getOddCounts()
+            int r0 = com.google.zxing.common.detector.MathUtils.sum(r0)
+            int[] r1 = r9.getEvenCounts()
+            int r1 = com.google.zxing.common.detector.MathUtils.sum(r1)
+            r2 = 4
+            r3 = 0
+            r4 = 1
+            if (r10 == 0) goto L_0x0028
+            r5 = 12
+            if (r0 <= r5) goto L_0x001c
+            r6 = 0
+            r7 = 1
+            goto L_0x0022
+        L_0x001c:
+            if (r0 >= r2) goto L_0x0020
+            r6 = 1
+            goto L_0x0021
+        L_0x0020:
+            r6 = 0
+        L_0x0021:
+            r7 = 0
+        L_0x0022:
+            if (r1 <= r5) goto L_0x0025
+            goto L_0x003a
+        L_0x0025:
+            if (r1 >= r2) goto L_0x0041
+            goto L_0x003f
+        L_0x0028:
+            r5 = 11
+            if (r0 <= r5) goto L_0x002f
+            r6 = 0
+            r7 = 1
+            goto L_0x0036
+        L_0x002f:
+            r5 = 5
+            if (r0 >= r5) goto L_0x0034
+            r6 = 1
+            goto L_0x0035
+        L_0x0034:
+            r6 = 0
+        L_0x0035:
+            r7 = 0
+        L_0x0036:
+            r5 = 10
+            if (r1 <= r5) goto L_0x003d
+        L_0x003a:
+            r2 = 0
+            r5 = 1
+            goto L_0x0043
+        L_0x003d:
+            if (r1 >= r2) goto L_0x0041
+        L_0x003f:
+            r2 = 1
+            goto L_0x0042
+        L_0x0041:
+            r2 = 0
+        L_0x0042:
+            r5 = 0
+        L_0x0043:
+            int r8 = r0 + r1
+            int r8 = r8 - r11
+            r11 = r0 & 1
+            if (r11 != r10) goto L_0x004c
+            r10 = 1
+            goto L_0x004d
+        L_0x004c:
+            r10 = 0
+        L_0x004d:
+            r11 = r1 & 1
+            if (r11 != r4) goto L_0x0052
+            r3 = 1
+        L_0x0052:
+            if (r8 != r4) goto L_0x006a
+            if (r10 == 0) goto L_0x0060
+            if (r3 != 0) goto L_0x005b
+            r4 = r6
+        L_0x0059:
+            r7 = 1
+            goto L_0x0095
+        L_0x005b:
+            com.google.zxing.NotFoundException r10 = com.google.zxing.NotFoundException.getNotFoundInstance()
+            throw r10
+        L_0x0060:
+            if (r3 == 0) goto L_0x0065
+            r4 = r6
+        L_0x0063:
+            r5 = 1
+            goto L_0x0095
+        L_0x0065:
+            com.google.zxing.NotFoundException r10 = com.google.zxing.NotFoundException.getNotFoundInstance()
+            throw r10
+        L_0x006a:
+            r11 = -1
+            if (r8 != r11) goto L_0x0081
+            if (r10 == 0) goto L_0x0077
+            if (r3 != 0) goto L_0x0072
+            goto L_0x0095
+        L_0x0072:
+            com.google.zxing.NotFoundException r10 = com.google.zxing.NotFoundException.getNotFoundInstance()
+            throw r10
+        L_0x0077:
+            if (r3 == 0) goto L_0x007c
+            r4 = r6
+            r2 = 1
+            goto L_0x0095
+        L_0x007c:
+            com.google.zxing.NotFoundException r10 = com.google.zxing.NotFoundException.getNotFoundInstance()
+            throw r10
+        L_0x0081:
+            if (r8 != 0) goto L_0x00df
+            if (r10 == 0) goto L_0x0092
+            if (r3 == 0) goto L_0x008d
+            if (r0 >= r1) goto L_0x008a
+            goto L_0x0063
+        L_0x008a:
+            r4 = r6
+            r2 = 1
+            goto L_0x0059
+        L_0x008d:
+            com.google.zxing.NotFoundException r10 = com.google.zxing.NotFoundException.getNotFoundInstance()
+            throw r10
+        L_0x0092:
+            if (r3 != 0) goto L_0x00da
+            r4 = r6
+        L_0x0095:
+            if (r4 == 0) goto L_0x00aa
+            if (r7 != 0) goto L_0x00a5
+            int[] r10 = r9.getOddCounts()
+            float[] r11 = r9.getOddRoundingErrors()
+            increment(r10, r11)
+            goto L_0x00aa
+        L_0x00a5:
+            com.google.zxing.NotFoundException r10 = com.google.zxing.NotFoundException.getNotFoundInstance()
+            throw r10
+        L_0x00aa:
+            if (r7 == 0) goto L_0x00b7
+            int[] r10 = r9.getOddCounts()
+            float[] r11 = r9.getOddRoundingErrors()
+            decrement(r10, r11)
+        L_0x00b7:
+            if (r2 == 0) goto L_0x00cc
+            if (r5 != 0) goto L_0x00c7
+            int[] r10 = r9.getEvenCounts()
+            float[] r11 = r9.getOddRoundingErrors()
+            increment(r10, r11)
+            goto L_0x00cc
+        L_0x00c7:
+            com.google.zxing.NotFoundException r10 = com.google.zxing.NotFoundException.getNotFoundInstance()
+            throw r10
+        L_0x00cc:
+            if (r5 == 0) goto L_0x00d9
+            int[] r10 = r9.getEvenCounts()
+            float[] r11 = r9.getEvenRoundingErrors()
+            decrement(r10, r11)
+        L_0x00d9:
+            return
+        L_0x00da:
+            com.google.zxing.NotFoundException r10 = com.google.zxing.NotFoundException.getNotFoundInstance()
+            throw r10
+        L_0x00df:
+            com.google.zxing.NotFoundException r10 = com.google.zxing.NotFoundException.getNotFoundInstance()
+            throw r10
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.google.zxing.oned.rss.RSS14Reader.adjustOddEvenCounts(boolean, int):void");
     }
 }

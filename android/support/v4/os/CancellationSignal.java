@@ -26,135 +26,114 @@ public final class CancellationSignal {
         }
     }
 
-    /* JADX WARNING: Code restructure failed: missing block: B:14:0x0014, code lost:
-        if (r1 == null) goto L_0x001c;
+    /* JADX WARNING: Code restructure failed: missing block: B:11:?, code lost:
+        r0.onCancel();
      */
-    /* JADX WARNING: Code restructure failed: missing block: B:16:?, code lost:
-        r1.onCancel();
+    /* JADX WARNING: Code restructure failed: missing block: B:12:0x0018, code lost:
+        r0 = move-exception;
      */
-    /* JADX WARNING: Code restructure failed: missing block: B:17:0x001a, code lost:
-        r3 = move-exception;
+    /* JADX WARNING: Code restructure failed: missing block: B:14:0x001a, code lost:
+        if (r1 == null) goto L_0x0033;
      */
-    /* JADX WARNING: Code restructure failed: missing block: B:19:0x001c, code lost:
-        if (r0 == null) goto L_0x0036;
+    /* JADX WARNING: Code restructure failed: missing block: B:16:0x0020, code lost:
+        if (android.os.Build.VERSION.SDK_INT < 16) goto L_0x0033;
      */
-    /* JADX WARNING: Code restructure failed: missing block: B:21:0x0022, code lost:
-        if (android.os.Build.VERSION.SDK_INT < 16) goto L_0x0036;
+    /* JADX WARNING: Code restructure failed: missing block: B:17:0x0022, code lost:
+        ((android.os.CancellationSignal) r1).cancel();
      */
-    /* JADX WARNING: Code restructure failed: missing block: B:22:0x0024, code lost:
-        ((android.os.CancellationSignal) r0).cancel();
+    /* JADX WARNING: Code restructure failed: missing block: B:18:0x0028, code lost:
+        monitor-enter(r4);
      */
-    /* JADX WARNING: Code restructure failed: missing block: B:23:0x002b, code lost:
-        monitor-enter(r6);
-     */
-    /* JADX WARNING: Code restructure failed: missing block: B:25:?, code lost:
-        r6.mCancelInProgress = false;
+    /* JADX WARNING: Code restructure failed: missing block: B:20:?, code lost:
+        r4.mCancelInProgress = false;
         notifyAll();
      */
-    /* JADX WARNING: Code restructure failed: missing block: B:27:0x0032, code lost:
-        throw r3;
+    /* JADX WARNING: Code restructure failed: missing block: B:22:0x002f, code lost:
+        throw r0;
      */
-    /* JADX WARNING: Code restructure failed: missing block: B:31:0x0036, code lost:
-        monitor-enter(r6);
+    /* JADX WARNING: Code restructure failed: missing block: B:26:0x0033, code lost:
+        monitor-enter(r4);
      */
-    /* JADX WARNING: Code restructure failed: missing block: B:33:?, code lost:
-        r6.mCancelInProgress = false;
+    /* JADX WARNING: Code restructure failed: missing block: B:28:?, code lost:
+        r4.mCancelInProgress = false;
         notifyAll();
      */
-    /* JADX WARNING: Code restructure failed: missing block: B:34:0x003c, code lost:
-        monitor-exit(r6);
+    /* JADX WARNING: Code restructure failed: missing block: B:29:0x0039, code lost:
+        monitor-exit(r4);
      */
-    /* JADX WARNING: Code restructure failed: missing block: B:35:0x003e, code lost:
+    /* JADX WARNING: Code restructure failed: missing block: B:30:0x003a, code lost:
         return;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:9:0x0012, code lost:
+        if (r0 == null) goto L_0x001a;
      */
     /* Code decompiled incorrectly, please refer to instructions dump. */
     public void cancel() {
         /*
-            r6 = this;
-            monitor-enter(r6)
-            r0 = 0
-            boolean r1 = r6.mIsCanceled     // Catch:{ all -> 0x004d }
-            if (r1 == 0) goto L_0x0008
-            monitor-exit(r6)     // Catch:{ all -> 0x004d }
+            r4 = this;
+            monitor-enter(r4)
+            boolean r0 = r4.mIsCanceled     // Catch:{ all -> 0x003e }
+            if (r0 == 0) goto L_0x0007
+            monitor-exit(r4)     // Catch:{ all -> 0x003e }
             return
-        L_0x0008:
-            r1 = 1
-            r6.mIsCanceled = r1     // Catch:{ all -> 0x004d }
-            r6.mCancelInProgress = r1     // Catch:{ all -> 0x004d }
-            android.support.v4.os.CancellationSignal$OnCancelListener r1 = r6.mOnCancelListener     // Catch:{ all -> 0x004d }
-            java.lang.Object r0 = r6.mCancellationSignalObj     // Catch:{ all -> 0x0047 }
-            r2 = r0
-            monitor-exit(r6)     // Catch:{ all -> 0x0042 }
-            r0 = 0
-            if (r1 == 0) goto L_0x001c
-            r1.onCancel()     // Catch:{ all -> 0x001a }
-            goto L_0x001c
+        L_0x0007:
+            r0 = 1
+            r4.mIsCanceled = r0     // Catch:{ all -> 0x003e }
+            r4.mCancelInProgress = r0     // Catch:{ all -> 0x003e }
+            android.support.v4.os.CancellationSignal$OnCancelListener r0 = r4.mOnCancelListener     // Catch:{ all -> 0x003e }
+            java.lang.Object r1 = r4.mCancellationSignalObj     // Catch:{ all -> 0x003e }
+            monitor-exit(r4)     // Catch:{ all -> 0x003e }
+            r2 = 0
+            if (r0 == 0) goto L_0x001a
+            r0.onCancel()     // Catch:{ all -> 0x0018 }
+            goto L_0x001a
+        L_0x0018:
+            r0 = move-exception
+            goto L_0x0028
         L_0x001a:
-            r3 = move-exception
-            goto L_0x002b
-        L_0x001c:
-            if (r2 == 0) goto L_0x0036
-            int r3 = android.os.Build.VERSION.SDK_INT     // Catch:{ all -> 0x001a }
-            r4 = 16
-            if (r3 < r4) goto L_0x0036
-            r3 = r2
-            android.os.CancellationSignal r3 = (android.os.CancellationSignal) r3     // Catch:{ all -> 0x001a }
-            r3.cancel()     // Catch:{ all -> 0x001a }
-            goto L_0x0036
-        L_0x002b:
-            monitor-enter(r6)
-            r6.mCancelInProgress = r0     // Catch:{ all -> 0x0033 }
-            r6.notifyAll()     // Catch:{ all -> 0x0033 }
-            monitor-exit(r6)     // Catch:{ all -> 0x0033 }
-            throw r3
+            if (r1 == 0) goto L_0x0033
+            int r0 = android.os.Build.VERSION.SDK_INT     // Catch:{ all -> 0x0018 }
+            r3 = 16
+            if (r0 < r3) goto L_0x0033
+            android.os.CancellationSignal r1 = (android.os.CancellationSignal) r1     // Catch:{ all -> 0x0018 }
+            r1.cancel()     // Catch:{ all -> 0x0018 }
+            goto L_0x0033
+        L_0x0028:
+            monitor-enter(r4)
+            r4.mCancelInProgress = r2     // Catch:{ all -> 0x0030 }
+            r4.notifyAll()     // Catch:{ all -> 0x0030 }
+            monitor-exit(r4)     // Catch:{ all -> 0x0030 }
+            throw r0
+        L_0x0030:
+            r0 = move-exception
+            monitor-exit(r4)
+            throw r0
         L_0x0033:
-            r0 = move-exception
-            monitor-exit(r6)
-            throw r0
-        L_0x0036:
-            monitor-enter(r6)
-            r6.mCancelInProgress = r0     // Catch:{ all -> 0x003f }
-            r6.notifyAll()     // Catch:{ all -> 0x003f }
-            monitor-exit(r6)     // Catch:{ all -> 0x003f }
+            monitor-enter(r4)
+            r4.mCancelInProgress = r2     // Catch:{ all -> 0x003b }
+            r4.notifyAll()     // Catch:{ all -> 0x003b }
+            monitor-exit(r4)     // Catch:{ all -> 0x003b }
             return
-        L_0x003f:
+        L_0x003b:
             r0 = move-exception
-            monitor-exit(r6)     // Catch:{ all -> 0x003f }
+            monitor-exit(r4)     // Catch:{ all -> 0x003b }
             throw r0
-        L_0x0042:
+        L_0x003e:
             r0 = move-exception
-            r5 = r1
-            r1 = r0
-            r0 = r5
-            goto L_0x004f
-        L_0x0047:
-            r2 = move-exception
-            r5 = r2
-            r2 = r0
-            r0 = r1
-            r1 = r5
-            goto L_0x004f
-        L_0x004d:
-            r1 = move-exception
-            r2 = r0
-        L_0x004f:
-            monitor-exit(r6)     // Catch:{ all -> 0x0051 }
-            throw r1
-        L_0x0051:
-            r1 = move-exception
-            goto L_0x004f
+            monitor-exit(r4)
+            throw r0
         */
         throw new UnsupportedOperationException("Method not decompiled: android.support.v4.os.CancellationSignal.cancel():void");
     }
 
-    public void setOnCancelListener(OnCancelListener listener) {
+    public void setOnCancelListener(OnCancelListener onCancelListener) {
         synchronized (this) {
             waitForCancelFinishedLocked();
-            if (this.mOnCancelListener != listener) {
-                this.mOnCancelListener = listener;
+            if (this.mOnCancelListener != onCancelListener) {
+                this.mOnCancelListener = onCancelListener;
                 if (this.mIsCanceled) {
-                    if (listener != null) {
-                        listener.onCancel();
+                    if (onCancelListener != null) {
+                        onCancelListener.onCancel();
                     }
                 }
             }
@@ -183,7 +162,7 @@ public final class CancellationSignal {
         while (this.mCancelInProgress) {
             try {
                 wait();
-            } catch (InterruptedException e) {
+            } catch (InterruptedException unused) {
             }
         }
     }

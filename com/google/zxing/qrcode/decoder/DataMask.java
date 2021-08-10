@@ -7,57 +7,57 @@ public enum DataMask {
     DATA_MASK_000 {
         /* access modifiers changed from: package-private */
         @Override // com.google.zxing.qrcode.decoder.DataMask
-        public boolean isMasked(int i, int j) {
-            return ((i + j) & 1) == 0;
+        public boolean isMasked(int i, int i2) {
+            return ((i + i2) & 1) == 0;
         }
     },
     DATA_MASK_001 {
         /* access modifiers changed from: package-private */
         @Override // com.google.zxing.qrcode.decoder.DataMask
-        public boolean isMasked(int i, int j) {
+        public boolean isMasked(int i, int i2) {
             return (i & 1) == 0;
         }
     },
     DATA_MASK_010 {
         /* access modifiers changed from: package-private */
         @Override // com.google.zxing.qrcode.decoder.DataMask
-        public boolean isMasked(int i, int j) {
-            return j % 3 == 0;
+        public boolean isMasked(int i, int i2) {
+            return i2 % 3 == 0;
         }
     },
     DATA_MASK_011 {
         /* access modifiers changed from: package-private */
         @Override // com.google.zxing.qrcode.decoder.DataMask
-        public boolean isMasked(int i, int j) {
-            return (i + j) % 3 == 0;
+        public boolean isMasked(int i, int i2) {
+            return (i + i2) % 3 == 0;
         }
     },
     DATA_MASK_100 {
         /* access modifiers changed from: package-private */
         @Override // com.google.zxing.qrcode.decoder.DataMask
-        public boolean isMasked(int i, int j) {
-            return (((i / 2) + (j / 3)) & 1) == 0;
+        public boolean isMasked(int i, int i2) {
+            return (((i / 2) + (i2 / 3)) & 1) == 0;
         }
     },
     DATA_MASK_101 {
         /* access modifiers changed from: package-private */
         @Override // com.google.zxing.qrcode.decoder.DataMask
-        public boolean isMasked(int i, int j) {
-            return (i * j) % 6 == 0;
+        public boolean isMasked(int i, int i2) {
+            return (i * i2) % 6 == 0;
         }
     },
     DATA_MASK_110 {
         /* access modifiers changed from: package-private */
         @Override // com.google.zxing.qrcode.decoder.DataMask
-        public boolean isMasked(int i, int j) {
-            return (i * j) % 6 < 3;
+        public boolean isMasked(int i, int i2) {
+            return (i * i2) % 6 < 3;
         }
     },
     DATA_MASK_111 {
         /* access modifiers changed from: package-private */
         @Override // com.google.zxing.qrcode.decoder.DataMask
-        public boolean isMasked(int i, int j) {
-            return (((i + j) + ((i * j) % 3)) & 1) == 0;
+        public boolean isMasked(int i, int i2) {
+            return (((i + i2) + ((i * i2) % 3)) & 1) == 0;
         }
     };
 
@@ -65,11 +65,11 @@ public enum DataMask {
     public abstract boolean isMasked(int i, int i2);
 
     /* access modifiers changed from: package-private */
-    public final void unmaskBitMatrix(BitMatrix bits, int dimension) {
-        for (int i = 0; i < dimension; i++) {
-            for (int j = 0; j < dimension; j++) {
-                if (isMasked(i, j)) {
-                    bits.flip(j, i);
+    public final void unmaskBitMatrix(BitMatrix bitMatrix, int i) {
+        for (int i2 = 0; i2 < i; i2++) {
+            for (int i3 = 0; i3 < i; i3++) {
+                if (isMasked(i2, i3)) {
+                    bitMatrix.flip(i3, i2);
                 }
             }
         }

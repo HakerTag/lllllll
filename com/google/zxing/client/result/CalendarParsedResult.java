@@ -3,7 +3,6 @@ package com.google.zxing.client.result;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
@@ -27,32 +26,38 @@ public final class CalendarParsedResult extends ParsedResult {
     private final boolean startAllDay;
     private final String summary;
 
-    public CalendarParsedResult(String summary2, String startString, String endString, String durationString, String location2, String organizer2, String[] attendees2, String description2, double latitude2, double longitude2) {
+    public CalendarParsedResult(String str, String str2, String str3, String str4, String str5, String str6, String[] strArr, String str7, double d, double d2) {
         super(ParsedResultType.CALENDAR);
-        this.summary = summary2;
+        Date date;
+        this.summary = str;
         try {
-            this.start = parseDate(startString);
-            if (endString == null) {
-                long durationMS = parseDurationMS(durationString);
-                this.end = durationMS < 0 ? null : new Date(this.start.getTime() + durationMS);
+            this.start = parseDate(str2);
+            if (str3 == null) {
+                long parseDurationMS = parseDurationMS(str4);
+                if (parseDurationMS < 0) {
+                    date = null;
+                } else {
+                    date = new Date(this.start.getTime() + parseDurationMS);
+                }
+                this.end = date;
             } else {
                 try {
-                    this.end = parseDate(endString);
-                } catch (ParseException pe) {
-                    throw new IllegalArgumentException(pe.toString());
+                    this.end = parseDate(str3);
+                } catch (ParseException e) {
+                    throw new IllegalArgumentException(e.toString());
                 }
             }
             boolean z = true;
-            this.startAllDay = startString.length() == 8;
-            this.endAllDay = (endString == null || endString.length() != 8) ? false : z;
-            this.location = location2;
-            this.organizer = organizer2;
-            this.attendees = attendees2;
-            this.description = description2;
-            this.latitude = latitude2;
-            this.longitude = longitude2;
-        } catch (ParseException pe2) {
-            throw new IllegalArgumentException(pe2.toString());
+            this.startAllDay = str2.length() == 8;
+            this.endAllDay = (str3 == null || str3.length() != 8) ? false : z;
+            this.location = str5;
+            this.organizer = str6;
+            this.attendees = strArr;
+            this.description = str7;
+            this.latitude = d;
+            this.longitude = d2;
+        } catch (ParseException e2) {
+            throw new IllegalArgumentException(e2.toString());
         }
     }
 
@@ -102,69 +107,72 @@ public final class CalendarParsedResult extends ParsedResult {
 
     @Override // com.google.zxing.client.result.ParsedResult
     public String getDisplayResult() {
-        StringBuilder result = new StringBuilder(100);
-        maybeAppend(this.summary, result);
-        maybeAppend(format(this.startAllDay, this.start), result);
-        maybeAppend(format(this.endAllDay, this.end), result);
-        maybeAppend(this.location, result);
-        maybeAppend(this.organizer, result);
-        maybeAppend(this.attendees, result);
-        maybeAppend(this.description, result);
-        return result.toString();
+        StringBuilder sb = new StringBuilder(100);
+        maybeAppend(this.summary, sb);
+        maybeAppend(format(this.startAllDay, this.start), sb);
+        maybeAppend(format(this.endAllDay, this.end), sb);
+        maybeAppend(this.location, sb);
+        maybeAppend(this.organizer, sb);
+        maybeAppend(this.attendees, sb);
+        maybeAppend(this.description, sb);
+        return sb.toString();
     }
 
-    private static Date parseDate(String when) throws ParseException {
-        if (!DATE_TIME.matcher(when).matches()) {
-            throw new ParseException(when, 0);
-        } else if (when.length() == 8) {
-            return buildDateFormat().parse(when);
+    private static Date parseDate(String str) throws ParseException {
+        if (!DATE_TIME.matcher(str).matches()) {
+            throw new ParseException(str, 0);
+        } else if (str.length() == 8) {
+            return buildDateFormat().parse(str);
         } else {
-            if (when.length() != 16 || when.charAt(15) != 'Z') {
-                return buildDateTimeFormat().parse(when);
+            if (str.length() != 16 || str.charAt(15) != 'Z') {
+                return buildDateTimeFormat().parse(str);
             }
-            Date date = buildDateTimeFormat().parse(when.substring(0, 15));
-            Calendar calendar = new GregorianCalendar();
-            long milliseconds = date.getTime() + ((long) calendar.get(15));
-            calendar.setTime(new Date(milliseconds));
-            return new Date(milliseconds + ((long) calendar.get(16)));
+            Date parse = buildDateTimeFormat().parse(str.substring(0, 15));
+            GregorianCalendar gregorianCalendar = new GregorianCalendar();
+            long time = parse.getTime() + ((long) gregorianCalendar.get(15));
+            gregorianCalendar.setTime(new Date(time));
+            return new Date(time + ((long) gregorianCalendar.get(16)));
         }
     }
 
-    private static String format(boolean allDay, Date date) {
-        DateFormat format;
+    private static String format(boolean z, Date date) {
+        DateFormat dateFormat;
         if (date == null) {
             return null;
         }
-        if (allDay) {
-            format = DateFormat.getDateInstance(2);
+        if (z) {
+            dateFormat = DateFormat.getDateInstance(2);
         } else {
-            format = DateFormat.getDateTimeInstance(2, 2);
+            dateFormat = DateFormat.getDateTimeInstance(2, 2);
         }
-        return format.format(date);
+        return dateFormat.format(date);
     }
 
-    private static long parseDurationMS(CharSequence durationString) {
-        if (durationString == null) {
+    private static long parseDurationMS(CharSequence charSequence) {
+        if (charSequence == null) {
             return -1;
         }
-        Matcher m = RFC2445_DURATION.matcher(durationString);
-        if (!m.matches()) {
+        Matcher matcher = RFC2445_DURATION.matcher(charSequence);
+        if (!matcher.matches()) {
             return -1;
         }
-        long durationMS = 0;
-        for (int i = 0; i < RFC2445_DURATION_FIELD_UNITS.length; i++) {
-            String fieldValue = m.group(i + 1);
-            if (fieldValue != null) {
-                durationMS += RFC2445_DURATION_FIELD_UNITS[i] * ((long) Integer.parseInt(fieldValue));
+        long j = 0;
+        int i = 0;
+        while (i < RFC2445_DURATION_FIELD_UNITS.length) {
+            int i2 = i + 1;
+            String group = matcher.group(i2);
+            if (group != null) {
+                j += RFC2445_DURATION_FIELD_UNITS[i] * ((long) Integer.parseInt(group));
             }
+            i = i2;
         }
-        return durationMS;
+        return j;
     }
 
     private static DateFormat buildDateFormat() {
-        DateFormat format = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
-        format.setTimeZone(TimeZone.getTimeZone("GMT"));
-        return format;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        return simpleDateFormat;
     }
 
     private static DateFormat buildDateTimeFormat() {

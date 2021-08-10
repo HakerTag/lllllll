@@ -18,82 +18,86 @@ public abstract class FragmentHostCallback<E> extends FragmentContainer {
     private final Handler mHandler;
     final int mWindowAnimations;
 
+    /* access modifiers changed from: package-private */
+    public void onAttachFragment(Fragment fragment) {
+    }
+
+    public void onDump(String str, FileDescriptor fileDescriptor, PrintWriter printWriter, String[] strArr) {
+    }
+
+    @Override // android.support.v4.app.FragmentContainer
+    public View onFindViewById(int i) {
+        return null;
+    }
+
     public abstract E onGetHost();
 
-    /* JADX INFO: this call moved to the top of the method (can break code semantics) */
-    public FragmentHostCallback(Context context, Handler handler, int windowAnimations) {
-        this(context instanceof Activity ? (Activity) context : null, context, handler, windowAnimations);
-    }
-
-    FragmentHostCallback(FragmentActivity activity) {
-        this(activity, activity, activity.mHandler, 0);
-    }
-
-    FragmentHostCallback(Activity activity, Context context, Handler handler, int windowAnimations) {
-        this.mFragmentManager = new FragmentManagerImpl();
-        this.mActivity = activity;
-        this.mContext = context;
-        this.mHandler = handler;
-        this.mWindowAnimations = windowAnimations;
-    }
-
-    public void onDump(String prefix, FileDescriptor fd, PrintWriter writer, String[] args) {
-    }
-
-    public boolean onShouldSaveFragmentState(Fragment fragment) {
+    @Override // android.support.v4.app.FragmentContainer
+    public boolean onHasView() {
         return true;
-    }
-
-    public LayoutInflater onGetLayoutInflater() {
-        return LayoutInflater.from(this.mContext);
-    }
-
-    public void onSupportInvalidateOptionsMenu() {
-    }
-
-    public void onStartActivityFromFragment(Fragment fragment, Intent intent, int requestCode) {
-        onStartActivityFromFragment(fragment, intent, requestCode, null);
-    }
-
-    public void onStartActivityFromFragment(Fragment fragment, Intent intent, int requestCode, Bundle options) {
-        if (requestCode == -1) {
-            this.mContext.startActivity(intent);
-            return;
-        }
-        throw new IllegalStateException("Starting activity with a requestCode requires a FragmentActivity host");
-    }
-
-    public void onStartIntentSenderFromFragment(Fragment fragment, IntentSender intent, int requestCode, Intent fillInIntent, int flagsMask, int flagsValues, int extraFlags, Bundle options) throws IntentSender.SendIntentException {
-        if (requestCode == -1) {
-            ActivityCompat.startIntentSenderForResult(this.mActivity, intent, requestCode, fillInIntent, flagsMask, flagsValues, extraFlags, options);
-            return;
-        }
-        throw new IllegalStateException("Starting intent sender with a requestCode requires a FragmentActivity host");
-    }
-
-    public void onRequestPermissionsFromFragment(Fragment fragment, String[] permissions, int requestCode) {
-    }
-
-    public boolean onShouldShowRequestPermissionRationale(String permission) {
-        return false;
     }
 
     public boolean onHasWindowAnimations() {
         return true;
     }
 
+    public void onRequestPermissionsFromFragment(Fragment fragment, String[] strArr, int i) {
+    }
+
+    public boolean onShouldSaveFragmentState(Fragment fragment) {
+        return true;
+    }
+
+    public boolean onShouldShowRequestPermissionRationale(String str) {
+        return false;
+    }
+
+    public void onSupportInvalidateOptionsMenu() {
+    }
+
+    /* JADX INFO: this call moved to the top of the method (can break code semantics) */
+    public FragmentHostCallback(Context context, Handler handler, int i) {
+        this(context instanceof Activity ? (Activity) context : null, context, handler, i);
+    }
+
+    FragmentHostCallback(FragmentActivity fragmentActivity) {
+        this(fragmentActivity, fragmentActivity, fragmentActivity.mHandler, 0);
+    }
+
+    FragmentHostCallback(Activity activity, Context context, Handler handler, int i) {
+        this.mFragmentManager = new FragmentManagerImpl();
+        this.mActivity = activity;
+        this.mContext = context;
+        this.mHandler = handler;
+        this.mWindowAnimations = i;
+    }
+
+    public LayoutInflater onGetLayoutInflater() {
+        return LayoutInflater.from(this.mContext);
+    }
+
+    public void onStartActivityFromFragment(Fragment fragment, Intent intent, int i) {
+        onStartActivityFromFragment(fragment, intent, i, null);
+    }
+
+    public void onStartActivityFromFragment(Fragment fragment, Intent intent, int i, Bundle bundle) {
+        if (i == -1) {
+            this.mContext.startActivity(intent);
+            return;
+        }
+        throw new IllegalStateException("Starting activity with a requestCode requires a FragmentActivity host");
+    }
+
+    public void onStartIntentSenderFromFragment(Fragment fragment, IntentSender intentSender, int i, Intent intent, int i2, int i3, int i4, Bundle bundle) throws IntentSender.SendIntentException {
+        if (i == -1) {
+            ActivityCompat.startIntentSenderForResult(this.mActivity, intentSender, i, intent, i2, i3, i4, bundle);
+            return;
+        }
+        throw new IllegalStateException("Starting intent sender with a requestCode requires a FragmentActivity host");
+    }
+
     public int onGetWindowAnimations() {
         return this.mWindowAnimations;
-    }
-
-    @Override // android.support.v4.app.FragmentContainer
-    public View onFindViewById(int id) {
-        return null;
-    }
-
-    @Override // android.support.v4.app.FragmentContainer
-    public boolean onHasView() {
-        return true;
     }
 
     /* access modifiers changed from: package-private */
@@ -114,9 +118,5 @@ public abstract class FragmentHostCallback<E> extends FragmentContainer {
     /* access modifiers changed from: package-private */
     public FragmentManagerImpl getFragmentManagerImpl() {
         return this.mFragmentManager;
-    }
-
-    /* access modifiers changed from: package-private */
-    public void onAttachFragment(Fragment fragment) {
     }
 }

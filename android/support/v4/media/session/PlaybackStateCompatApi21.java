@@ -10,54 +10,54 @@ public class PlaybackStateCompatApi21 {
     PlaybackStateCompatApi21() {
     }
 
-    public static int getState(Object stateObj) {
-        return ((PlaybackState) stateObj).getState();
+    public static int getState(Object obj) {
+        return ((PlaybackState) obj).getState();
     }
 
-    public static long getPosition(Object stateObj) {
-        return ((PlaybackState) stateObj).getPosition();
+    public static long getPosition(Object obj) {
+        return ((PlaybackState) obj).getPosition();
     }
 
-    public static long getBufferedPosition(Object stateObj) {
-        return ((PlaybackState) stateObj).getBufferedPosition();
+    public static long getBufferedPosition(Object obj) {
+        return ((PlaybackState) obj).getBufferedPosition();
     }
 
-    public static float getPlaybackSpeed(Object stateObj) {
-        return ((PlaybackState) stateObj).getPlaybackSpeed();
+    public static float getPlaybackSpeed(Object obj) {
+        return ((PlaybackState) obj).getPlaybackSpeed();
     }
 
-    public static long getActions(Object stateObj) {
-        return ((PlaybackState) stateObj).getActions();
+    public static long getActions(Object obj) {
+        return ((PlaybackState) obj).getActions();
     }
 
-    public static CharSequence getErrorMessage(Object stateObj) {
-        return ((PlaybackState) stateObj).getErrorMessage();
+    public static CharSequence getErrorMessage(Object obj) {
+        return ((PlaybackState) obj).getErrorMessage();
     }
 
-    public static long getLastPositionUpdateTime(Object stateObj) {
-        return ((PlaybackState) stateObj).getLastPositionUpdateTime();
+    public static long getLastPositionUpdateTime(Object obj) {
+        return ((PlaybackState) obj).getLastPositionUpdateTime();
     }
 
-    public static List<Object> getCustomActions(Object stateObj) {
-        return ((PlaybackState) stateObj).getCustomActions();
+    public static List<Object> getCustomActions(Object obj) {
+        return ((PlaybackState) obj).getCustomActions();
     }
 
-    public static long getActiveQueueItemId(Object stateObj) {
-        return ((PlaybackState) stateObj).getActiveQueueItemId();
+    public static long getActiveQueueItemId(Object obj) {
+        return ((PlaybackState) obj).getActiveQueueItemId();
     }
 
-    public static Object newInstance(int state, long position, long bufferedPosition, float speed, long actions, CharSequence errorMessage, long updateTime, List<Object> customActions, long activeItemId) {
-        PlaybackState.Builder stateObj = new PlaybackState.Builder();
-        stateObj.setState(state, position, speed, updateTime);
-        stateObj.setBufferedPosition(bufferedPosition);
-        stateObj.setActions(actions);
-        stateObj.setErrorMessage(errorMessage);
-        Iterator<Object> it = customActions.iterator();
+    public static Object newInstance(int i, long j, long j2, float f, long j3, CharSequence charSequence, long j4, List<Object> list, long j5) {
+        PlaybackState.Builder builder = new PlaybackState.Builder();
+        builder.setState(i, j, f, j4);
+        builder.setBufferedPosition(j2);
+        builder.setActions(j3);
+        builder.setErrorMessage(charSequence);
+        Iterator<Object> it = list.iterator();
         while (it.hasNext()) {
-            stateObj.addCustomAction((PlaybackState.CustomAction) it.next());
+            builder.addCustomAction((PlaybackState.CustomAction) it.next());
         }
-        stateObj.setActiveQueueItemId(activeItemId);
-        return stateObj.build();
+        builder.setActiveQueueItemId(j5);
+        return builder.build();
     }
 
     /* access modifiers changed from: package-private */
@@ -65,26 +65,26 @@ public class PlaybackStateCompatApi21 {
         CustomAction() {
         }
 
-        public static String getAction(Object customActionObj) {
-            return ((PlaybackState.CustomAction) customActionObj).getAction();
+        public static String getAction(Object obj) {
+            return ((PlaybackState.CustomAction) obj).getAction();
         }
 
-        public static CharSequence getName(Object customActionObj) {
-            return ((PlaybackState.CustomAction) customActionObj).getName();
+        public static CharSequence getName(Object obj) {
+            return ((PlaybackState.CustomAction) obj).getName();
         }
 
-        public static int getIcon(Object customActionObj) {
-            return ((PlaybackState.CustomAction) customActionObj).getIcon();
+        public static int getIcon(Object obj) {
+            return ((PlaybackState.CustomAction) obj).getIcon();
         }
 
-        public static Bundle getExtras(Object customActionObj) {
-            return ((PlaybackState.CustomAction) customActionObj).getExtras();
+        public static Bundle getExtras(Object obj) {
+            return ((PlaybackState.CustomAction) obj).getExtras();
         }
 
-        public static Object newInstance(String action, CharSequence name, int icon, Bundle extras) {
-            PlaybackState.CustomAction.Builder customActionObj = new PlaybackState.CustomAction.Builder(action, name, icon);
-            customActionObj.setExtras(extras);
-            return customActionObj.build();
+        public static Object newInstance(String str, CharSequence charSequence, int i, Bundle bundle) {
+            PlaybackState.CustomAction.Builder builder = new PlaybackState.CustomAction.Builder(str, charSequence, i);
+            builder.setExtras(bundle);
+            return builder.build();
         }
     }
 }

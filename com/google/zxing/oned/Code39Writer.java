@@ -8,61 +8,54 @@ import java.util.Map;
 
 public final class Code39Writer extends OneDimensionalCodeWriter {
     @Override // com.google.zxing.oned.OneDimensionalCodeWriter, com.google.zxing.Writer
-    public BitMatrix encode(String contents, BarcodeFormat format, int width, int height, Map<EncodeHintType, ?> hints) throws WriterException {
-        if (format == BarcodeFormat.CODE_39) {
-            return super.encode(contents, format, width, height, hints);
+    public BitMatrix encode(String str, BarcodeFormat barcodeFormat, int i, int i2, Map<EncodeHintType, ?> map) throws WriterException {
+        if (barcodeFormat == BarcodeFormat.CODE_39) {
+            return super.encode(str, barcodeFormat, i, i2, map);
         }
-        throw new IllegalArgumentException("Can only encode CODE_39, but got " + format);
+        throw new IllegalArgumentException("Can only encode CODE_39, but got " + barcodeFormat);
     }
 
-    /* JADX INFO: Multiple debug info for r3v3 boolean[]: [D('i' int), D('result' boolean[])] */
     @Override // com.google.zxing.oned.OneDimensionalCodeWriter
-    public boolean[] encode(String contents) {
-        int length = contents.length();
+    public boolean[] encode(String str) {
+        int length = str.length();
         if (length <= 80) {
-            int[] widths = new int[9];
-            int codeWidth = length + 25;
-            int i = 0;
-            while (true) {
-                if (i < length) {
-                    int indexInString = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. *$/+%".indexOf(contents.charAt(i));
-                    if (indexInString >= 0) {
-                        toIntArray(Code39Reader.CHARACTER_ENCODINGS[indexInString], widths);
-                        for (int width : widths) {
-                            codeWidth += width;
-                        }
-                        i++;
-                    } else {
-                        throw new IllegalArgumentException("Bad contents: " + contents);
+            int[] iArr = new int[9];
+            int i = length + 25;
+            for (int i2 = 0; i2 < length; i2++) {
+                int indexOf = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. *$/+%".indexOf(str.charAt(i2));
+                if (indexOf >= 0) {
+                    toIntArray(Code39Reader.CHARACTER_ENCODINGS[indexOf], iArr);
+                    for (int i3 = 0; i3 < 9; i3++) {
+                        i += iArr[i3];
                     }
                 } else {
-                    boolean[] result = new boolean[codeWidth];
-                    toIntArray(Code39Reader.ASTERISK_ENCODING, widths);
-                    int pos = appendPattern(result, 0, widths, true);
-                    int[] narrowWhite = {1};
-                    int pos2 = pos + appendPattern(result, pos, narrowWhite, false);
-                    for (int i2 = 0; i2 < length; i2++) {
-                        toIntArray(Code39Reader.CHARACTER_ENCODINGS["0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. *$/+%".indexOf(contents.charAt(i2))], widths);
-                        int pos3 = pos2 + appendPattern(result, pos2, widths, true);
-                        pos2 = pos3 + appendPattern(result, pos3, narrowWhite, false);
-                    }
-                    toIntArray(Code39Reader.ASTERISK_ENCODING, widths);
-                    appendPattern(result, pos2, widths, true);
-                    return result;
+                    throw new IllegalArgumentException("Bad contents: " + str);
                 }
             }
-        } else {
-            throw new IllegalArgumentException("Requested contents should be less than 80 digits long, but got " + length);
+            boolean[] zArr = new boolean[i];
+            toIntArray(Code39Reader.ASTERISK_ENCODING, iArr);
+            int appendPattern = appendPattern(zArr, 0, iArr, true);
+            int[] iArr2 = {1};
+            int appendPattern2 = appendPattern + appendPattern(zArr, appendPattern, iArr2, false);
+            for (int i4 = 0; i4 < length; i4++) {
+                toIntArray(Code39Reader.CHARACTER_ENCODINGS["0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. *$/+%".indexOf(str.charAt(i4))], iArr);
+                int appendPattern3 = appendPattern2 + appendPattern(zArr, appendPattern2, iArr, true);
+                appendPattern2 = appendPattern3 + appendPattern(zArr, appendPattern3, iArr2, false);
+            }
+            toIntArray(Code39Reader.ASTERISK_ENCODING, iArr);
+            appendPattern(zArr, appendPattern2, iArr, true);
+            return zArr;
         }
+        throw new IllegalArgumentException("Requested contents should be less than 80 digits long, but got " + length);
     }
 
-    private static void toIntArray(int a, int[] toReturn) {
-        for (int i = 0; i < 9; i++) {
-            int i2 = 1;
-            if (((1 << (8 - i)) & a) != 0) {
-                i2 = 2;
+    private static void toIntArray(int i, int[] iArr) {
+        for (int i2 = 0; i2 < 9; i2++) {
+            int i3 = 1;
+            if (((1 << (8 - i2)) & i) != 0) {
+                i3 = 2;
             }
-            toReturn[i] = i2;
+            iArr[i2] = i3;
         }
     }
 }

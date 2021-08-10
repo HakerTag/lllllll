@@ -10,21 +10,26 @@ import java.util.ArrayList;
 class RawDocumentFile extends DocumentFile {
     private File mFile;
 
-    RawDocumentFile(DocumentFile parent, File file) {
-        super(parent);
+    @Override // android.support.v4.provider.DocumentFile
+    public boolean isVirtual() {
+        return false;
+    }
+
+    RawDocumentFile(DocumentFile documentFile, File file) {
+        super(documentFile);
         this.mFile = file;
     }
 
     @Override // android.support.v4.provider.DocumentFile
-    public DocumentFile createFile(String mimeType, String displayName) {
-        String extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType);
-        if (extension != null) {
-            displayName = displayName + "." + extension;
+    public DocumentFile createFile(String str, String str2) {
+        String extensionFromMimeType = MimeTypeMap.getSingleton().getExtensionFromMimeType(str);
+        if (extensionFromMimeType != null) {
+            str2 = str2 + "." + extensionFromMimeType;
         }
-        File target = new File(this.mFile, displayName);
+        File file = new File(this.mFile, str2);
         try {
-            target.createNewFile();
-            return new RawDocumentFile(this, target);
+            file.createNewFile();
+            return new RawDocumentFile(this, file);
         } catch (IOException e) {
             Log.w("DocumentFile", "Failed to createFile: " + e);
             return null;
@@ -32,10 +37,10 @@ class RawDocumentFile extends DocumentFile {
     }
 
     @Override // android.support.v4.provider.DocumentFile
-    public DocumentFile createDirectory(String displayName) {
-        File target = new File(this.mFile, displayName);
-        if (target.isDirectory() || target.mkdir()) {
-            return new RawDocumentFile(this, target);
+    public DocumentFile createDirectory(String str) {
+        File file = new File(this.mFile, str);
+        if (file.isDirectory() || file.mkdir()) {
+            return new RawDocumentFile(this, file);
         }
         return null;
     }
@@ -66,11 +71,6 @@ class RawDocumentFile extends DocumentFile {
     @Override // android.support.v4.provider.DocumentFile
     public boolean isFile() {
         return this.mFile.isFile();
-    }
-
-    @Override // android.support.v4.provider.DocumentFile
-    public boolean isVirtual() {
-        return false;
     }
 
     @Override // android.support.v4.provider.DocumentFile
@@ -106,49 +106,46 @@ class RawDocumentFile extends DocumentFile {
 
     @Override // android.support.v4.provider.DocumentFile
     public DocumentFile[] listFiles() {
-        ArrayList<DocumentFile> results = new ArrayList<>();
-        File[] files = this.mFile.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                results.add(new RawDocumentFile(this, file));
+        ArrayList arrayList = new ArrayList();
+        File[] listFiles = this.mFile.listFiles();
+        if (listFiles != null) {
+            for (File file : listFiles) {
+                arrayList.add(new RawDocumentFile(this, file));
             }
         }
-        return (DocumentFile[]) results.toArray(new DocumentFile[results.size()]);
+        return (DocumentFile[]) arrayList.toArray(new DocumentFile[arrayList.size()]);
     }
 
     @Override // android.support.v4.provider.DocumentFile
-    public boolean renameTo(String displayName) {
-        File target = new File(this.mFile.getParentFile(), displayName);
-        if (!this.mFile.renameTo(target)) {
+    public boolean renameTo(String str) {
+        File file = new File(this.mFile.getParentFile(), str);
+        if (!this.mFile.renameTo(file)) {
             return false;
         }
-        this.mFile = target;
+        this.mFile = file;
         return true;
     }
 
-    private static String getTypeForName(String name) {
-        String mime;
-        int lastDot = name.lastIndexOf(46);
-        if (lastDot < 0 || (mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(name.substring(lastDot + 1).toLowerCase())) == null) {
-            return "application/octet-stream";
-        }
-        return mime;
+    private static String getTypeForName(String str) {
+        String mimeTypeFromExtension;
+        int lastIndexOf = str.lastIndexOf(46);
+        return (lastIndexOf < 0 || (mimeTypeFromExtension = MimeTypeMap.getSingleton().getMimeTypeFromExtension(str.substring(lastIndexOf + 1).toLowerCase())) == null) ? "application/octet-stream" : mimeTypeFromExtension;
     }
 
-    private static boolean deleteContents(File dir) {
-        File[] files = dir.listFiles();
-        boolean success = true;
-        if (files != null) {
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    success &= deleteContents(file);
+    private static boolean deleteContents(File file) {
+        File[] listFiles = file.listFiles();
+        boolean z = true;
+        if (listFiles != null) {
+            for (File file2 : listFiles) {
+                if (file2.isDirectory()) {
+                    z &= deleteContents(file2);
                 }
-                if (!file.delete()) {
-                    Log.w("DocumentFile", "Failed to delete " + file);
-                    success = false;
+                if (!file2.delete()) {
+                    Log.w("DocumentFile", "Failed to delete " + file2);
+                    z = false;
                 }
             }
         }
-        return success;
+        return z;
     }
 }

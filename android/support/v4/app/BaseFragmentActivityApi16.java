@@ -10,18 +10,18 @@ abstract class BaseFragmentActivityApi16 extends BaseFragmentActivityApi14 {
     BaseFragmentActivityApi16() {
     }
 
-    public void startActivityForResult(Intent intent, int requestCode, Bundle options) {
-        if (!this.mStartedActivityFromFragment && requestCode != -1) {
-            checkForValidRequestCode(requestCode);
+    public void startActivityForResult(Intent intent, int i, Bundle bundle) {
+        if (!this.mStartedActivityFromFragment && i != -1) {
+            checkForValidRequestCode(i);
         }
-        super.startActivityForResult(intent, requestCode, options);
+        super.startActivityForResult(intent, i, bundle);
     }
 
     @Override // android.app.Activity
-    public void startIntentSenderForResult(IntentSender intent, int requestCode, Intent fillInIntent, int flagsMask, int flagsValues, int extraFlags, Bundle options) throws IntentSender.SendIntentException {
-        if (!this.mStartedIntentSenderFromFragment && requestCode != -1) {
-            checkForValidRequestCode(requestCode);
+    public void startIntentSenderForResult(IntentSender intentSender, int i, Intent intent, int i2, int i3, int i4, Bundle bundle) throws IntentSender.SendIntentException {
+        if (!this.mStartedIntentSenderFromFragment && i != -1) {
+            checkForValidRequestCode(i);
         }
-        super.startIntentSenderForResult(intent, requestCode, fillInIntent, flagsMask, flagsValues, extraFlags, options);
+        super.startIntentSenderForResult(intentSender, i, intent, i2, i3, i4, bundle);
     }
 }

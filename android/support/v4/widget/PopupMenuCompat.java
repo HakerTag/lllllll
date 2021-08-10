@@ -8,9 +8,9 @@ public final class PopupMenuCompat {
     private PopupMenuCompat() {
     }
 
-    public static View.OnTouchListener getDragToOpenListener(Object popupMenu) {
+    public static View.OnTouchListener getDragToOpenListener(Object obj) {
         if (Build.VERSION.SDK_INT >= 19) {
-            return ((PopupMenu) popupMenu).getDragToOpenListener();
+            return ((PopupMenu) obj).getDragToOpenListener();
         }
         return null;
     }

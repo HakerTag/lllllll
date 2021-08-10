@@ -2,7 +2,6 @@ package com.google.zxing.client.android.result;
 
 import android.app.Activity;
 import android.telephony.PhoneNumberUtils;
-import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
 import barcodescanner.xservices.nl.barcodescanner.R;
@@ -23,33 +22,32 @@ public final class AddressBookResultHandler extends ResultHandler {
     static {
         DateFormat[] dateFormatArr = {new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH), new SimpleDateFormat("yyyyMMdd'T'HHmmss", Locale.ENGLISH), new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH), new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH)};
         DATE_FORMATS = dateFormatArr;
-        for (DateFormat format : dateFormatArr) {
-            format.setLenient(false);
+        for (DateFormat dateFormat : dateFormatArr) {
+            dateFormat.setLenient(false);
         }
     }
 
-    private int mapIndexToAction(int index) {
-        if (index >= this.buttonCount) {
-            return -1;
-        }
-        int count = -1;
-        for (int x = 0; x < 4; x++) {
-            if (this.fields[x]) {
-                count++;
-            }
-            if (count == index) {
-                return x;
+    private int mapIndexToAction(int i) {
+        if (i < this.buttonCount) {
+            int i2 = -1;
+            for (int i3 = 0; i3 < 4; i3++) {
+                if (this.fields[i3]) {
+                    i2++;
+                }
+                if (i2 == i) {
+                    return i3;
+                }
             }
         }
         return -1;
     }
 
-    public AddressBookResultHandler(Activity activity, ParsedResult result) {
-        super(activity, result);
-        AddressBookParsedResult addressResult = (AddressBookParsedResult) result;
-        String[] addresses = addressResult.getAddresses();
-        String[] phoneNumbers = addressResult.getPhoneNumbers();
-        String[] emails = addressResult.getEmails();
+    public AddressBookResultHandler(Activity activity, ParsedResult parsedResult) {
+        super(activity, parsedResult);
+        AddressBookParsedResult addressBookParsedResult = (AddressBookParsedResult) parsedResult;
+        String[] addresses = addressBookParsedResult.getAddresses();
+        String[] phoneNumbers = addressBookParsedResult.getPhoneNumbers();
+        String[] emails = addressBookParsedResult.getEmails();
         boolean[] zArr = new boolean[4];
         this.fields = zArr;
         zArr[0] = true;
@@ -57,8 +55,8 @@ public final class AddressBookResultHandler extends ResultHandler {
         this.fields[2] = phoneNumbers != null && phoneNumbers.length > 0;
         this.fields[3] = emails != null && emails.length > 0;
         this.buttonCount = 0;
-        for (int x = 0; x < 4; x++) {
-            if (this.fields[x]) {
+        for (int i = 0; i < 4; i++) {
+            if (this.fields[i]) {
                 this.buttonCount++;
             }
         }
@@ -70,38 +68,35 @@ public final class AddressBookResultHandler extends ResultHandler {
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler
-    public int getButtonText(int index) {
-        return BUTTON_TEXTS[mapIndexToAction(index)];
+    public int getButtonText(int i) {
+        return BUTTON_TEXTS[mapIndexToAction(i)];
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler
-    public void handleButtonPress(int index) {
-        AddressBookParsedResult addressResult = (AddressBookParsedResult) getResult();
-        String[] addresses = addressResult.getAddresses();
-        String address1Type = null;
-        String address1 = (addresses == null || addresses.length < 1) ? null : addresses[0];
-        String[] addressTypes = addressResult.getAddressTypes();
-        if (addressTypes != null && addressTypes.length >= 1) {
-            address1Type = addressTypes[0];
-        }
-        int action = mapIndexToAction(index);
-        if (action == 0) {
-            addContact(addressResult.getNames(), addressResult.getNicknames(), addressResult.getPronunciation(), addressResult.getPhoneNumbers(), addressResult.getPhoneTypes(), addressResult.getEmails(), addressResult.getEmailTypes(), addressResult.getNote(), addressResult.getInstantMessenger(), address1, address1Type, addressResult.getOrg(), addressResult.getTitle(), addressResult.getURLs(), addressResult.getBirthday(), addressResult.getGeo());
-        } else if (action == 1) {
-            searchMap(address1);
-        } else if (action == 2) {
-            dialPhone(addressResult.getPhoneNumbers()[0]);
-        } else if (action == 3) {
-            sendEmail(addressResult.getEmails(), null, null, null, null);
+    public void handleButtonPress(int i) {
+        AddressBookParsedResult addressBookParsedResult = (AddressBookParsedResult) getResult();
+        String[] addresses = addressBookParsedResult.getAddresses();
+        String str = (addresses == null || addresses.length < 1) ? null : addresses[0];
+        String[] addressTypes = addressBookParsedResult.getAddressTypes();
+        String str2 = (addressTypes == null || addressTypes.length < 1) ? null : addressTypes[0];
+        int mapIndexToAction = mapIndexToAction(i);
+        if (mapIndexToAction == 0) {
+            addContact(addressBookParsedResult.getNames(), addressBookParsedResult.getNicknames(), addressBookParsedResult.getPronunciation(), addressBookParsedResult.getPhoneNumbers(), addressBookParsedResult.getPhoneTypes(), addressBookParsedResult.getEmails(), addressBookParsedResult.getEmailTypes(), addressBookParsedResult.getNote(), addressBookParsedResult.getInstantMessenger(), str, str2, addressBookParsedResult.getOrg(), addressBookParsedResult.getTitle(), addressBookParsedResult.getURLs(), addressBookParsedResult.getBirthday(), addressBookParsedResult.getGeo());
+        } else if (mapIndexToAction == 1) {
+            searchMap(str);
+        } else if (mapIndexToAction == 2) {
+            dialPhone(addressBookParsedResult.getPhoneNumbers()[0]);
+        } else if (mapIndexToAction == 3) {
+            sendEmail(addressBookParsedResult.getEmails(), null, null, null, null);
         }
     }
 
-    private static Date parseDate(String s) {
-        DateFormat[] dateFormatArr = DATE_FORMATS;
-        for (int i = 0; i < dateFormatArr.length; i++) {
+    private static Date parseDate(String str) {
+        DateFormat[] dateFormatArr;
+        for (DateFormat dateFormat : DATE_FORMATS) {
             try {
-                return dateFormatArr[i].parse(s);
-            } catch (ParseException e) {
+                return dateFormat.parse(str);
+            } catch (ParseException unused) {
             }
         }
         return null;
@@ -109,41 +104,41 @@ public final class AddressBookResultHandler extends ResultHandler {
 
     @Override // com.google.zxing.client.android.result.ResultHandler
     public CharSequence getDisplayContents() {
-        Date date;
-        AddressBookParsedResult result = (AddressBookParsedResult) getResult();
-        StringBuilder contents = new StringBuilder(100);
-        ParsedResult.maybeAppend(result.getNames(), contents);
-        int namesLength = contents.length();
-        String pronunciation = result.getPronunciation();
+        Date parseDate;
+        AddressBookParsedResult addressBookParsedResult = (AddressBookParsedResult) getResult();
+        StringBuilder sb = new StringBuilder(100);
+        ParsedResult.maybeAppend(addressBookParsedResult.getNames(), sb);
+        int length = sb.length();
+        String pronunciation = addressBookParsedResult.getPronunciation();
         if (pronunciation != null && !pronunciation.isEmpty()) {
-            contents.append("\n(");
-            contents.append(pronunciation);
-            contents.append(')');
+            sb.append("\n(");
+            sb.append(pronunciation);
+            sb.append(')');
         }
-        ParsedResult.maybeAppend(result.getTitle(), contents);
-        ParsedResult.maybeAppend(result.getOrg(), contents);
-        ParsedResult.maybeAppend(result.getAddresses(), contents);
-        String[] numbers = result.getPhoneNumbers();
-        if (numbers != null) {
-            for (String number : numbers) {
-                if (number != null) {
-                    ParsedResult.maybeAppend(PhoneNumberUtils.formatNumber(number), contents);
+        ParsedResult.maybeAppend(addressBookParsedResult.getTitle(), sb);
+        ParsedResult.maybeAppend(addressBookParsedResult.getOrg(), sb);
+        ParsedResult.maybeAppend(addressBookParsedResult.getAddresses(), sb);
+        String[] phoneNumbers = addressBookParsedResult.getPhoneNumbers();
+        if (phoneNumbers != null) {
+            for (String str : phoneNumbers) {
+                if (str != null) {
+                    ParsedResult.maybeAppend(PhoneNumberUtils.formatNumber(str), sb);
                 }
             }
         }
-        ParsedResult.maybeAppend(result.getEmails(), contents);
-        ParsedResult.maybeAppend(result.getURLs(), contents);
-        String birthday = result.getBirthday();
-        if (!(birthday == null || birthday.isEmpty() || (date = parseDate(birthday)) == null)) {
-            ParsedResult.maybeAppend(DateFormat.getDateInstance(2).format(Long.valueOf(date.getTime())), contents);
+        ParsedResult.maybeAppend(addressBookParsedResult.getEmails(), sb);
+        ParsedResult.maybeAppend(addressBookParsedResult.getURLs(), sb);
+        String birthday = addressBookParsedResult.getBirthday();
+        if (!(birthday == null || birthday.isEmpty() || (parseDate = parseDate(birthday)) == null)) {
+            ParsedResult.maybeAppend(DateFormat.getDateInstance(2).format(Long.valueOf(parseDate.getTime())), sb);
         }
-        ParsedResult.maybeAppend(result.getNote(), contents);
-        if (namesLength <= 0) {
-            return contents.toString();
+        ParsedResult.maybeAppend(addressBookParsedResult.getNote(), sb);
+        if (length <= 0) {
+            return sb.toString();
         }
-        Spannable styled = new SpannableString(contents.toString());
-        styled.setSpan(new StyleSpan(1), 0, namesLength, 0);
-        return styled;
+        SpannableString spannableString = new SpannableString(sb.toString());
+        spannableString.setSpan(new StyleSpan(1), 0, length, 0);
+        return spannableString;
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler

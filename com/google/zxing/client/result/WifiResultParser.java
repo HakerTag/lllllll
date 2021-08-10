@@ -5,16 +5,16 @@ import com.google.zxing.Result;
 public final class WifiResultParser extends ResultParser {
     @Override // com.google.zxing.client.result.ResultParser
     public WifiParsedResult parse(Result result) {
-        String ssid;
-        String rawText = getMassagedText(result);
-        if (!rawText.startsWith("WIFI:") || (ssid = matchSinglePrefixedField("S:", rawText, ';', false)) == null || ssid.isEmpty()) {
+        String matchSinglePrefixedField;
+        String massagedText = getMassagedText(result);
+        if (!massagedText.startsWith("WIFI:") || (matchSinglePrefixedField = matchSinglePrefixedField("S:", massagedText, ';', false)) == null || matchSinglePrefixedField.isEmpty()) {
             return null;
         }
-        String pass = matchSinglePrefixedField("P:", rawText, ';', false);
-        String type = matchSinglePrefixedField("T:", rawText, ';', false);
-        if (type == null) {
-            type = "nopass";
+        String matchSinglePrefixedField2 = matchSinglePrefixedField("P:", massagedText, ';', false);
+        String matchSinglePrefixedField3 = matchSinglePrefixedField("T:", massagedText, ';', false);
+        if (matchSinglePrefixedField3 == null) {
+            matchSinglePrefixedField3 = "nopass";
         }
-        return new WifiParsedResult(type, ssid, pass, Boolean.parseBoolean(matchSinglePrefixedField("H:", rawText, ';', false)));
+        return new WifiParsedResult(matchSinglePrefixedField3, matchSinglePrefixedField, matchSinglePrefixedField2, Boolean.parseBoolean(matchSinglePrefixedField("H:", massagedText, ';', false)));
     }
 }

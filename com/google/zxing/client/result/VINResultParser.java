@@ -13,27 +13,33 @@ public final class VINResultParser extends ResultParser {
         if (result.getBarcodeFormat() != BarcodeFormat.CODE_39) {
             return null;
         }
-        String rawText = IOQ.matcher(result.getText()).replaceAll("").trim();
-        if (!AZ09.matcher(rawText).matches()) {
+        String trim = IOQ.matcher(result.getText()).replaceAll("").trim();
+        if (!AZ09.matcher(trim).matches()) {
             return null;
         }
         try {
-            if (!checkChecksum(rawText)) {
+            if (!checkChecksum(trim)) {
                 return null;
             }
-            String wmi = rawText.substring(0, 3);
-            return new VINParsedResult(rawText, wmi, rawText.substring(3, 9), rawText.substring(9, 17), countryCode(wmi), rawText.substring(3, 8), modelYear(rawText.charAt(9)), rawText.charAt(10), rawText.substring(11));
-        } catch (IllegalArgumentException e) {
+            String substring = trim.substring(0, 3);
+            return new VINParsedResult(trim, substring, trim.substring(3, 9), trim.substring(9, 17), countryCode(substring), trim.substring(3, 8), modelYear(trim.charAt(9)), trim.charAt(10), trim.substring(11));
+        } catch (IllegalArgumentException unused) {
             return null;
         }
     }
 
-    private static boolean checkChecksum(CharSequence vin) {
-        int sum = 0;
-        for (int i = 0; i < vin.length(); i++) {
-            sum += vinPositionWeight(i + 1) * vinCharValue(vin.charAt(i));
+    private static boolean checkChecksum(CharSequence charSequence) {
+        int i = 0;
+        int i2 = 0;
+        while (i < charSequence.length()) {
+            int i3 = i + 1;
+            i2 += vinPositionWeight(i3) * vinCharValue(charSequence.charAt(i));
+            i = i3;
         }
-        return vin.charAt(8) == checkChar(sum % 11);
+        if (charSequence.charAt(8) == checkChar(i2 % 11)) {
+            return true;
+        }
+        return false;
     }
 
     private static int vinCharValue(char c) {
@@ -52,27 +58,27 @@ public final class VINResultParser extends ResultParser {
         throw new IllegalArgumentException();
     }
 
-    private static int vinPositionWeight(int position) {
-        if (position >= 1 && position <= 7) {
-            return 9 - position;
+    private static int vinPositionWeight(int i) {
+        if (i >= 1 && i <= 7) {
+            return 9 - i;
         }
-        if (position == 8) {
+        if (i == 8) {
             return 10;
         }
-        if (position == 9) {
+        if (i == 9) {
             return 0;
         }
-        if (position >= 10 && position <= 17) {
-            return 19 - position;
+        if (i >= 10 && i <= 17) {
+            return 19 - i;
         }
         throw new IllegalArgumentException();
     }
 
-    private static char checkChar(int remainder) {
-        if (remainder < 10) {
-            return (char) (remainder + 48);
+    private static char checkChar(int i) {
+        if (i < 10) {
+            return (char) (i + 48);
         }
-        if (remainder == 10) {
+        if (i == 10) {
             return 'X';
         }
         throw new IllegalArgumentException();
@@ -103,13 +109,13 @@ public final class VINResultParser extends ResultParser {
         throw new IllegalArgumentException();
     }
 
-    private static String countryCode(CharSequence wmi) {
-        char c1 = wmi.charAt(0);
-        char c2 = wmi.charAt(1);
-        if (c1 != '9') {
-            if (c1 != 'S') {
-                if (c1 != 'Z') {
-                    switch (c1) {
+    private static String countryCode(CharSequence charSequence) {
+        char charAt = charSequence.charAt(0);
+        char charAt2 = charSequence.charAt(1);
+        if (charAt != '9') {
+            if (charAt != 'S') {
+                if (charAt != 'Z') {
+                    switch (charAt) {
                         case '1':
                         case '4':
                         case '5':
@@ -117,46 +123,46 @@ public final class VINResultParser extends ResultParser {
                         case '2':
                             return "CA";
                         case '3':
-                            if (c2 < 'A' || c2 > 'W') {
+                            if (charAt2 < 'A' || charAt2 > 'W') {
                                 return null;
                             }
                             return "MX";
                         default:
-                            switch (c1) {
+                            switch (charAt) {
                                 case 'J':
-                                    if (c2 < 'A' || c2 > 'T') {
+                                    if (charAt2 < 'A' || charAt2 > 'T') {
                                         return null;
                                     }
                                     return "JP";
                                 case 'K':
-                                    if (c2 < 'L' || c2 > 'R') {
+                                    if (charAt2 < 'L' || charAt2 > 'R') {
                                         return null;
                                     }
                                     return "KO";
                                 case 'L':
                                     return "CN";
                                 case 'M':
-                                    if (c2 < 'A' || c2 > 'E') {
+                                    if (charAt2 < 'A' || charAt2 > 'E') {
                                         return null;
                                     }
                                     return "IN";
                                 default:
-                                    switch (c1) {
+                                    switch (charAt) {
                                         case 'V':
-                                            if (c2 >= 'F' && c2 <= 'R') {
+                                            if (charAt2 >= 'F' && charAt2 <= 'R') {
                                                 return "FR";
                                             }
-                                            if (c2 < 'S' || c2 > 'W') {
+                                            if (charAt2 < 'S' || charAt2 > 'W') {
                                                 return null;
                                             }
                                             return "ES";
                                         case 'W':
                                             return "DE";
                                         case 'X':
-                                            if (c2 == '0') {
+                                            if (charAt2 == '0') {
                                                 return "RU";
                                             }
-                                            if (c2 < '3' || c2 > '9') {
+                                            if (charAt2 < '3' || charAt2 > '9') {
                                                 return null;
                                             }
                                             return "RU";
@@ -165,23 +171,23 @@ public final class VINResultParser extends ResultParser {
                                     }
                             }
                     }
-                } else if (c2 < 'A' || c2 > 'R') {
+                } else if (charAt2 < 'A' || charAt2 > 'R') {
                     return null;
                 } else {
                     return "IT";
                 }
-            } else if (c2 >= 'A' && c2 <= 'M') {
+            } else if (charAt2 >= 'A' && charAt2 <= 'M') {
                 return "UK";
             } else {
-                if (c2 < 'N' || c2 > 'T') {
+                if (charAt2 < 'N' || charAt2 > 'T') {
                     return null;
                 }
                 return "DE";
             }
-        } else if (c2 >= 'A' && c2 <= 'E') {
+        } else if (charAt2 >= 'A' && charAt2 <= 'E') {
             return "BR";
         } else {
-            if (c2 < '3' || c2 > '9') {
+            if (charAt2 < '3' || charAt2 > '9') {
                 return null;
             }
             return "BR";

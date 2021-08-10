@@ -11,14 +11,14 @@ public final class BitArray implements Cloneable {
         this.bits = new int[1];
     }
 
-    public BitArray(int size2) {
-        this.size = size2;
-        this.bits = makeArray(size2);
+    public BitArray(int i) {
+        this.size = i;
+        this.bits = makeArray(i);
     }
 
-    BitArray(int[] bits2, int size2) {
-        this.bits = bits2;
-        this.size = size2;
+    BitArray(int[] iArr, int i) {
+        this.bits = iArr;
+        this.size = i;
     }
 
     public int getSize() {
@@ -29,124 +29,137 @@ public final class BitArray implements Cloneable {
         return (this.size + 7) / 8;
     }
 
-    private void ensureCapacity(int size2) {
-        if (size2 > this.bits.length * 32) {
-            int[] newBits = makeArray(size2);
+    private void ensureCapacity(int i) {
+        if (i > this.bits.length * 32) {
+            int[] makeArray = makeArray(i);
             int[] iArr = this.bits;
-            System.arraycopy(iArr, 0, newBits, 0, iArr.length);
-            this.bits = newBits;
+            System.arraycopy(iArr, 0, makeArray, 0, iArr.length);
+            this.bits = makeArray;
         }
     }
 
     public boolean get(int i) {
-        return (this.bits[i / 32] & (1 << (i & 31))) != 0;
+        return ((1 << (i & 31)) & this.bits[i / 32]) != 0;
     }
 
     public void set(int i) {
         int[] iArr = this.bits;
         int i2 = i / 32;
-        iArr[i2] = iArr[i2] | (1 << (i & 31));
+        iArr[i2] = (1 << (i & 31)) | iArr[i2];
     }
 
     public void flip(int i) {
         int[] iArr = this.bits;
         int i2 = i / 32;
-        iArr[i2] = iArr[i2] ^ (1 << (i & 31));
+        iArr[i2] = (1 << (i & 31)) ^ iArr[i2];
     }
 
-    public int getNextSet(int from) {
-        int i = this.size;
-        if (from >= i) {
-            return i;
+    public int getNextSet(int i) {
+        int i2 = this.size;
+        if (i >= i2) {
+            return i2;
         }
-        int bitsOffset = from / 32;
-        int currentBits = this.bits[bitsOffset] & (~((1 << (from & 31)) - 1));
-        while (currentBits == 0) {
-            bitsOffset++;
+        int i3 = i / 32;
+        int i4 = (~((1 << (i & 31)) - 1)) & this.bits[i3];
+        while (i4 == 0) {
+            i3++;
             int[] iArr = this.bits;
-            if (bitsOffset == iArr.length) {
+            if (i3 == iArr.length) {
                 return this.size;
             }
-            currentBits = iArr[bitsOffset];
+            i4 = iArr[i3];
         }
-        int result = (bitsOffset * 32) + Integer.numberOfTrailingZeros(currentBits);
-        int i2 = this.size;
-        return result > i2 ? i2 : result;
+        int numberOfTrailingZeros = (i3 * 32) + Integer.numberOfTrailingZeros(i4);
+        int i5 = this.size;
+        return numberOfTrailingZeros > i5 ? i5 : numberOfTrailingZeros;
     }
 
-    public int getNextUnset(int from) {
-        int i = this.size;
-        if (from >= i) {
-            return i;
+    public int getNextUnset(int i) {
+        int i2 = this.size;
+        if (i >= i2) {
+            return i2;
         }
-        int bitsOffset = from / 32;
-        int currentBits = (~this.bits[bitsOffset]) & (~((1 << (from & 31)) - 1));
-        while (currentBits == 0) {
-            bitsOffset++;
+        int i3 = i / 32;
+        int i4 = (~((1 << (i & 31)) - 1)) & (~this.bits[i3]);
+        while (i4 == 0) {
+            i3++;
             int[] iArr = this.bits;
-            if (bitsOffset == iArr.length) {
+            if (i3 == iArr.length) {
                 return this.size;
             }
-            currentBits = ~iArr[bitsOffset];
+            i4 = ~iArr[i3];
         }
-        int result = (bitsOffset * 32) + Integer.numberOfTrailingZeros(currentBits);
-        int i2 = this.size;
-        return result > i2 ? i2 : result;
+        int numberOfTrailingZeros = (i3 * 32) + Integer.numberOfTrailingZeros(i4);
+        int i5 = this.size;
+        return numberOfTrailingZeros > i5 ? i5 : numberOfTrailingZeros;
     }
 
-    public void setBulk(int i, int newBits) {
-        this.bits[i / 32] = newBits;
+    public void setBulk(int i, int i2) {
+        this.bits[i / 32] = i2;
     }
 
-    public void setRange(int start, int end) {
-        if (end < start || start < 0 || end > this.size) {
+    public void setRange(int i, int i2) {
+        if (i2 < i || i < 0 || i2 > this.size) {
             throw new IllegalArgumentException();
-        } else if (end != start) {
-            int end2 = end - 1;
-            int firstInt = start / 32;
-            int lastInt = end2 / 32;
-            int i = firstInt;
-            while (i <= lastInt) {
-                int firstBit = i > firstInt ? 0 : start & 31;
-                int lastBit = i < lastInt ? 31 : end2 & 31;
+        } else if (i2 != i) {
+            int i3 = i2 - 1;
+            int i4 = i / 32;
+            int i5 = i3 / 32;
+            int i6 = i4;
+            while (i6 <= i5) {
+                int i7 = 31;
+                int i8 = i6 > i4 ? 0 : i & 31;
+                if (i6 >= i5) {
+                    i7 = 31 & i3;
+                }
+                int i9 = (2 << i7) - (1 << i8);
                 int[] iArr = this.bits;
-                iArr[i] = iArr[i] | ((2 << lastBit) - (1 << firstBit));
-                i++;
+                iArr[i6] = i9 | iArr[i6];
+                i6++;
             }
         }
     }
 
     public void clear() {
-        int max = this.bits.length;
-        for (int i = 0; i < max; i++) {
+        int length = this.bits.length;
+        for (int i = 0; i < length; i++) {
             this.bits[i] = 0;
         }
     }
 
-    public boolean isRange(int start, int end, boolean value) {
-        if (end < start || start < 0 || end > this.size) {
+    public boolean isRange(int i, int i2, boolean z) {
+        if (i2 < i || i < 0 || i2 > this.size) {
             throw new IllegalArgumentException();
-        } else if (end == start) {
+        } else if (i2 == i) {
             return true;
         } else {
-            int end2 = end - 1;
-            int firstInt = start / 32;
-            int lastInt = end2 / 32;
-            int i = firstInt;
-            while (i <= lastInt) {
-                int mask = (2 << (i < lastInt ? 31 : end2 & 31)) - (1 << (i > firstInt ? 0 : start & 31));
-                if ((this.bits[i] & mask) != (value ? mask : 0)) {
+            int i3 = i2 - 1;
+            int i4 = i / 32;
+            int i5 = i3 / 32;
+            int i6 = i4;
+            while (i6 <= i5) {
+                int i7 = 31;
+                int i8 = i6 > i4 ? 0 : i & 31;
+                if (i6 >= i5) {
+                    i7 = 31 & i3;
+                }
+                int i9 = (2 << i7) - (1 << i8);
+                int i10 = this.bits[i6] & i9;
+                if (!z) {
+                    i9 = 0;
+                }
+                if (i10 != i9) {
                     return false;
                 }
-                i++;
+                i6++;
             }
             return true;
         }
     }
 
-    public void appendBit(boolean bit) {
+    public void appendBit(boolean z) {
         ensureCapacity(this.size + 1);
-        if (bit) {
+        if (z) {
             int[] iArr = this.bits;
             int i = this.size;
             int i2 = i / 32;
@@ -155,35 +168,36 @@ public final class BitArray implements Cloneable {
         this.size++;
     }
 
-    public void appendBits(int value, int numBits) {
-        if (numBits < 0 || numBits > 32) {
+    public void appendBits(int i, int i2) {
+        if (i2 < 0 || i2 > 32) {
             throw new IllegalArgumentException("Num bits must be between 0 and 32");
         }
-        ensureCapacity(this.size + numBits);
-        for (int numBitsLeft = numBits; numBitsLeft > 0; numBitsLeft--) {
+        ensureCapacity(this.size + i2);
+        while (i2 > 0) {
             boolean z = true;
-            if (((value >> (numBitsLeft - 1)) & 1) != 1) {
+            if (((i >> (i2 - 1)) & 1) != 1) {
                 z = false;
             }
             appendBit(z);
+            i2--;
         }
     }
 
-    public void appendBitArray(BitArray other) {
-        int otherSize = other.size;
-        ensureCapacity(this.size + otherSize);
-        for (int i = 0; i < otherSize; i++) {
-            appendBit(other.get(i));
+    public void appendBitArray(BitArray bitArray) {
+        int i = bitArray.size;
+        ensureCapacity(this.size + i);
+        for (int i2 = 0; i2 < i; i2++) {
+            appendBit(bitArray.get(i2));
         }
     }
 
-    public void xor(BitArray other) {
-        if (this.size == other.size) {
+    public void xor(BitArray bitArray) {
+        if (this.size == bitArray.size) {
             int i = 0;
             while (true) {
                 int[] iArr = this.bits;
                 if (i < iArr.length) {
-                    iArr[i] = iArr[i] ^ other.bits[i];
+                    iArr[i] = iArr[i] ^ bitArray.bits[i];
                     i++;
                 } else {
                     return;
@@ -194,16 +208,16 @@ public final class BitArray implements Cloneable {
         }
     }
 
-    public void toBytes(int bitOffset, byte[] array, int offset, int numBytes) {
-        for (int i = 0; i < numBytes; i++) {
-            int theByte = 0;
-            for (int j = 0; j < 8; j++) {
-                if (get(bitOffset)) {
-                    theByte |= 1 << (7 - j);
+    public void toBytes(int i, byte[] bArr, int i2, int i3) {
+        for (int i4 = 0; i4 < i3; i4++) {
+            int i5 = 0;
+            for (int i6 = 0; i6 < 8; i6++) {
+                if (get(i)) {
+                    i5 |= 1 << (7 - i6);
                 }
-                bitOffset++;
+                i++;
             }
-            array[offset + i] = (byte) theByte;
+            bArr[i2 + i4] = (byte) i5;
         }
     }
 
@@ -212,41 +226,42 @@ public final class BitArray implements Cloneable {
     }
 
     public void reverse() {
-        int[] newBits = new int[this.bits.length];
-        int len = (this.size - 1) / 32;
-        int oldBitsLen = len + 1;
-        for (int i = 0; i < oldBitsLen; i++) {
-            long x = (long) this.bits[i];
-            long x2 = ((x >> 1) & 1431655765) | ((1431655765 & x) << 1);
-            long x3 = ((x2 >> 2) & 858993459) | ((858993459 & x2) << 2);
-            long x4 = ((x3 >> 4) & 252645135) | ((252645135 & x3) << 4);
-            long x5 = ((x4 >> 8) & 16711935) | ((16711935 & x4) << 8);
-            newBits[len - i] = (int) (((x5 >> 16) & 65535) | ((65535 & x5) << 16));
+        int[] iArr = new int[this.bits.length];
+        int i = (this.size - 1) / 32;
+        int i2 = i + 1;
+        for (int i3 = 0; i3 < i2; i3++) {
+            long j = (long) this.bits[i3];
+            long j2 = ((j & 1431655765) << 1) | ((j >> 1) & 1431655765);
+            long j3 = ((j2 & 858993459) << 2) | ((j2 >> 2) & 858993459);
+            long j4 = ((j3 & 252645135) << 4) | ((j3 >> 4) & 252645135);
+            long j5 = ((j4 & 16711935) << 8) | ((j4 >> 8) & 16711935);
+            iArr[i - i3] = (int) (((j5 & 65535) << 16) | ((j5 >> 16) & 65535));
         }
-        int i2 = this.size;
-        if (i2 != oldBitsLen * 32) {
-            int leftOffset = (oldBitsLen * 32) - i2;
-            int currentInt = newBits[0] >>> leftOffset;
-            for (int i3 = 1; i3 < oldBitsLen; i3++) {
-                int nextInt = newBits[i3];
-                newBits[i3 - 1] = currentInt | (nextInt << (32 - leftOffset));
-                currentInt = nextInt >>> leftOffset;
+        int i4 = this.size;
+        int i5 = i2 * 32;
+        if (i4 != i5) {
+            int i6 = i5 - i4;
+            int i7 = iArr[0] >>> i6;
+            for (int i8 = 1; i8 < i2; i8++) {
+                int i9 = iArr[i8];
+                iArr[i8 - 1] = i7 | (i9 << (32 - i6));
+                i7 = i9 >>> i6;
             }
-            newBits[oldBitsLen - 1] = currentInt;
+            iArr[i2 - 1] = i7;
         }
-        this.bits = newBits;
+        this.bits = iArr;
     }
 
-    private static int[] makeArray(int size2) {
-        return new int[((size2 + 31) / 32)];
+    private static int[] makeArray(int i) {
+        return new int[((i + 31) / 32)];
     }
 
-    public boolean equals(Object o) {
-        if (!(o instanceof BitArray)) {
+    public boolean equals(Object obj) {
+        if (!(obj instanceof BitArray)) {
             return false;
         }
-        BitArray other = (BitArray) o;
-        if (this.size != other.size || !Arrays.equals(this.bits, other.bits)) {
+        BitArray bitArray = (BitArray) obj;
+        if (this.size != bitArray.size || !Arrays.equals(this.bits, bitArray.bits)) {
             return false;
         }
         return true;
@@ -257,14 +272,14 @@ public final class BitArray implements Cloneable {
     }
 
     public String toString() {
-        StringBuilder result = new StringBuilder(this.size);
+        StringBuilder sb = new StringBuilder(this.size);
         for (int i = 0; i < this.size; i++) {
             if ((i & 7) == 0) {
-                result.append(' ');
+                sb.append(' ');
             }
-            result.append(get(i) ? 'X' : '.');
+            sb.append(get(i) ? 'X' : '.');
         }
-        return result.toString();
+        return sb.toString();
     }
 
     @Override // java.lang.Object

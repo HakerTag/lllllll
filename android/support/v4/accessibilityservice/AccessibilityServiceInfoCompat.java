@@ -17,86 +17,71 @@ public final class AccessibilityServiceInfoCompat {
     public static final int FLAG_REQUEST_FILTER_KEY_EVENTS = 32;
     public static final int FLAG_REQUEST_TOUCH_EXPLORATION_MODE = 4;
 
-    private AccessibilityServiceInfoCompat() {
+    public static String capabilityToString(int i) {
+        return i != 1 ? i != 2 ? i != 4 ? i != 8 ? "UNKNOWN" : "CAPABILITY_CAN_FILTER_KEY_EVENTS" : "CAPABILITY_CAN_REQUEST_ENHANCED_WEB_ACCESSIBILITY" : "CAPABILITY_CAN_REQUEST_TOUCH_EXPLORATION" : "CAPABILITY_CAN_RETRIEVE_WINDOW_CONTENT";
     }
 
-    public static String loadDescription(AccessibilityServiceInfo info, PackageManager packageManager) {
-        if (Build.VERSION.SDK_INT >= 16) {
-            return info.loadDescription(packageManager);
-        }
-        return info.getDescription();
-    }
-
-    public static String feedbackTypeToString(int feedbackType) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("[");
-        while (feedbackType > 0) {
-            int feedbackTypeFlag = 1 << Integer.numberOfTrailingZeros(feedbackType);
-            feedbackType &= ~feedbackTypeFlag;
-            if (builder.length() > 1) {
-                builder.append(", ");
-            }
-            if (feedbackTypeFlag == 1) {
-                builder.append("FEEDBACK_SPOKEN");
-            } else if (feedbackTypeFlag == 2) {
-                builder.append("FEEDBACK_HAPTIC");
-            } else if (feedbackTypeFlag == 4) {
-                builder.append("FEEDBACK_AUDIBLE");
-            } else if (feedbackTypeFlag == 8) {
-                builder.append("FEEDBACK_VISUAL");
-            } else if (feedbackTypeFlag == 16) {
-                builder.append("FEEDBACK_GENERIC");
-            }
-        }
-        builder.append("]");
-        return builder.toString();
-    }
-
-    public static String flagToString(int flag) {
-        if (flag == 1) {
+    public static String flagToString(int i) {
+        if (i == 1) {
             return "DEFAULT";
         }
-        if (flag == 2) {
+        if (i == 2) {
             return "FLAG_INCLUDE_NOT_IMPORTANT_VIEWS";
         }
-        if (flag == 4) {
+        if (i == 4) {
             return "FLAG_REQUEST_TOUCH_EXPLORATION_MODE";
         }
-        if (flag == 8) {
+        if (i == 8) {
             return "FLAG_REQUEST_ENHANCED_WEB_ACCESSIBILITY";
         }
-        if (flag == 16) {
+        if (i == 16) {
             return "FLAG_REPORT_VIEW_IDS";
         }
-        if (flag != 32) {
+        if (i != 32) {
             return null;
         }
         return "FLAG_REQUEST_FILTER_KEY_EVENTS";
     }
 
-    public static int getCapabilities(AccessibilityServiceInfo info) {
-        if (Build.VERSION.SDK_INT >= 18) {
-            return info.getCapabilities();
-        }
-        if (info.getCanRetrieveWindowContent()) {
-            return 1;
-        }
-        return 0;
+    private AccessibilityServiceInfoCompat() {
     }
 
-    public static String capabilityToString(int capability) {
-        if (capability == 1) {
-            return "CAPABILITY_CAN_RETRIEVE_WINDOW_CONTENT";
+    public static String loadDescription(AccessibilityServiceInfo accessibilityServiceInfo, PackageManager packageManager) {
+        if (Build.VERSION.SDK_INT >= 16) {
+            return accessibilityServiceInfo.loadDescription(packageManager);
         }
-        if (capability == 2) {
-            return "CAPABILITY_CAN_REQUEST_TOUCH_EXPLORATION";
+        return accessibilityServiceInfo.getDescription();
+    }
+
+    public static String feedbackTypeToString(int i) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        while (i > 0) {
+            int numberOfTrailingZeros = 1 << Integer.numberOfTrailingZeros(i);
+            i &= ~numberOfTrailingZeros;
+            if (sb.length() > 1) {
+                sb.append(", ");
+            }
+            if (numberOfTrailingZeros == 1) {
+                sb.append("FEEDBACK_SPOKEN");
+            } else if (numberOfTrailingZeros == 2) {
+                sb.append("FEEDBACK_HAPTIC");
+            } else if (numberOfTrailingZeros == 4) {
+                sb.append("FEEDBACK_AUDIBLE");
+            } else if (numberOfTrailingZeros == 8) {
+                sb.append("FEEDBACK_VISUAL");
+            } else if (numberOfTrailingZeros == 16) {
+                sb.append("FEEDBACK_GENERIC");
+            }
         }
-        if (capability == 4) {
-            return "CAPABILITY_CAN_REQUEST_ENHANCED_WEB_ACCESSIBILITY";
+        sb.append("]");
+        return sb.toString();
+    }
+
+    public static int getCapabilities(AccessibilityServiceInfo accessibilityServiceInfo) {
+        if (Build.VERSION.SDK_INT >= 18) {
+            return accessibilityServiceInfo.getCapabilities();
         }
-        if (capability != 8) {
-            return "UNKNOWN";
-        }
-        return "CAPABILITY_CAN_FILTER_KEY_EVENTS";
+        return accessibilityServiceInfo.getCanRetrieveWindowContent() ? 1 : 0;
     }
 }

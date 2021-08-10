@@ -15,64 +15,62 @@ public final class QRCodeWriter implements Writer {
     private static final int QUIET_ZONE_SIZE = 4;
 
     @Override // com.google.zxing.Writer
-    public BitMatrix encode(String contents, BarcodeFormat format, int width, int height) throws WriterException {
-        return encode(contents, format, width, height, null);
+    public BitMatrix encode(String str, BarcodeFormat barcodeFormat, int i, int i2) throws WriterException {
+        return encode(str, barcodeFormat, i, i2, null);
     }
 
     @Override // com.google.zxing.Writer
-    public BitMatrix encode(String contents, BarcodeFormat format, int width, int height, Map<EncodeHintType, ?> hints) throws WriterException {
-        if (contents.isEmpty()) {
+    public BitMatrix encode(String str, BarcodeFormat barcodeFormat, int i, int i2, Map<EncodeHintType, ?> map) throws WriterException {
+        if (str.isEmpty()) {
             throw new IllegalArgumentException("Found empty contents");
-        } else if (format != BarcodeFormat.QR_CODE) {
-            throw new IllegalArgumentException("Can only encode QR_CODE, but got " + format);
-        } else if (width < 0 || height < 0) {
-            throw new IllegalArgumentException("Requested dimensions are too small: " + width + 'x' + height);
+        } else if (barcodeFormat != BarcodeFormat.QR_CODE) {
+            throw new IllegalArgumentException("Can only encode QR_CODE, but got " + barcodeFormat);
+        } else if (i < 0 || i2 < 0) {
+            throw new IllegalArgumentException("Requested dimensions are too small: " + i + 'x' + i2);
         } else {
             ErrorCorrectionLevel errorCorrectionLevel = ErrorCorrectionLevel.L;
-            int quietZone = 4;
-            if (hints != null) {
-                if (hints.containsKey(EncodeHintType.ERROR_CORRECTION)) {
-                    errorCorrectionLevel = ErrorCorrectionLevel.valueOf(hints.get(EncodeHintType.ERROR_CORRECTION).toString());
+            int i3 = 4;
+            if (map != null) {
+                if (map.containsKey(EncodeHintType.ERROR_CORRECTION)) {
+                    errorCorrectionLevel = ErrorCorrectionLevel.valueOf(map.get(EncodeHintType.ERROR_CORRECTION).toString());
                 }
-                if (hints.containsKey(EncodeHintType.MARGIN)) {
-                    quietZone = Integer.parseInt(hints.get(EncodeHintType.MARGIN).toString());
+                if (map.containsKey(EncodeHintType.MARGIN)) {
+                    i3 = Integer.parseInt(map.get(EncodeHintType.MARGIN).toString());
                 }
             }
-            return renderResult(Encoder.encode(contents, errorCorrectionLevel, hints), width, height, quietZone);
+            return renderResult(Encoder.encode(str, errorCorrectionLevel, map), i, i2, i3);
         }
     }
 
-    private static BitMatrix renderResult(QRCode code, int width, int height, int quietZone) {
-        ByteMatrix input = code.getMatrix();
-        if (input != null) {
-            int inputWidth = input.getWidth();
-            int inputHeight = input.getHeight();
-            int qrWidth = (quietZone * 2) + inputWidth;
-            int qrHeight = (quietZone * 2) + inputHeight;
-            int outputWidth = Math.max(width, qrWidth);
-            int outputHeight = Math.max(height, qrHeight);
-            int multiple = Math.min(outputWidth / qrWidth, outputHeight / qrHeight);
-            int leftPadding = (outputWidth - (inputWidth * multiple)) / 2;
-            BitMatrix output = new BitMatrix(outputWidth, outputHeight);
-            int inputY = 0;
-            int outputY = (outputHeight - (inputHeight * multiple)) / 2;
-            while (inputY < inputHeight) {
-                int inputX = 0;
-                int outputX = leftPadding;
-                while (inputX < inputWidth) {
-                    if (input.get(inputX, inputY) == 1) {
-                        output.setRegion(outputX, outputY, multiple, multiple);
+    private static BitMatrix renderResult(QRCode qRCode, int i, int i2, int i3) {
+        ByteMatrix matrix = qRCode.getMatrix();
+        if (matrix != null) {
+            int width = matrix.getWidth();
+            int height = matrix.getHeight();
+            int i4 = i3 * 2;
+            int i5 = width + i4;
+            int i6 = i4 + height;
+            int max = Math.max(i, i5);
+            int max2 = Math.max(i2, i6);
+            int min = Math.min(max / i5, max2 / i6);
+            int i7 = (max - (width * min)) / 2;
+            int i8 = (max2 - (height * min)) / 2;
+            BitMatrix bitMatrix = new BitMatrix(max, max2);
+            int i9 = 0;
+            while (i9 < height) {
+                int i10 = i7;
+                int i11 = 0;
+                while (i11 < width) {
+                    if (matrix.get(i11, i9) == 1) {
+                        bitMatrix.setRegion(i10, i8, min, min);
                     }
-                    inputX++;
-                    outputX += multiple;
-                    inputWidth = inputWidth;
-                    input = input;
+                    i11++;
+                    i10 += min;
                 }
-                inputY++;
-                outputY += multiple;
-                inputHeight = inputHeight;
+                i9++;
+                i8 += min;
             }
-            return output;
+            return bitMatrix;
         }
         throw new IllegalStateException();
     }

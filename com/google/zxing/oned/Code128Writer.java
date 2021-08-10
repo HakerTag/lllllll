@@ -5,7 +5,6 @@ import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map;
 
 public final class Code128Writer extends OneDimensionalCodeWriter {
@@ -32,27 +31,27 @@ public final class Code128Writer extends OneDimensionalCodeWriter {
     }
 
     @Override // com.google.zxing.oned.OneDimensionalCodeWriter, com.google.zxing.Writer
-    public BitMatrix encode(String contents, BarcodeFormat format, int width, int height, Map<EncodeHintType, ?> hints) throws WriterException {
-        if (format == BarcodeFormat.CODE_128) {
-            return super.encode(contents, format, width, height, hints);
+    public BitMatrix encode(String str, BarcodeFormat barcodeFormat, int i, int i2, Map<EncodeHintType, ?> map) throws WriterException {
+        if (barcodeFormat == BarcodeFormat.CODE_128) {
+            return super.encode(str, barcodeFormat, i, i2, map);
         }
-        throw new IllegalArgumentException("Can only encode CODE_128, but got " + format);
+        throw new IllegalArgumentException("Can only encode CODE_128, but got " + barcodeFormat);
     }
 
     @Override // com.google.zxing.oned.OneDimensionalCodeWriter
-    public boolean[] encode(String contents) {
-        int patternIndex;
-        int patternIndex2;
-        int length = contents.length();
+    public boolean[] encode(String str) {
+        int i;
+        int length = str.length();
         if (length < 1 || length > 80) {
             throw new IllegalArgumentException("Contents length should be between 1 and 80 characters, but got " + length);
         }
-        for (int i = 0; i < length; i++) {
-            char c = contents.charAt(i);
-            if (c < ' ' || c > '~') {
-                switch (c) {
+        int i2 = 0;
+        for (int i3 = 0; i3 < length; i3++) {
+            char charAt = str.charAt(i3);
+            if (charAt < ' ' || charAt > '~') {
+                switch (charAt) {
                     default:
-                        throw new IllegalArgumentException("Bad character in input: " + c);
+                        throw new IllegalArgumentException("Bad character in input: " + charAt);
                     case 241:
                     case 242:
                     case 243:
@@ -61,131 +60,124 @@ public final class Code128Writer extends OneDimensionalCodeWriter {
                 }
             }
         }
-        Collection<int[]> patterns = new ArrayList<>();
-        int checkSum = 0;
-        int checkWeight = 1;
-        int codeSet = 0;
-        int position = 0;
-        while (position < length) {
-            int newCodeSet = chooseCode(contents, position, codeSet);
-            if (newCodeSet == codeSet) {
-                switch (contents.charAt(position)) {
+        ArrayList<int[]> arrayList = new ArrayList();
+        int i4 = 0;
+        int i5 = 0;
+        int i6 = 0;
+        int i7 = 1;
+        while (i4 < length) {
+            int chooseCode = chooseCode(str, i4, i6);
+            int i8 = 100;
+            if (chooseCode == i6) {
+                switch (str.charAt(i4)) {
                     case 241:
-                        patternIndex = CODE_FNC_1;
+                        i8 = CODE_FNC_1;
                         break;
                     case 242:
-                        patternIndex = CODE_FNC_2;
+                        i8 = CODE_FNC_2;
                         break;
                     case 243:
-                        patternIndex = CODE_FNC_3;
+                        i8 = CODE_FNC_3;
                         break;
                     case 244:
-                        patternIndex = 100;
                         break;
                     default:
-                        if (codeSet == 100) {
-                            patternIndex = contents.charAt(position) - ' ';
+                        if (i6 == 100) {
+                            i8 = str.charAt(i4) - ' ';
                             break;
                         } else {
-                            patternIndex = Integer.parseInt(contents.substring(position, position + 2));
-                            position++;
+                            i8 = Integer.parseInt(str.substring(i4, i4 + 2));
+                            i4++;
                             break;
                         }
                 }
-                position++;
+                i4++;
             } else {
-                if (codeSet != 0) {
-                    patternIndex2 = newCodeSet;
-                } else if (newCodeSet == 100) {
-                    patternIndex2 = CODE_START_B;
-                } else {
-                    patternIndex2 = CODE_START_C;
-                }
-                codeSet = newCodeSet;
+                i = i6 == 0 ? chooseCode == 100 ? CODE_START_B : CODE_START_C : chooseCode;
+                i6 = chooseCode;
             }
-            patterns.add(Code128Reader.CODE_PATTERNS[patternIndex]);
-            checkSum += patternIndex * checkWeight;
-            if (position != 0) {
-                checkWeight++;
+            arrayList.add(Code128Reader.CODE_PATTERNS[i]);
+            i5 += i * i7;
+            if (i4 != 0) {
+                i7++;
             }
         }
-        patterns.add(Code128Reader.CODE_PATTERNS[checkSum % 103]);
-        patterns.add(Code128Reader.CODE_PATTERNS[CODE_STOP]);
-        int codeWidth = 0;
-        for (int[] pattern : patterns) {
-            for (int width : pattern) {
-                codeWidth += width;
+        arrayList.add(Code128Reader.CODE_PATTERNS[i5 % 103]);
+        arrayList.add(Code128Reader.CODE_PATTERNS[CODE_STOP]);
+        int i9 = 0;
+        for (int[] iArr : arrayList) {
+            for (int i10 : iArr) {
+                i9 += i10;
             }
         }
-        boolean[] result = new boolean[codeWidth];
-        int pos = 0;
-        for (int[] pattern2 : patterns) {
-            pos += appendPattern(result, pos, pattern2, true);
+        boolean[] zArr = new boolean[i9];
+        for (int[] iArr2 : arrayList) {
+            i2 += appendPattern(zArr, i2, iArr2, true);
         }
-        return result;
+        return zArr;
     }
 
-    private static CType findCType(CharSequence value, int start) {
-        int last = value.length();
-        if (start >= last) {
+    private static CType findCType(CharSequence charSequence, int i) {
+        int length = charSequence.length();
+        if (i >= length) {
             return CType.UNCODABLE;
         }
-        char c = value.charAt(start);
-        if (c == 241) {
+        char charAt = charSequence.charAt(i);
+        if (charAt == 241) {
             return CType.FNC_1;
         }
-        if (c < '0' || c > '9') {
+        if (charAt < '0' || charAt > '9') {
             return CType.UNCODABLE;
         }
-        if (start + 1 >= last) {
+        int i2 = i + 1;
+        if (i2 >= length) {
             return CType.ONE_DIGIT;
         }
-        char c2 = value.charAt(start + 1);
-        if (c2 < '0' || c2 > '9') {
+        char charAt2 = charSequence.charAt(i2);
+        if (charAt2 < '0' || charAt2 > '9') {
             return CType.ONE_DIGIT;
         }
         return CType.TWO_DIGITS;
     }
 
-    private static int chooseCode(CharSequence value, int start, int oldCode) {
-        CType lookahead;
-        CType lookahead2;
-        CType lookahead3 = findCType(value, start);
-        if (lookahead3 == CType.UNCODABLE || lookahead3 == CType.ONE_DIGIT) {
-            return 100;
-        }
-        if (oldCode == CODE_CODE_C) {
-            return oldCode;
-        }
-        if (oldCode != 100) {
-            if (lookahead3 == CType.FNC_1) {
-                lookahead3 = findCType(value, start + 1);
+    private static int chooseCode(CharSequence charSequence, int i, int i2) {
+        CType findCType;
+        CType findCType2;
+        CType findCType3 = findCType(charSequence, i);
+        if (!(findCType3 == CType.UNCODABLE || findCType3 == CType.ONE_DIGIT)) {
+            if (i2 == CODE_CODE_C) {
+                return i2;
             }
-            if (lookahead3 == CType.TWO_DIGITS) {
-                return CODE_CODE_C;
-            }
-            return 100;
-        } else if (lookahead3 == CType.FNC_1 || (lookahead = findCType(value, start + 2)) == CType.UNCODABLE || lookahead == CType.ONE_DIGIT) {
-            return oldCode;
-        } else {
-            if (lookahead != CType.FNC_1) {
-                int index = start + 4;
-                while (true) {
-                    lookahead2 = findCType(value, index);
-                    if (lookahead2 != CType.TWO_DIGITS) {
-                        break;
-                    }
-                    index += 2;
+            if (i2 != 100) {
+                if (findCType3 == CType.FNC_1) {
+                    findCType3 = findCType(charSequence, i + 1);
                 }
-                if (lookahead2 == CType.ONE_DIGIT) {
+                if (findCType3 == CType.TWO_DIGITS) {
+                    return CODE_CODE_C;
+                }
+            } else if (findCType3 == CType.FNC_1 || (findCType = findCType(charSequence, i + 2)) == CType.UNCODABLE || findCType == CType.ONE_DIGIT) {
+                return i2;
+            } else {
+                if (findCType != CType.FNC_1) {
+                    int i3 = i + 4;
+                    while (true) {
+                        findCType2 = findCType(charSequence, i3);
+                        if (findCType2 != CType.TWO_DIGITS) {
+                            break;
+                        }
+                        i3 += 2;
+                    }
+                    if (findCType2 == CType.ONE_DIGIT) {
+                        return 100;
+                    }
+                    return CODE_CODE_C;
+                } else if (findCType(charSequence, i + 3) == CType.TWO_DIGITS) {
+                    return CODE_CODE_C;
+                } else {
                     return 100;
                 }
-                return CODE_CODE_C;
-            } else if (findCType(value, start + 3) == CType.TWO_DIGITS) {
-                return CODE_CODE_C;
-            } else {
-                return 100;
             }
         }
+        return 100;
     }
 }

@@ -17,55 +17,55 @@ public class SMSReader extends CordovaPlugin {
     private String[] SMSPermissions = {"android.permission.READ_SMS", "android.permission.RECEIVE_SMS", "android.permission.SEND_SMS"};
 
     @Override // org.apache.cordova.CordovaPlugin
-    public void initialize(CordovaInterface cordova, CordovaWebView webView) {
-        super.initialize(cordova, webView);
+    public void initialize(CordovaInterface cordovaInterface, CordovaWebView cordovaWebView) {
+        super.initialize(cordovaInterface, cordovaWebView);
     }
 
-    private String[] getStringArrayFromJSONArray(JSONArray array) throws JSONException {
-        if (array == null) {
+    private String[] getStringArrayFromJSONArray(JSONArray jSONArray) throws JSONException {
+        if (jSONArray == null) {
             return new String[0];
         }
-        String[] stringArray = new String[array.length()];
-        for (int i = 0; i < stringArray.length; i++) {
-            stringArray[i] = array.getString(i);
+        int length = jSONArray.length();
+        String[] strArr = new String[length];
+        for (int i = 0; i < length; i++) {
+            strArr[i] = jSONArray.getString(i);
         }
-        return stringArray;
+        return strArr;
     }
 
-    /* JADX INFO: Can't fix incorrect switch cases order, some code will duplicate */
     @Override // org.apache.cordova.CordovaPlugin
-    public boolean execute(String action, JSONArray data, CallbackContext callbackContext) {
-        Log.v("SMSReader", "Called action " + action);
+    public boolean execute(String str, JSONArray jSONArray, CallbackContext callbackContext) {
+        Log.v("SMSReader", "Called action " + str);
         try {
-            ArrayList<SMS> sms = new ArrayList<>();
+            ArrayList<SMS> arrayList = new ArrayList<>();
             char c = 65535;
-            switch (action.hashCode()) {
+            switch (str.hashCode()) {
                 case -1552643814:
-                    if (action.equals("filterbody")) {
+                    if (str.equals("filterbody")) {
                         c = 2;
                         break;
                     }
                     break;
                 case -517618225:
-                    if (action.equals("permission")) {
+                    if (str.equals("permission")) {
                         c = 0;
                         break;
                     }
                     break;
                 case -383972762:
-                    if (action.equals("filtersenders")) {
+                    if (str.equals("filtersenders")) {
                         c = 3;
                         break;
                     }
                     break;
                 case 96673:
-                    if (action.equals("all")) {
+                    if (str.equals("all")) {
                         c = 1;
                         break;
                     }
                     break;
                 case 503340481:
-                    if (action.equals("filterbodyorsenders")) {
+                    if (str.equals("filterbodyorsenders")) {
                         c = 4;
                         break;
                     }
@@ -73,31 +73,31 @@ public class SMSReader extends CordovaPlugin {
             }
             if (c != 0) {
                 if (c == 1) {
-                    sms = fetchSMS(data.getLong(0), new String[0], new String[0]);
+                    arrayList = fetchSMS(jSONArray.getLong(0), new String[0], new String[0]);
                 } else if (c == 2) {
-                    String[] searchstrings = getStringArrayFromJSONArray(data.getJSONArray(1));
-                    if (searchstrings.length > 0) {
-                        sms = fetchSMS(data.getLong(0), searchstrings, new String[0]);
+                    String[] stringArrayFromJSONArray = getStringArrayFromJSONArray(jSONArray.getJSONArray(1));
+                    if (stringArrayFromJSONArray.length > 0) {
+                        arrayList = fetchSMS(jSONArray.getLong(0), stringArrayFromJSONArray, new String[0]);
                     }
                 } else if (c == 3) {
-                    String[] senderids = getStringArrayFromJSONArray(data.getJSONArray(2));
-                    if (senderids.length > 0) {
-                        sms = fetchSMS(data.getLong(0), new String[0], senderids);
+                    String[] stringArrayFromJSONArray2 = getStringArrayFromJSONArray(jSONArray.getJSONArray(2));
+                    if (stringArrayFromJSONArray2.length > 0) {
+                        arrayList = fetchSMS(jSONArray.getLong(0), new String[0], stringArrayFromJSONArray2);
                     }
                 } else if (c != 4) {
                     callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.INVALID_ACTION));
                     return false;
                 } else {
-                    String[] searchstrings2 = getStringArrayFromJSONArray(data.getJSONArray(1));
-                    String[] senderids2 = getStringArrayFromJSONArray(data.getJSONArray(2));
-                    if (searchstrings2.length + senderids2.length > 0) {
-                        sms = fetchSMS(data.getLong(0), searchstrings2, senderids2);
+                    String[] stringArrayFromJSONArray3 = getStringArrayFromJSONArray(jSONArray.getJSONArray(1));
+                    String[] stringArrayFromJSONArray4 = getStringArrayFromJSONArray(jSONArray.getJSONArray(2));
+                    if (stringArrayFromJSONArray3.length + stringArrayFromJSONArray4.length > 0) {
+                        arrayList = fetchSMS(jSONArray.getLong(0), stringArrayFromJSONArray3, stringArrayFromJSONArray4);
                     }
                 }
-                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, convertToJSONArray(sms)));
+                callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, convertToJSONArray(arrayList)));
                 return true;
             }
-            ensurePermissions(getStringArrayFromJSONArray(data.getJSONArray(0)), callbackContext);
+            ensurePermissions(getStringArrayFromJSONArray(jSONArray.getJSONArray(0)), callbackContext);
             return true;
         } catch (JSONException e) {
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION, e.getMessage()));
@@ -105,10 +105,10 @@ public class SMSReader extends CordovaPlugin {
         }
     }
 
-    private String[] resolvePermissions(String[] permissionCodes) {
-        String[] permissions = new String[permissionCodes.length];
-        for (int i = 0; i < permissionCodes.length; i++) {
-            String str = permissionCodes[i];
+    private String[] resolvePermissions(String[] strArr) {
+        String[] strArr2 = new String[strArr.length];
+        for (int i = 0; i < strArr.length; i++) {
+            String str = strArr[i];
             char c = 65535;
             int hashCode = str.hashCode();
             if (hashCode != 3496342) {
@@ -123,43 +123,43 @@ public class SMSReader extends CordovaPlugin {
                 c = 0;
             }
             if (c == 0) {
-                permissions[i] = this.SMSPermissions[0];
+                strArr2[i] = this.SMSPermissions[0];
             } else if (c == 1) {
-                permissions[i] = this.SMSPermissions[1];
+                strArr2[i] = this.SMSPermissions[1];
             } else if (c == 2) {
-                permissions[i] = this.SMSPermissions[2];
+                strArr2[i] = this.SMSPermissions[2];
             }
         }
-        return permissions;
+        return strArr2;
     }
 
-    private void ensurePermissions(String[] permissionCodes, CallbackContext callbackContext) {
-        boolean hasPermission = true;
-        String[] permissions = resolvePermissions(permissionCodes);
-        int length = permissions.length;
+    private void ensurePermissions(String[] strArr, CallbackContext callbackContext) {
+        String[] resolvePermissions = resolvePermissions(strArr);
+        int length = resolvePermissions.length;
+        boolean z = false;
         int i = 0;
         while (true) {
             if (i >= length) {
+                z = true;
                 break;
             }
-            if (!this.cordova.hasPermission(permissions[i])) {
-                hasPermission = false;
+            if (!this.cordova.hasPermission(resolvePermissions[i])) {
                 break;
             }
             i++;
         }
-        if (hasPermission) {
+        if (z) {
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, "PERMISSION_GRANTED"));
             return;
         }
         this.CallbackContext = callbackContext;
-        this.cordova.requestPermissions(this, 1, permissions);
+        this.cordova.requestPermissions(this, 1, resolvePermissions);
     }
 
     @Override // org.apache.cordova.CordovaPlugin
-    public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
-        for (int r : grantResults) {
-            if (r == -1) {
+    public void onRequestPermissionResult(int i, String[] strArr, int[] iArr) throws JSONException {
+        for (int i2 : iArr) {
+            if (i2 == -1) {
                 this.CallbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "PERMISSION_DENIED"));
                 return;
             }
@@ -168,29 +168,29 @@ public class SMSReader extends CordovaPlugin {
         this.CallbackContext = null;
     }
 
-    private JSONArray convertToJSONArray(ArrayList<SMS> sms) throws JSONException {
-        JSONArray smsResult = new JSONArray();
-        int resultLength = sms.size();
-        for (int i = 0; i < resultLength; i++) {
-            smsResult.put(sms.get(i).writeJSON());
+    private JSONArray convertToJSONArray(ArrayList<SMS> arrayList) throws JSONException {
+        JSONArray jSONArray = new JSONArray();
+        int size = arrayList.size();
+        for (int i = 0; i < size; i++) {
+            jSONArray.put(arrayList.get(i).writeJSON());
         }
-        return smsResult;
+        return jSONArray;
     }
 
-    private ArrayList<SMS> fetchSMS(long since, String[] searchText, String[] senderids) {
-        ArrayList<SMS> lstSms = new ArrayList<>();
-        Cursor cursor = this.cordova.getActivity().getContentResolver().query(Uri.parse("content://sms/inbox"), null, null, null, null);
-        int totalSMS = cursor.getCount();
-        if (cursor.moveToFirst()) {
-            for (int i = 0; i < totalSMS; i++) {
-                SMS sms = new SMS(cursor);
-                if (sms.applyFilters(since, searchText, senderids)) {
-                    lstSms.add(sms);
+    private ArrayList<SMS> fetchSMS(long j, String[] strArr, String[] strArr2) {
+        ArrayList<SMS> arrayList = new ArrayList<>();
+        Cursor query = this.cordova.getActivity().getContentResolver().query(Uri.parse("content://sms/inbox"), null, null, null, null);
+        int count = query.getCount();
+        if (query.moveToFirst()) {
+            for (int i = 0; i < count; i++) {
+                SMS sms = new SMS(query);
+                if (sms.applyFilters(j, strArr, strArr2)) {
+                    arrayList.add(sms);
                 }
-                cursor.moveToNext();
+                query.moveToNext();
             }
         }
-        cursor.close();
-        return lstSms;
+        query.close();
+        return arrayList;
     }
 }

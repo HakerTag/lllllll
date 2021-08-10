@@ -29,19 +29,19 @@ public abstract class SupplementalInfoRetriever extends AsyncTask<Object, Object
     /* access modifiers changed from: package-private */
     public abstract void retrieveSupplementalInfo() throws IOException;
 
-    public static void maybeInvokeRetrieval(TextView textView, ParsedResult result, HistoryManager historyManager, Context context) {
+    public static void maybeInvokeRetrieval(TextView textView, ParsedResult parsedResult, HistoryManager historyManager, Context context) {
         try {
-            if (result instanceof URIParsedResult) {
-                new URIResultInfoRetriever(textView, (URIParsedResult) result, historyManager, context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Object[0]);
-                new TitleRetriever(textView, (URIParsedResult) result, historyManager).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Object[0]);
-            } else if (result instanceof ProductParsedResult) {
-                new ProductResultInfoRetriever(textView, ((ProductParsedResult) result).getProductID(), historyManager, context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Object[0]);
-            } else if (result instanceof ISBNParsedResult) {
-                String isbn = ((ISBNParsedResult) result).getISBN();
+            if (parsedResult instanceof URIParsedResult) {
+                new URIResultInfoRetriever(textView, (URIParsedResult) parsedResult, historyManager, context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Object[0]);
+                new TitleRetriever(textView, (URIParsedResult) parsedResult, historyManager).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Object[0]);
+            } else if (parsedResult instanceof ProductParsedResult) {
+                new ProductResultInfoRetriever(textView, ((ProductParsedResult) parsedResult).getProductID(), historyManager, context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Object[0]);
+            } else if (parsedResult instanceof ISBNParsedResult) {
+                String isbn = ((ISBNParsedResult) parsedResult).getISBN();
                 new ProductResultInfoRetriever(textView, isbn, historyManager, context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Object[0]);
                 new BookResultInfoRetriever(textView, isbn, historyManager, context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Object[0]);
             }
-        } catch (RejectedExecutionException e) {
+        } catch (RejectedExecutionException unused) {
         }
     }
 
@@ -51,7 +51,7 @@ public abstract class SupplementalInfoRetriever extends AsyncTask<Object, Object
     }
 
     @Override // android.os.AsyncTask
-    public final Object doInBackground(Object... args) {
+    public final Object doInBackground(Object... objArr) {
         try {
             retrieveSupplementalInfo();
             return null;
@@ -63,75 +63,75 @@ public abstract class SupplementalInfoRetriever extends AsyncTask<Object, Object
 
     /* access modifiers changed from: protected */
     @Override // android.os.AsyncTask
-    public final void onPostExecute(Object arg) {
+    public final void onPostExecute(Object obj) {
         TextView textView = this.textViewRef.get();
         if (textView != null) {
-            for (CharSequence content : this.newContents) {
-                textView.append(content);
+            for (Spannable spannable : this.newContents) {
+                textView.append(spannable);
             }
             textView.setMovementMethod(LinkMovementMethod.getInstance());
         }
         HistoryManager historyManager = this.historyManagerRef.get();
         if (historyManager != null) {
-            for (String[] text : this.newHistories) {
-                historyManager.addHistoryItemDetails(text[0], text[1]);
+            for (String[] strArr : this.newHistories) {
+                historyManager.addHistoryItemDetails(strArr[0], strArr[1]);
             }
         }
     }
 
     /* access modifiers changed from: package-private */
-    public final void append(String itemID, String source, String[] newTexts, String linkURL) {
-        StringBuilder newTextCombined = new StringBuilder();
-        if (source != null) {
-            newTextCombined.append(source);
-            newTextCombined.append(' ');
+    public final void append(String str, String str2, String[] strArr, String str3) {
+        StringBuilder sb = new StringBuilder();
+        if (str2 != null) {
+            sb.append(str2);
+            sb.append(' ');
         }
-        int linkStart = newTextCombined.length();
-        boolean first = true;
-        for (String newText : newTexts) {
-            if (first) {
-                newTextCombined.append(newText);
-                first = false;
+        int length = sb.length();
+        boolean z = true;
+        for (String str4 : strArr) {
+            if (z) {
+                sb.append(str4);
+                z = false;
             } else {
-                newTextCombined.append(" [");
-                newTextCombined.append(newText);
-                newTextCombined.append(']');
+                sb.append(" [");
+                sb.append(str4);
+                sb.append(']');
             }
         }
-        int linkEnd = newTextCombined.length();
-        String newText2 = newTextCombined.toString();
-        Spannable content = new SpannableString(newText2 + "\n\n");
-        if (linkURL != null) {
-            if (linkURL.startsWith("HTTP://")) {
-                linkURL = "http" + linkURL.substring(4);
-            } else if (linkURL.startsWith("HTTPS://")) {
-                linkURL = "https" + linkURL.substring(5);
+        int length2 = sb.length();
+        String sb2 = sb.toString();
+        SpannableString spannableString = new SpannableString(sb2 + "\n\n");
+        if (str3 != null) {
+            if (str3.startsWith("HTTP://")) {
+                str3 = "http" + str3.substring(4);
+            } else if (str3.startsWith("HTTPS://")) {
+                str3 = "https" + str3.substring(5);
             }
-            content.setSpan(new URLSpan(linkURL), linkStart, linkEnd, 33);
+            spannableString.setSpan(new URLSpan(str3), length, length2, 33);
         }
-        this.newContents.add(content);
-        this.newHistories.add(new String[]{itemID, newText2});
+        this.newContents.add(spannableString);
+        this.newHistories.add(new String[]{str, sb2});
     }
 
-    static void maybeAddText(String text, Collection<String> texts) {
-        if (text != null && !text.isEmpty()) {
-            texts.add(text);
+    static void maybeAddText(String str, Collection<String> collection) {
+        if (str != null && !str.isEmpty()) {
+            collection.add(str);
         }
     }
 
-    static void maybeAddTextSeries(Collection<String> textSeries, Collection<String> texts) {
-        if (!(textSeries == null || textSeries.isEmpty())) {
-            boolean first = true;
-            StringBuilder authorsText = new StringBuilder();
-            for (String author : textSeries) {
-                if (first) {
-                    first = false;
+    static void maybeAddTextSeries(Collection<String> collection, Collection<String> collection2) {
+        if (!(collection == null || collection.isEmpty())) {
+            boolean z = true;
+            StringBuilder sb = new StringBuilder();
+            for (String str : collection) {
+                if (z) {
+                    z = false;
                 } else {
-                    authorsText.append(", ");
+                    sb.append(", ");
                 }
-                authorsText.append(author);
+                sb.append(str);
             }
-            texts.add(authorsText.toString());
+            collection2.add(sb.toString());
         }
     }
 }

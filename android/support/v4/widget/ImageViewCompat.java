@@ -24,31 +24,31 @@ public class ImageViewCompat {
         }
 
         @Override // android.support.v4.widget.ImageViewCompat.ImageViewCompatImpl
-        public ColorStateList getImageTintList(ImageView view) {
-            if (view instanceof TintableImageSourceView) {
-                return ((TintableImageSourceView) view).getSupportImageTintList();
+        public ColorStateList getImageTintList(ImageView imageView) {
+            if (imageView instanceof TintableImageSourceView) {
+                return ((TintableImageSourceView) imageView).getSupportImageTintList();
             }
             return null;
         }
 
         @Override // android.support.v4.widget.ImageViewCompat.ImageViewCompatImpl
-        public void setImageTintList(ImageView view, ColorStateList tintList) {
-            if (view instanceof TintableImageSourceView) {
-                ((TintableImageSourceView) view).setSupportImageTintList(tintList);
+        public void setImageTintList(ImageView imageView, ColorStateList colorStateList) {
+            if (imageView instanceof TintableImageSourceView) {
+                ((TintableImageSourceView) imageView).setSupportImageTintList(colorStateList);
             }
         }
 
         @Override // android.support.v4.widget.ImageViewCompat.ImageViewCompatImpl
-        public void setImageTintMode(ImageView view, PorterDuff.Mode mode) {
-            if (view instanceof TintableImageSourceView) {
-                ((TintableImageSourceView) view).setSupportImageTintMode(mode);
+        public void setImageTintMode(ImageView imageView, PorterDuff.Mode mode) {
+            if (imageView instanceof TintableImageSourceView) {
+                ((TintableImageSourceView) imageView).setSupportImageTintMode(mode);
             }
         }
 
         @Override // android.support.v4.widget.ImageViewCompat.ImageViewCompatImpl
-        public PorterDuff.Mode getImageTintMode(ImageView view) {
-            if (view instanceof TintableImageSourceView) {
-                return ((TintableImageSourceView) view).getSupportImageTintMode();
+        public PorterDuff.Mode getImageTintMode(ImageView imageView) {
+            if (imageView instanceof TintableImageSourceView) {
+                return ((TintableImageSourceView) imageView).getSupportImageTintMode();
             }
             return null;
         }
@@ -59,43 +59,43 @@ public class ImageViewCompat {
         }
 
         @Override // android.support.v4.widget.ImageViewCompat.ImageViewCompatImpl, android.support.v4.widget.ImageViewCompat.BaseViewCompatImpl
-        public ColorStateList getImageTintList(ImageView view) {
-            return view.getImageTintList();
+        public ColorStateList getImageTintList(ImageView imageView) {
+            return imageView.getImageTintList();
         }
 
         @Override // android.support.v4.widget.ImageViewCompat.ImageViewCompatImpl, android.support.v4.widget.ImageViewCompat.BaseViewCompatImpl
-        public void setImageTintList(ImageView view, ColorStateList tintList) {
-            view.setImageTintList(tintList);
+        public void setImageTintList(ImageView imageView, ColorStateList colorStateList) {
+            imageView.setImageTintList(colorStateList);
             if (Build.VERSION.SDK_INT == 21) {
-                Drawable imageViewDrawable = view.getDrawable();
-                boolean hasTint = (view.getImageTintList() == null || view.getImageTintMode() == null) ? false : true;
-                if (imageViewDrawable != null && hasTint) {
-                    if (imageViewDrawable.isStateful()) {
-                        imageViewDrawable.setState(view.getDrawableState());
+                Drawable drawable = imageView.getDrawable();
+                boolean z = (imageView.getImageTintList() == null || imageView.getImageTintMode() == null) ? false : true;
+                if (drawable != null && z) {
+                    if (drawable.isStateful()) {
+                        drawable.setState(imageView.getDrawableState());
                     }
-                    view.setImageDrawable(imageViewDrawable);
+                    imageView.setImageDrawable(drawable);
                 }
             }
         }
 
         @Override // android.support.v4.widget.ImageViewCompat.ImageViewCompatImpl, android.support.v4.widget.ImageViewCompat.BaseViewCompatImpl
-        public void setImageTintMode(ImageView view, PorterDuff.Mode mode) {
-            view.setImageTintMode(mode);
+        public void setImageTintMode(ImageView imageView, PorterDuff.Mode mode) {
+            imageView.setImageTintMode(mode);
             if (Build.VERSION.SDK_INT == 21) {
-                Drawable imageViewDrawable = view.getDrawable();
-                boolean hasTint = (view.getImageTintList() == null || view.getImageTintMode() == null) ? false : true;
-                if (imageViewDrawable != null && hasTint) {
-                    if (imageViewDrawable.isStateful()) {
-                        imageViewDrawable.setState(view.getDrawableState());
+                Drawable drawable = imageView.getDrawable();
+                boolean z = (imageView.getImageTintList() == null || imageView.getImageTintMode() == null) ? false : true;
+                if (drawable != null && z) {
+                    if (drawable.isStateful()) {
+                        drawable.setState(imageView.getDrawableState());
                     }
-                    view.setImageDrawable(imageViewDrawable);
+                    imageView.setImageDrawable(drawable);
                 }
             }
         }
 
         @Override // android.support.v4.widget.ImageViewCompat.ImageViewCompatImpl, android.support.v4.widget.ImageViewCompat.BaseViewCompatImpl
-        public PorterDuff.Mode getImageTintMode(ImageView view) {
-            return view.getImageTintMode();
+        public PorterDuff.Mode getImageTintMode(ImageView imageView) {
+            return imageView.getImageTintMode();
         }
     }
 
@@ -107,20 +107,20 @@ public class ImageViewCompat {
         }
     }
 
-    public static ColorStateList getImageTintList(ImageView view) {
-        return IMPL.getImageTintList(view);
+    public static ColorStateList getImageTintList(ImageView imageView) {
+        return IMPL.getImageTintList(imageView);
     }
 
-    public static void setImageTintList(ImageView view, ColorStateList tintList) {
-        IMPL.setImageTintList(view, tintList);
+    public static void setImageTintList(ImageView imageView, ColorStateList colorStateList) {
+        IMPL.setImageTintList(imageView, colorStateList);
     }
 
-    public static PorterDuff.Mode getImageTintMode(ImageView view) {
-        return IMPL.getImageTintMode(view);
+    public static PorterDuff.Mode getImageTintMode(ImageView imageView) {
+        return IMPL.getImageTintMode(imageView);
     }
 
-    public static void setImageTintMode(ImageView view, PorterDuff.Mode mode) {
-        IMPL.setImageTintMode(view, mode);
+    public static void setImageTintMode(ImageView imageView, PorterDuff.Mode mode) {
+        IMPL.setImageTintMode(imageView, mode);
     }
 
     private ImageViewCompat() {

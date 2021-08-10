@@ -19,111 +19,110 @@ public final class UPCEANExtension5Support {
     }
 
     /* access modifiers changed from: package-private */
-    public Result decodeRow(int rowNumber, BitArray row, int[] extensionStartRange) throws NotFoundException {
-        StringBuilder result = this.decodeRowStringBuffer;
-        result.setLength(0);
-        int end = decodeMiddle(row, extensionStartRange, result);
-        String resultString = result.toString();
-        Map<ResultMetadataType, Object> extensionData = parseExtensionString(resultString);
-        Result extensionResult = new Result(resultString, null, new ResultPoint[]{new ResultPoint(((float) (extensionStartRange[0] + extensionStartRange[1])) / 2.0f, (float) rowNumber), new ResultPoint((float) end, (float) rowNumber)}, BarcodeFormat.UPC_EAN_EXTENSION);
-        if (extensionData != null) {
-            extensionResult.putAllMetadata(extensionData);
+    public Result decodeRow(int i, BitArray bitArray, int[] iArr) throws NotFoundException {
+        StringBuilder sb = this.decodeRowStringBuffer;
+        sb.setLength(0);
+        int decodeMiddle = decodeMiddle(bitArray, iArr, sb);
+        String sb2 = sb.toString();
+        Map<ResultMetadataType, Object> parseExtensionString = parseExtensionString(sb2);
+        float f = (float) i;
+        Result result = new Result(sb2, null, new ResultPoint[]{new ResultPoint(((float) (iArr[0] + iArr[1])) / 2.0f, f), new ResultPoint((float) decodeMiddle, f)}, BarcodeFormat.UPC_EAN_EXTENSION);
+        if (parseExtensionString != null) {
+            result.putAllMetadata(parseExtensionString);
         }
-        return extensionResult;
+        return result;
     }
 
-    private int decodeMiddle(BitArray row, int[] startRange, StringBuilder resultString) throws NotFoundException {
-        int[] counters = this.decodeMiddleCounters;
-        counters[0] = 0;
-        counters[1] = 0;
-        counters[2] = 0;
-        counters[3] = 0;
-        int end = row.getSize();
-        int rowOffset = startRange[1];
-        int lgPatternFound = 0;
-        for (int x = 0; x < 5 && rowOffset < end; x++) {
-            int bestMatch = UPCEANReader.decodeDigit(row, counters, rowOffset, UPCEANReader.L_AND_G_PATTERNS);
-            resultString.append((char) ((bestMatch % 10) + 48));
-            for (int counter : counters) {
-                rowOffset += counter;
+    private int decodeMiddle(BitArray bitArray, int[] iArr, StringBuilder sb) throws NotFoundException {
+        int[] iArr2 = this.decodeMiddleCounters;
+        iArr2[0] = 0;
+        iArr2[1] = 0;
+        iArr2[2] = 0;
+        iArr2[3] = 0;
+        int size = bitArray.getSize();
+        int i = iArr[1];
+        int i2 = 0;
+        for (int i3 = 0; i3 < 5 && i < size; i3++) {
+            int decodeDigit = UPCEANReader.decodeDigit(bitArray, iArr2, i, UPCEANReader.L_AND_G_PATTERNS);
+            sb.append((char) ((decodeDigit % 10) + 48));
+            for (int i4 : iArr2) {
+                i += i4;
             }
-            if (bestMatch >= 10) {
-                lgPatternFound |= 1 << (4 - x);
+            if (decodeDigit >= 10) {
+                i2 |= 1 << (4 - i3);
             }
-            if (x != 4) {
-                rowOffset = row.getNextUnset(row.getNextSet(rowOffset));
+            if (i3 != 4) {
+                i = bitArray.getNextUnset(bitArray.getNextSet(i));
             }
         }
-        if (resultString.length() == 5) {
-            if (extensionChecksum(resultString.toString()) == determineCheckDigit(lgPatternFound)) {
-                return rowOffset;
+        if (sb.length() == 5) {
+            if (extensionChecksum(sb.toString()) == determineCheckDigit(i2)) {
+                return i;
             }
             throw NotFoundException.getNotFoundInstance();
         }
         throw NotFoundException.getNotFoundInstance();
     }
 
-    private static int extensionChecksum(CharSequence s) {
-        int length = s.length();
-        int sum = 0;
-        for (int i = length - 2; i >= 0; i -= 2) {
-            sum += s.charAt(i) - '0';
+    private static int extensionChecksum(CharSequence charSequence) {
+        int length = charSequence.length();
+        int i = 0;
+        for (int i2 = length - 2; i2 >= 0; i2 -= 2) {
+            i += charSequence.charAt(i2) - '0';
         }
-        int sum2 = sum * 3;
-        for (int i2 = length - 1; i2 >= 0; i2 -= 2) {
-            sum2 += s.charAt(i2) - '0';
+        int i3 = i * 3;
+        for (int i4 = length - 1; i4 >= 0; i4 -= 2) {
+            i3 += charSequence.charAt(i4) - '0';
         }
-        return (sum2 * 3) % 10;
+        return (i3 * 3) % 10;
     }
 
-    private static int determineCheckDigit(int lgPatternFound) throws NotFoundException {
-        for (int d = 0; d < 10; d++) {
-            if (lgPatternFound == CHECK_DIGIT_ENCODINGS[d]) {
-                return d;
+    private static int determineCheckDigit(int i) throws NotFoundException {
+        for (int i2 = 0; i2 < 10; i2++) {
+            if (i == CHECK_DIGIT_ENCODINGS[i2]) {
+                return i2;
             }
         }
         throw NotFoundException.getNotFoundInstance();
     }
 
-    private static Map<ResultMetadataType, Object> parseExtensionString(String raw) {
-        Object parseExtension5String;
-        if (raw.length() != 5 || (parseExtension5String = parseExtension5String(raw)) == null) {
+    private static Map<ResultMetadataType, Object> parseExtensionString(String str) {
+        String parseExtension5String;
+        if (str.length() != 5 || (parseExtension5String = parseExtension5String(str)) == null) {
             return null;
         }
-        Map<ResultMetadataType, Object> result = new EnumMap<>(ResultMetadataType.class);
-        result.put(ResultMetadataType.SUGGESTED_PRICE, parseExtension5String);
-        return result;
+        EnumMap enumMap = new EnumMap(ResultMetadataType.class);
+        enumMap.put((Object) ResultMetadataType.SUGGESTED_PRICE, (Object) parseExtension5String);
+        return enumMap;
     }
 
-    private static String parseExtension5String(String raw) {
-        String currency;
-        String hundredthsString;
-        char charAt = raw.charAt(0);
+    private static String parseExtension5String(String str) {
+        String str2;
+        char charAt = str.charAt(0);
+        String str3 = "";
         if (charAt == '0') {
-            currency = "£";
+            str3 = "£";
         } else if (charAt == '5') {
-            currency = "$";
-        } else if (charAt != '9') {
-            currency = "";
-        } else if ("90000".equals(raw)) {
-            return null;
-        } else {
-            if ("99991".equals(raw)) {
+            str3 = "$";
+        } else if (charAt == '9') {
+            if ("90000".equals(str)) {
+                return null;
+            }
+            if ("99991".equals(str)) {
                 return "0.00";
             }
-            if ("99990".equals(raw)) {
+            if ("99990".equals(str)) {
                 return "Used";
             }
-            currency = "";
         }
-        int rawAmount = Integer.parseInt(raw.substring(1));
-        String unitsString = String.valueOf(rawAmount / 100);
-        int hundredths = rawAmount % 100;
-        if (hundredths < 10) {
-            hundredthsString = "0" + hundredths;
+        int parseInt = Integer.parseInt(str.substring(1));
+        String valueOf = String.valueOf(parseInt / 100);
+        int i = parseInt % 100;
+        if (i < 10) {
+            str2 = "0" + i;
         } else {
-            hundredthsString = String.valueOf(hundredths);
+            str2 = String.valueOf(i);
         }
-        return currency + unitsString + '.' + hundredthsString;
+        return str3 + valueOf + '.' + str2;
     }
 }

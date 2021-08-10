@@ -9,12 +9,12 @@ public final class ISBNResultParser extends ResultParser {
         if (result.getBarcodeFormat() != BarcodeFormat.EAN_13) {
             return null;
         }
-        String rawText = getMassagedText(result);
-        if (rawText.length() != 13) {
+        String massagedText = getMassagedText(result);
+        if (massagedText.length() != 13) {
             return null;
         }
-        if (rawText.startsWith("978") || rawText.startsWith("979")) {
-            return new ISBNParsedResult(rawText);
+        if (massagedText.startsWith("978") || massagedText.startsWith("979")) {
+            return new ISBNParsedResult(massagedText);
         }
         return null;
     }

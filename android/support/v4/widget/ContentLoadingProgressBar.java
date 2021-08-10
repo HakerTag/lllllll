@@ -18,8 +18,8 @@ public class ContentLoadingProgressBar extends ProgressBar {
         this(context, null);
     }
 
-    public ContentLoadingProgressBar(Context context, AttributeSet attrs) {
-        super(context, attrs, 0);
+    public ContentLoadingProgressBar(Context context, AttributeSet attributeSet) {
+        super(context, attributeSet, 0);
         this.mStartTime = -1;
         this.mPostedHide = false;
         this.mPostedShow = false;
@@ -65,11 +65,11 @@ public class ContentLoadingProgressBar extends ProgressBar {
         this.mDismissed = true;
         removeCallbacks(this.mDelayedShow);
         this.mPostedShow = false;
-        long diff = System.currentTimeMillis() - this.mStartTime;
-        if (diff < 500) {
+        long currentTimeMillis = System.currentTimeMillis() - this.mStartTime;
+        if (currentTimeMillis < 500) {
             if (this.mStartTime != -1) {
                 if (!this.mPostedHide) {
-                    postDelayed(this.mDelayedHide, 500 - diff);
+                    postDelayed(this.mDelayedHide, 500 - currentTimeMillis);
                     this.mPostedHide = true;
                 }
             }

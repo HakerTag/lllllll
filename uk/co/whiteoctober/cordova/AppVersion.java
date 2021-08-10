@@ -8,25 +8,25 @@ import org.json.JSONException;
 
 public class AppVersion extends CordovaPlugin {
     @Override // org.apache.cordova.CordovaPlugin
-    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
+    public boolean execute(String str, JSONArray jSONArray, CallbackContext callbackContext) throws JSONException {
         try {
-            if (action.equals("getAppName")) {
+            if (str.equals("getAppName")) {
                 PackageManager packageManager = this.cordova.getActivity().getPackageManager();
                 callbackContext.success((String) packageManager.getApplicationLabel(packageManager.getApplicationInfo(this.cordova.getActivity().getPackageName(), 0)));
                 return true;
-            } else if (action.equals("getPackageName")) {
+            } else if (str.equals("getPackageName")) {
                 callbackContext.success(this.cordova.getActivity().getPackageName());
                 return true;
-            } else if (action.equals("getVersionNumber")) {
+            } else if (str.equals("getVersionNumber")) {
                 callbackContext.success(this.cordova.getActivity().getPackageManager().getPackageInfo(this.cordova.getActivity().getPackageName(), 0).versionName);
                 return true;
-            } else if (!action.equals("getVersionCode")) {
+            } else if (!str.equals("getVersionCode")) {
                 return false;
             } else {
                 callbackContext.success(this.cordova.getActivity().getPackageManager().getPackageInfo(this.cordova.getActivity().getPackageName(), 0).versionCode);
                 return true;
             }
-        } catch (PackageManager.NameNotFoundException e) {
+        } catch (PackageManager.NameNotFoundException unused) {
             callbackContext.success("N/A");
             return true;
         }

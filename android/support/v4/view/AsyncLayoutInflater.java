@@ -17,13 +17,13 @@ public final class AsyncLayoutInflater {
     private Handler.Callback mHandlerCallback = new Handler.Callback() {
         /* class android.support.v4.view.AsyncLayoutInflater.AnonymousClass1 */
 
-        public boolean handleMessage(Message msg) {
-            InflateRequest request = (InflateRequest) msg.obj;
-            if (request.view == null) {
-                request.view = AsyncLayoutInflater.this.mInflater.inflate(request.resid, request.parent, false);
+        public boolean handleMessage(Message message) {
+            InflateRequest inflateRequest = (InflateRequest) message.obj;
+            if (inflateRequest.view == null) {
+                inflateRequest.view = AsyncLayoutInflater.this.mInflater.inflate(inflateRequest.resid, inflateRequest.parent, false);
             }
-            request.callback.onInflateFinished(request.view, request.resid, request.parent);
-            AsyncLayoutInflater.this.mInflateThread.releaseRequest(request);
+            inflateRequest.callback.onInflateFinished(inflateRequest.view, inflateRequest.resid, inflateRequest.parent);
+            AsyncLayoutInflater.this.mInflateThread.releaseRequest(inflateRequest);
             return true;
         }
     };
@@ -40,14 +40,14 @@ public final class AsyncLayoutInflater {
         this.mInflateThread = InflateThread.getInstance();
     }
 
-    public void inflate(int resid, ViewGroup parent, OnInflateFinishedListener callback) {
-        if (callback != null) {
-            InflateRequest request = this.mInflateThread.obtainRequest();
-            request.inflater = this;
-            request.resid = resid;
-            request.parent = parent;
-            request.callback = callback;
-            this.mInflateThread.enqueue(request);
+    public void inflate(int i, ViewGroup viewGroup, OnInflateFinishedListener onInflateFinishedListener) {
+        if (onInflateFinishedListener != null) {
+            InflateRequest obtainRequest = this.mInflateThread.obtainRequest();
+            obtainRequest.inflater = this;
+            obtainRequest.resid = i;
+            obtainRequest.parent = viewGroup;
+            obtainRequest.callback = onInflateFinishedListener;
+            this.mInflateThread.enqueue(obtainRequest);
             return;
         }
         throw new NullPointerException("callback argument may not be null!");
@@ -72,23 +72,23 @@ public final class AsyncLayoutInflater {
             super(context);
         }
 
-        public LayoutInflater cloneInContext(Context newContext) {
-            return new BasicInflater(newContext);
+        public LayoutInflater cloneInContext(Context context) {
+            return new BasicInflater(context);
         }
 
         /* access modifiers changed from: protected */
         @Override // android.view.LayoutInflater
-        public View onCreateView(String name, AttributeSet attrs) throws ClassNotFoundException {
-            for (String prefix : sClassPrefixList) {
+        public View onCreateView(String str, AttributeSet attributeSet) throws ClassNotFoundException {
+            for (String str2 : sClassPrefixList) {
                 try {
-                    View view = createView(name, prefix, attrs);
-                    if (view != null) {
-                        return view;
+                    View createView = createView(str, str2, attributeSet);
+                    if (createView != null) {
+                        return createView;
                     }
-                } catch (ClassNotFoundException e) {
+                } catch (ClassNotFoundException unused) {
                 }
             }
-            return super.onCreateView(name, attrs);
+            return super.onCreateView(str, attributeSet);
         }
     }
 
@@ -112,15 +112,15 @@ public final class AsyncLayoutInflater {
 
         public void runInner() {
             try {
-                InflateRequest request = this.mQueue.take();
+                InflateRequest take = this.mQueue.take();
                 try {
-                    request.view = request.inflater.mInflater.inflate(request.resid, request.parent, false);
-                } catch (RuntimeException ex) {
-                    Log.w(AsyncLayoutInflater.TAG, "Failed to inflate resource in the background! Retrying on the UI thread", ex);
+                    take.view = take.inflater.mInflater.inflate(take.resid, take.parent, false);
+                } catch (RuntimeException e) {
+                    Log.w(AsyncLayoutInflater.TAG, "Failed to inflate resource in the background! Retrying on the UI thread", e);
                 }
-                Message.obtain(request.inflater.mHandler, 0, request).sendToTarget();
-            } catch (InterruptedException ex2) {
-                Log.w(AsyncLayoutInflater.TAG, ex2);
+                Message.obtain(take.inflater.mHandler, 0, take).sendToTarget();
+            } catch (InterruptedException e2) {
+                Log.w(AsyncLayoutInflater.TAG, e2);
             }
         }
 
@@ -131,25 +131,22 @@ public final class AsyncLayoutInflater {
         }
 
         public InflateRequest obtainRequest() {
-            InflateRequest obj = this.mRequestPool.acquire();
-            if (obj == null) {
-                return new InflateRequest();
-            }
-            return obj;
+            InflateRequest acquire = this.mRequestPool.acquire();
+            return acquire == null ? new InflateRequest() : acquire;
         }
 
-        public void releaseRequest(InflateRequest obj) {
-            obj.callback = null;
-            obj.inflater = null;
-            obj.parent = null;
-            obj.resid = 0;
-            obj.view = null;
-            this.mRequestPool.release(obj);
+        public void releaseRequest(InflateRequest inflateRequest) {
+            inflateRequest.callback = null;
+            inflateRequest.inflater = null;
+            inflateRequest.parent = null;
+            inflateRequest.resid = 0;
+            inflateRequest.view = null;
+            this.mRequestPool.release(inflateRequest);
         }
 
-        public void enqueue(InflateRequest request) {
+        public void enqueue(InflateRequest inflateRequest) {
             try {
-                this.mQueue.put(request);
+                this.mQueue.put(inflateRequest);
             } catch (InterruptedException e) {
                 throw new RuntimeException("Failed to enqueue async inflate request", e);
             }

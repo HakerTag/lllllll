@@ -15,6 +15,22 @@ public class NativeToJsMessageQueue {
     private boolean paused;
     private final LinkedList<JsMessage> queue = new LinkedList<>();
 
+    public static abstract class BridgeMode {
+        public void notifyOfFlush(NativeToJsMessageQueue nativeToJsMessageQueue, boolean z) {
+        }
+
+        public abstract void onNativeToJsMessageAvailable(NativeToJsMessageQueue nativeToJsMessageQueue);
+
+        public void reset() {
+        }
+    }
+
+    public static class NoOpBridgeMode extends BridgeMode {
+        @Override // org.apache.cordova.NativeToJsMessageQueue.BridgeMode
+        public void onNativeToJsMessageAvailable(NativeToJsMessageQueue nativeToJsMessageQueue) {
+        }
+    }
+
     public void addBridgeMode(BridgeMode bridgeMode) {
         this.bridgeModes.add(bridgeMode);
     }
@@ -27,23 +43,28 @@ public class NativeToJsMessageQueue {
         return this.queue.isEmpty();
     }
 
-    public void setBridgeMode(int value) {
-        if (value < -1 || value >= this.bridgeModes.size()) {
-            LOG.d(LOG_TAG, "Invalid NativeToJsBridgeMode: " + value);
+    public void setBridgeMode(int i) {
+        BridgeMode bridgeMode;
+        if (i < -1 || i >= this.bridgeModes.size()) {
+            LOG.d(LOG_TAG, "Invalid NativeToJsBridgeMode: " + i);
             return;
         }
-        BridgeMode newMode = value < 0 ? null : this.bridgeModes.get(value);
-        if (newMode != this.activeBridgeMode) {
+        if (i < 0) {
+            bridgeMode = null;
+        } else {
+            bridgeMode = this.bridgeModes.get(i);
+        }
+        if (bridgeMode != this.activeBridgeMode) {
             StringBuilder sb = new StringBuilder();
             sb.append("Set native->JS mode to ");
-            sb.append(newMode == null ? "null" : newMode.getClass().getSimpleName());
+            sb.append(bridgeMode == null ? "null" : bridgeMode.getClass().getSimpleName());
             LOG.d(LOG_TAG, sb.toString());
             synchronized (this) {
-                this.activeBridgeMode = newMode;
-                if (newMode != null) {
-                    newMode.reset();
+                this.activeBridgeMode = bridgeMode;
+                if (bridgeMode != null) {
+                    bridgeMode.reset();
                     if (!this.paused && !this.queue.isEmpty()) {
-                        newMode.onNativeToJsMessageAvailable(this);
+                        bridgeMode.onNativeToJsMessageAvailable(this);
                     }
                 }
             }
@@ -57,42 +78,42 @@ public class NativeToJsMessageQueue {
         }
     }
 
-    private int calculatePackedMessageLength(JsMessage message) {
-        int messageLen = message.calculateEncodedLength();
-        return String.valueOf(messageLen).length() + messageLen + 1;
+    private int calculatePackedMessageLength(JsMessage jsMessage) {
+        int calculateEncodedLength = jsMessage.calculateEncodedLength();
+        return String.valueOf(calculateEncodedLength).length() + calculateEncodedLength + 1;
     }
 
-    private void packMessage(JsMessage message, StringBuilder sb) {
-        sb.append(message.calculateEncodedLength());
+    private void packMessage(JsMessage jsMessage, StringBuilder sb) {
+        sb.append(jsMessage.calculateEncodedLength());
         sb.append(' ');
-        message.encodeAsMessage(sb);
+        jsMessage.encodeAsMessage(sb);
     }
 
-    public String popAndEncode(boolean fromOnlineEvent) {
+    public String popAndEncode(boolean z) {
         synchronized (this) {
             if (this.activeBridgeMode == null) {
                 return null;
             }
-            this.activeBridgeMode.notifyOfFlush(this, fromOnlineEvent);
+            this.activeBridgeMode.notifyOfFlush(this, z);
             if (this.queue.isEmpty()) {
                 return null;
             }
-            int totalPayloadLen = 0;
-            int numMessagesToSend = 0;
             Iterator<JsMessage> it = this.queue.iterator();
+            int i = 0;
+            int i2 = 0;
             while (true) {
                 if (!it.hasNext()) {
                     break;
                 }
-                int messageSize = calculatePackedMessageLength(it.next());
-                if (numMessagesToSend > 0 && COMBINED_RESPONSE_CUTOFF > 0 && totalPayloadLen + messageSize > COMBINED_RESPONSE_CUTOFF) {
+                int calculatePackedMessageLength = calculatePackedMessageLength(it.next());
+                if (i > 0 && COMBINED_RESPONSE_CUTOFF > 0 && i2 + calculatePackedMessageLength > COMBINED_RESPONSE_CUTOFF) {
                     break;
                 }
-                totalPayloadLen += messageSize;
-                numMessagesToSend++;
+                i2 += calculatePackedMessageLength;
+                i++;
             }
-            StringBuilder sb = new StringBuilder(totalPayloadLen);
-            for (int i = 0; i < numMessagesToSend; i++) {
+            StringBuilder sb = new StringBuilder(i2);
+            for (int i3 = 0; i3 < i; i3++) {
                 packMessage(this.queue.removeFirst(), sb);
             }
             if (!this.queue.isEmpty()) {
@@ -107,82 +128,78 @@ public class NativeToJsMessageQueue {
             if (this.queue.size() == 0) {
                 return null;
             }
-            int totalPayloadLen = 0;
-            int numMessagesToSend = 0;
             Iterator<JsMessage> it = this.queue.iterator();
+            int i = 0;
+            int i2 = 0;
             while (true) {
                 if (!it.hasNext()) {
                     break;
                 }
-                int messageSize = it.next().calculateEncodedLength() + 50;
-                if (numMessagesToSend > 0 && COMBINED_RESPONSE_CUTOFF > 0 && totalPayloadLen + messageSize > COMBINED_RESPONSE_CUTOFF) {
+                int calculateEncodedLength = it.next().calculateEncodedLength() + 50;
+                if (i > 0 && COMBINED_RESPONSE_CUTOFF > 0 && i2 + calculateEncodedLength > COMBINED_RESPONSE_CUTOFF) {
                     break;
                 }
-                totalPayloadLen += messageSize;
-                numMessagesToSend++;
+                i2 += calculateEncodedLength;
+                i++;
             }
-            int i = 0;
-            boolean willSendAllMessages = numMessagesToSend == this.queue.size();
-            StringBuilder sb = new StringBuilder((willSendAllMessages ? 0 : 100) + totalPayloadLen);
-            for (int i2 = 0; i2 < numMessagesToSend; i2++) {
-                JsMessage message = this.queue.removeFirst();
-                if (!willSendAllMessages || i2 + 1 != numMessagesToSend) {
+            int i3 = i == this.queue.size() ? 1 : 0;
+            StringBuilder sb = new StringBuilder(i2 + (i3 != 0 ? 0 : 100));
+            for (int i4 = 0; i4 < i; i4++) {
+                JsMessage removeFirst = this.queue.removeFirst();
+                if (i3 == 0 || i4 + 1 != i) {
                     sb.append("try{");
-                    message.encodeAsJsMessage(sb);
+                    removeFirst.encodeAsJsMessage(sb);
                     sb.append("}finally{");
                 } else {
-                    message.encodeAsJsMessage(sb);
+                    removeFirst.encodeAsJsMessage(sb);
                 }
             }
-            if (!willSendAllMessages) {
+            if (i3 == 0) {
                 sb.append("window.setTimeout(function(){cordova.require('cordova/plugin/android/polling').pollOnce();},0);");
             }
-            if (willSendAllMessages) {
-                i = 1;
-            }
-            while (i < numMessagesToSend) {
+            while (i3 < i) {
                 sb.append('}');
-                i++;
+                i3++;
             }
             return sb.toString();
         }
     }
 
-    public void addJavaScript(String statement) {
-        enqueueMessage(new JsMessage(statement));
+    public void addJavaScript(String str) {
+        enqueueMessage(new JsMessage(str));
     }
 
-    public void addPluginResult(PluginResult result, String callbackId) {
-        if (callbackId == null) {
+    public void addPluginResult(PluginResult pluginResult, String str) {
+        if (str == null) {
             LOG.e(LOG_TAG, "Got plugin result with no callbackId", new Throwable());
             return;
         }
-        boolean noResult = result.getStatus() == PluginResult.Status.NO_RESULT.ordinal();
-        boolean keepCallback = result.getKeepCallback();
-        if (!noResult || !keepCallback) {
-            enqueueMessage(new JsMessage(result, callbackId));
+        boolean z = pluginResult.getStatus() == PluginResult.Status.NO_RESULT.ordinal();
+        boolean keepCallback = pluginResult.getKeepCallback();
+        if (!z || !keepCallback) {
+            enqueueMessage(new JsMessage(pluginResult, str));
         }
     }
 
-    private void enqueueMessage(JsMessage message) {
+    private void enqueueMessage(JsMessage jsMessage) {
         synchronized (this) {
             if (this.activeBridgeMode == null) {
                 LOG.d(LOG_TAG, "Dropping Native->JS message due to disabled bridge");
                 return;
             }
-            this.queue.add(message);
+            this.queue.add(jsMessage);
             if (!this.paused) {
                 this.activeBridgeMode.onNativeToJsMessageAvailable(this);
             }
         }
     }
 
-    public void setPaused(boolean value) {
-        if (this.paused && value) {
+    public void setPaused(boolean z) {
+        if (this.paused && z) {
             LOG.e(LOG_TAG, "nested call to setPaused detected.", new Throwable());
         }
-        this.paused = value;
-        if (!value) {
+        this.paused = z;
+        if (!z) {
             synchronized (this) {
                 if (!this.queue.isEmpty() && this.activeBridgeMode != null) {
                     this.activeBridgeMode.onNativeToJsMessageAvailable(this);
@@ -191,41 +208,25 @@ public class NativeToJsMessageQueue {
         }
     }
 
-    public static abstract class BridgeMode {
-        public abstract void onNativeToJsMessageAvailable(NativeToJsMessageQueue nativeToJsMessageQueue);
-
-        public void notifyOfFlush(NativeToJsMessageQueue queue, boolean fromOnlineEvent) {
-        }
-
-        public void reset() {
-        }
-    }
-
-    public static class NoOpBridgeMode extends BridgeMode {
-        @Override // org.apache.cordova.NativeToJsMessageQueue.BridgeMode
-        public void onNativeToJsMessageAvailable(NativeToJsMessageQueue queue) {
-        }
-    }
-
     public static class LoadUrlBridgeMode extends BridgeMode {
         private final CordovaInterface cordova;
         private final CordovaWebViewEngine engine;
 
-        public LoadUrlBridgeMode(CordovaWebViewEngine engine2, CordovaInterface cordova2) {
-            this.engine = engine2;
-            this.cordova = cordova2;
+        public LoadUrlBridgeMode(CordovaWebViewEngine cordovaWebViewEngine, CordovaInterface cordovaInterface) {
+            this.engine = cordovaWebViewEngine;
+            this.cordova = cordovaInterface;
         }
 
         @Override // org.apache.cordova.NativeToJsMessageQueue.BridgeMode
-        public void onNativeToJsMessageAvailable(final NativeToJsMessageQueue queue) {
+        public void onNativeToJsMessageAvailable(final NativeToJsMessageQueue nativeToJsMessageQueue) {
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 /* class org.apache.cordova.NativeToJsMessageQueue.LoadUrlBridgeMode.AnonymousClass1 */
 
                 public void run() {
-                    String js = queue.popAndEncodeAsJs();
-                    if (js != null) {
+                    String popAndEncodeAsJs = nativeToJsMessageQueue.popAndEncodeAsJs();
+                    if (popAndEncodeAsJs != null) {
                         CordovaWebViewEngine cordovaWebViewEngine = LoadUrlBridgeMode.this.engine;
-                        cordovaWebViewEngine.loadUrl("javascript:" + js, false);
+                        cordovaWebViewEngine.loadUrl("javascript:" + popAndEncodeAsJs, false);
                     }
                 }
             });
@@ -243,8 +244,8 @@ public class NativeToJsMessageQueue {
             void setNetworkAvailable(boolean z);
         }
 
-        public OnlineEventsBridgeMode(OnlineEventsBridgeModeDelegate delegate2) {
-            this.delegate = delegate2;
+        public OnlineEventsBridgeMode(OnlineEventsBridgeModeDelegate onlineEventsBridgeModeDelegate) {
+            this.delegate = onlineEventsBridgeModeDelegate;
         }
 
         @Override // org.apache.cordova.NativeToJsMessageQueue.BridgeMode
@@ -261,12 +262,12 @@ public class NativeToJsMessageQueue {
         }
 
         @Override // org.apache.cordova.NativeToJsMessageQueue.BridgeMode
-        public void onNativeToJsMessageAvailable(final NativeToJsMessageQueue queue) {
+        public void onNativeToJsMessageAvailable(final NativeToJsMessageQueue nativeToJsMessageQueue) {
             this.delegate.runOnUiThread(new Runnable() {
                 /* class org.apache.cordova.NativeToJsMessageQueue.OnlineEventsBridgeMode.AnonymousClass2 */
 
                 public void run() {
-                    if (!queue.isEmpty()) {
+                    if (!nativeToJsMessageQueue.isEmpty()) {
                         OnlineEventsBridgeMode.this.ignoreNextFlush = false;
                         OnlineEventsBridgeMode.this.delegate.setNetworkAvailable(OnlineEventsBridgeMode.this.online);
                     }
@@ -275,8 +276,8 @@ public class NativeToJsMessageQueue {
         }
 
         @Override // org.apache.cordova.NativeToJsMessageQueue.BridgeMode
-        public void notifyOfFlush(NativeToJsMessageQueue queue, boolean fromOnlineEvent) {
-            if (fromOnlineEvent && !this.ignoreNextFlush) {
+        public void notifyOfFlush(NativeToJsMessageQueue nativeToJsMessageQueue, boolean z) {
+            if (z && !this.ignoreNextFlush) {
                 this.online = !this.online;
             }
         }
@@ -286,20 +287,20 @@ public class NativeToJsMessageQueue {
         private final CordovaInterface cordova;
         private final CordovaWebViewEngine engine;
 
-        public EvalBridgeMode(CordovaWebViewEngine engine2, CordovaInterface cordova2) {
-            this.engine = engine2;
-            this.cordova = cordova2;
+        public EvalBridgeMode(CordovaWebViewEngine cordovaWebViewEngine, CordovaInterface cordovaInterface) {
+            this.engine = cordovaWebViewEngine;
+            this.cordova = cordovaInterface;
         }
 
         @Override // org.apache.cordova.NativeToJsMessageQueue.BridgeMode
-        public void onNativeToJsMessageAvailable(final NativeToJsMessageQueue queue) {
+        public void onNativeToJsMessageAvailable(final NativeToJsMessageQueue nativeToJsMessageQueue) {
             this.cordova.getActivity().runOnUiThread(new Runnable() {
                 /* class org.apache.cordova.NativeToJsMessageQueue.EvalBridgeMode.AnonymousClass1 */
 
                 public void run() {
-                    String js = queue.popAndEncodeAsJs();
-                    if (js != null) {
-                        EvalBridgeMode.this.engine.evaluateJavascript(js, null);
+                    String popAndEncodeAsJs = nativeToJsMessageQueue.popAndEncodeAsJs();
+                    if (popAndEncodeAsJs != null) {
+                        EvalBridgeMode.this.engine.evaluateJavascript(popAndEncodeAsJs, null);
                     }
                 }
             });
@@ -311,20 +312,20 @@ public class NativeToJsMessageQueue {
         final String jsPayloadOrCallbackId;
         final PluginResult pluginResult;
 
-        JsMessage(String js) {
-            if (js != null) {
-                this.jsPayloadOrCallbackId = js;
+        JsMessage(String str) {
+            if (str != null) {
+                this.jsPayloadOrCallbackId = str;
                 this.pluginResult = null;
                 return;
             }
             throw null;
         }
 
-        JsMessage(PluginResult pluginResult2, String callbackId) {
-            if (callbackId == null || pluginResult2 == null) {
+        JsMessage(PluginResult pluginResult2, String str) {
+            if (str == null || pluginResult2 == null) {
                 throw null;
             }
-            this.jsPayloadOrCallbackId = callbackId;
+            this.jsPayloadOrCallbackId = str;
             this.pluginResult = pluginResult2;
         }
 
@@ -345,12 +346,12 @@ public class NativeToJsMessageQueue {
                 case 7:
                     return pluginResult2.getMessage().length() + 1;
                 case 8:
-                    int ret = 1;
-                    for (int i = 0; i < pluginResult2.getMultipartMessagesSize(); i++) {
-                        int length = calculateEncodedLengthHelper(pluginResult2.getMultipartMessage(i));
-                        ret += String.valueOf(length).length() + 1 + length;
+                    int i = 1;
+                    for (int i2 = 0; i2 < pluginResult2.getMultipartMessagesSize(); i2++) {
+                        int calculateEncodedLengthHelper = calculateEncodedLengthHelper(pluginResult2.getMultipartMessage(i2));
+                        i += String.valueOf(calculateEncodedLengthHelper).length() + 1 + calculateEncodedLengthHelper;
                     }
-                    return ret;
+                    return i;
             }
         }
 
@@ -360,7 +361,7 @@ public class NativeToJsMessageQueue {
             if (pluginResult2 == null) {
                 return this.jsPayloadOrCallbackId.length() + 1;
             }
-            return calculateEncodedLengthHelper(this.pluginResult) + String.valueOf(pluginResult2.getStatus()).length() + 2 + 1 + this.jsPayloadOrCallbackId.length() + 1;
+            return String.valueOf(pluginResult2.getStatus()).length() + 2 + 1 + this.jsPayloadOrCallbackId.length() + 1 + calculateEncodedLengthHelper(this.pluginResult);
         }
 
         static void encodeAsMessageHelper(StringBuilder sb, PluginResult pluginResult2) {
@@ -412,13 +413,13 @@ public class NativeToJsMessageQueue {
                 return;
             }
             int status = pluginResult2.getStatus();
-            boolean resultOk = true;
-            boolean noResult = status == PluginResult.Status.NO_RESULT.ordinal();
+            boolean z = true;
+            boolean z2 = status == PluginResult.Status.NO_RESULT.ordinal();
             if (status != PluginResult.Status.OK.ordinal()) {
-                resultOk = false;
+                z = false;
             }
             boolean keepCallback = this.pluginResult.getKeepCallback();
-            sb.append((noResult || resultOk) ? 'S' : 'F');
+            sb.append((z2 || z) ? 'S' : 'F');
             sb.append(keepCallback ? '1' : '0');
             sb.append(status);
             sb.append(' ');
@@ -443,10 +444,10 @@ public class NativeToJsMessageQueue {
             } else if (messageType != 8) {
                 sb.append(this.pluginResult.getMessage());
             } else {
-                int size = this.pluginResult.getMultipartMessagesSize();
-                for (int i = 0; i < size; i++) {
+                int multipartMessagesSize = this.pluginResult.getMultipartMessagesSize();
+                for (int i = 0; i < multipartMessagesSize; i++) {
                     new JsMessage(this.pluginResult.getMultipartMessage(i), this.jsPayloadOrCallbackId).buildJsMessage(sb);
-                    if (i < size - 1) {
+                    if (i < multipartMessagesSize - 1) {
                         sb.append(",");
                     }
                 }
@@ -461,11 +462,11 @@ public class NativeToJsMessageQueue {
                 return;
             }
             int status = pluginResult2.getStatus();
-            boolean success = status == PluginResult.Status.OK.ordinal() || status == PluginResult.Status.NO_RESULT.ordinal();
+            boolean z = status == PluginResult.Status.OK.ordinal() || status == PluginResult.Status.NO_RESULT.ordinal();
             sb.append("cordova.callbackFromNative('");
             sb.append(this.jsPayloadOrCallbackId);
             sb.append("',");
-            sb.append(success);
+            sb.append(z);
             sb.append(",");
             sb.append(status);
             sb.append(",[");

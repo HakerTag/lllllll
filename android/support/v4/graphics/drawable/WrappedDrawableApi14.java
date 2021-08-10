@@ -18,20 +18,25 @@ class WrappedDrawableApi14 extends Drawable implements Drawable.Callback, Wrappe
     private boolean mMutated;
     DrawableWrapperState mState;
 
-    WrappedDrawableApi14(DrawableWrapperState state, Resources res) {
-        this.mState = state;
-        updateLocalState(res);
+    /* access modifiers changed from: protected */
+    public boolean isCompatTintEnabled() {
+        return true;
     }
 
-    WrappedDrawableApi14(Drawable dr) {
+    WrappedDrawableApi14(DrawableWrapperState drawableWrapperState, Resources resources) {
+        this.mState = drawableWrapperState;
+        updateLocalState(resources);
+    }
+
+    WrappedDrawableApi14(Drawable drawable) {
         this.mState = mutateConstantState();
-        setWrappedDrawable(dr);
+        setWrappedDrawable(drawable);
     }
 
-    private void updateLocalState(Resources res) {
+    private void updateLocalState(Resources resources) {
         DrawableWrapperState drawableWrapperState = this.mState;
         if (drawableWrapperState != null && drawableWrapperState.mDrawableState != null) {
-            setWrappedDrawable(this.mState.mDrawableState.newDrawable(res));
+            setWrappedDrawable(this.mState.mDrawableState.newDrawable(resources));
         }
     }
 
@@ -44,15 +49,15 @@ class WrappedDrawableApi14 extends Drawable implements Drawable.Callback, Wrappe
     }
 
     /* access modifiers changed from: protected */
-    public void onBoundsChange(Rect bounds) {
+    public void onBoundsChange(Rect rect) {
         Drawable drawable = this.mDrawable;
         if (drawable != null) {
-            drawable.setBounds(bounds);
+            drawable.setBounds(rect);
         }
     }
 
-    public void setChangingConfigurations(int configs) {
-        this.mDrawable.setChangingConfigurations(configs);
+    public void setChangingConfigurations(int i) {
+        this.mDrawable.setChangingConfigurations(i);
     }
 
     public int getChangingConfigurations() {
@@ -61,30 +66,30 @@ class WrappedDrawableApi14 extends Drawable implements Drawable.Callback, Wrappe
         return changingConfigurations | (drawableWrapperState != null ? drawableWrapperState.getChangingConfigurations() : 0) | this.mDrawable.getChangingConfigurations();
     }
 
-    public void setDither(boolean dither) {
-        this.mDrawable.setDither(dither);
+    public void setDither(boolean z) {
+        this.mDrawable.setDither(z);
     }
 
-    public void setFilterBitmap(boolean filter) {
-        this.mDrawable.setFilterBitmap(filter);
+    public void setFilterBitmap(boolean z) {
+        this.mDrawable.setFilterBitmap(z);
     }
 
-    public void setAlpha(int alpha) {
-        this.mDrawable.setAlpha(alpha);
+    public void setAlpha(int i) {
+        this.mDrawable.setAlpha(i);
     }
 
-    public void setColorFilter(ColorFilter cf) {
-        this.mDrawable.setColorFilter(cf);
+    public void setColorFilter(ColorFilter colorFilter) {
+        this.mDrawable.setColorFilter(colorFilter);
     }
 
     public boolean isStateful() {
         DrawableWrapperState drawableWrapperState;
-        ColorStateList tintList = (!isCompatTintEnabled() || (drawableWrapperState = this.mState) == null) ? null : drawableWrapperState.mTint;
-        return (tintList != null && tintList.isStateful()) || this.mDrawable.isStateful();
+        ColorStateList colorStateList = (!isCompatTintEnabled() || (drawableWrapperState = this.mState) == null) ? null : drawableWrapperState.mTint;
+        return (colorStateList != null && colorStateList.isStateful()) || this.mDrawable.isStateful();
     }
 
-    public boolean setState(int[] stateSet) {
-        return updateTint(stateSet) || this.mDrawable.setState(stateSet);
+    public boolean setState(int[] iArr) {
+        return updateTint(iArr) || this.mDrawable.setState(iArr);
     }
 
     public int[] getState() {
@@ -95,8 +100,8 @@ class WrappedDrawableApi14 extends Drawable implements Drawable.Callback, Wrappe
         return this.mDrawable.getCurrent();
     }
 
-    public boolean setVisible(boolean visible, boolean restart) {
-        return super.setVisible(visible, restart) || this.mDrawable.setVisible(visible, restart);
+    public boolean setVisible(boolean z, boolean z2) {
+        return super.setVisible(z, z2) || this.mDrawable.setVisible(z, z2);
     }
 
     public int getOpacity() {
@@ -123,8 +128,8 @@ class WrappedDrawableApi14 extends Drawable implements Drawable.Callback, Wrappe
         return this.mDrawable.getMinimumHeight();
     }
 
-    public boolean getPadding(Rect padding) {
-        return this.mDrawable.getPadding(padding);
+    public boolean getPadding(Rect rect) {
+        return this.mDrawable.getPadding(rect);
     }
 
     public Drawable.ConstantState getConstantState() {
@@ -158,55 +163,55 @@ class WrappedDrawableApi14 extends Drawable implements Drawable.Callback, Wrappe
         return new DrawableWrapperStateBase(this.mState, null);
     }
 
-    public void invalidateDrawable(Drawable who) {
+    public void invalidateDrawable(Drawable drawable) {
         invalidateSelf();
     }
 
-    public void scheduleDrawable(Drawable who, Runnable what, long when) {
-        scheduleSelf(what, when);
+    public void scheduleDrawable(Drawable drawable, Runnable runnable, long j) {
+        scheduleSelf(runnable, j);
     }
 
-    public void unscheduleDrawable(Drawable who, Runnable what) {
-        unscheduleSelf(what);
+    public void unscheduleDrawable(Drawable drawable, Runnable runnable) {
+        unscheduleSelf(runnable);
     }
 
     /* access modifiers changed from: protected */
-    public boolean onLevelChange(int level) {
-        return this.mDrawable.setLevel(level);
+    public boolean onLevelChange(int i) {
+        return this.mDrawable.setLevel(i);
     }
 
     @Override // android.support.v4.graphics.drawable.TintAwareDrawable
-    public void setTint(int tint) {
-        setTintList(ColorStateList.valueOf(tint));
+    public void setTint(int i) {
+        setTintList(ColorStateList.valueOf(i));
     }
 
     @Override // android.support.v4.graphics.drawable.TintAwareDrawable
-    public void setTintList(ColorStateList tint) {
-        this.mState.mTint = tint;
+    public void setTintList(ColorStateList colorStateList) {
+        this.mState.mTint = colorStateList;
         updateTint(getState());
     }
 
     @Override // android.support.v4.graphics.drawable.TintAwareDrawable
-    public void setTintMode(PorterDuff.Mode tintMode) {
-        this.mState.mTintMode = tintMode;
+    public void setTintMode(PorterDuff.Mode mode) {
+        this.mState.mTintMode = mode;
         updateTint(getState());
     }
 
-    private boolean updateTint(int[] state) {
+    private boolean updateTint(int[] iArr) {
         if (!isCompatTintEnabled()) {
             return false;
         }
-        ColorStateList tintList = this.mState.mTint;
-        PorterDuff.Mode tintMode = this.mState.mTintMode;
-        if (tintList == null || tintMode == null) {
+        ColorStateList colorStateList = this.mState.mTint;
+        PorterDuff.Mode mode = this.mState.mTintMode;
+        if (colorStateList == null || mode == null) {
             this.mColorFilterSet = false;
             clearColorFilter();
         } else {
-            int color = tintList.getColorForState(state, tintList.getDefaultColor());
-            if (!(this.mColorFilterSet && color == this.mCurrentColor && tintMode == this.mCurrentMode)) {
-                setColorFilter(color, tintMode);
-                this.mCurrentColor = color;
-                this.mCurrentMode = tintMode;
+            int colorForState = colorStateList.getColorForState(iArr, colorStateList.getDefaultColor());
+            if (!(this.mColorFilterSet && colorForState == this.mCurrentColor && mode == this.mCurrentMode)) {
+                setColorFilter(colorForState, mode);
+                this.mCurrentColor = colorForState;
+                this.mCurrentMode = mode;
                 this.mColorFilterSet = true;
                 return true;
             }
@@ -220,29 +225,24 @@ class WrappedDrawableApi14 extends Drawable implements Drawable.Callback, Wrappe
     }
 
     @Override // android.support.v4.graphics.drawable.WrappedDrawable
-    public final void setWrappedDrawable(Drawable dr) {
-        Drawable drawable = this.mDrawable;
-        if (drawable != null) {
-            drawable.setCallback(null);
+    public final void setWrappedDrawable(Drawable drawable) {
+        Drawable drawable2 = this.mDrawable;
+        if (drawable2 != null) {
+            drawable2.setCallback(null);
         }
-        this.mDrawable = dr;
-        if (dr != null) {
-            dr.setCallback(this);
-            setVisible(dr.isVisible(), true);
-            setState(dr.getState());
-            setLevel(dr.getLevel());
-            setBounds(dr.getBounds());
+        this.mDrawable = drawable;
+        if (drawable != null) {
+            drawable.setCallback(this);
+            setVisible(drawable.isVisible(), true);
+            setState(drawable.getState());
+            setLevel(drawable.getLevel());
+            setBounds(drawable.getBounds());
             DrawableWrapperState drawableWrapperState = this.mState;
             if (drawableWrapperState != null) {
-                drawableWrapperState.mDrawableState = dr.getConstantState();
+                drawableWrapperState.mDrawableState = drawable.getConstantState();
             }
         }
         invalidateSelf();
-    }
-
-    /* access modifiers changed from: protected */
-    public boolean isCompatTintEnabled() {
-        return true;
     }
 
     /* access modifiers changed from: protected */
@@ -254,12 +254,12 @@ class WrappedDrawableApi14 extends Drawable implements Drawable.Callback, Wrappe
 
         public abstract Drawable newDrawable(Resources resources);
 
-        DrawableWrapperState(DrawableWrapperState orig, Resources res) {
-            if (orig != null) {
-                this.mChangingConfigurations = orig.mChangingConfigurations;
-                this.mDrawableState = orig.mDrawableState;
-                this.mTint = orig.mTint;
-                this.mTintMode = orig.mTintMode;
+        DrawableWrapperState(DrawableWrapperState drawableWrapperState, Resources resources) {
+            if (drawableWrapperState != null) {
+                this.mChangingConfigurations = drawableWrapperState.mChangingConfigurations;
+                this.mDrawableState = drawableWrapperState.mDrawableState;
+                this.mTint = drawableWrapperState.mTint;
+                this.mTintMode = drawableWrapperState.mTintMode;
             }
         }
 
@@ -281,13 +281,13 @@ class WrappedDrawableApi14 extends Drawable implements Drawable.Callback, Wrappe
 
     /* access modifiers changed from: private */
     public static class DrawableWrapperStateBase extends DrawableWrapperState {
-        DrawableWrapperStateBase(DrawableWrapperState orig, Resources res) {
-            super(orig, res);
+        DrawableWrapperStateBase(DrawableWrapperState drawableWrapperState, Resources resources) {
+            super(drawableWrapperState, resources);
         }
 
         @Override // android.support.v4.graphics.drawable.WrappedDrawableApi14.DrawableWrapperState
-        public Drawable newDrawable(Resources res) {
-            return new WrappedDrawableApi14(this, res);
+        public Drawable newDrawable(Resources resources) {
+            return new WrappedDrawableApi14(this, resources);
         }
     }
 }

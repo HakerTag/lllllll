@@ -10,60 +10,57 @@ public final class OpenCameraInterface {
     private OpenCameraInterface() {
     }
 
-    public static OpenCamera open(int cameraId) {
-        int index;
+    public static OpenCamera open(int i) {
+        Camera.CameraInfo cameraInfo;
+        int i2;
         Camera camera;
-        int numCameras = Camera.getNumberOfCameras();
-        if (numCameras == 0) {
+        int numberOfCameras = Camera.getNumberOfCameras();
+        if (numberOfCameras == 0) {
             Log.w(TAG, "No cameras!");
             return null;
         }
-        boolean explicitRequest = true;
-        if (numCameras == 1) {
-            cameraId = 0;
+        boolean z = true;
+        if (numberOfCameras == 1) {
+            i = 0;
         }
-        if (cameraId < 0) {
-            explicitRequest = false;
+        if (i < 0) {
+            z = false;
         }
-        Camera.CameraInfo selectedCameraInfo = null;
-        if (!explicitRequest) {
-            index = 0;
+        if (!z) {
+            i2 = 0;
             while (true) {
-                if (index >= numCameras) {
+                if (i2 >= numberOfCameras) {
+                    cameraInfo = null;
                     break;
                 }
-                Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
-                Camera.getCameraInfo(index, cameraInfo);
+                cameraInfo = new Camera.CameraInfo();
+                Camera.getCameraInfo(i2, cameraInfo);
                 if (CameraFacing.values()[cameraInfo.facing] == CameraFacing.BACK) {
-                    selectedCameraInfo = cameraInfo;
                     break;
                 }
-                index++;
+                i2++;
             }
         } else {
-            index = cameraId;
-            selectedCameraInfo = new Camera.CameraInfo();
-            Camera.getCameraInfo(index, selectedCameraInfo);
+            Camera.CameraInfo cameraInfo2 = new Camera.CameraInfo();
+            Camera.getCameraInfo(i, cameraInfo2);
+            cameraInfo = cameraInfo2;
+            i2 = i;
         }
-        if (index < numCameras) {
-            String str = TAG;
-            Log.i(str, "Opening camera #" + index);
-            camera = Camera.open(index);
-        } else if (explicitRequest) {
-            String str2 = TAG;
-            Log.w(str2, "Requested camera does not exist: " + cameraId);
+        if (i2 < numberOfCameras) {
+            Log.i(TAG, "Opening camera #" + i2);
+            camera = Camera.open(i2);
+        } else if (z) {
+            Log.w(TAG, "Requested camera does not exist: " + i);
             camera = null;
         } else {
-            String str3 = TAG;
-            Log.i(str3, "No camera facing " + CameraFacing.BACK + "; returning camera #0");
-            Camera camera2 = Camera.open(0);
-            selectedCameraInfo = new Camera.CameraInfo();
-            Camera.getCameraInfo(0, selectedCameraInfo);
-            camera = camera2;
+            Log.i(TAG, "No camera facing " + CameraFacing.BACK + "; returning camera #0");
+            camera = Camera.open(0);
+            cameraInfo = new Camera.CameraInfo();
+            Camera.getCameraInfo(0, cameraInfo);
         }
         if (camera == null) {
             return null;
         }
-        return new OpenCamera(index, camera, CameraFacing.values()[selectedCameraInfo.facing], selectedCameraInfo.orientation);
+        return new OpenCamera(i2, camera, CameraFacing.values()[cameraInfo.facing], cameraInfo.orientation);
     }
 }

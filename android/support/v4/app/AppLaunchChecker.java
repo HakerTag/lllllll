@@ -15,13 +15,13 @@ public class AppLaunchChecker {
     }
 
     public static void onActivityCreate(Activity activity) {
-        Intent launchIntent;
-        SharedPreferences sp = activity.getSharedPreferences(SHARED_PREFS_NAME, 0);
-        if (sp.getBoolean(KEY_STARTED_FROM_LAUNCHER, false) || (launchIntent = activity.getIntent()) == null || !"android.intent.action.MAIN".equals(launchIntent.getAction())) {
+        Intent intent;
+        SharedPreferences sharedPreferences = activity.getSharedPreferences(SHARED_PREFS_NAME, 0);
+        if (sharedPreferences.getBoolean(KEY_STARTED_FROM_LAUNCHER, false) || (intent = activity.getIntent()) == null || !"android.intent.action.MAIN".equals(intent.getAction())) {
             return;
         }
-        if (launchIntent.hasCategory("android.intent.category.LAUNCHER") || launchIntent.hasCategory(IntentCompat.CATEGORY_LEANBACK_LAUNCHER)) {
-            sp.edit().putBoolean(KEY_STARTED_FROM_LAUNCHER, true).apply();
+        if (intent.hasCategory("android.intent.category.LAUNCHER") || intent.hasCategory(IntentCompat.CATEGORY_LEANBACK_LAUNCHER)) {
+            sharedPreferences.edit().putBoolean(KEY_STARTED_FROM_LAUNCHER, true).apply();
         }
     }
 }

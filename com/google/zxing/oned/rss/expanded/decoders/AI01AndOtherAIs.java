@@ -8,17 +8,17 @@ import com.google.zxing.common.BitArray;
 public final class AI01AndOtherAIs extends AI01decoder {
     private static final int HEADER_SIZE = 4;
 
-    AI01AndOtherAIs(BitArray information) {
-        super(information);
+    AI01AndOtherAIs(BitArray bitArray) {
+        super(bitArray);
     }
 
     @Override // com.google.zxing.oned.rss.expanded.decoders.AbstractExpandedDecoder
     public String parseInformation() throws NotFoundException, FormatException {
-        StringBuilder buff = new StringBuilder();
-        buff.append("(01)");
-        int initialGtinPosition = buff.length();
-        buff.append(getGeneralDecoder().extractNumericValueFromBitArray(4, 4));
-        encodeCompressedGtinWithoutAI(buff, 8, initialGtinPosition);
-        return getGeneralDecoder().decodeAllCodes(buff, 48);
+        StringBuilder sb = new StringBuilder();
+        sb.append("(01)");
+        int length = sb.length();
+        sb.append(getGeneralDecoder().extractNumericValueFromBitArray(4, 4));
+        encodeCompressedGtinWithoutAI(sb, 8, length);
+        return getGeneralDecoder().decodeAllCodes(sb, 48);
     }
 }

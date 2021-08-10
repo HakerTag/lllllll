@@ -8,20 +8,20 @@ public final class EmailDoCoMoResultParser extends AbstractDoCoMoResultParser {
 
     @Override // com.google.zxing.client.result.ResultParser
     public EmailAddressParsedResult parse(Result result) {
-        String[] tos;
-        String rawText = getMassagedText(result);
-        if (!rawText.startsWith("MATMSG:") || (tos = matchDoCoMoPrefixedField("TO:", rawText, true)) == null) {
+        String[] matchDoCoMoPrefixedField;
+        String massagedText = getMassagedText(result);
+        if (!massagedText.startsWith("MATMSG:") || (matchDoCoMoPrefixedField = matchDoCoMoPrefixedField("TO:", massagedText, true)) == null) {
             return null;
         }
-        for (String to : tos) {
-            if (!isBasicallyValidEmailAddress(to)) {
+        for (String str : matchDoCoMoPrefixedField) {
+            if (!isBasicallyValidEmailAddress(str)) {
                 return null;
             }
         }
-        return new EmailAddressParsedResult(tos, null, null, matchSingleDoCoMoPrefixedField("SUB:", rawText, false), matchSingleDoCoMoPrefixedField("BODY:", rawText, false));
+        return new EmailAddressParsedResult(matchDoCoMoPrefixedField, null, null, matchSingleDoCoMoPrefixedField("SUB:", massagedText, false), matchSingleDoCoMoPrefixedField("BODY:", massagedText, false));
     }
 
-    static boolean isBasicallyValidEmailAddress(String email) {
-        return email != null && ATEXT_ALPHANUMERIC.matcher(email).matches() && email.indexOf(64) >= 0;
+    static boolean isBasicallyValidEmailAddress(String str) {
+        return str != null && ATEXT_ALPHANUMERIC.matcher(str).matches() && str.indexOf(64) >= 0;
     }
 }

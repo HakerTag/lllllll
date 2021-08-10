@@ -21,531 +21,494 @@ public final class Code128Reader extends OneDReader {
     private static final float MAX_AVG_VARIANCE = 0.25f;
     private static final float MAX_INDIVIDUAL_VARIANCE = 0.7f;
 
-    private static int[] findStartPattern(BitArray row) throws NotFoundException {
-        int width = row.getSize();
-        int rowOffset = row.getNextSet(0);
-        int counterPosition = 0;
-        int[] counters = new int[6];
-        int patternStart = rowOffset;
-        boolean isWhite = false;
-        int patternLength = counters.length;
-        for (int i = rowOffset; i < width; i++) {
-            boolean z = true;
-            if (row.get(i) ^ isWhite) {
-                counters[counterPosition] = counters[counterPosition] + 1;
+    private static int[] findStartPattern(BitArray bitArray) throws NotFoundException {
+        int size = bitArray.getSize();
+        int nextSet = bitArray.getNextSet(0);
+        int[] iArr = new int[6];
+        int i = nextSet;
+        boolean z = false;
+        int i2 = 0;
+        while (nextSet < size) {
+            if (bitArray.get(nextSet) ^ z) {
+                iArr[i2] = iArr[i2] + 1;
             } else {
-                if (counterPosition == patternLength - 1) {
-                    float bestVariance = MAX_AVG_VARIANCE;
-                    int bestMatch = -1;
-                    for (int startCode = CODE_START_A; startCode <= CODE_START_C; startCode++) {
-                        float variance = patternMatchVariance(counters, CODE_PATTERNS[startCode], MAX_INDIVIDUAL_VARIANCE);
-                        if (variance < bestVariance) {
-                            bestVariance = variance;
-                            bestMatch = startCode;
+                if (i2 == 5) {
+                    float f = MAX_AVG_VARIANCE;
+                    int i3 = -1;
+                    for (int i4 = CODE_START_A; i4 <= CODE_START_C; i4++) {
+                        float patternMatchVariance = patternMatchVariance(iArr, CODE_PATTERNS[i4], MAX_INDIVIDUAL_VARIANCE);
+                        if (patternMatchVariance < f) {
+                            i3 = i4;
+                            f = patternMatchVariance;
                         }
                     }
-                    if (bestMatch < 0 || !row.isRange(Math.max(0, patternStart - ((i - patternStart) / 2)), patternStart, false)) {
-                        patternStart += counters[0] + counters[1];
-                        System.arraycopy(counters, 2, counters, 0, patternLength - 2);
-                        counters[patternLength - 2] = 0;
-                        counters[patternLength - 1] = 0;
-                        counterPosition--;
+                    if (i3 < 0 || !bitArray.isRange(Math.max(0, i - ((nextSet - i) / 2)), i, false)) {
+                        i += iArr[0] + iArr[1];
+                        System.arraycopy(iArr, 2, iArr, 0, 4);
+                        iArr[4] = 0;
+                        iArr[5] = 0;
+                        i2--;
                     } else {
-                        return new int[]{patternStart, i, bestMatch};
+                        return new int[]{i, nextSet, i3};
                     }
                 } else {
-                    counterPosition++;
+                    i2++;
                 }
-                counters[counterPosition] = 1;
-                if (isWhite) {
-                    z = false;
-                }
-                isWhite = z;
+                iArr[i2] = 1;
+                z = !z;
             }
+            nextSet++;
         }
         throw NotFoundException.getNotFoundInstance();
     }
 
-    private static int decodeCode(BitArray row, int[] counters, int rowOffset) throws NotFoundException {
-        recordPattern(row, rowOffset, counters);
-        float bestVariance = MAX_AVG_VARIANCE;
-        int bestMatch = -1;
-        int d = 0;
+    private static int decodeCode(BitArray bitArray, int[] iArr, int i) throws NotFoundException {
+        recordPattern(bitArray, i, iArr);
+        float f = MAX_AVG_VARIANCE;
+        int i2 = -1;
+        int i3 = 0;
         while (true) {
-            int[][] iArr = CODE_PATTERNS;
-            if (d >= iArr.length) {
+            int[][] iArr2 = CODE_PATTERNS;
+            if (i3 >= iArr2.length) {
                 break;
             }
-            float variance = patternMatchVariance(counters, iArr[d], MAX_INDIVIDUAL_VARIANCE);
-            if (variance < bestVariance) {
-                bestVariance = variance;
-                bestMatch = d;
+            float patternMatchVariance = patternMatchVariance(iArr, iArr2[i3], MAX_INDIVIDUAL_VARIANCE);
+            if (patternMatchVariance < f) {
+                i2 = i3;
+                f = patternMatchVariance;
             }
-            d++;
+            i3++;
         }
-        if (bestMatch >= 0) {
-            return bestMatch;
+        if (i2 >= 0) {
+            return i2;
         }
         throw NotFoundException.getNotFoundInstance();
     }
 
-    /* JADX INFO: Multiple debug info for r2v2 byte[]: [D('lastPatternSize' int), D('rawBytes' byte[])] */
-    /* JADX INFO: Can't fix incorrect switch cases order, some code will duplicate */
-    /* JADX WARNING: Removed duplicated region for block: B:109:0x01be A[FALL_THROUGH, PHI: r20 
-      PHI: (r20v4 'lastCharacterWasPrintable' boolean) = (r20v2 'lastCharacterWasPrintable' boolean), (r20v5 'lastCharacterWasPrintable' boolean), (r20v5 'lastCharacterWasPrintable' boolean), (r20v5 'lastCharacterWasPrintable' boolean), (r20v5 'lastCharacterWasPrintable' boolean), (r20v2 'lastCharacterWasPrintable' boolean) binds: [B:25:0x0095, B:100:0x019b, B:101:0x019f, B:105:0x01ab, B:104:0x01a7, B:95:0x018f] A[DONT_GENERATE, DONT_INLINE]] */
+    /* JADX WARNING: Removed duplicated region for block: B:70:0x0124 A[FALL_THROUGH, PHI: r17 
+      PHI: (r17v12 boolean) = (r17v13 boolean), (r17v13 boolean), (r17v13 boolean), (r17v13 boolean), (r17v15 boolean), (r17v15 boolean), (r17v15 boolean), (r17v15 boolean) binds: [B:64:0x010f, B:65:0x0113, B:69:0x011f, B:68:0x011b, B:41:0x00c2, B:42:0x00c7, B:46:0x00d3, B:45:0x00cf] A[DONT_GENERATE, DONT_INLINE]] */
+    /* JADX WARNING: Removed duplicated region for block: B:80:0x013d A[PHI: r17 
+      PHI: (r17v9 boolean) = (r17v13 boolean), (r17v15 boolean) binds: [B:64:0x010f, B:41:0x00c2] A[DONT_GENERATE, DONT_INLINE]] */
     @Override // com.google.zxing.oned.OneDReader
     /* Code decompiled incorrectly, please refer to instructions dump. */
-    public com.google.zxing.Result decodeRow(int r32, com.google.zxing.common.BitArray r33, java.util.Map<com.google.zxing.DecodeHintType, ?> r34) throws com.google.zxing.NotFoundException, com.google.zxing.FormatException, com.google.zxing.ChecksumException {
+    public com.google.zxing.Result decodeRow(int r25, com.google.zxing.common.BitArray r26, java.util.Map<com.google.zxing.DecodeHintType, ?> r27) throws com.google.zxing.NotFoundException, com.google.zxing.FormatException, com.google.zxing.ChecksumException {
         /*
-            r31 = this;
-            r0 = r32
-            r1 = r33
-            r2 = r34
+            r24 = this;
+            r0 = r26
+            r1 = r27
+            r2 = 1
             r3 = 0
-            r4 = 1
-            if (r2 == 0) goto L_0x0014
-            com.google.zxing.DecodeHintType r5 = com.google.zxing.DecodeHintType.ASSUME_GS1
-            boolean r5 = r2.containsKey(r5)
-            if (r5 == 0) goto L_0x0014
-            r5 = 1
-            goto L_0x0015
-        L_0x0014:
-            r5 = 0
-        L_0x0015:
-            int[] r6 = findStartPattern(r33)
-            r7 = 2
-            r8 = r6[r7]
-            java.util.ArrayList r9 = new java.util.ArrayList
-            r10 = 20
-            r9.<init>(r10)
-            byte r11 = (byte) r8
-            java.lang.Byte r11 = java.lang.Byte.valueOf(r11)
-            r9.add(r11)
-            switch(r8) {
-                case 103: goto L_0x0039;
-                case 104: goto L_0x0036;
-                case 105: goto L_0x0033;
-                default: goto L_0x002e;
-            }
-        L_0x002e:
-            com.google.zxing.FormatException r1 = com.google.zxing.FormatException.getFormatInstance()
-            throw r1
-        L_0x0033:
-            r11 = 99
-            goto L_0x003c
-        L_0x0036:
-            r11 = 100
-            goto L_0x003c
-        L_0x0039:
-            r11 = 101(0x65, float:1.42E-43)
-        L_0x003c:
-            r12 = 0
-            r13 = 0
-            java.lang.StringBuilder r14 = new java.lang.StringBuilder
-            r14.<init>(r10)
-            r10 = r14
-            r14 = r6[r3]
-            r15 = r6[r4]
-            r4 = 6
-            int[] r4 = new int[r4]
-            r16 = 0
-            r17 = 0
-            r18 = r8
-            r19 = 0
-            r20 = 1
-            r21 = 0
-            r22 = 0
-            r23 = r16
-            r3 = r21
-            r7 = r22
-        L_0x005f:
-            if (r12 != 0) goto L_0x01d1
-            r22 = r13
-            r13 = 0
-            r23 = r17
-            int r2 = decodeCode(r1, r4, r15)
-            r24 = r8
-            byte r8 = (byte) r2
-            java.lang.Byte r8 = java.lang.Byte.valueOf(r8)
-            r9.add(r8)
-            r8 = 106(0x6a, float:1.49E-43)
-            if (r2 == r8) goto L_0x007a
-            r20 = 1
-        L_0x007a:
-            if (r2 == r8) goto L_0x0082
-            int r19 = r19 + 1
-            int r17 = r19 * r2
-            int r18 = r18 + r17
-        L_0x0082:
-            r14 = r15
-            int r8 = r4.length
-            r25 = r12
-            r12 = 0
-        L_0x0087:
-            if (r12 >= r8) goto L_0x0090
-            r26 = r4[r12]
-            int r15 = r15 + r26
-            int r12 = r12 + 1
-            goto L_0x0087
-        L_0x0090:
-            switch(r2) {
-                case 103: goto L_0x009a;
-                case 104: goto L_0x009a;
-                case 105: goto L_0x009a;
-                default: goto L_0x0093;
-            }
-        L_0x0093:
-            java.lang.String r12 = "]C1"
-            switch(r11) {
-                case 99: goto L_0x0182;
-                case 100: goto L_0x011d;
-                case 101: goto L_0x009f;
-                default: goto L_0x0098;
-            }
-        L_0x0098:
-            goto L_0x01be
-        L_0x009a:
-            com.google.zxing.FormatException r8 = com.google.zxing.FormatException.getFormatInstance()
-            throw r8
-        L_0x009f:
-            r8 = 64
-            if (r2 >= r8) goto L_0x00b9
-            if (r7 != r3) goto L_0x00ac
-            int r8 = r2 + 32
-            char r8 = (char) r8
-            r10.append(r8)
-            goto L_0x00b4
-        L_0x00ac:
-            int r8 = r2 + 32
-            int r8 = r8 + 128
-            char r8 = (char) r8
-            r10.append(r8)
-        L_0x00b4:
-            r7 = 0
-            r12 = r25
-            goto L_0x01c0
-        L_0x00b9:
-            r8 = 96
-            if (r2 >= r8) goto L_0x00d1
-            if (r7 != r3) goto L_0x00c6
-            int r8 = r2 + -64
-            char r8 = (char) r8
-            r10.append(r8)
-            goto L_0x00cc
-        L_0x00c6:
-            int r8 = r2 + 64
-            char r8 = (char) r8
-            r10.append(r8)
-        L_0x00cc:
-            r7 = 0
-            r12 = r25
-            goto L_0x01c0
-        L_0x00d1:
-            r8 = 106(0x6a, float:1.49E-43)
-            if (r2 == r8) goto L_0x00d7
-            r20 = 0
-        L_0x00d7:
-            if (r2 == r8) goto L_0x011a
-            switch(r2) {
-                case 98: goto L_0x0113;
-                case 99: goto L_0x010d;
-                case 100: goto L_0x0107;
-                case 101: goto L_0x00f1;
-                case 102: goto L_0x00dd;
-                default: goto L_0x00dc;
-            }
-        L_0x00dc:
-            goto L_0x00ee
-        L_0x00dd:
-            if (r5 == 0) goto L_0x00ee
-            int r8 = r10.length()
-            if (r8 != 0) goto L_0x00e9
-            r10.append(r12)
-            goto L_0x00ee
-        L_0x00e9:
-            r8 = 29
-            r10.append(r8)
-        L_0x00ee:
-            r12 = r25
-            goto L_0x011b
-        L_0x00f1:
-            if (r3 != 0) goto L_0x00fa
-            if (r7 == 0) goto L_0x00fa
-            r3 = 1
-            r7 = 0
-            r12 = r25
-            goto L_0x011b
-        L_0x00fa:
-            if (r3 == 0) goto L_0x0103
-            if (r7 == 0) goto L_0x0103
-            r3 = 0
-            r7 = 0
-            r12 = r25
-            goto L_0x011b
-        L_0x0103:
-            r7 = 1
-            r12 = r25
-            goto L_0x011b
-        L_0x0107:
-            r8 = 100
-            r11 = r8
-            r12 = r25
-            goto L_0x011b
-        L_0x010d:
-            r8 = 99
-            r11 = r8
-            r12 = r25
-            goto L_0x011b
-        L_0x0113:
-            r13 = 1
-            r8 = 100
-            r11 = r8
-            r12 = r25
-            goto L_0x011b
-        L_0x011a:
-            r12 = 1
-        L_0x011b:
-            goto L_0x01c0
-        L_0x011d:
-            r8 = 96
-            if (r2 >= r8) goto L_0x0137
-            if (r7 != r3) goto L_0x012a
-            int r8 = r2 + 32
-            char r8 = (char) r8
-            r10.append(r8)
-            goto L_0x0132
-        L_0x012a:
-            int r8 = r2 + 32
-            int r8 = r8 + 128
-            char r8 = (char) r8
-            r10.append(r8)
-        L_0x0132:
-            r7 = 0
-            r12 = r25
-            goto L_0x01c0
-        L_0x0137:
-            r8 = 106(0x6a, float:1.49E-43)
-            if (r2 == r8) goto L_0x013d
-            r20 = 0
-        L_0x013d:
-            if (r2 == r8) goto L_0x0180
-            switch(r2) {
-                case 98: goto L_0x0179;
-                case 99: goto L_0x0173;
-                case 100: goto L_0x015d;
-                case 101: goto L_0x0157;
-                case 102: goto L_0x0143;
-                default: goto L_0x0142;
-            }
-        L_0x0142:
-            goto L_0x0154
-        L_0x0143:
-            if (r5 == 0) goto L_0x0154
-            int r8 = r10.length()
-            if (r8 != 0) goto L_0x014f
-            r10.append(r12)
-            goto L_0x0154
-        L_0x014f:
-            r8 = 29
-            r10.append(r8)
-        L_0x0154:
-            r12 = r25
-            goto L_0x0181
-        L_0x0157:
-            r8 = 101(0x65, float:1.42E-43)
-            r11 = r8
-            r12 = r25
-            goto L_0x0181
-        L_0x015d:
-            if (r3 != 0) goto L_0x0166
-            if (r7 == 0) goto L_0x0166
-            r3 = 1
-            r7 = 0
-            r12 = r25
-            goto L_0x0181
-        L_0x0166:
-            if (r3 == 0) goto L_0x016f
-            if (r7 == 0) goto L_0x016f
-            r3 = 0
-            r7 = 0
-            r12 = r25
-            goto L_0x0181
-        L_0x016f:
-            r7 = 1
-            r12 = r25
-            goto L_0x0181
-        L_0x0173:
-            r8 = 99
-            r11 = r8
-            r12 = r25
-            goto L_0x0181
-        L_0x0179:
-            r13 = 1
-            r8 = 101(0x65, float:1.42E-43)
-            r11 = r8
-            r12 = r25
-            goto L_0x0181
-        L_0x0180:
-            r12 = 1
-        L_0x0181:
-            goto L_0x01c0
-        L_0x0182:
-            r8 = 100
-            if (r2 >= r8) goto L_0x0193
-            r12 = 10
-            if (r2 >= r12) goto L_0x018f
-            r12 = 48
-            r10.append(r12)
-        L_0x018f:
-            r10.append(r2)
-            goto L_0x01be
-        L_0x0193:
-            r8 = 106(0x6a, float:1.49E-43)
-            if (r2 == r8) goto L_0x0199
-            r20 = 0
-        L_0x0199:
-            if (r2 == r8) goto L_0x01bb
-            switch(r2) {
-                case 100: goto L_0x01b6;
-                case 101: goto L_0x01b1;
-                case 102: goto L_0x019f;
-                default: goto L_0x019e;
-            }
-        L_0x019e:
-            goto L_0x01be
-        L_0x019f:
-            if (r5 == 0) goto L_0x01be
-            int r8 = r10.length()
-            if (r8 != 0) goto L_0x01ab
-            r10.append(r12)
-            goto L_0x01be
-        L_0x01ab:
-            r8 = 29
-            r10.append(r8)
-            goto L_0x01be
-        L_0x01b1:
-            r11 = 101(0x65, float:1.42E-43)
-            r12 = r25
-            goto L_0x01c0
-        L_0x01b6:
-            r11 = 100
-            r12 = r25
-            goto L_0x01c0
-        L_0x01bb:
-            r8 = 1
-            r12 = r8
-            goto L_0x01c0
-        L_0x01be:
-            r12 = r25
-        L_0x01c0:
-            if (r22 == 0) goto L_0x01c9
-            r8 = 101(0x65, float:1.42E-43)
-            if (r11 != r8) goto L_0x01c8
-            r8 = 100
-        L_0x01c8:
-            r11 = r8
-        L_0x01c9:
-            r17 = r2
-            r8 = r24
-            r2 = r34
-            goto L_0x005f
-        L_0x01d1:
-            r24 = r8
-            r25 = r12
-            int r2 = r15 - r14
-            int r8 = r1.getNextUnset(r15)
-            int r12 = r33.getSize()
-            int r15 = r8 - r14
-            r21 = 2
-            int r15 = r15 / 2
-            int r15 = r15 + r8
-            int r12 = java.lang.Math.min(r12, r15)
-            r15 = 0
-            boolean r12 = r1.isRange(r8, r12, r15)
-            if (r12 == 0) goto L_0x027d
-            r12 = r23
-            int r23 = r19 * r12
-            int r18 = r18 - r23
-            int r15 = r18 % 103
-            if (r15 != r12) goto L_0x0278
-            int r15 = r10.length()
-            if (r15 == 0) goto L_0x0273
-            if (r15 <= 0) goto L_0x0215
-            if (r20 == 0) goto L_0x0215
-            r1 = 99
-            if (r11 != r1) goto L_0x0210
-            int r1 = r15 + -2
-            r10.delete(r1, r15)
-            goto L_0x0215
-        L_0x0210:
-            int r1 = r15 + -1
-            r10.delete(r1, r15)
-        L_0x0215:
+            if (r1 == 0) goto L_0x0012
+            com.google.zxing.DecodeHintType r4 = com.google.zxing.DecodeHintType.ASSUME_GS1
+            boolean r1 = r1.containsKey(r4)
+            if (r1 == 0) goto L_0x0012
             r1 = 1
-            r22 = r6[r1]
+            goto L_0x0013
+        L_0x0012:
             r1 = 0
-            r23 = r6[r1]
-            int r1 = r22 + r23
+        L_0x0013:
+            int[] r4 = findStartPattern(r26)
+            r5 = 2
+            r6 = r4[r5]
+            java.util.ArrayList r7 = new java.util.ArrayList
+            r8 = 20
+            r7.<init>(r8)
+            byte r9 = (byte) r6
+            java.lang.Byte r9 = java.lang.Byte.valueOf(r9)
+            r7.add(r9)
+            switch(r6) {
+                case 103: goto L_0x0037;
+                case 104: goto L_0x0034;
+                case 105: goto L_0x0031;
+                default: goto L_0x002c;
+            }
+        L_0x002c:
+            com.google.zxing.FormatException r0 = com.google.zxing.FormatException.getFormatInstance()
+            throw r0
+        L_0x0031:
+            r12 = 99
+            goto L_0x0039
+        L_0x0034:
+            r12 = 100
+            goto L_0x0039
+        L_0x0037:
+            r12 = 101(0x65, float:1.42E-43)
+        L_0x0039:
+            java.lang.StringBuilder r13 = new java.lang.StringBuilder
+            r13.<init>(r8)
+            r8 = r4[r3]
+            r14 = r4[r2]
+            r15 = 6
+            int[] r2 = new int[r15]
+            r9 = 0
+            r16 = 0
+            r17 = 1
+            r18 = 0
+            r19 = 0
+            r20 = 0
+            r21 = 0
+            r23 = r12
+            r12 = r8
+            r8 = r14
+            r14 = r23
+        L_0x0058:
+            if (r16 != 0) goto L_0x01a7
+            int r12 = decodeCode(r0, r2, r8)
+            byte r5 = (byte) r12
+            java.lang.Byte r5 = java.lang.Byte.valueOf(r5)
+            r7.add(r5)
+            r5 = 106(0x6a, float:1.49E-43)
+            if (r12 == r5) goto L_0x006c
+            r17 = 1
+        L_0x006c:
+            if (r12 == r5) goto L_0x0074
+            int r20 = r20 + 1
+            int r21 = r20 * r12
+            int r6 = r6 + r21
+        L_0x0074:
+            r21 = r8
+            r11 = 0
+        L_0x0077:
+            if (r11 >= r15) goto L_0x0080
+            r22 = r2[r11]
+            int r21 = r21 + r22
+            int r11 = r11 + 1
+            goto L_0x0077
+        L_0x0080:
+            switch(r12) {
+                case 103: goto L_0x008e;
+                case 104: goto L_0x008e;
+                case 105: goto L_0x008e;
+                default: goto L_0x0083;
+            }
+        L_0x0083:
+            r11 = 96
+            java.lang.String r15 = "]C1"
+            switch(r14) {
+                case 99: goto L_0x0153;
+                case 100: goto L_0x00f0;
+                case 101: goto L_0x0093;
+                default: goto L_0x008a;
+            }
+        L_0x008a:
+            r10 = 100
+            goto L_0x018c
+        L_0x008e:
+            com.google.zxing.FormatException r0 = com.google.zxing.FormatException.getFormatInstance()
+            throw r0
+        L_0x0093:
+            r10 = 64
+            if (r12 >= r10) goto L_0x00aa
+            if (r9 != r3) goto L_0x00a1
+            int r5 = r12 + 32
+            char r5 = (char) r5
+            r13.append(r5)
+            goto L_0x0103
+        L_0x00a1:
+            int r5 = r12 + 32
+            int r5 = r5 + 128
+            char r5 = (char) r5
+            r13.append(r5)
+            goto L_0x0103
+        L_0x00aa:
+            if (r12 >= r11) goto L_0x00bc
+            if (r9 != r3) goto L_0x00b5
+            int r5 = r12 + -64
+            char r5 = (char) r5
+            r13.append(r5)
+            goto L_0x0103
+        L_0x00b5:
+            int r5 = r12 + 64
+            char r5 = (char) r5
+            r13.append(r5)
+            goto L_0x0103
+        L_0x00bc:
+            if (r12 == r5) goto L_0x00c0
+            r17 = 0
+        L_0x00c0:
+            if (r12 == r5) goto L_0x0147
+            switch(r12) {
+                case 98: goto L_0x00ea;
+                case 99: goto L_0x013d;
+                case 100: goto L_0x00e7;
+                case 101: goto L_0x00d9;
+                case 102: goto L_0x00c7;
+                default: goto L_0x00c5;
+            }
+        L_0x00c5:
+            goto L_0x0124
+        L_0x00c7:
+            if (r1 == 0) goto L_0x0124
+            int r5 = r13.length()
+            if (r5 != 0) goto L_0x00d3
+            r13.append(r15)
+            goto L_0x0124
+        L_0x00d3:
+            r5 = 29
+            r13.append(r5)
+            goto L_0x0124
+        L_0x00d9:
+            if (r3 != 0) goto L_0x00e0
+            if (r9 == 0) goto L_0x00e0
+            r3 = 0
+            r5 = 1
+            goto L_0x0130
+        L_0x00e0:
+            if (r3 == 0) goto L_0x0139
+            if (r9 == 0) goto L_0x0139
+            r3 = 0
+            r5 = 0
+            goto L_0x0130
+        L_0x00e7:
+            r5 = r3
+            r3 = 0
+            goto L_0x00ec
+        L_0x00ea:
+            r5 = r3
+            r3 = 1
+        L_0x00ec:
+            r14 = 100
+            goto L_0x014b
+        L_0x00f0:
+            if (r12 >= r11) goto L_0x0109
+            if (r9 != r3) goto L_0x00fb
+            int r5 = r12 + 32
+            char r5 = (char) r5
+            r13.append(r5)
+            goto L_0x0103
+        L_0x00fb:
+            int r5 = r12 + 32
+            int r5 = r5 + 128
+            char r5 = (char) r5
+            r13.append(r5)
+        L_0x0103:
+            r5 = 0
+            r9 = 0
+            r10 = 100
+            goto L_0x018d
+        L_0x0109:
+            if (r12 == r5) goto L_0x010d
+            r17 = 0
+        L_0x010d:
+            if (r12 == r5) goto L_0x0147
+            switch(r12) {
+                case 98: goto L_0x0142;
+                case 99: goto L_0x013d;
+                case 100: goto L_0x012a;
+                case 101: goto L_0x0127;
+                case 102: goto L_0x0113;
+                default: goto L_0x0112;
+            }
+        L_0x0112:
+            goto L_0x0124
+        L_0x0113:
+            if (r1 == 0) goto L_0x0124
+            int r5 = r13.length()
+            if (r5 != 0) goto L_0x011f
+            r13.append(r15)
+            goto L_0x0124
+        L_0x011f:
+            r5 = 29
+            r13.append(r5)
+        L_0x0124:
+            r5 = r3
+            r3 = 0
+            goto L_0x014b
+        L_0x0127:
+            r5 = r3
+            r3 = 0
+            goto L_0x0144
+        L_0x012a:
+            if (r3 != 0) goto L_0x0132
+            if (r9 == 0) goto L_0x0132
+            r3 = 0
+            r5 = 1
+        L_0x0130:
+            r9 = 0
+            goto L_0x014b
+        L_0x0132:
+            if (r3 == 0) goto L_0x0139
+            if (r9 == 0) goto L_0x0139
+            r3 = 0
+            r5 = 0
+            goto L_0x0130
+        L_0x0139:
+            r5 = r3
+            r3 = 0
+            r9 = 1
+            goto L_0x014b
+        L_0x013d:
+            r5 = r3
+            r3 = 0
+            r14 = 99
+            goto L_0x014b
+        L_0x0142:
+            r5 = r3
+            r3 = 1
+        L_0x0144:
+            r14 = 101(0x65, float:1.42E-43)
+            goto L_0x014b
+        L_0x0147:
+            r5 = r3
+            r3 = 0
+            r16 = 1
+        L_0x014b:
+            r10 = 100
+            r23 = r5
+            r5 = r3
+            r3 = r23
+            goto L_0x018d
+        L_0x0153:
+            r10 = 100
+            if (r12 >= r10) goto L_0x0164
+            r5 = 10
+            if (r12 >= r5) goto L_0x0160
+            r5 = 48
+            r13.append(r5)
+        L_0x0160:
+            r13.append(r12)
+            goto L_0x018c
+        L_0x0164:
+            if (r12 == r5) goto L_0x0168
+            r17 = 0
+        L_0x0168:
+            if (r12 == r5) goto L_0x0188
+            switch(r12) {
+                case 100: goto L_0x0184;
+                case 101: goto L_0x0180;
+                case 102: goto L_0x016e;
+                default: goto L_0x016d;
+            }
+        L_0x016d:
+            goto L_0x018c
+        L_0x016e:
+            if (r1 == 0) goto L_0x018c
+            int r5 = r13.length()
+            if (r5 != 0) goto L_0x017a
+            r13.append(r15)
+            goto L_0x018c
+        L_0x017a:
+            r5 = 29
+            r13.append(r5)
+            goto L_0x018c
+        L_0x0180:
+            r5 = 0
+            r14 = 101(0x65, float:1.42E-43)
+            goto L_0x018d
+        L_0x0184:
+            r5 = 0
+            r14 = 100
+            goto L_0x018d
+        L_0x0188:
+            r5 = 0
+            r16 = 1
+            goto L_0x018d
+        L_0x018c:
+            r5 = 0
+        L_0x018d:
+            r11 = 101(0x65, float:1.42E-43)
+            if (r18 == 0) goto L_0x0198
+            if (r14 != r11) goto L_0x0196
+            r14 = 100
+            goto L_0x0198
+        L_0x0196:
+            r14 = 101(0x65, float:1.42E-43)
+        L_0x0198:
+            r18 = r5
+            r5 = 2
+            r15 = 6
+            r23 = r12
+            r12 = r8
+            r8 = r21
+            r21 = r19
+            r19 = r23
+            goto L_0x0058
+        L_0x01a7:
+            int r1 = r8 - r12
+            int r2 = r0.getNextUnset(r8)
+            int r3 = r26.getSize()
+            int r5 = r2 - r12
+            r8 = 2
+            int r5 = r5 / r8
+            int r5 = r5 + r2
+            int r3 = java.lang.Math.min(r3, r5)
+            r5 = 0
+            boolean r0 = r0.isRange(r2, r3, r5)
+            if (r0 == 0) goto L_0x0237
+            r3 = r21
+            int r20 = r20 * r3
+            int r6 = r6 - r20
+            int r6 = r6 % 103
+            if (r6 != r3) goto L_0x0232
+            int r0 = r13.length()
+            if (r0 == 0) goto L_0x022d
+            if (r0 <= 0) goto L_0x01e4
+            if (r17 == 0) goto L_0x01e4
+            r2 = 99
+            if (r14 != r2) goto L_0x01df
+            int r2 = r0 + -2
+            r13.delete(r2, r0)
+            goto L_0x01e4
+        L_0x01df:
+            int r2 = r0 + -1
+            r13.delete(r2, r0)
+        L_0x01e4:
+            r0 = 1
+            r2 = r4[r0]
+            r0 = 0
+            r3 = r4[r0]
+            int r2 = r2 + r3
+            float r0 = (float) r2
+            r2 = 1073741824(0x40000000, float:2.0)
+            float r0 = r0 / r2
+            float r3 = (float) r12
             float r1 = (float) r1
-            r22 = 1073741824(0x40000000, float:2.0)
-            float r1 = r1 / r22
-            r23 = r3
-            float r3 = (float) r14
-            r26 = r4
-            float r4 = (float) r2
-            float r4 = r4 / r22
-            float r3 = r3 + r4
-            int r4 = r9.size()
-            r22 = r2
-            byte[] r2 = new byte[r4]
-            r27 = 0
-            r28 = r5
-            r5 = r27
-        L_0x0239:
-            if (r5 >= r4) goto L_0x024a
-            java.lang.Object r27 = r9.get(r5)
-            java.lang.Byte r27 = (java.lang.Byte) r27
-            byte r27 = r27.byteValue()
-            r2[r5] = r27
+            float r1 = r1 / r2
+            float r3 = r3 + r1
+            int r1 = r7.size()
+            byte[] r2 = new byte[r1]
+            r5 = 0
+        L_0x01fa:
+            if (r5 >= r1) goto L_0x020b
+            java.lang.Object r4 = r7.get(r5)
+            java.lang.Byte r4 = (java.lang.Byte) r4
+            byte r4 = r4.byteValue()
+            r2[r5] = r4
             int r5 = r5 + 1
-            goto L_0x0239
-        L_0x024a:
-            com.google.zxing.Result r5 = new com.google.zxing.Result
-            r27 = r4
-            java.lang.String r4 = r10.toString()
-            r29 = r6
-            r6 = 2
-            com.google.zxing.ResultPoint[] r6 = new com.google.zxing.ResultPoint[r6]
-            r21 = r7
-            com.google.zxing.ResultPoint r7 = new com.google.zxing.ResultPoint
-            r30 = r8
-            float r8 = (float) r0
-            r7.<init>(r1, r8)
-            r8 = 0
-            r6[r8] = r7
-            com.google.zxing.ResultPoint r7 = new com.google.zxing.ResultPoint
-            float r8 = (float) r0
-            r7.<init>(r3, r8)
-            r8 = 1
-            r6[r8] = r7
-            com.google.zxing.BarcodeFormat r7 = com.google.zxing.BarcodeFormat.CODE_128
-            r5.<init>(r4, r2, r6, r7)
-            return r5
-        L_0x0273:
-            com.google.zxing.NotFoundException r1 = com.google.zxing.NotFoundException.getNotFoundInstance()
-            throw r1
-        L_0x0278:
-            com.google.zxing.ChecksumException r1 = com.google.zxing.ChecksumException.getChecksumInstance()
-            throw r1
-        L_0x027d:
-            com.google.zxing.NotFoundException r1 = com.google.zxing.NotFoundException.getNotFoundInstance()
-            throw r1
-            switch-data {103->0x0039, 104->0x0036, 105->0x0033, }
-            switch-data {103->0x009a, 104->0x009a, 105->0x009a, }
-            switch-data {99->0x0182, 100->0x011d, 101->0x009f, }
-            switch-data {98->0x0113, 99->0x010d, 100->0x0107, 101->0x00f1, 102->0x00dd, }
-            switch-data {98->0x0179, 99->0x0173, 100->0x015d, 101->0x0157, 102->0x0143, }
-            switch-data {100->0x01b6, 101->0x01b1, 102->0x019f, }
+            goto L_0x01fa
+        L_0x020b:
+            com.google.zxing.Result r1 = new com.google.zxing.Result
+            java.lang.String r4 = r13.toString()
+            r5 = 2
+            com.google.zxing.ResultPoint[] r5 = new com.google.zxing.ResultPoint[r5]
+            com.google.zxing.ResultPoint r6 = new com.google.zxing.ResultPoint
+            r7 = r25
+            float r7 = (float) r7
+            r6.<init>(r0, r7)
+            r0 = 0
+            r5[r0] = r6
+            com.google.zxing.ResultPoint r0 = new com.google.zxing.ResultPoint
+            r0.<init>(r3, r7)
+            r3 = 1
+            r5[r3] = r0
+            com.google.zxing.BarcodeFormat r0 = com.google.zxing.BarcodeFormat.CODE_128
+            r1.<init>(r4, r2, r5, r0)
+            return r1
+        L_0x022d:
+            com.google.zxing.NotFoundException r0 = com.google.zxing.NotFoundException.getNotFoundInstance()
+            throw r0
+        L_0x0232:
+            com.google.zxing.ChecksumException r0 = com.google.zxing.ChecksumException.getChecksumInstance()
+            throw r0
+        L_0x0237:
+            com.google.zxing.NotFoundException r0 = com.google.zxing.NotFoundException.getNotFoundInstance()
+            throw r0
+            switch-data {103->0x0037, 104->0x0034, 105->0x0031, }
+            switch-data {103->0x008e, 104->0x008e, 105->0x008e, }
+            switch-data {99->0x0153, 100->0x00f0, 101->0x0093, }
+            switch-data {98->0x00ea, 99->0x013d, 100->0x00e7, 101->0x00d9, 102->0x00c7, }
+            switch-data {98->0x0142, 99->0x013d, 100->0x012a, 101->0x0127, 102->0x0113, }
+            switch-data {100->0x0184, 101->0x0180, 102->0x016e, }
         */
         throw new UnsupportedOperationException("Method not decompiled: com.google.zxing.oned.Code128Reader.decodeRow(int, com.google.zxing.common.BitArray, java.util.Map):com.google.zxing.Result");
     }

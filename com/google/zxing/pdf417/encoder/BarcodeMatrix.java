@@ -8,21 +8,21 @@ public final class BarcodeMatrix {
     private final BarcodeRow[] matrix;
     private final int width;
 
-    BarcodeMatrix(int height2, int width2) {
-        BarcodeRow[] barcodeRowArr = new BarcodeRow[height2];
+    BarcodeMatrix(int i, int i2) {
+        BarcodeRow[] barcodeRowArr = new BarcodeRow[i];
         this.matrix = barcodeRowArr;
-        int matrixLength = barcodeRowArr.length;
-        for (int i = 0; i < matrixLength; i++) {
-            this.matrix[i] = new BarcodeRow(((width2 + 4) * 17) + 1);
+        int length = barcodeRowArr.length;
+        for (int i3 = 0; i3 < length; i3++) {
+            this.matrix[i3] = new BarcodeRow(((i2 + 4) * 17) + 1);
         }
-        this.width = width2 * 17;
-        this.height = height2;
+        this.width = i2 * 17;
+        this.height = i;
         this.currentRow = -1;
     }
 
     /* access modifiers changed from: package-private */
-    public void set(int x, int y, byte value) {
-        this.matrix[y].set(x, value);
+    public void set(int i, int i2, byte b) {
+        this.matrix[i2].set(i, b);
     }
 
     /* access modifiers changed from: package-private */
@@ -39,15 +39,15 @@ public final class BarcodeMatrix {
         return getScaledMatrix(1, 1);
     }
 
-    public byte[][] getScaledMatrix(int xScale, int yScale) {
+    public byte[][] getScaledMatrix(int i, int i2) {
         int[] iArr = new int[2];
-        iArr[1] = this.width * xScale;
-        iArr[0] = this.height * yScale;
-        byte[][] matrixOut = (byte[][]) Array.newInstance(byte.class, iArr);
-        int yMax = this.height * yScale;
-        for (int i = 0; i < yMax; i++) {
-            matrixOut[(yMax - i) - 1] = this.matrix[i / yScale].getScaledRow(xScale);
+        iArr[1] = this.width * i;
+        iArr[0] = this.height * i2;
+        byte[][] bArr = (byte[][]) Array.newInstance(byte.class, iArr);
+        int i3 = this.height * i2;
+        for (int i4 = 0; i4 < i3; i4++) {
+            bArr[(i3 - i4) - 1] = this.matrix[i4 / i2].getScaledRow(i);
         }
-        return matrixOut;
+        return bArr;
     }
 }

@@ -16,32 +16,32 @@ public final class URIResultInfoRetriever extends SupplementalInfoRetriever {
     private final String redirectString;
     private final URIParsedResult result;
 
-    URIResultInfoRetriever(TextView textView, URIParsedResult result2, HistoryManager historyManager, Context context) {
+    URIResultInfoRetriever(TextView textView, URIParsedResult uRIParsedResult, HistoryManager historyManager, Context context) {
         super(textView, historyManager);
         this.redirectString = context.getString(R.string.msg_redirect);
-        this.result = result2;
+        this.result = uRIParsedResult;
     }
 
     /* access modifiers changed from: package-private */
     @Override // com.google.zxing.client.android.result.supplement.SupplementalInfoRetriever
     public void retrieveSupplementalInfo() throws IOException {
         try {
-            URI oldURI = new URI(this.result.getURI());
-            URI newURI = HttpHelper.unredirect(oldURI);
-            int count = 0;
+            URI uri = new URI(this.result.getURI());
+            URI unredirect = HttpHelper.unredirect(uri);
+            int i = 0;
             while (true) {
-                int count2 = count + 1;
-                if (count < 5 && !oldURI.equals(newURI)) {
+                int i2 = i + 1;
+                if (i < 5 && !uri.equals(unredirect)) {
                     String displayResult = this.result.getDisplayResult();
-                    append(displayResult, null, new String[]{this.redirectString + " : " + newURI}, newURI.toString());
-                    oldURI = newURI;
-                    newURI = HttpHelper.unredirect(newURI);
-                    count = count2;
+                    append(displayResult, null, new String[]{this.redirectString + " : " + unredirect}, unredirect.toString());
+                    i = i2;
+                    unredirect = HttpHelper.unredirect(unredirect);
+                    uri = unredirect;
                 } else {
                     return;
                 }
             }
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException unused) {
         }
     }
 }

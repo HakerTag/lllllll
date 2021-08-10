@@ -21,8 +21,8 @@ public final class EdgeEffectCompat {
         EdgeEffectBaseImpl() {
         }
 
-        public void onPull(EdgeEffect edgeEffect, float deltaDistance, float displacement) {
-            edgeEffect.onPull(deltaDistance);
+        public void onPull(EdgeEffect edgeEffect, float f, float f2) {
+            edgeEffect.onPull(f);
         }
     }
 
@@ -31,8 +31,8 @@ public final class EdgeEffectCompat {
         }
 
         @Override // android.support.v4.widget.EdgeEffectCompat.EdgeEffectBaseImpl
-        public void onPull(EdgeEffect edgeEffect, float deltaDistance, float displacement) {
-            edgeEffect.onPull(deltaDistance, displacement);
+        public void onPull(EdgeEffect edgeEffect, float f, float f2) {
+            edgeEffect.onPull(f, f2);
         }
     }
 
@@ -42,8 +42,8 @@ public final class EdgeEffectCompat {
     }
 
     @Deprecated
-    public void setSize(int width, int height) {
-        this.mEdgeEffect.setSize(width, height);
+    public void setSize(int i, int i2) {
+        this.mEdgeEffect.setSize(i, i2);
     }
 
     @Deprecated
@@ -57,19 +57,19 @@ public final class EdgeEffectCompat {
     }
 
     @Deprecated
-    public boolean onPull(float deltaDistance) {
-        this.mEdgeEffect.onPull(deltaDistance);
+    public boolean onPull(float f) {
+        this.mEdgeEffect.onPull(f);
         return true;
     }
 
     @Deprecated
-    public boolean onPull(float deltaDistance, float displacement) {
-        IMPL.onPull(this.mEdgeEffect, deltaDistance, displacement);
+    public boolean onPull(float f, float f2) {
+        IMPL.onPull(this.mEdgeEffect, f, f2);
         return true;
     }
 
-    public static void onPull(EdgeEffect edgeEffect, float deltaDistance, float displacement) {
-        IMPL.onPull(edgeEffect, deltaDistance, displacement);
+    public static void onPull(EdgeEffect edgeEffect, float f, float f2) {
+        IMPL.onPull(edgeEffect, f, f2);
     }
 
     @Deprecated
@@ -79,8 +79,8 @@ public final class EdgeEffectCompat {
     }
 
     @Deprecated
-    public boolean onAbsorb(int velocity) {
-        this.mEdgeEffect.onAbsorb(velocity);
+    public boolean onAbsorb(int i) {
+        this.mEdgeEffect.onAbsorb(i);
         return true;
     }
 

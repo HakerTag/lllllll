@@ -11,7 +11,7 @@ public final class ContentResolverCompat {
     private ContentResolverCompat() {
     }
 
-    public static Cursor query(ContentResolver resolver, Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder, CancellationSignal cancellationSignal) {
+    public static Cursor query(ContentResolver contentResolver, Uri uri, String[] strArr, String str, String[] strArr2, String str2, CancellationSignal cancellationSignal) {
         Object obj;
         if (Build.VERSION.SDK_INT >= 16) {
             if (cancellationSignal != null) {
@@ -26,11 +26,11 @@ public final class ContentResolverCompat {
             } else {
                 obj = null;
             }
-            return resolver.query(uri, projection, selection, selectionArgs, sortOrder, (android.os.CancellationSignal) obj);
+            return contentResolver.query(uri, strArr, str, strArr2, str2, (android.os.CancellationSignal) obj);
         }
         if (cancellationSignal != null) {
             cancellationSignal.throwIfCanceled();
         }
-        return resolver.query(uri, projection, selection, selectionArgs, sortOrder);
+        return contentResolver.query(uri, strArr, str, strArr2, str2);
     }
 }

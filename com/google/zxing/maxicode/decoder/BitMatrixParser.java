@@ -15,19 +15,19 @@ public final class BitMatrixParser {
 
     /* access modifiers changed from: package-private */
     public byte[] readCodewords() {
-        byte[] result = new byte[144];
+        byte[] bArr = new byte[144];
         int height = this.bitMatrix.getHeight();
         int width = this.bitMatrix.getWidth();
-        for (int y = 0; y < height; y++) {
-            int[] bitnrRow = BITNR[y];
-            for (int x = 0; x < width; x++) {
-                int bit = bitnrRow[x];
-                if (bit >= 0 && this.bitMatrix.get(x, y)) {
-                    int i = bit / 6;
-                    result[i] = (byte) (result[i] | ((byte) (1 << (5 - (bit % 6)))));
+        for (int i = 0; i < height; i++) {
+            int[] iArr = BITNR[i];
+            for (int i2 = 0; i2 < width; i2++) {
+                int i3 = iArr[i2];
+                if (i3 >= 0 && this.bitMatrix.get(i2, i)) {
+                    int i4 = i3 / 6;
+                    bArr[i4] = (byte) (((byte) (1 << (5 - (i3 % 6)))) | bArr[i4]);
                 }
             }
         }
-        return result;
+        return bArr;
     }
 }

@@ -8,16 +8,16 @@ import android.view.DragEvent;
 public final class DragAndDropPermissionsCompat {
     private Object mDragAndDropPermissions;
 
-    private DragAndDropPermissionsCompat(Object dragAndDropPermissions) {
-        this.mDragAndDropPermissions = dragAndDropPermissions;
+    private DragAndDropPermissionsCompat(Object obj) {
+        this.mDragAndDropPermissions = obj;
     }
 
     public static DragAndDropPermissionsCompat request(Activity activity, DragEvent dragEvent) {
-        DragAndDropPermissions dragAndDropPermissions;
-        if (Build.VERSION.SDK_INT < 24 || (dragAndDropPermissions = activity.requestDragAndDropPermissions(dragEvent)) == null) {
+        DragAndDropPermissions requestDragAndDropPermissions;
+        if (Build.VERSION.SDK_INT < 24 || (requestDragAndDropPermissions = activity.requestDragAndDropPermissions(dragEvent)) == null) {
             return null;
         }
-        return new DragAndDropPermissionsCompat(dragAndDropPermissions);
+        return new DragAndDropPermissionsCompat(requestDragAndDropPermissions);
     }
 
     public void release() {

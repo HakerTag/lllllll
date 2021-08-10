@@ -12,8 +12,8 @@ public abstract class Binarizer {
 
     public abstract BitArray getBlackRow(int i, BitArray bitArray) throws NotFoundException;
 
-    protected Binarizer(LuminanceSource source2) {
-        this.source = source2;
+    protected Binarizer(LuminanceSource luminanceSource) {
+        this.source = luminanceSource;
     }
 
     public final LuminanceSource getLuminanceSource() {

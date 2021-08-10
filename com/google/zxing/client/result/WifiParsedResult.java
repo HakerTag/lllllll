@@ -6,16 +6,16 @@ public final class WifiParsedResult extends ParsedResult {
     private final String password;
     private final String ssid;
 
-    public WifiParsedResult(String networkEncryption2, String ssid2, String password2) {
-        this(networkEncryption2, ssid2, password2, false);
+    public WifiParsedResult(String str, String str2, String str3) {
+        this(str, str2, str3, false);
     }
 
-    public WifiParsedResult(String networkEncryption2, String ssid2, String password2, boolean hidden2) {
+    public WifiParsedResult(String str, String str2, String str3, boolean z) {
         super(ParsedResultType.WIFI);
-        this.ssid = ssid2;
-        this.networkEncryption = networkEncryption2;
-        this.password = password2;
-        this.hidden = hidden2;
+        this.ssid = str2;
+        this.networkEncryption = str;
+        this.password = str3;
+        this.hidden = z;
     }
 
     public String getSsid() {
@@ -36,11 +36,11 @@ public final class WifiParsedResult extends ParsedResult {
 
     @Override // com.google.zxing.client.result.ParsedResult
     public String getDisplayResult() {
-        StringBuilder result = new StringBuilder(80);
-        maybeAppend(this.ssid, result);
-        maybeAppend(this.networkEncryption, result);
-        maybeAppend(this.password, result);
-        maybeAppend(Boolean.toString(this.hidden), result);
-        return result.toString();
+        StringBuilder sb = new StringBuilder(80);
+        maybeAppend(this.ssid, sb);
+        maybeAppend(this.networkEncryption, sb);
+        maybeAppend(this.password, sb);
+        maybeAppend(Boolean.toString(this.hidden), sb);
+        return sb.toString();
     }
 }

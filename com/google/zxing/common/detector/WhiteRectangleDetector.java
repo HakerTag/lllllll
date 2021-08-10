@@ -15,172 +15,148 @@ public final class WhiteRectangleDetector {
     private final int upInit;
     private final int width;
 
-    public WhiteRectangleDetector(BitMatrix image2) throws NotFoundException {
-        this(image2, 10, image2.getWidth() / 2, image2.getHeight() / 2);
+    public WhiteRectangleDetector(BitMatrix bitMatrix) throws NotFoundException {
+        this(bitMatrix, 10, bitMatrix.getWidth() / 2, bitMatrix.getHeight() / 2);
     }
 
-    public WhiteRectangleDetector(BitMatrix image2, int initSize, int x, int y) throws NotFoundException {
-        this.image = image2;
-        this.height = image2.getHeight();
-        int width2 = image2.getWidth();
+    public WhiteRectangleDetector(BitMatrix bitMatrix, int i, int i2, int i3) throws NotFoundException {
+        this.image = bitMatrix;
+        this.height = bitMatrix.getHeight();
+        int width2 = bitMatrix.getWidth();
         this.width = width2;
-        int halfsize = initSize / 2;
-        int i = x - halfsize;
-        this.leftInit = i;
-        int i2 = x + halfsize;
-        this.rightInit = i2;
-        int i3 = y - halfsize;
-        this.upInit = i3;
-        int i4 = y + halfsize;
-        this.downInit = i4;
-        if (i3 < 0 || i < 0 || i4 >= this.height || i2 >= width2) {
+        int i4 = i / 2;
+        int i5 = i2 - i4;
+        this.leftInit = i5;
+        int i6 = i2 + i4;
+        this.rightInit = i6;
+        int i7 = i3 - i4;
+        this.upInit = i7;
+        int i8 = i3 + i4;
+        this.downInit = i8;
+        if (i7 < 0 || i5 < 0 || i8 >= this.height || i6 >= width2) {
             throw NotFoundException.getNotFoundInstance();
         }
     }
 
     public ResultPoint[] detect() throws NotFoundException {
-        int down;
-        int down2;
-        int left = this.leftInit;
-        int right = this.rightInit;
-        int up = this.upInit;
-        int down3 = this.downInit;
-        boolean sizeExceeded = false;
-        boolean aBlackPointFoundOnBorder = true;
-        boolean atLeastOneBlackPointFoundOnBorder = false;
-        boolean atLeastOneBlackPointFoundOnRight = false;
-        boolean atLeastOneBlackPointFoundOnBottom = false;
-        boolean atLeastOneBlackPointFoundOnLeft = false;
-        boolean atLeastOneBlackPointFoundOnTop = false;
+        int i = this.leftInit;
+        int i2 = this.rightInit;
+        int i3 = this.upInit;
+        int i4 = this.downInit;
+        boolean z = false;
+        int i5 = 1;
+        boolean z2 = true;
+        boolean z3 = false;
+        boolean z4 = false;
+        boolean z5 = false;
+        boolean z6 = false;
+        boolean z7 = false;
         while (true) {
-            if (!aBlackPointFoundOnBorder) {
+            if (!z2) {
                 break;
             }
-            aBlackPointFoundOnBorder = false;
-            boolean rightBorderNotWhite = true;
+            boolean z8 = true;
+            boolean z9 = false;
             while (true) {
-                if ((rightBorderNotWhite || !atLeastOneBlackPointFoundOnRight) && right < this.width) {
-                    rightBorderNotWhite = containsBlackPoint(up, down, right, false);
-                    if (rightBorderNotWhite) {
-                        right++;
-                        aBlackPointFoundOnBorder = true;
-                        atLeastOneBlackPointFoundOnRight = true;
-                    } else if (!atLeastOneBlackPointFoundOnRight) {
-                        right++;
+                if ((z8 || !z3) && i2 < this.width) {
+                    z8 = containsBlackPoint(i3, i4, i2, false);
+                    if (z8) {
+                        i2++;
+                        z3 = true;
+                        z9 = true;
+                    } else if (!z3) {
+                        i2++;
                     }
                 }
             }
-            if (right >= this.width) {
-                sizeExceeded = true;
+            if (i2 >= this.width) {
                 break;
             }
-            boolean bottomBorderNotWhite = true;
+            boolean z10 = true;
             while (true) {
-                if ((bottomBorderNotWhite || !atLeastOneBlackPointFoundOnBottom) && down < this.height) {
-                    bottomBorderNotWhite = containsBlackPoint(left, right, down, true);
-                    if (bottomBorderNotWhite) {
-                        down++;
-                        aBlackPointFoundOnBorder = true;
-                        atLeastOneBlackPointFoundOnBottom = true;
-                    } else if (!atLeastOneBlackPointFoundOnBottom) {
-                        down++;
+                if ((z10 || !z4) && i4 < this.height) {
+                    z10 = containsBlackPoint(i, i2, i4, true);
+                    if (z10) {
+                        i4++;
+                        z4 = true;
+                        z9 = true;
+                    } else if (!z4) {
+                        i4++;
                     }
                 }
             }
-            if (down >= this.height) {
-                sizeExceeded = true;
+            if (i4 >= this.height) {
                 break;
             }
-            boolean leftBorderNotWhite = true;
+            boolean z11 = true;
             while (true) {
-                if ((leftBorderNotWhite || !atLeastOneBlackPointFoundOnLeft) && left >= 0) {
-                    leftBorderNotWhite = containsBlackPoint(up, down, left, false);
-                    if (leftBorderNotWhite) {
-                        left--;
-                        aBlackPointFoundOnBorder = true;
-                        atLeastOneBlackPointFoundOnLeft = true;
-                    } else if (!atLeastOneBlackPointFoundOnLeft) {
-                        left--;
+                if ((z11 || !z5) && i >= 0) {
+                    z11 = containsBlackPoint(i3, i4, i, false);
+                    if (z11) {
+                        i--;
+                        z5 = true;
+                        z9 = true;
+                    } else if (!z5) {
+                        i--;
                     }
                 }
             }
-            if (left < 0) {
-                sizeExceeded = true;
+            if (i < 0) {
                 break;
             }
-            boolean topBorderNotWhite = true;
+            z2 = z9;
+            boolean z12 = true;
             while (true) {
-                if (topBorderNotWhite || !atLeastOneBlackPointFoundOnTop) {
-                    if (up < 0) {
-                        down2 = down;
-                        break;
+                if ((z12 || !z7) && i3 >= 0) {
+                    z12 = containsBlackPoint(i, i2, i3, true);
+                    if (z12) {
+                        i3--;
+                        z2 = true;
+                        z7 = true;
+                    } else if (!z7) {
+                        i3--;
                     }
-                    topBorderNotWhite = containsBlackPoint(left, right, up, true);
-                    if (topBorderNotWhite) {
-                        up--;
-                        aBlackPointFoundOnBorder = true;
-                        atLeastOneBlackPointFoundOnTop = true;
-                        down = down;
-                    } else if (!atLeastOneBlackPointFoundOnTop) {
-                        up--;
-                        down = down;
-                    } else {
-                        down = down;
-                    }
-                } else {
-                    down2 = down;
-                    break;
                 }
             }
-            if (up < 0) {
-                sizeExceeded = true;
-                down = down2;
+            if (i3 < 0) {
                 break;
+            } else if (z2) {
+                z6 = true;
             }
-            if (aBlackPointFoundOnBorder) {
-                atLeastOneBlackPointFoundOnBorder = true;
-            }
-            down3 = down2;
         }
-        if (sizeExceeded || !atLeastOneBlackPointFoundOnBorder) {
+        z = true;
+        if (z || !z6) {
             throw NotFoundException.getNotFoundInstance();
         }
-        int maxSize = right - left;
-        ResultPoint z = null;
-        int i = 1;
-        while (z == null && i < maxSize) {
-            z = getBlackPointOnSegment((float) left, (float) (down - i), (float) (left + i), (float) down);
-            i++;
-            sizeExceeded = sizeExceeded;
-            aBlackPointFoundOnBorder = aBlackPointFoundOnBorder;
-            atLeastOneBlackPointFoundOnBorder = atLeastOneBlackPointFoundOnBorder;
+        int i6 = i2 - i;
+        ResultPoint resultPoint = null;
+        ResultPoint resultPoint2 = null;
+        int i7 = 1;
+        while (resultPoint2 == null && i7 < i6) {
+            resultPoint2 = getBlackPointOnSegment((float) i, (float) (i4 - i7), (float) (i + i7), (float) i4);
+            i7++;
         }
-        if (z != null) {
-            ResultPoint t = null;
-            int i2 = 1;
-            while (t == null && i2 < maxSize) {
-                t = getBlackPointOnSegment((float) left, (float) (up + i2), (float) (left + i2), (float) up);
-                i2++;
-                left = left;
+        if (resultPoint2 != null) {
+            ResultPoint resultPoint3 = null;
+            int i8 = 1;
+            while (resultPoint3 == null && i8 < i6) {
+                resultPoint3 = getBlackPointOnSegment((float) i, (float) (i3 + i8), (float) (i + i8), (float) i3);
+                i8++;
             }
-            if (t != null) {
-                ResultPoint x = null;
-                int i3 = 1;
-                while (x == null && i3 < maxSize) {
-                    x = getBlackPointOnSegment((float) right, (float) (up + i3), (float) (right - i3), (float) up);
-                    i3++;
-                    atLeastOneBlackPointFoundOnRight = atLeastOneBlackPointFoundOnRight;
+            if (resultPoint3 != null) {
+                ResultPoint resultPoint4 = null;
+                int i9 = 1;
+                while (resultPoint4 == null && i9 < i6) {
+                    resultPoint4 = getBlackPointOnSegment((float) i2, (float) (i3 + i9), (float) (i2 - i9), (float) i3);
+                    i9++;
                 }
-                if (x != null) {
-                    ResultPoint y = null;
-                    int i4 = 1;
-                    while (y == null && i4 < maxSize) {
-                        y = getBlackPointOnSegment((float) right, (float) (down - i4), (float) (right - i4), (float) down);
-                        i4++;
-                        right = right;
+                if (resultPoint4 != null) {
+                    while (resultPoint == null && i5 < i6) {
+                        resultPoint = getBlackPointOnSegment((float) i2, (float) (i4 - i5), (float) (i2 - i5), (float) i4);
+                        i5++;
                     }
-                    if (y != null) {
-                        return centerEdges(y, z, x, t);
+                    if (resultPoint != null) {
+                        return centerEdges(resultPoint, resultPoint2, resultPoint4, resultPoint3);
                     }
                     throw NotFoundException.getNotFoundInstance();
                 }
@@ -191,48 +167,52 @@ public final class WhiteRectangleDetector {
         throw NotFoundException.getNotFoundInstance();
     }
 
-    private ResultPoint getBlackPointOnSegment(float aX, float aY, float bX, float bY) {
-        int dist = MathUtils.round(MathUtils.distance(aX, aY, bX, bY));
-        float xStep = (bX - aX) / ((float) dist);
-        float yStep = (bY - aY) / ((float) dist);
-        for (int i = 0; i < dist; i++) {
-            int x = MathUtils.round((((float) i) * xStep) + aX);
-            int y = MathUtils.round((((float) i) * yStep) + aY);
-            if (this.image.get(x, y)) {
-                return new ResultPoint((float) x, (float) y);
+    private ResultPoint getBlackPointOnSegment(float f, float f2, float f3, float f4) {
+        int round = MathUtils.round(MathUtils.distance(f, f2, f3, f4));
+        float f5 = (float) round;
+        float f6 = (f3 - f) / f5;
+        float f7 = (f4 - f2) / f5;
+        for (int i = 0; i < round; i++) {
+            float f8 = (float) i;
+            int round2 = MathUtils.round((f8 * f6) + f);
+            int round3 = MathUtils.round((f8 * f7) + f2);
+            if (this.image.get(round2, round3)) {
+                return new ResultPoint((float) round2, (float) round3);
             }
         }
         return null;
     }
 
-    private ResultPoint[] centerEdges(ResultPoint y, ResultPoint z, ResultPoint x, ResultPoint t) {
-        float yi = y.getX();
-        float yj = y.getY();
-        float zi = z.getX();
-        float zj = z.getY();
-        float xi = x.getX();
-        float xj = x.getY();
-        float ti = t.getX();
-        float tj = t.getY();
-        if (yi < ((float) this.width) / 2.0f) {
-            return new ResultPoint[]{new ResultPoint(ti - 1.0f, tj + 1.0f), new ResultPoint(zi + 1.0f, zj + 1.0f), new ResultPoint(xi - 1.0f, xj - 1.0f), new ResultPoint(yi + 1.0f, yj - 1.0f)};
+    private ResultPoint[] centerEdges(ResultPoint resultPoint, ResultPoint resultPoint2, ResultPoint resultPoint3, ResultPoint resultPoint4) {
+        float x = resultPoint.getX();
+        float y = resultPoint.getY();
+        float x2 = resultPoint2.getX();
+        float y2 = resultPoint2.getY();
+        float x3 = resultPoint3.getX();
+        float y3 = resultPoint3.getY();
+        float x4 = resultPoint4.getX();
+        float y4 = resultPoint4.getY();
+        if (x < ((float) this.width) / 2.0f) {
+            return new ResultPoint[]{new ResultPoint(x4 - 1.0f, y4 + 1.0f), new ResultPoint(x2 + 1.0f, y2 + 1.0f), new ResultPoint(x3 - 1.0f, y3 - 1.0f), new ResultPoint(x + 1.0f, y - 1.0f)};
         }
-        return new ResultPoint[]{new ResultPoint(ti + 1.0f, tj + 1.0f), new ResultPoint(zi + 1.0f, zj - 1.0f), new ResultPoint(xi - 1.0f, xj + 1.0f), new ResultPoint(yi - 1.0f, yj - 1.0f)};
+        return new ResultPoint[]{new ResultPoint(x4 + 1.0f, y4 + 1.0f), new ResultPoint(x2 + 1.0f, y2 - 1.0f), new ResultPoint(x3 - 1.0f, y3 + 1.0f), new ResultPoint(x - 1.0f, y - 1.0f)};
     }
 
-    private boolean containsBlackPoint(int a, int b, int fixed, boolean horizontal) {
-        if (horizontal) {
-            for (int x = a; x <= b; x++) {
-                if (this.image.get(x, fixed)) {
+    private boolean containsBlackPoint(int i, int i2, int i3, boolean z) {
+        if (z) {
+            while (i <= i2) {
+                if (this.image.get(i, i3)) {
                     return true;
                 }
+                i++;
             }
             return false;
         }
-        for (int y = a; y <= b; y++) {
-            if (this.image.get(fixed, y)) {
+        while (i <= i2) {
+            if (this.image.get(i3, i)) {
                 return true;
             }
+            i++;
         }
         return false;
     }

@@ -40,60 +40,60 @@ public final class AccessibilityEventCompat {
     }
 
     @Deprecated
-    public static int getRecordCount(AccessibilityEvent event) {
-        return event.getRecordCount();
+    public static int getRecordCount(AccessibilityEvent accessibilityEvent) {
+        return accessibilityEvent.getRecordCount();
     }
 
     @Deprecated
-    public static void appendRecord(AccessibilityEvent event, AccessibilityRecordCompat record) {
-        event.appendRecord((AccessibilityRecord) record.getImpl());
+    public static void appendRecord(AccessibilityEvent accessibilityEvent, AccessibilityRecordCompat accessibilityRecordCompat) {
+        accessibilityEvent.appendRecord((AccessibilityRecord) accessibilityRecordCompat.getImpl());
     }
 
     @Deprecated
-    public static AccessibilityRecordCompat getRecord(AccessibilityEvent event, int index) {
-        return new AccessibilityRecordCompat(event.getRecord(index));
+    public static AccessibilityRecordCompat getRecord(AccessibilityEvent accessibilityEvent, int i) {
+        return new AccessibilityRecordCompat(accessibilityEvent.getRecord(i));
     }
 
     @Deprecated
-    public static AccessibilityRecordCompat asRecord(AccessibilityEvent event) {
-        return new AccessibilityRecordCompat(event);
+    public static AccessibilityRecordCompat asRecord(AccessibilityEvent accessibilityEvent) {
+        return new AccessibilityRecordCompat(accessibilityEvent);
     }
 
-    public static void setContentChangeTypes(AccessibilityEvent event, int changeTypes) {
+    public static void setContentChangeTypes(AccessibilityEvent accessibilityEvent, int i) {
         if (Build.VERSION.SDK_INT >= 19) {
-            event.setContentChangeTypes(changeTypes);
+            accessibilityEvent.setContentChangeTypes(i);
         }
     }
 
-    public static int getContentChangeTypes(AccessibilityEvent event) {
+    public static int getContentChangeTypes(AccessibilityEvent accessibilityEvent) {
         if (Build.VERSION.SDK_INT >= 19) {
-            return event.getContentChangeTypes();
+            return accessibilityEvent.getContentChangeTypes();
         }
         return 0;
     }
 
-    public static void setMovementGranularity(AccessibilityEvent event, int granularity) {
+    public static void setMovementGranularity(AccessibilityEvent accessibilityEvent, int i) {
         if (Build.VERSION.SDK_INT >= 16) {
-            event.setMovementGranularity(granularity);
+            accessibilityEvent.setMovementGranularity(i);
         }
     }
 
-    public static int getMovementGranularity(AccessibilityEvent event) {
+    public static int getMovementGranularity(AccessibilityEvent accessibilityEvent) {
         if (Build.VERSION.SDK_INT >= 16) {
-            return event.getMovementGranularity();
+            return accessibilityEvent.getMovementGranularity();
         }
         return 0;
     }
 
-    public static void setAction(AccessibilityEvent event, int action) {
+    public static void setAction(AccessibilityEvent accessibilityEvent, int i) {
         if (Build.VERSION.SDK_INT >= 16) {
-            event.setAction(action);
+            accessibilityEvent.setAction(i);
         }
     }
 
-    public static int getAction(AccessibilityEvent event) {
+    public static int getAction(AccessibilityEvent accessibilityEvent) {
         if (Build.VERSION.SDK_INT >= 16) {
-            return event.getAction();
+            return accessibilityEvent.getAction();
         }
         return 0;
     }

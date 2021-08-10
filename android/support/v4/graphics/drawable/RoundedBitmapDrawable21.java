@@ -7,8 +7,8 @@ import android.graphics.Rect;
 import android.view.Gravity;
 
 class RoundedBitmapDrawable21 extends RoundedBitmapDrawable {
-    protected RoundedBitmapDrawable21(Resources res, Bitmap bitmap) {
-        super(res, bitmap);
+    protected RoundedBitmapDrawable21(Resources resources, Bitmap bitmap) {
+        super(resources, bitmap);
     }
 
     public void getOutline(Outline outline) {
@@ -17,9 +17,9 @@ class RoundedBitmapDrawable21 extends RoundedBitmapDrawable {
     }
 
     @Override // android.support.v4.graphics.drawable.RoundedBitmapDrawable
-    public void setMipMap(boolean mipMap) {
+    public void setMipMap(boolean z) {
         if (this.mBitmap != null) {
-            this.mBitmap.setHasMipMap(mipMap);
+            this.mBitmap.setHasMipMap(z);
             invalidateSelf();
         }
     }
@@ -31,7 +31,7 @@ class RoundedBitmapDrawable21 extends RoundedBitmapDrawable {
 
     /* access modifiers changed from: package-private */
     @Override // android.support.v4.graphics.drawable.RoundedBitmapDrawable
-    public void gravityCompatApply(int gravity, int bitmapWidth, int bitmapHeight, Rect bounds, Rect outRect) {
-        Gravity.apply(gravity, bitmapWidth, bitmapHeight, bounds, outRect, 0);
+    public void gravityCompatApply(int i, int i2, int i3, Rect rect, Rect rect2) {
+        Gravity.apply(i, i2, i3, rect, rect2, 0);
     }
 }

@@ -168,448 +168,400 @@ public interface IMediaSession extends IInterface {
         static final int TRANSACTION_stop = 19;
         static final int TRANSACTION_unregisterCallbackListener = 4;
 
-        public Stub() {
-            attachInterface(this, DESCRIPTOR);
-        }
-
-        public static IMediaSession asInterface(IBinder obj) {
-            if (obj == null) {
-                return null;
-            }
-            IInterface iin = obj.queryLocalInterface(DESCRIPTOR);
-            if (iin == null || !(iin instanceof IMediaSession)) {
-                return new Proxy(obj);
-            }
-            return (IMediaSession) iin;
-        }
-
         public IBinder asBinder() {
             return this;
         }
 
+        public Stub() {
+            attachInterface(this, DESCRIPTOR);
+        }
+
+        public static IMediaSession asInterface(IBinder iBinder) {
+            if (iBinder == null) {
+                return null;
+            }
+            IInterface queryLocalInterface = iBinder.queryLocalInterface(DESCRIPTOR);
+            if (queryLocalInterface == null || !(queryLocalInterface instanceof IMediaSession)) {
+                return new Proxy(iBinder);
+            }
+            return (IMediaSession) queryLocalInterface;
+        }
+
         @Override // android.os.Binder
-        public boolean onTransact(int code, Parcel data, Parcel reply, int flags) throws RemoteException {
-            RatingCompat _arg0;
-            Bundle _arg1;
-            Bundle _arg12;
-            MediaSessionCompat.ResultReceiverWrapper _arg2;
-            KeyEvent _arg02;
-            Bundle _arg13;
-            Bundle _arg14;
-            Uri _arg03;
-            Bundle _arg15;
-            RatingCompat _arg04;
-            Bundle _arg16;
-            Bundle _arg17;
-            Bundle _arg18;
-            Uri _arg05;
-            Bundle _arg19;
-            MediaDescriptionCompat _arg06;
-            MediaDescriptionCompat _arg07;
-            MediaDescriptionCompat _arg08;
-            if (code == TRANSACTION_rateWithExtras) {
-                data.enforceInterface(DESCRIPTOR);
-                if (data.readInt() != 0) {
-                    _arg0 = RatingCompat.CREATOR.createFromParcel(data);
-                } else {
-                    _arg0 = null;
+        public boolean onTransact(int i, Parcel parcel, Parcel parcel2, int i2) throws RemoteException {
+            Bundle bundle = null;
+            MediaDescriptionCompat mediaDescriptionCompat = null;
+            MediaDescriptionCompat mediaDescriptionCompat2 = null;
+            MediaDescriptionCompat mediaDescriptionCompat3 = null;
+            Bundle bundle2 = null;
+            Bundle bundle3 = null;
+            Bundle bundle4 = null;
+            Bundle bundle5 = null;
+            RatingCompat ratingCompat = null;
+            Bundle bundle6 = null;
+            Bundle bundle7 = null;
+            Bundle bundle8 = null;
+            KeyEvent keyEvent = null;
+            MediaSessionCompat.ResultReceiverWrapper resultReceiverWrapper = null;
+            if (i == TRANSACTION_rateWithExtras) {
+                parcel.enforceInterface(DESCRIPTOR);
+                RatingCompat createFromParcel = parcel.readInt() != 0 ? RatingCompat.CREATOR.createFromParcel(parcel) : null;
+                if (parcel.readInt() != 0) {
+                    bundle = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
                 }
-                if (data.readInt() != 0) {
-                    _arg1 = (Bundle) Bundle.CREATOR.createFromParcel(data);
-                } else {
-                    _arg1 = null;
-                }
-                rateWithExtras(_arg0, _arg1);
-                reply.writeNoException();
+                rateWithExtras(createFromParcel, bundle);
+                parcel2.writeNoException();
                 return true;
-            } else if (code != 1598968902) {
-                boolean _arg09 = false;
-                boolean _arg010 = false;
-                switch (code) {
+            } else if (i != 1598968902) {
+                boolean z = false;
+                boolean z2 = false;
+                switch (i) {
                     case 1:
-                        data.enforceInterface(DESCRIPTOR);
-                        String _arg011 = data.readString();
-                        if (data.readInt() != 0) {
-                            _arg12 = (Bundle) Bundle.CREATOR.createFromParcel(data);
-                        } else {
-                            _arg12 = null;
+                        parcel.enforceInterface(DESCRIPTOR);
+                        String readString = parcel.readString();
+                        Bundle bundle9 = parcel.readInt() != 0 ? (Bundle) Bundle.CREATOR.createFromParcel(parcel) : null;
+                        if (parcel.readInt() != 0) {
+                            resultReceiverWrapper = MediaSessionCompat.ResultReceiverWrapper.CREATOR.createFromParcel(parcel);
                         }
-                        if (data.readInt() != 0) {
-                            _arg2 = MediaSessionCompat.ResultReceiverWrapper.CREATOR.createFromParcel(data);
-                        } else {
-                            _arg2 = null;
-                        }
-                        sendCommand(_arg011, _arg12, _arg2);
-                        reply.writeNoException();
+                        sendCommand(readString, bundle9, resultReceiverWrapper);
+                        parcel2.writeNoException();
                         return true;
                     case 2:
-                        data.enforceInterface(DESCRIPTOR);
-                        if (data.readInt() != 0) {
-                            _arg02 = (KeyEvent) KeyEvent.CREATOR.createFromParcel(data);
-                        } else {
-                            _arg02 = null;
+                        parcel.enforceInterface(DESCRIPTOR);
+                        if (parcel.readInt() != 0) {
+                            keyEvent = (KeyEvent) KeyEvent.CREATOR.createFromParcel(parcel);
                         }
-                        boolean sendMediaButton = sendMediaButton(_arg02);
-                        reply.writeNoException();
-                        reply.writeInt(sendMediaButton ? 1 : 0);
+                        boolean sendMediaButton = sendMediaButton(keyEvent);
+                        parcel2.writeNoException();
+                        parcel2.writeInt(sendMediaButton ? 1 : 0);
                         return true;
                     case 3:
-                        data.enforceInterface(DESCRIPTOR);
-                        registerCallbackListener(IMediaControllerCallback.Stub.asInterface(data.readStrongBinder()));
-                        reply.writeNoException();
+                        parcel.enforceInterface(DESCRIPTOR);
+                        registerCallbackListener(IMediaControllerCallback.Stub.asInterface(parcel.readStrongBinder()));
+                        parcel2.writeNoException();
                         return true;
                     case 4:
-                        data.enforceInterface(DESCRIPTOR);
-                        unregisterCallbackListener(IMediaControllerCallback.Stub.asInterface(data.readStrongBinder()));
-                        reply.writeNoException();
+                        parcel.enforceInterface(DESCRIPTOR);
+                        unregisterCallbackListener(IMediaControllerCallback.Stub.asInterface(parcel.readStrongBinder()));
+                        parcel2.writeNoException();
                         return true;
                     case 5:
-                        data.enforceInterface(DESCRIPTOR);
+                        parcel.enforceInterface(DESCRIPTOR);
                         boolean isTransportControlEnabled = isTransportControlEnabled();
-                        reply.writeNoException();
-                        reply.writeInt(isTransportControlEnabled ? 1 : 0);
+                        parcel2.writeNoException();
+                        parcel2.writeInt(isTransportControlEnabled ? 1 : 0);
                         return true;
                     case 6:
-                        data.enforceInterface(DESCRIPTOR);
-                        String _result = getPackageName();
-                        reply.writeNoException();
-                        reply.writeString(_result);
+                        parcel.enforceInterface(DESCRIPTOR);
+                        String packageName = getPackageName();
+                        parcel2.writeNoException();
+                        parcel2.writeString(packageName);
                         return true;
                     case 7:
-                        data.enforceInterface(DESCRIPTOR);
-                        String _result2 = getTag();
-                        reply.writeNoException();
-                        reply.writeString(_result2);
+                        parcel.enforceInterface(DESCRIPTOR);
+                        String tag = getTag();
+                        parcel2.writeNoException();
+                        parcel2.writeString(tag);
                         return true;
                     case 8:
-                        data.enforceInterface(DESCRIPTOR);
-                        PendingIntent _result3 = getLaunchPendingIntent();
-                        reply.writeNoException();
-                        if (_result3 != null) {
-                            reply.writeInt(1);
-                            _result3.writeToParcel(reply, 1);
+                        parcel.enforceInterface(DESCRIPTOR);
+                        PendingIntent launchPendingIntent = getLaunchPendingIntent();
+                        parcel2.writeNoException();
+                        if (launchPendingIntent != null) {
+                            parcel2.writeInt(1);
+                            launchPendingIntent.writeToParcel(parcel2, 1);
                         } else {
-                            reply.writeInt(0);
+                            parcel2.writeInt(0);
                         }
                         return true;
                     case 9:
-                        data.enforceInterface(DESCRIPTOR);
-                        long _result4 = getFlags();
-                        reply.writeNoException();
-                        reply.writeLong(_result4);
+                        parcel.enforceInterface(DESCRIPTOR);
+                        long flags = getFlags();
+                        parcel2.writeNoException();
+                        parcel2.writeLong(flags);
                         return true;
                     case 10:
-                        data.enforceInterface(DESCRIPTOR);
-                        ParcelableVolumeInfo _result5 = getVolumeAttributes();
-                        reply.writeNoException();
-                        if (_result5 != null) {
-                            reply.writeInt(1);
-                            _result5.writeToParcel(reply, 1);
+                        parcel.enforceInterface(DESCRIPTOR);
+                        ParcelableVolumeInfo volumeAttributes = getVolumeAttributes();
+                        parcel2.writeNoException();
+                        if (volumeAttributes != null) {
+                            parcel2.writeInt(1);
+                            volumeAttributes.writeToParcel(parcel2, 1);
                         } else {
-                            reply.writeInt(0);
+                            parcel2.writeInt(0);
                         }
                         return true;
                     case 11:
-                        data.enforceInterface(DESCRIPTOR);
-                        adjustVolume(data.readInt(), data.readInt(), data.readString());
-                        reply.writeNoException();
+                        parcel.enforceInterface(DESCRIPTOR);
+                        adjustVolume(parcel.readInt(), parcel.readInt(), parcel.readString());
+                        parcel2.writeNoException();
                         return true;
                     case 12:
-                        data.enforceInterface(DESCRIPTOR);
-                        setVolumeTo(data.readInt(), data.readInt(), data.readString());
-                        reply.writeNoException();
+                        parcel.enforceInterface(DESCRIPTOR);
+                        setVolumeTo(parcel.readInt(), parcel.readInt(), parcel.readString());
+                        parcel2.writeNoException();
                         return true;
                     case 13:
-                        data.enforceInterface(DESCRIPTOR);
+                        parcel.enforceInterface(DESCRIPTOR);
                         play();
-                        reply.writeNoException();
+                        parcel2.writeNoException();
                         return true;
                     case 14:
-                        data.enforceInterface(DESCRIPTOR);
-                        String _arg012 = data.readString();
-                        if (data.readInt() != 0) {
-                            _arg13 = (Bundle) Bundle.CREATOR.createFromParcel(data);
-                        } else {
-                            _arg13 = null;
+                        parcel.enforceInterface(DESCRIPTOR);
+                        String readString2 = parcel.readString();
+                        if (parcel.readInt() != 0) {
+                            bundle8 = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
                         }
-                        playFromMediaId(_arg012, _arg13);
-                        reply.writeNoException();
+                        playFromMediaId(readString2, bundle8);
+                        parcel2.writeNoException();
                         return true;
                     case 15:
-                        data.enforceInterface(DESCRIPTOR);
-                        String _arg013 = data.readString();
-                        if (data.readInt() != 0) {
-                            _arg14 = (Bundle) Bundle.CREATOR.createFromParcel(data);
-                        } else {
-                            _arg14 = null;
+                        parcel.enforceInterface(DESCRIPTOR);
+                        String readString3 = parcel.readString();
+                        if (parcel.readInt() != 0) {
+                            bundle7 = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
                         }
-                        playFromSearch(_arg013, _arg14);
-                        reply.writeNoException();
+                        playFromSearch(readString3, bundle7);
+                        parcel2.writeNoException();
                         return true;
                     case 16:
-                        data.enforceInterface(DESCRIPTOR);
-                        if (data.readInt() != 0) {
-                            _arg03 = (Uri) Uri.CREATOR.createFromParcel(data);
-                        } else {
-                            _arg03 = null;
+                        parcel.enforceInterface(DESCRIPTOR);
+                        Uri uri = parcel.readInt() != 0 ? (Uri) Uri.CREATOR.createFromParcel(parcel) : null;
+                        if (parcel.readInt() != 0) {
+                            bundle6 = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
                         }
-                        if (data.readInt() != 0) {
-                            _arg15 = (Bundle) Bundle.CREATOR.createFromParcel(data);
-                        } else {
-                            _arg15 = null;
-                        }
-                        playFromUri(_arg03, _arg15);
-                        reply.writeNoException();
+                        playFromUri(uri, bundle6);
+                        parcel2.writeNoException();
                         return true;
                     case 17:
-                        data.enforceInterface(DESCRIPTOR);
-                        skipToQueueItem(data.readLong());
-                        reply.writeNoException();
+                        parcel.enforceInterface(DESCRIPTOR);
+                        skipToQueueItem(parcel.readLong());
+                        parcel2.writeNoException();
                         return true;
                     case 18:
-                        data.enforceInterface(DESCRIPTOR);
+                        parcel.enforceInterface(DESCRIPTOR);
                         pause();
-                        reply.writeNoException();
+                        parcel2.writeNoException();
                         return true;
                     case 19:
-                        data.enforceInterface(DESCRIPTOR);
+                        parcel.enforceInterface(DESCRIPTOR);
                         stop();
-                        reply.writeNoException();
+                        parcel2.writeNoException();
                         return true;
                     case 20:
-                        data.enforceInterface(DESCRIPTOR);
+                        parcel.enforceInterface(DESCRIPTOR);
                         next();
-                        reply.writeNoException();
+                        parcel2.writeNoException();
                         return true;
                     case 21:
-                        data.enforceInterface(DESCRIPTOR);
+                        parcel.enforceInterface(DESCRIPTOR);
                         previous();
-                        reply.writeNoException();
+                        parcel2.writeNoException();
                         return true;
                     case 22:
-                        data.enforceInterface(DESCRIPTOR);
+                        parcel.enforceInterface(DESCRIPTOR);
                         fastForward();
-                        reply.writeNoException();
+                        parcel2.writeNoException();
                         return true;
                     case 23:
-                        data.enforceInterface(DESCRIPTOR);
+                        parcel.enforceInterface(DESCRIPTOR);
                         rewind();
-                        reply.writeNoException();
+                        parcel2.writeNoException();
                         return true;
                     case 24:
-                        data.enforceInterface(DESCRIPTOR);
-                        seekTo(data.readLong());
-                        reply.writeNoException();
+                        parcel.enforceInterface(DESCRIPTOR);
+                        seekTo(parcel.readLong());
+                        parcel2.writeNoException();
                         return true;
                     case 25:
-                        data.enforceInterface(DESCRIPTOR);
-                        if (data.readInt() != 0) {
-                            _arg04 = RatingCompat.CREATOR.createFromParcel(data);
-                        } else {
-                            _arg04 = null;
+                        parcel.enforceInterface(DESCRIPTOR);
+                        if (parcel.readInt() != 0) {
+                            ratingCompat = RatingCompat.CREATOR.createFromParcel(parcel);
                         }
-                        rate(_arg04);
-                        reply.writeNoException();
+                        rate(ratingCompat);
+                        parcel2.writeNoException();
                         return true;
                     case 26:
-                        data.enforceInterface(DESCRIPTOR);
-                        String _arg014 = data.readString();
-                        if (data.readInt() != 0) {
-                            _arg16 = (Bundle) Bundle.CREATOR.createFromParcel(data);
-                        } else {
-                            _arg16 = null;
+                        parcel.enforceInterface(DESCRIPTOR);
+                        String readString4 = parcel.readString();
+                        if (parcel.readInt() != 0) {
+                            bundle5 = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
                         }
-                        sendCustomAction(_arg014, _arg16);
-                        reply.writeNoException();
+                        sendCustomAction(readString4, bundle5);
+                        parcel2.writeNoException();
                         return true;
                     case 27:
-                        data.enforceInterface(DESCRIPTOR);
-                        MediaMetadataCompat _result6 = getMetadata();
-                        reply.writeNoException();
-                        if (_result6 != null) {
-                            reply.writeInt(1);
-                            _result6.writeToParcel(reply, 1);
+                        parcel.enforceInterface(DESCRIPTOR);
+                        MediaMetadataCompat metadata = getMetadata();
+                        parcel2.writeNoException();
+                        if (metadata != null) {
+                            parcel2.writeInt(1);
+                            metadata.writeToParcel(parcel2, 1);
                         } else {
-                            reply.writeInt(0);
+                            parcel2.writeInt(0);
                         }
                         return true;
                     case 28:
-                        data.enforceInterface(DESCRIPTOR);
-                        PlaybackStateCompat _result7 = getPlaybackState();
-                        reply.writeNoException();
-                        if (_result7 != null) {
-                            reply.writeInt(1);
-                            _result7.writeToParcel(reply, 1);
+                        parcel.enforceInterface(DESCRIPTOR);
+                        PlaybackStateCompat playbackState = getPlaybackState();
+                        parcel2.writeNoException();
+                        if (playbackState != null) {
+                            parcel2.writeInt(1);
+                            playbackState.writeToParcel(parcel2, 1);
                         } else {
-                            reply.writeInt(0);
+                            parcel2.writeInt(0);
                         }
                         return true;
                     case TRANSACTION_getQueue /*{ENCODED_INT: 29}*/:
-                        data.enforceInterface(DESCRIPTOR);
-                        List<MediaSessionCompat.QueueItem> _result8 = getQueue();
-                        reply.writeNoException();
-                        reply.writeTypedList(_result8);
+                        parcel.enforceInterface(DESCRIPTOR);
+                        List<MediaSessionCompat.QueueItem> queue = getQueue();
+                        parcel2.writeNoException();
+                        parcel2.writeTypedList(queue);
                         return true;
                     case TRANSACTION_getQueueTitle /*{ENCODED_INT: 30}*/:
-                        data.enforceInterface(DESCRIPTOR);
-                        CharSequence _result9 = getQueueTitle();
-                        reply.writeNoException();
-                        if (_result9 != null) {
-                            reply.writeInt(1);
-                            TextUtils.writeToParcel(_result9, reply, 1);
+                        parcel.enforceInterface(DESCRIPTOR);
+                        CharSequence queueTitle = getQueueTitle();
+                        parcel2.writeNoException();
+                        if (queueTitle != null) {
+                            parcel2.writeInt(1);
+                            TextUtils.writeToParcel(queueTitle, parcel2, 1);
                         } else {
-                            reply.writeInt(0);
+                            parcel2.writeInt(0);
                         }
                         return true;
                     case TRANSACTION_getExtras /*{ENCODED_INT: 31}*/:
-                        data.enforceInterface(DESCRIPTOR);
-                        Bundle _result10 = getExtras();
-                        reply.writeNoException();
-                        if (_result10 != null) {
-                            reply.writeInt(1);
-                            _result10.writeToParcel(reply, 1);
+                        parcel.enforceInterface(DESCRIPTOR);
+                        Bundle extras = getExtras();
+                        parcel2.writeNoException();
+                        if (extras != null) {
+                            parcel2.writeInt(1);
+                            extras.writeToParcel(parcel2, 1);
                         } else {
-                            reply.writeInt(0);
+                            parcel2.writeInt(0);
                         }
                         return true;
                     case 32:
-                        data.enforceInterface(DESCRIPTOR);
-                        int _result11 = getRatingType();
-                        reply.writeNoException();
-                        reply.writeInt(_result11);
+                        parcel.enforceInterface(DESCRIPTOR);
+                        int ratingType = getRatingType();
+                        parcel2.writeNoException();
+                        parcel2.writeInt(ratingType);
                         return true;
                     case 33:
-                        data.enforceInterface(DESCRIPTOR);
+                        parcel.enforceInterface(DESCRIPTOR);
                         prepare();
-                        reply.writeNoException();
+                        parcel2.writeNoException();
                         return true;
                     case 34:
-                        data.enforceInterface(DESCRIPTOR);
-                        String _arg015 = data.readString();
-                        if (data.readInt() != 0) {
-                            _arg17 = (Bundle) Bundle.CREATOR.createFromParcel(data);
-                        } else {
-                            _arg17 = null;
+                        parcel.enforceInterface(DESCRIPTOR);
+                        String readString5 = parcel.readString();
+                        if (parcel.readInt() != 0) {
+                            bundle4 = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
                         }
-                        prepareFromMediaId(_arg015, _arg17);
-                        reply.writeNoException();
+                        prepareFromMediaId(readString5, bundle4);
+                        parcel2.writeNoException();
                         return true;
                     case 35:
-                        data.enforceInterface(DESCRIPTOR);
-                        String _arg016 = data.readString();
-                        if (data.readInt() != 0) {
-                            _arg18 = (Bundle) Bundle.CREATOR.createFromParcel(data);
-                        } else {
-                            _arg18 = null;
+                        parcel.enforceInterface(DESCRIPTOR);
+                        String readString6 = parcel.readString();
+                        if (parcel.readInt() != 0) {
+                            bundle3 = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
                         }
-                        prepareFromSearch(_arg016, _arg18);
-                        reply.writeNoException();
+                        prepareFromSearch(readString6, bundle3);
+                        parcel2.writeNoException();
                         return true;
                     case 36:
-                        data.enforceInterface(DESCRIPTOR);
-                        if (data.readInt() != 0) {
-                            _arg05 = (Uri) Uri.CREATOR.createFromParcel(data);
-                        } else {
-                            _arg05 = null;
+                        parcel.enforceInterface(DESCRIPTOR);
+                        Uri uri2 = parcel.readInt() != 0 ? (Uri) Uri.CREATOR.createFromParcel(parcel) : null;
+                        if (parcel.readInt() != 0) {
+                            bundle2 = (Bundle) Bundle.CREATOR.createFromParcel(parcel);
                         }
-                        if (data.readInt() != 0) {
-                            _arg19 = (Bundle) Bundle.CREATOR.createFromParcel(data);
-                        } else {
-                            _arg19 = null;
-                        }
-                        prepareFromUri(_arg05, _arg19);
-                        reply.writeNoException();
+                        prepareFromUri(uri2, bundle2);
+                        parcel2.writeNoException();
                         return true;
                     case 37:
-                        data.enforceInterface(DESCRIPTOR);
-                        int _result12 = getRepeatMode();
-                        reply.writeNoException();
-                        reply.writeInt(_result12);
+                        parcel.enforceInterface(DESCRIPTOR);
+                        int repeatMode = getRepeatMode();
+                        parcel2.writeNoException();
+                        parcel2.writeInt(repeatMode);
                         return true;
                     case 38:
-                        data.enforceInterface(DESCRIPTOR);
+                        parcel.enforceInterface(DESCRIPTOR);
                         boolean isShuffleModeEnabledRemoved = isShuffleModeEnabledRemoved();
-                        reply.writeNoException();
-                        reply.writeInt(isShuffleModeEnabledRemoved ? 1 : 0);
+                        parcel2.writeNoException();
+                        parcel2.writeInt(isShuffleModeEnabledRemoved ? 1 : 0);
                         return true;
                     case 39:
-                        data.enforceInterface(DESCRIPTOR);
-                        setRepeatMode(data.readInt());
-                        reply.writeNoException();
+                        parcel.enforceInterface(DESCRIPTOR);
+                        setRepeatMode(parcel.readInt());
+                        parcel2.writeNoException();
                         return true;
                     case 40:
-                        data.enforceInterface(DESCRIPTOR);
-                        if (data.readInt() != 0) {
-                            _arg09 = true;
+                        parcel.enforceInterface(DESCRIPTOR);
+                        if (parcel.readInt() != 0) {
+                            z = true;
                         }
-                        setShuffleModeEnabledRemoved(_arg09);
-                        reply.writeNoException();
+                        setShuffleModeEnabledRemoved(z);
+                        parcel2.writeNoException();
                         return true;
                     case 41:
-                        data.enforceInterface(DESCRIPTOR);
-                        if (data.readInt() != 0) {
-                            _arg06 = MediaDescriptionCompat.CREATOR.createFromParcel(data);
-                        } else {
-                            _arg06 = null;
+                        parcel.enforceInterface(DESCRIPTOR);
+                        if (parcel.readInt() != 0) {
+                            mediaDescriptionCompat3 = MediaDescriptionCompat.CREATOR.createFromParcel(parcel);
                         }
-                        addQueueItem(_arg06);
-                        reply.writeNoException();
+                        addQueueItem(mediaDescriptionCompat3);
+                        parcel2.writeNoException();
                         return true;
                     case 42:
-                        data.enforceInterface(DESCRIPTOR);
-                        if (data.readInt() != 0) {
-                            _arg07 = MediaDescriptionCompat.CREATOR.createFromParcel(data);
-                        } else {
-                            _arg07 = null;
+                        parcel.enforceInterface(DESCRIPTOR);
+                        if (parcel.readInt() != 0) {
+                            mediaDescriptionCompat2 = MediaDescriptionCompat.CREATOR.createFromParcel(parcel);
                         }
-                        addQueueItemAt(_arg07, data.readInt());
-                        reply.writeNoException();
+                        addQueueItemAt(mediaDescriptionCompat2, parcel.readInt());
+                        parcel2.writeNoException();
                         return true;
                     case 43:
-                        data.enforceInterface(DESCRIPTOR);
-                        if (data.readInt() != 0) {
-                            _arg08 = MediaDescriptionCompat.CREATOR.createFromParcel(data);
-                        } else {
-                            _arg08 = null;
+                        parcel.enforceInterface(DESCRIPTOR);
+                        if (parcel.readInt() != 0) {
+                            mediaDescriptionCompat = MediaDescriptionCompat.CREATOR.createFromParcel(parcel);
                         }
-                        removeQueueItem(_arg08);
-                        reply.writeNoException();
+                        removeQueueItem(mediaDescriptionCompat);
+                        parcel2.writeNoException();
                         return true;
                     case 44:
-                        data.enforceInterface(DESCRIPTOR);
-                        removeQueueItemAt(data.readInt());
-                        reply.writeNoException();
+                        parcel.enforceInterface(DESCRIPTOR);
+                        removeQueueItemAt(parcel.readInt());
+                        parcel2.writeNoException();
                         return true;
                     case 45:
-                        data.enforceInterface(DESCRIPTOR);
+                        parcel.enforceInterface(DESCRIPTOR);
                         boolean isCaptioningEnabled = isCaptioningEnabled();
-                        reply.writeNoException();
-                        reply.writeInt(isCaptioningEnabled ? 1 : 0);
+                        parcel2.writeNoException();
+                        parcel2.writeInt(isCaptioningEnabled ? 1 : 0);
                         return true;
                     case 46:
-                        data.enforceInterface(DESCRIPTOR);
-                        if (data.readInt() != 0) {
-                            _arg010 = true;
+                        parcel.enforceInterface(DESCRIPTOR);
+                        if (parcel.readInt() != 0) {
+                            z2 = true;
                         }
-                        setCaptioningEnabled(_arg010);
-                        reply.writeNoException();
+                        setCaptioningEnabled(z2);
+                        parcel2.writeNoException();
                         return true;
                     case 47:
-                        data.enforceInterface(DESCRIPTOR);
-                        int _result13 = getShuffleMode();
-                        reply.writeNoException();
-                        reply.writeInt(_result13);
+                        parcel.enforceInterface(DESCRIPTOR);
+                        int shuffleMode = getShuffleMode();
+                        parcel2.writeNoException();
+                        parcel2.writeInt(shuffleMode);
                         return true;
                     case TRANSACTION_setShuffleMode /*{ENCODED_INT: 48}*/:
-                        data.enforceInterface(DESCRIPTOR);
-                        setShuffleMode(data.readInt());
-                        reply.writeNoException();
+                        parcel.enforceInterface(DESCRIPTOR);
+                        setShuffleMode(parcel.readInt());
+                        parcel2.writeNoException();
                         return true;
                     default:
-                        return super.onTransact(code, data, reply, flags);
+                        return super.onTransact(i, parcel, parcel2, i2);
                 }
             } else {
-                reply.writeString(DESCRIPTOR);
+                parcel2.writeString(DESCRIPTOR);
                 return true;
             }
         }
@@ -617,900 +569,864 @@ public interface IMediaSession extends IInterface {
         private static class Proxy implements IMediaSession {
             private IBinder mRemote;
 
-            Proxy(IBinder remote) {
-                this.mRemote = remote;
+            public String getInterfaceDescriptor() {
+                return Stub.DESCRIPTOR;
+            }
+
+            Proxy(IBinder iBinder) {
+                this.mRemote = iBinder;
             }
 
             public IBinder asBinder() {
                 return this.mRemote;
             }
 
-            public String getInterfaceDescriptor() {
-                return Stub.DESCRIPTOR;
-            }
-
             @Override // android.support.v4.media.session.IMediaSession
-            public void sendCommand(String command, Bundle args, MediaSessionCompat.ResultReceiverWrapper cb) throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+            public void sendCommand(String str, Bundle bundle, MediaSessionCompat.ResultReceiverWrapper resultReceiverWrapper) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    _data.writeString(command);
-                    if (args != null) {
-                        _data.writeInt(1);
-                        args.writeToParcel(_data, 0);
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    obtain.writeString(str);
+                    if (bundle != null) {
+                        obtain.writeInt(1);
+                        bundle.writeToParcel(obtain, 0);
                     } else {
-                        _data.writeInt(0);
+                        obtain.writeInt(0);
                     }
-                    if (cb != null) {
-                        _data.writeInt(1);
-                        cb.writeToParcel(_data, 0);
+                    if (resultReceiverWrapper != null) {
+                        obtain.writeInt(1);
+                        resultReceiverWrapper.writeToParcel(obtain, 0);
                     } else {
-                        _data.writeInt(0);
+                        obtain.writeInt(0);
                     }
-                    this.mRemote.transact(1, _data, _reply, 0);
-                    _reply.readException();
+                    this.mRemote.transact(1, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
-            public boolean sendMediaButton(KeyEvent mediaButton) throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
-                boolean _result = false;
+            public boolean sendMediaButton(KeyEvent keyEvent) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    if (mediaButton != null) {
-                        _data.writeInt(1);
-                        mediaButton.writeToParcel(_data, 0);
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    boolean z = true;
+                    if (keyEvent != null) {
+                        obtain.writeInt(1);
+                        keyEvent.writeToParcel(obtain, 0);
                     } else {
-                        _data.writeInt(0);
+                        obtain.writeInt(0);
                     }
-                    this.mRemote.transact(2, _data, _reply, 0);
-                    _reply.readException();
-                    if (_reply.readInt() != 0) {
-                        _result = true;
+                    this.mRemote.transact(2, obtain, obtain2, 0);
+                    obtain2.readException();
+                    if (obtain2.readInt() == 0) {
+                        z = false;
                     }
-                    return _result;
+                    return z;
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
-            public void registerCallbackListener(IMediaControllerCallback cb) throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+            public void registerCallbackListener(IMediaControllerCallback iMediaControllerCallback) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    _data.writeStrongBinder(cb != null ? cb.asBinder() : null);
-                    this.mRemote.transact(3, _data, _reply, 0);
-                    _reply.readException();
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    obtain.writeStrongBinder(iMediaControllerCallback != null ? iMediaControllerCallback.asBinder() : null);
+                    this.mRemote.transact(3, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
-            public void unregisterCallbackListener(IMediaControllerCallback cb) throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+            public void unregisterCallbackListener(IMediaControllerCallback iMediaControllerCallback) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    _data.writeStrongBinder(cb != null ? cb.asBinder() : null);
-                    this.mRemote.transact(4, _data, _reply, 0);
-                    _reply.readException();
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    obtain.writeStrongBinder(iMediaControllerCallback != null ? iMediaControllerCallback.asBinder() : null);
+                    this.mRemote.transact(4, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
             public boolean isTransportControlEnabled() throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
-                boolean _result = false;
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    this.mRemote.transact(5, _data, _reply, 0);
-                    _reply.readException();
-                    if (_reply.readInt() != 0) {
-                        _result = true;
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    boolean z = false;
+                    this.mRemote.transact(5, obtain, obtain2, 0);
+                    obtain2.readException();
+                    if (obtain2.readInt() != 0) {
+                        z = true;
                     }
-                    return _result;
+                    return z;
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
             public String getPackageName() throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    this.mRemote.transact(6, _data, _reply, 0);
-                    _reply.readException();
-                    return _reply.readString();
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    this.mRemote.transact(6, obtain, obtain2, 0);
+                    obtain2.readException();
+                    return obtain2.readString();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
             public String getTag() throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    this.mRemote.transact(7, _data, _reply, 0);
-                    _reply.readException();
-                    return _reply.readString();
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    this.mRemote.transact(7, obtain, obtain2, 0);
+                    obtain2.readException();
+                    return obtain2.readString();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
             public PendingIntent getLaunchPendingIntent() throws RemoteException {
-                PendingIntent _result;
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    this.mRemote.transact(8, _data, _reply, 0);
-                    _reply.readException();
-                    if (_reply.readInt() != 0) {
-                        _result = (PendingIntent) PendingIntent.CREATOR.createFromParcel(_reply);
-                    } else {
-                        _result = null;
-                    }
-                    return _result;
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    this.mRemote.transact(8, obtain, obtain2, 0);
+                    obtain2.readException();
+                    return obtain2.readInt() != 0 ? (PendingIntent) PendingIntent.CREATOR.createFromParcel(obtain2) : null;
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
             public long getFlags() throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    this.mRemote.transact(9, _data, _reply, 0);
-                    _reply.readException();
-                    return _reply.readLong();
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    this.mRemote.transact(9, obtain, obtain2, 0);
+                    obtain2.readException();
+                    return obtain2.readLong();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
             public ParcelableVolumeInfo getVolumeAttributes() throws RemoteException {
-                ParcelableVolumeInfo _result;
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    this.mRemote.transact(10, _data, _reply, 0);
-                    _reply.readException();
-                    if (_reply.readInt() != 0) {
-                        _result = ParcelableVolumeInfo.CREATOR.createFromParcel(_reply);
-                    } else {
-                        _result = null;
-                    }
-                    return _result;
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    this.mRemote.transact(10, obtain, obtain2, 0);
+                    obtain2.readException();
+                    return obtain2.readInt() != 0 ? ParcelableVolumeInfo.CREATOR.createFromParcel(obtain2) : null;
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
-            public void adjustVolume(int direction, int flags, String packageName) throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+            public void adjustVolume(int i, int i2, String str) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    _data.writeInt(direction);
-                    _data.writeInt(flags);
-                    _data.writeString(packageName);
-                    this.mRemote.transact(11, _data, _reply, 0);
-                    _reply.readException();
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    obtain.writeInt(i);
+                    obtain.writeInt(i2);
+                    obtain.writeString(str);
+                    this.mRemote.transact(11, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
-            public void setVolumeTo(int value, int flags, String packageName) throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+            public void setVolumeTo(int i, int i2, String str) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    _data.writeInt(value);
-                    _data.writeInt(flags);
-                    _data.writeString(packageName);
-                    this.mRemote.transact(12, _data, _reply, 0);
-                    _reply.readException();
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    obtain.writeInt(i);
+                    obtain.writeInt(i2);
+                    obtain.writeString(str);
+                    this.mRemote.transact(12, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
             public MediaMetadataCompat getMetadata() throws RemoteException {
-                MediaMetadataCompat _result;
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    this.mRemote.transact(27, _data, _reply, 0);
-                    _reply.readException();
-                    if (_reply.readInt() != 0) {
-                        _result = MediaMetadataCompat.CREATOR.createFromParcel(_reply);
-                    } else {
-                        _result = null;
-                    }
-                    return _result;
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    this.mRemote.transact(27, obtain, obtain2, 0);
+                    obtain2.readException();
+                    return obtain2.readInt() != 0 ? MediaMetadataCompat.CREATOR.createFromParcel(obtain2) : null;
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
             public PlaybackStateCompat getPlaybackState() throws RemoteException {
-                PlaybackStateCompat _result;
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    this.mRemote.transact(28, _data, _reply, 0);
-                    _reply.readException();
-                    if (_reply.readInt() != 0) {
-                        _result = PlaybackStateCompat.CREATOR.createFromParcel(_reply);
-                    } else {
-                        _result = null;
-                    }
-                    return _result;
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    this.mRemote.transact(28, obtain, obtain2, 0);
+                    obtain2.readException();
+                    return obtain2.readInt() != 0 ? PlaybackStateCompat.CREATOR.createFromParcel(obtain2) : null;
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
             public List<MediaSessionCompat.QueueItem> getQueue() throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    this.mRemote.transact(Stub.TRANSACTION_getQueue, _data, _reply, 0);
-                    _reply.readException();
-                    return _reply.createTypedArrayList(MediaSessionCompat.QueueItem.CREATOR);
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    this.mRemote.transact(Stub.TRANSACTION_getQueue, obtain, obtain2, 0);
+                    obtain2.readException();
+                    return obtain2.createTypedArrayList(MediaSessionCompat.QueueItem.CREATOR);
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
             public CharSequence getQueueTitle() throws RemoteException {
-                CharSequence _result;
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    this.mRemote.transact(Stub.TRANSACTION_getQueueTitle, _data, _reply, 0);
-                    _reply.readException();
-                    if (_reply.readInt() != 0) {
-                        _result = (CharSequence) TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(_reply);
-                    } else {
-                        _result = null;
-                    }
-                    return _result;
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    this.mRemote.transact(Stub.TRANSACTION_getQueueTitle, obtain, obtain2, 0);
+                    obtain2.readException();
+                    return obtain2.readInt() != 0 ? (CharSequence) TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(obtain2) : null;
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
             public Bundle getExtras() throws RemoteException {
-                Bundle _result;
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    this.mRemote.transact(Stub.TRANSACTION_getExtras, _data, _reply, 0);
-                    _reply.readException();
-                    if (_reply.readInt() != 0) {
-                        _result = (Bundle) Bundle.CREATOR.createFromParcel(_reply);
-                    } else {
-                        _result = null;
-                    }
-                    return _result;
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    this.mRemote.transact(Stub.TRANSACTION_getExtras, obtain, obtain2, 0);
+                    obtain2.readException();
+                    return obtain2.readInt() != 0 ? (Bundle) Bundle.CREATOR.createFromParcel(obtain2) : null;
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
             public int getRatingType() throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    this.mRemote.transact(32, _data, _reply, 0);
-                    _reply.readException();
-                    return _reply.readInt();
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    this.mRemote.transact(32, obtain, obtain2, 0);
+                    obtain2.readException();
+                    return obtain2.readInt();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
             public boolean isCaptioningEnabled() throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
-                boolean _result = false;
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    this.mRemote.transact(45, _data, _reply, 0);
-                    _reply.readException();
-                    if (_reply.readInt() != 0) {
-                        _result = true;
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    boolean z = false;
+                    this.mRemote.transact(45, obtain, obtain2, 0);
+                    obtain2.readException();
+                    if (obtain2.readInt() != 0) {
+                        z = true;
                     }
-                    return _result;
+                    return z;
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
             public int getRepeatMode() throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    this.mRemote.transact(37, _data, _reply, 0);
-                    _reply.readException();
-                    return _reply.readInt();
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    this.mRemote.transact(37, obtain, obtain2, 0);
+                    obtain2.readException();
+                    return obtain2.readInt();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
             public boolean isShuffleModeEnabledRemoved() throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
-                boolean _result = false;
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    this.mRemote.transact(38, _data, _reply, 0);
-                    _reply.readException();
-                    if (_reply.readInt() != 0) {
-                        _result = true;
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    boolean z = false;
+                    this.mRemote.transact(38, obtain, obtain2, 0);
+                    obtain2.readException();
+                    if (obtain2.readInt() != 0) {
+                        z = true;
                     }
-                    return _result;
+                    return z;
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
             public int getShuffleMode() throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    this.mRemote.transact(47, _data, _reply, 0);
-                    _reply.readException();
-                    return _reply.readInt();
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    this.mRemote.transact(47, obtain, obtain2, 0);
+                    obtain2.readException();
+                    return obtain2.readInt();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
-            public void addQueueItem(MediaDescriptionCompat description) throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+            public void addQueueItem(MediaDescriptionCompat mediaDescriptionCompat) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    if (description != null) {
-                        _data.writeInt(1);
-                        description.writeToParcel(_data, 0);
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    if (mediaDescriptionCompat != null) {
+                        obtain.writeInt(1);
+                        mediaDescriptionCompat.writeToParcel(obtain, 0);
                     } else {
-                        _data.writeInt(0);
+                        obtain.writeInt(0);
                     }
-                    this.mRemote.transact(41, _data, _reply, 0);
-                    _reply.readException();
+                    this.mRemote.transact(41, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
-            public void addQueueItemAt(MediaDescriptionCompat description, int index) throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+            public void addQueueItemAt(MediaDescriptionCompat mediaDescriptionCompat, int i) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    if (description != null) {
-                        _data.writeInt(1);
-                        description.writeToParcel(_data, 0);
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    if (mediaDescriptionCompat != null) {
+                        obtain.writeInt(1);
+                        mediaDescriptionCompat.writeToParcel(obtain, 0);
                     } else {
-                        _data.writeInt(0);
+                        obtain.writeInt(0);
                     }
-                    _data.writeInt(index);
-                    this.mRemote.transact(42, _data, _reply, 0);
-                    _reply.readException();
+                    obtain.writeInt(i);
+                    this.mRemote.transact(42, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
-            public void removeQueueItem(MediaDescriptionCompat description) throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+            public void removeQueueItem(MediaDescriptionCompat mediaDescriptionCompat) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    if (description != null) {
-                        _data.writeInt(1);
-                        description.writeToParcel(_data, 0);
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    if (mediaDescriptionCompat != null) {
+                        obtain.writeInt(1);
+                        mediaDescriptionCompat.writeToParcel(obtain, 0);
                     } else {
-                        _data.writeInt(0);
+                        obtain.writeInt(0);
                     }
-                    this.mRemote.transact(43, _data, _reply, 0);
-                    _reply.readException();
+                    this.mRemote.transact(43, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
-            public void removeQueueItemAt(int index) throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+            public void removeQueueItemAt(int i) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    _data.writeInt(index);
-                    this.mRemote.transact(44, _data, _reply, 0);
-                    _reply.readException();
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    obtain.writeInt(i);
+                    this.mRemote.transact(44, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
             public void prepare() throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    this.mRemote.transact(33, _data, _reply, 0);
-                    _reply.readException();
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    this.mRemote.transact(33, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
-            public void prepareFromMediaId(String uri, Bundle extras) throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+            public void prepareFromMediaId(String str, Bundle bundle) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    _data.writeString(uri);
-                    if (extras != null) {
-                        _data.writeInt(1);
-                        extras.writeToParcel(_data, 0);
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    obtain.writeString(str);
+                    if (bundle != null) {
+                        obtain.writeInt(1);
+                        bundle.writeToParcel(obtain, 0);
                     } else {
-                        _data.writeInt(0);
+                        obtain.writeInt(0);
                     }
-                    this.mRemote.transact(34, _data, _reply, 0);
-                    _reply.readException();
+                    this.mRemote.transact(34, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
-            public void prepareFromSearch(String string, Bundle extras) throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+            public void prepareFromSearch(String str, Bundle bundle) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    _data.writeString(string);
-                    if (extras != null) {
-                        _data.writeInt(1);
-                        extras.writeToParcel(_data, 0);
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    obtain.writeString(str);
+                    if (bundle != null) {
+                        obtain.writeInt(1);
+                        bundle.writeToParcel(obtain, 0);
                     } else {
-                        _data.writeInt(0);
+                        obtain.writeInt(0);
                     }
-                    this.mRemote.transact(35, _data, _reply, 0);
-                    _reply.readException();
+                    this.mRemote.transact(35, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
-            public void prepareFromUri(Uri uri, Bundle extras) throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+            public void prepareFromUri(Uri uri, Bundle bundle) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
                     if (uri != null) {
-                        _data.writeInt(1);
-                        uri.writeToParcel(_data, 0);
+                        obtain.writeInt(1);
+                        uri.writeToParcel(obtain, 0);
                     } else {
-                        _data.writeInt(0);
+                        obtain.writeInt(0);
                     }
-                    if (extras != null) {
-                        _data.writeInt(1);
-                        extras.writeToParcel(_data, 0);
+                    if (bundle != null) {
+                        obtain.writeInt(1);
+                        bundle.writeToParcel(obtain, 0);
                     } else {
-                        _data.writeInt(0);
+                        obtain.writeInt(0);
                     }
-                    this.mRemote.transact(36, _data, _reply, 0);
-                    _reply.readException();
+                    this.mRemote.transact(36, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
             public void play() throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    this.mRemote.transact(13, _data, _reply, 0);
-                    _reply.readException();
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    this.mRemote.transact(13, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
-            public void playFromMediaId(String uri, Bundle extras) throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+            public void playFromMediaId(String str, Bundle bundle) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    _data.writeString(uri);
-                    if (extras != null) {
-                        _data.writeInt(1);
-                        extras.writeToParcel(_data, 0);
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    obtain.writeString(str);
+                    if (bundle != null) {
+                        obtain.writeInt(1);
+                        bundle.writeToParcel(obtain, 0);
                     } else {
-                        _data.writeInt(0);
+                        obtain.writeInt(0);
                     }
-                    this.mRemote.transact(14, _data, _reply, 0);
-                    _reply.readException();
+                    this.mRemote.transact(14, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
-            public void playFromSearch(String string, Bundle extras) throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+            public void playFromSearch(String str, Bundle bundle) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    _data.writeString(string);
-                    if (extras != null) {
-                        _data.writeInt(1);
-                        extras.writeToParcel(_data, 0);
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    obtain.writeString(str);
+                    if (bundle != null) {
+                        obtain.writeInt(1);
+                        bundle.writeToParcel(obtain, 0);
                     } else {
-                        _data.writeInt(0);
+                        obtain.writeInt(0);
                     }
-                    this.mRemote.transact(15, _data, _reply, 0);
-                    _reply.readException();
+                    this.mRemote.transact(15, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
-            public void playFromUri(Uri uri, Bundle extras) throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+            public void playFromUri(Uri uri, Bundle bundle) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
                     if (uri != null) {
-                        _data.writeInt(1);
-                        uri.writeToParcel(_data, 0);
+                        obtain.writeInt(1);
+                        uri.writeToParcel(obtain, 0);
                     } else {
-                        _data.writeInt(0);
+                        obtain.writeInt(0);
                     }
-                    if (extras != null) {
-                        _data.writeInt(1);
-                        extras.writeToParcel(_data, 0);
+                    if (bundle != null) {
+                        obtain.writeInt(1);
+                        bundle.writeToParcel(obtain, 0);
                     } else {
-                        _data.writeInt(0);
+                        obtain.writeInt(0);
                     }
-                    this.mRemote.transact(16, _data, _reply, 0);
-                    _reply.readException();
+                    this.mRemote.transact(16, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
-            public void skipToQueueItem(long id) throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+            public void skipToQueueItem(long j) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    _data.writeLong(id);
-                    this.mRemote.transact(17, _data, _reply, 0);
-                    _reply.readException();
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    obtain.writeLong(j);
+                    this.mRemote.transact(17, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
             public void pause() throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    this.mRemote.transact(18, _data, _reply, 0);
-                    _reply.readException();
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    this.mRemote.transact(18, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
             public void stop() throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    this.mRemote.transact(19, _data, _reply, 0);
-                    _reply.readException();
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    this.mRemote.transact(19, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
             public void next() throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    this.mRemote.transact(20, _data, _reply, 0);
-                    _reply.readException();
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    this.mRemote.transact(20, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
             public void previous() throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    this.mRemote.transact(21, _data, _reply, 0);
-                    _reply.readException();
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    this.mRemote.transact(21, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
             public void fastForward() throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    this.mRemote.transact(22, _data, _reply, 0);
-                    _reply.readException();
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    this.mRemote.transact(22, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
             public void rewind() throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    this.mRemote.transact(23, _data, _reply, 0);
-                    _reply.readException();
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    this.mRemote.transact(23, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
-            public void seekTo(long pos) throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+            public void seekTo(long j) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    _data.writeLong(pos);
-                    this.mRemote.transact(24, _data, _reply, 0);
-                    _reply.readException();
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    obtain.writeLong(j);
+                    this.mRemote.transact(24, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
-            public void rate(RatingCompat rating) throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+            public void rate(RatingCompat ratingCompat) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    if (rating != null) {
-                        _data.writeInt(1);
-                        rating.writeToParcel(_data, 0);
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    if (ratingCompat != null) {
+                        obtain.writeInt(1);
+                        ratingCompat.writeToParcel(obtain, 0);
                     } else {
-                        _data.writeInt(0);
+                        obtain.writeInt(0);
                     }
-                    this.mRemote.transact(25, _data, _reply, 0);
-                    _reply.readException();
+                    this.mRemote.transact(25, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
-            public void rateWithExtras(RatingCompat rating, Bundle extras) throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+            public void rateWithExtras(RatingCompat ratingCompat, Bundle bundle) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    if (rating != null) {
-                        _data.writeInt(1);
-                        rating.writeToParcel(_data, 0);
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    if (ratingCompat != null) {
+                        obtain.writeInt(1);
+                        ratingCompat.writeToParcel(obtain, 0);
                     } else {
-                        _data.writeInt(0);
+                        obtain.writeInt(0);
                     }
-                    if (extras != null) {
-                        _data.writeInt(1);
-                        extras.writeToParcel(_data, 0);
+                    if (bundle != null) {
+                        obtain.writeInt(1);
+                        bundle.writeToParcel(obtain, 0);
                     } else {
-                        _data.writeInt(0);
+                        obtain.writeInt(0);
                     }
-                    this.mRemote.transact(Stub.TRANSACTION_rateWithExtras, _data, _reply, 0);
-                    _reply.readException();
+                    this.mRemote.transact(Stub.TRANSACTION_rateWithExtras, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
-            public void setCaptioningEnabled(boolean enabled) throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+            public void setCaptioningEnabled(boolean z) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    _data.writeInt(enabled ? 1 : 0);
-                    this.mRemote.transact(46, _data, _reply, 0);
-                    _reply.readException();
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    obtain.writeInt(z ? 1 : 0);
+                    this.mRemote.transact(46, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
-            public void setRepeatMode(int repeatMode) throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+            public void setRepeatMode(int i) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    _data.writeInt(repeatMode);
-                    this.mRemote.transact(39, _data, _reply, 0);
-                    _reply.readException();
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    obtain.writeInt(i);
+                    this.mRemote.transact(39, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
-            public void setShuffleModeEnabledRemoved(boolean shuffleMode) throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+            public void setShuffleModeEnabledRemoved(boolean z) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    _data.writeInt(shuffleMode ? 1 : 0);
-                    this.mRemote.transact(40, _data, _reply, 0);
-                    _reply.readException();
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    obtain.writeInt(z ? 1 : 0);
+                    this.mRemote.transact(40, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
-            public void setShuffleMode(int shuffleMode) throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+            public void setShuffleMode(int i) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    _data.writeInt(shuffleMode);
-                    this.mRemote.transact(Stub.TRANSACTION_setShuffleMode, _data, _reply, 0);
-                    _reply.readException();
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    obtain.writeInt(i);
+                    this.mRemote.transact(Stub.TRANSACTION_setShuffleMode, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
 
             @Override // android.support.v4.media.session.IMediaSession
-            public void sendCustomAction(String action, Bundle args) throws RemoteException {
-                Parcel _data = Parcel.obtain();
-                Parcel _reply = Parcel.obtain();
+            public void sendCustomAction(String str, Bundle bundle) throws RemoteException {
+                Parcel obtain = Parcel.obtain();
+                Parcel obtain2 = Parcel.obtain();
                 try {
-                    _data.writeInterfaceToken(Stub.DESCRIPTOR);
-                    _data.writeString(action);
-                    if (args != null) {
-                        _data.writeInt(1);
-                        args.writeToParcel(_data, 0);
+                    obtain.writeInterfaceToken(Stub.DESCRIPTOR);
+                    obtain.writeString(str);
+                    if (bundle != null) {
+                        obtain.writeInt(1);
+                        bundle.writeToParcel(obtain, 0);
                     } else {
-                        _data.writeInt(0);
+                        obtain.writeInt(0);
                     }
-                    this.mRemote.transact(26, _data, _reply, 0);
-                    _reply.readException();
+                    this.mRemote.transact(26, obtain, obtain2, 0);
+                    obtain2.readException();
                 } finally {
-                    _reply.recycle();
-                    _data.recycle();
+                    obtain2.recycle();
+                    obtain.recycle();
                 }
             }
         }

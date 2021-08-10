@@ -14,48 +14,61 @@ public abstract class FragmentPagerAdapter extends PagerAdapter {
 
     public abstract Fragment getItem(int i);
 
-    public FragmentPagerAdapter(FragmentManager fm) {
-        this.mFragmentManager = fm;
+    public long getItemId(int i) {
+        return (long) i;
     }
 
     @Override // android.support.v4.view.PagerAdapter
-    public void startUpdate(ViewGroup container) {
-        if (container.getId() == -1) {
+    public void restoreState(Parcelable parcelable, ClassLoader classLoader) {
+    }
+
+    @Override // android.support.v4.view.PagerAdapter
+    public Parcelable saveState() {
+        return null;
+    }
+
+    public FragmentPagerAdapter(FragmentManager fragmentManager) {
+        this.mFragmentManager = fragmentManager;
+    }
+
+    @Override // android.support.v4.view.PagerAdapter
+    public void startUpdate(ViewGroup viewGroup) {
+        if (viewGroup.getId() == -1) {
             throw new IllegalStateException("ViewPager with adapter " + this + " requires a view id");
         }
     }
 
     @Override // android.support.v4.view.PagerAdapter
-    public Object instantiateItem(ViewGroup container, int position) {
+    public Object instantiateItem(ViewGroup viewGroup, int i) {
         if (this.mCurTransaction == null) {
             this.mCurTransaction = this.mFragmentManager.beginTransaction();
         }
-        long itemId = getItemId(position);
-        Fragment fragment = this.mFragmentManager.findFragmentByTag(makeFragmentName(container.getId(), itemId));
-        if (fragment != null) {
-            this.mCurTransaction.attach(fragment);
+        long itemId = getItemId(i);
+        Fragment findFragmentByTag = this.mFragmentManager.findFragmentByTag(makeFragmentName(viewGroup.getId(), itemId));
+        if (findFragmentByTag != null) {
+            this.mCurTransaction.attach(findFragmentByTag);
         } else {
-            fragment = getItem(position);
-            this.mCurTransaction.add(container.getId(), fragment, makeFragmentName(container.getId(), itemId));
+            findFragmentByTag = getItem(i);
+            this.mCurTransaction.add(viewGroup.getId(), findFragmentByTag, makeFragmentName(viewGroup.getId(), itemId));
         }
-        if (fragment != this.mCurrentPrimaryItem) {
-            fragment.setMenuVisibility(false);
-            fragment.setUserVisibleHint(false);
+        if (findFragmentByTag != this.mCurrentPrimaryItem) {
+            findFragmentByTag.setMenuVisibility(false);
+            findFragmentByTag.setUserVisibleHint(false);
         }
-        return fragment;
+        return findFragmentByTag;
     }
 
     @Override // android.support.v4.view.PagerAdapter
-    public void destroyItem(ViewGroup container, int position, Object object) {
+    public void destroyItem(ViewGroup viewGroup, int i, Object obj) {
         if (this.mCurTransaction == null) {
             this.mCurTransaction = this.mFragmentManager.beginTransaction();
         }
-        this.mCurTransaction.detach((Fragment) object);
+        this.mCurTransaction.detach((Fragment) obj);
     }
 
     @Override // android.support.v4.view.PagerAdapter
-    public void setPrimaryItem(ViewGroup container, int position, Object object) {
-        Fragment fragment = (Fragment) object;
+    public void setPrimaryItem(ViewGroup viewGroup, int i, Object obj) {
+        Fragment fragment = (Fragment) obj;
         Fragment fragment2 = this.mCurrentPrimaryItem;
         if (fragment != fragment2) {
             if (fragment2 != null) {
@@ -71,7 +84,7 @@ public abstract class FragmentPagerAdapter extends PagerAdapter {
     }
 
     @Override // android.support.v4.view.PagerAdapter
-    public void finishUpdate(ViewGroup container) {
+    public void finishUpdate(ViewGroup viewGroup) {
         FragmentTransaction fragmentTransaction = this.mCurTransaction;
         if (fragmentTransaction != null) {
             fragmentTransaction.commitNowAllowingStateLoss();
@@ -80,24 +93,11 @@ public abstract class FragmentPagerAdapter extends PagerAdapter {
     }
 
     @Override // android.support.v4.view.PagerAdapter
-    public boolean isViewFromObject(View view, Object object) {
-        return ((Fragment) object).getView() == view;
+    public boolean isViewFromObject(View view, Object obj) {
+        return ((Fragment) obj).getView() == view;
     }
 
-    @Override // android.support.v4.view.PagerAdapter
-    public Parcelable saveState() {
-        return null;
-    }
-
-    @Override // android.support.v4.view.PagerAdapter
-    public void restoreState(Parcelable state, ClassLoader loader) {
-    }
-
-    public long getItemId(int position) {
-        return (long) position;
-    }
-
-    private static String makeFragmentName(int viewId, long id) {
-        return "android:switcher:" + viewId + ":" + id;
+    private static String makeFragmentName(int i, long j) {
+        return "android:switcher:" + i + ":" + j;
     }
 }

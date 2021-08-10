@@ -9,12 +9,12 @@ class WrappedDrawableApi19 extends WrappedDrawableApi14 {
         super(drawable);
     }
 
-    WrappedDrawableApi19(WrappedDrawableApi14.DrawableWrapperState state, Resources resources) {
-        super(state, resources);
+    WrappedDrawableApi19(WrappedDrawableApi14.DrawableWrapperState drawableWrapperState, Resources resources) {
+        super(drawableWrapperState, resources);
     }
 
-    public void setAutoMirrored(boolean mirrored) {
-        this.mDrawable.setAutoMirrored(mirrored);
+    public void setAutoMirrored(boolean z) {
+        this.mDrawable.setAutoMirrored(z);
     }
 
     public boolean isAutoMirrored() {
@@ -28,13 +28,13 @@ class WrappedDrawableApi19 extends WrappedDrawableApi14 {
     }
 
     private static class DrawableWrapperStateKitKat extends WrappedDrawableApi14.DrawableWrapperState {
-        DrawableWrapperStateKitKat(WrappedDrawableApi14.DrawableWrapperState orig, Resources res) {
-            super(orig, res);
+        DrawableWrapperStateKitKat(WrappedDrawableApi14.DrawableWrapperState drawableWrapperState, Resources resources) {
+            super(drawableWrapperState, resources);
         }
 
         @Override // android.support.v4.graphics.drawable.WrappedDrawableApi14.DrawableWrapperState
-        public Drawable newDrawable(Resources res) {
-            return new WrappedDrawableApi19(this, res);
+        public Drawable newDrawable(Resources resources) {
+            return new WrappedDrawableApi19(this, resources);
         }
     }
 }

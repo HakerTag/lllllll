@@ -5,7 +5,6 @@ import com.google.zxing.DecodeHintType;
 import com.google.zxing.NotFoundException;
 import com.google.zxing.ResultPoint;
 import com.google.zxing.common.BitMatrix;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -26,216 +25,285 @@ public final class Detector {
     private Detector() {
     }
 
-    public static PDF417DetectorResult detect(BinaryBitmap image, Map<DecodeHintType, ?> map, boolean multiple) throws NotFoundException {
-        BitMatrix bitMatrix = image.getBlackMatrix();
-        List<ResultPoint[]> barcodeCoordinates = detect(multiple, bitMatrix);
-        if (barcodeCoordinates.isEmpty()) {
-            bitMatrix = bitMatrix.clone();
-            bitMatrix.rotate180();
-            barcodeCoordinates = detect(multiple, bitMatrix);
+    public static PDF417DetectorResult detect(BinaryBitmap binaryBitmap, Map<DecodeHintType, ?> map, boolean z) throws NotFoundException {
+        BitMatrix blackMatrix = binaryBitmap.getBlackMatrix();
+        List<ResultPoint[]> detect = detect(z, blackMatrix);
+        if (detect.isEmpty()) {
+            blackMatrix = blackMatrix.clone();
+            blackMatrix.rotate180();
+            detect = detect(z, blackMatrix);
         }
-        return new PDF417DetectorResult(bitMatrix, barcodeCoordinates);
+        return new PDF417DetectorResult(blackMatrix, detect);
     }
 
-    private static List<ResultPoint[]> detect(boolean multiple, BitMatrix bitMatrix) {
-        List<ResultPoint[]> barcodeCoordinates = new ArrayList<>();
-        int row = 0;
-        int column = 0;
-        boolean foundBarcodeInRow = false;
-        while (row < bitMatrix.getHeight()) {
-            ResultPoint[] vertices = findVertices(bitMatrix, row, column);
-            if (vertices[0] != null || vertices[3] != null) {
-                foundBarcodeInRow = true;
-                barcodeCoordinates.add(vertices);
-                if (!multiple) {
-                    break;
-                } else if (vertices[2] != null) {
-                    column = (int) vertices[2].getX();
-                    row = (int) vertices[2].getY();
-                } else {
-                    column = (int) vertices[4].getX();
-                    row = (int) vertices[4].getY();
-                }
-            } else if (!foundBarcodeInRow) {
-                break;
-            } else {
-                foundBarcodeInRow = false;
-                column = 0;
-                for (ResultPoint[] barcodeCoordinate : barcodeCoordinates) {
-                    if (barcodeCoordinate[1] != null) {
-                        row = (int) Math.max((float) row, barcodeCoordinate[1].getY());
-                    }
-                    if (barcodeCoordinate[3] != null) {
-                        row = Math.max(row, (int) barcodeCoordinate[3].getY());
-                    }
-                }
-                row += 5;
-            }
-        }
-        return barcodeCoordinates;
+    /* JADX WARNING: Code restructure failed: missing block: B:11:0x0028, code lost:
+        if (r4.hasNext() == false) goto L_0x0050;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:12:0x002a, code lost:
+        r5 = (com.google.zxing.ResultPoint[]) r4.next();
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:13:0x0032, code lost:
+        if (r5[1] == null) goto L_0x0040;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:14:0x0034, code lost:
+        r3 = (int) java.lang.Math.max((float) r3, r5[1].getY());
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:16:0x0042, code lost:
+        if (r5[3] == null) goto L_0x0024;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:17:0x0044, code lost:
+        r3 = java.lang.Math.max(r3, (int) r5[3].getY());
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:8:0x001d, code lost:
+        if (r5 != false) goto L_0x0020;
+     */
+    /* JADX WARNING: Code restructure failed: missing block: B:9:0x0020, code lost:
+        r4 = r0.iterator();
+     */
+    /* Code decompiled incorrectly, please refer to instructions dump. */
+    private static java.util.List<com.google.zxing.ResultPoint[]> detect(boolean r8, com.google.zxing.common.BitMatrix r9) {
+        /*
+            java.util.ArrayList r0 = new java.util.ArrayList
+            r0.<init>()
+            r1 = 1
+            r2 = 0
+            r3 = 0
+        L_0x0008:
+            r4 = 0
+            r5 = 0
+        L_0x000a:
+            int r6 = r9.getHeight()
+            if (r3 >= r6) goto L_0x007e
+            com.google.zxing.ResultPoint[] r4 = findVertices(r9, r3, r4)
+            r6 = r4[r2]
+            if (r6 != 0) goto L_0x0053
+            r6 = 3
+            r7 = r4[r6]
+            if (r7 != 0) goto L_0x0053
+            if (r5 != 0) goto L_0x0020
+            goto L_0x007e
+        L_0x0020:
+            java.util.Iterator r4 = r0.iterator()
+        L_0x0024:
+            boolean r5 = r4.hasNext()
+            if (r5 == 0) goto L_0x0050
+            java.lang.Object r5 = r4.next()
+            com.google.zxing.ResultPoint[] r5 = (com.google.zxing.ResultPoint[]) r5
+            r7 = r5[r1]
+            if (r7 == 0) goto L_0x0040
+            float r3 = (float) r3
+            r7 = r5[r1]
+            float r7 = r7.getY()
+            float r3 = java.lang.Math.max(r3, r7)
+            int r3 = (int) r3
+        L_0x0040:
+            r7 = r5[r6]
+            if (r7 == 0) goto L_0x0024
+            r5 = r5[r6]
+            float r5 = r5.getY()
+            int r5 = (int) r5
+            int r3 = java.lang.Math.max(r3, r5)
+            goto L_0x0024
+        L_0x0050:
+            int r3 = r3 + 5
+            goto L_0x0008
+        L_0x0053:
+            r0.add(r4)
+            if (r8 != 0) goto L_0x0059
+            goto L_0x007e
+        L_0x0059:
+            r3 = 2
+            r5 = r4[r3]
+            if (r5 == 0) goto L_0x006c
+            r5 = r4[r3]
+            float r5 = r5.getX()
+            int r5 = (int) r5
+            r3 = r4[r3]
+            float r3 = r3.getY()
+            goto L_0x007a
+        L_0x006c:
+            r3 = 4
+            r5 = r4[r3]
+            float r5 = r5.getX()
+            int r5 = (int) r5
+            r3 = r4[r3]
+            float r3 = r3.getY()
+        L_0x007a:
+            int r3 = (int) r3
+            r4 = r5
+            r5 = 1
+            goto L_0x000a
+        L_0x007e:
+            return r0
+        */
+        throw new UnsupportedOperationException("Method not decompiled: com.google.zxing.pdf417.detector.Detector.detect(boolean, com.google.zxing.common.BitMatrix):java.util.List");
     }
 
-    private static ResultPoint[] findVertices(BitMatrix matrix, int startRow, int startColumn) {
-        int height = matrix.getHeight();
-        int width = matrix.getWidth();
-        ResultPoint[] result = new ResultPoint[8];
-        copyToResult(result, findRowsWithPattern(matrix, height, width, startRow, startColumn, START_PATTERN), INDEXES_START_PATTERN);
-        if (result[4] != null) {
-            startColumn = (int) result[4].getX();
-            startRow = (int) result[4].getY();
+    private static ResultPoint[] findVertices(BitMatrix bitMatrix, int i, int i2) {
+        int height = bitMatrix.getHeight();
+        int width = bitMatrix.getWidth();
+        ResultPoint[] resultPointArr = new ResultPoint[8];
+        copyToResult(resultPointArr, findRowsWithPattern(bitMatrix, height, width, i, i2, START_PATTERN), INDEXES_START_PATTERN);
+        if (resultPointArr[4] != null) {
+            i2 = (int) resultPointArr[4].getX();
+            i = (int) resultPointArr[4].getY();
         }
-        copyToResult(result, findRowsWithPattern(matrix, height, width, startRow, startColumn, STOP_PATTERN), INDEXES_STOP_PATTERN);
-        return result;
+        copyToResult(resultPointArr, findRowsWithPattern(bitMatrix, height, width, i, i2, STOP_PATTERN), INDEXES_STOP_PATTERN);
+        return resultPointArr;
     }
 
-    private static void copyToResult(ResultPoint[] result, ResultPoint[] tmpResult, int[] destinationIndexes) {
-        for (int i = 0; i < destinationIndexes.length; i++) {
-            result[destinationIndexes[i]] = tmpResult[i];
+    private static void copyToResult(ResultPoint[] resultPointArr, ResultPoint[] resultPointArr2, int[] iArr) {
+        for (int i = 0; i < iArr.length; i++) {
+            resultPointArr[iArr[i]] = resultPointArr2[i];
         }
     }
 
-    private static ResultPoint[] findRowsWithPattern(BitMatrix matrix, int height, int width, int startRow, int startColumn, int[] pattern) {
-        int skippedRowCount;
-        int stopRow;
-        int startRow2;
-        ResultPoint[] result = new ResultPoint[4];
-        boolean found = false;
-        int[] counters = new int[pattern.length];
-        int startRow3 = startRow;
+    private static ResultPoint[] findRowsWithPattern(BitMatrix bitMatrix, int i, int i2, int i3, int i4, int[] iArr) {
+        int i5;
+        boolean z;
+        int i6;
+        int i7;
+        int i8;
+        ResultPoint[] resultPointArr = new ResultPoint[4];
+        int[] iArr2 = new int[iArr.length];
+        int i9 = i3;
         while (true) {
-            if (startRow3 >= height) {
+            if (i9 >= i) {
+                z = false;
                 break;
             }
-            int[] loc = findGuardPattern(matrix, startColumn, startRow3, width, false, pattern, counters);
-            if (loc != null) {
-                int[] loc2 = loc;
-                int startRow4 = startRow3;
+            int[] findGuardPattern = findGuardPattern(bitMatrix, i4, i9, i2, false, iArr, iArr2);
+            if (findGuardPattern != null) {
+                int[] iArr3 = findGuardPattern;
+                int i10 = i9;
                 while (true) {
-                    if (startRow4 <= 0) {
-                        startRow2 = startRow4;
+                    if (i10 <= 0) {
+                        i8 = i10;
                         break;
                     }
-                    int startRow5 = startRow4 - 1;
-                    int[] previousRowLoc = findGuardPattern(matrix, startColumn, startRow5, width, false, pattern, counters);
-                    if (previousRowLoc == null) {
-                        startRow2 = startRow5 + 1;
+                    int i11 = i10 - 1;
+                    int[] findGuardPattern2 = findGuardPattern(bitMatrix, i4, i11, i2, false, iArr, iArr2);
+                    if (findGuardPattern2 == null) {
+                        i8 = i11 + 1;
                         break;
                     }
-                    loc2 = previousRowLoc;
-                    startRow4 = startRow5;
+                    iArr3 = findGuardPattern2;
+                    i10 = i11;
                 }
-                result[0] = new ResultPoint((float) loc2[0], (float) startRow2);
-                result[1] = new ResultPoint((float) loc2[1], (float) startRow2);
-                found = true;
-                startRow3 = startRow2;
+                float f = (float) i8;
+                resultPointArr[0] = new ResultPoint((float) iArr3[0], f);
+                resultPointArr[1] = new ResultPoint((float) iArr3[1], f);
+                i9 = i8;
+                z = true;
             } else {
-                startRow3 += 5;
+                i9 += 5;
             }
         }
-        int stopRow2 = startRow3 + 1;
-        if (found) {
-            int stopRow3 = stopRow2;
-            int skippedRowCount2 = 0;
-            int[] previousRowLoc2 = {(int) result[0].getX(), (int) result[1].getX()};
+        int i12 = i9 + 1;
+        if (z) {
+            int[] iArr4 = {(int) resultPointArr[0].getX(), (int) resultPointArr[1].getX()};
+            int i13 = i12;
+            int i14 = 0;
             while (true) {
-                if (stopRow3 >= height) {
-                    skippedRowCount = skippedRowCount2;
-                    stopRow = stopRow3;
+                if (i13 >= i) {
+                    i6 = i14;
+                    i7 = i13;
                     break;
                 }
-                skippedRowCount = skippedRowCount2;
-                stopRow = stopRow3;
-                int[] loc3 = findGuardPattern(matrix, previousRowLoc2[0], stopRow3, width, false, pattern, counters);
-                if (loc3 != null && Math.abs(previousRowLoc2[0] - loc3[0]) < 5 && Math.abs(previousRowLoc2[1] - loc3[1]) < 5) {
-                    previousRowLoc2 = loc3;
-                    skippedRowCount2 = 0;
-                } else if (skippedRowCount > 25) {
+                i6 = i14;
+                i7 = i13;
+                int[] findGuardPattern3 = findGuardPattern(bitMatrix, iArr4[0], i13, i2, false, iArr, iArr2);
+                if (findGuardPattern3 != null && Math.abs(iArr4[0] - findGuardPattern3[0]) < 5 && Math.abs(iArr4[1] - findGuardPattern3[1]) < 5) {
+                    iArr4 = findGuardPattern3;
+                    i14 = 0;
+                } else if (i6 > 25) {
                     break;
                 } else {
-                    skippedRowCount2 = skippedRowCount + 1;
+                    i14 = i6 + 1;
                 }
-                stopRow3 = stopRow + 1;
+                i13 = i7 + 1;
             }
-            stopRow2 = stopRow - (skippedRowCount + 1);
-            result[2] = new ResultPoint((float) previousRowLoc2[0], (float) stopRow2);
-            result[3] = new ResultPoint((float) previousRowLoc2[1], (float) stopRow2);
+            i12 = i7 - (i6 + 1);
+            float f2 = (float) i12;
+            resultPointArr[2] = new ResultPoint((float) iArr4[0], f2);
+            resultPointArr[3] = new ResultPoint((float) iArr4[1], f2);
         }
-        if (stopRow2 - startRow3 < 10) {
-            for (int i = 0; i < result.length; i++) {
-                result[i] = null;
+        if (i12 - i9 < 10) {
+            for (i5 = 0; i5 < 4; i5++) {
+                resultPointArr[i5] = null;
             }
         }
-        return result;
+        return resultPointArr;
     }
 
-    private static int[] findGuardPattern(BitMatrix matrix, int column, int row, int width, boolean whiteFirst, int[] pattern, int[] counters) {
-        Arrays.fill(counters, 0, counters.length, 0);
-        int patternStart = column;
-        int pixelDrift = 0;
-        while (true) {
-            if (!matrix.get(patternStart, row) || patternStart <= 0) {
+    private static int[] findGuardPattern(BitMatrix bitMatrix, int i, int i2, int i3, boolean z, int[] iArr, int[] iArr2) {
+        Arrays.fill(iArr2, 0, iArr2.length, 0);
+        int i4 = 0;
+        while (bitMatrix.get(i, i2) && i > 0) {
+            int i5 = i4 + 1;
+            if (i4 >= 3) {
                 break;
             }
-            int pixelDrift2 = pixelDrift + 1;
-            if (pixelDrift >= 3) {
-                break;
-            }
-            patternStart--;
-            pixelDrift = pixelDrift2;
+            i--;
+            i4 = i5;
         }
-        int x = patternStart;
-        int counterPosition = 0;
-        int patternLength = pattern.length;
-        boolean isWhite = whiteFirst;
-        while (x < width) {
-            if (matrix.get(x, row) ^ isWhite) {
-                counters[counterPosition] = counters[counterPosition] + 1;
+        int length = iArr.length;
+        boolean z2 = z;
+        int i6 = 0;
+        int i7 = i;
+        while (i < i3) {
+            if (bitMatrix.get(i, i2) ^ z2) {
+                iArr2[i6] = iArr2[i6] + 1;
             } else {
-                if (counterPosition != patternLength - 1) {
-                    counterPosition++;
-                } else if (patternMatchVariance(counters, pattern, MAX_INDIVIDUAL_VARIANCE) < MAX_AVG_VARIANCE) {
-                    return new int[]{patternStart, x};
+                int i8 = length - 1;
+                if (i6 != i8) {
+                    i6++;
+                } else if (patternMatchVariance(iArr2, iArr, MAX_INDIVIDUAL_VARIANCE) < MAX_AVG_VARIANCE) {
+                    return new int[]{i7, i};
                 } else {
-                    patternStart += counters[0] + counters[1];
-                    System.arraycopy(counters, 2, counters, 0, patternLength - 2);
-                    counters[patternLength - 2] = 0;
-                    counters[patternLength - 1] = 0;
-                    counterPosition--;
+                    i7 += iArr2[0] + iArr2[1];
+                    int i9 = length - 2;
+                    System.arraycopy(iArr2, 2, iArr2, 0, i9);
+                    iArr2[i9] = 0;
+                    iArr2[i8] = 0;
+                    i6--;
                 }
-                counters[counterPosition] = 1;
-                isWhite = !isWhite;
+                iArr2[i6] = 1;
+                z2 = !z2;
             }
-            x++;
+            i++;
         }
-        if (counterPosition != patternLength - 1 || patternMatchVariance(counters, pattern, MAX_INDIVIDUAL_VARIANCE) >= MAX_AVG_VARIANCE) {
+        if (i6 != length - 1 || patternMatchVariance(iArr2, iArr, MAX_INDIVIDUAL_VARIANCE) >= MAX_AVG_VARIANCE) {
             return null;
         }
-        return new int[]{patternStart, x - 1};
+        return new int[]{i7, i - 1};
     }
 
-    private static float patternMatchVariance(int[] counters, int[] pattern, float maxIndividualVariance) {
-        int numCounters = counters.length;
-        int total = 0;
-        int patternLength = 0;
-        for (int i = 0; i < numCounters; i++) {
-            total += counters[i];
-            patternLength += pattern[i];
+    private static float patternMatchVariance(int[] iArr, int[] iArr2, float f) {
+        int length = iArr.length;
+        int i = 0;
+        int i2 = 0;
+        for (int i3 = 0; i3 < length; i3++) {
+            i += iArr[i3];
+            i2 += iArr2[i3];
         }
-        if (total < patternLength) {
+        if (i < i2) {
             return Float.POSITIVE_INFINITY;
         }
-        float unitBarWidth = ((float) total) / ((float) patternLength);
-        float maxIndividualVariance2 = maxIndividualVariance * unitBarWidth;
-        float totalVariance = 0.0f;
-        for (int x = 0; x < numCounters; x++) {
-            int counter = counters[x];
-            float scaledPattern = ((float) pattern[x]) * unitBarWidth;
-            float variance = ((float) counter) > scaledPattern ? ((float) counter) - scaledPattern : scaledPattern - ((float) counter);
-            if (variance > maxIndividualVariance2) {
+        float f2 = (float) i;
+        float f3 = f2 / ((float) i2);
+        float f4 = f * f3;
+        float f5 = 0.0f;
+        for (int i4 = 0; i4 < length; i4++) {
+            int i5 = iArr[i4];
+            float f6 = ((float) iArr2[i4]) * f3;
+            float f7 = (float) i5;
+            float f8 = f7 > f6 ? f7 - f6 : f6 - f7;
+            if (f8 > f4) {
                 return Float.POSITIVE_INFINITY;
             }
-            totalVariance += variance;
+            f5 += f8;
         }
-        return totalVariance / ((float) total);
+        return f5 / f2;
     }
 }

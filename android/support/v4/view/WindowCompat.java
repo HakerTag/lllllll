@@ -11,10 +11,10 @@ public final class WindowCompat {
     private WindowCompat() {
     }
 
-    public static <T extends View> T requireViewById(Window window, int id) {
-        T view = (T) window.findViewById(id);
-        if (view != null) {
-            return view;
+    public static <T extends View> T requireViewById(Window window, int i) {
+        T t = (T) window.findViewById(i);
+        if (t != null) {
+            return t;
         }
         throw new IllegalArgumentException("ID does not reference a View inside this Window");
     }

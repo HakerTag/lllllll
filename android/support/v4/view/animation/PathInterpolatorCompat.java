@@ -16,17 +16,17 @@ public final class PathInterpolatorCompat {
         return new PathInterpolatorApi14(path);
     }
 
-    public static Interpolator create(float controlX, float controlY) {
+    public static Interpolator create(float f, float f2) {
         if (Build.VERSION.SDK_INT >= 21) {
-            return new PathInterpolator(controlX, controlY);
+            return new PathInterpolator(f, f2);
         }
-        return new PathInterpolatorApi14(controlX, controlY);
+        return new PathInterpolatorApi14(f, f2);
     }
 
-    public static Interpolator create(float controlX1, float controlY1, float controlX2, float controlY2) {
+    public static Interpolator create(float f, float f2, float f3, float f4) {
         if (Build.VERSION.SDK_INT >= 21) {
-            return new PathInterpolator(controlX1, controlY1, controlX2, controlY2);
+            return new PathInterpolator(f, f2, f3, f4);
         }
-        return new PathInterpolatorApi14(controlX1, controlY1, controlX2, controlY2);
+        return new PathInterpolatorApi14(f, f2, f3, f4);
     }
 }

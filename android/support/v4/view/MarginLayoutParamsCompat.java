@@ -4,65 +4,60 @@ import android.os.Build;
 import android.view.ViewGroup;
 
 public final class MarginLayoutParamsCompat {
-    public static int getMarginStart(ViewGroup.MarginLayoutParams lp) {
+    public static int getMarginStart(ViewGroup.MarginLayoutParams marginLayoutParams) {
         if (Build.VERSION.SDK_INT >= 17) {
-            return lp.getMarginStart();
+            return marginLayoutParams.getMarginStart();
         }
-        return lp.leftMargin;
+        return marginLayoutParams.leftMargin;
     }
 
-    public static int getMarginEnd(ViewGroup.MarginLayoutParams lp) {
+    public static int getMarginEnd(ViewGroup.MarginLayoutParams marginLayoutParams) {
         if (Build.VERSION.SDK_INT >= 17) {
-            return lp.getMarginEnd();
+            return marginLayoutParams.getMarginEnd();
         }
-        return lp.rightMargin;
+        return marginLayoutParams.rightMargin;
     }
 
-    public static void setMarginStart(ViewGroup.MarginLayoutParams lp, int marginStart) {
+    public static void setMarginStart(ViewGroup.MarginLayoutParams marginLayoutParams, int i) {
         if (Build.VERSION.SDK_INT >= 17) {
-            lp.setMarginStart(marginStart);
+            marginLayoutParams.setMarginStart(i);
         } else {
-            lp.leftMargin = marginStart;
+            marginLayoutParams.leftMargin = i;
         }
     }
 
-    public static void setMarginEnd(ViewGroup.MarginLayoutParams lp, int marginEnd) {
+    public static void setMarginEnd(ViewGroup.MarginLayoutParams marginLayoutParams, int i) {
         if (Build.VERSION.SDK_INT >= 17) {
-            lp.setMarginEnd(marginEnd);
+            marginLayoutParams.setMarginEnd(i);
         } else {
-            lp.rightMargin = marginEnd;
+            marginLayoutParams.rightMargin = i;
         }
     }
 
-    public static boolean isMarginRelative(ViewGroup.MarginLayoutParams lp) {
+    public static boolean isMarginRelative(ViewGroup.MarginLayoutParams marginLayoutParams) {
         if (Build.VERSION.SDK_INT >= 17) {
-            return lp.isMarginRelative();
+            return marginLayoutParams.isMarginRelative();
         }
         return false;
     }
 
-    public static int getLayoutDirection(ViewGroup.MarginLayoutParams lp) {
-        int result;
-        if (Build.VERSION.SDK_INT >= 17) {
-            result = lp.getLayoutDirection();
-        } else {
-            result = 0;
-        }
-        if (result == 0 || result == 1) {
-            return result;
+    public static int getLayoutDirection(ViewGroup.MarginLayoutParams marginLayoutParams) {
+        int layoutDirection = Build.VERSION.SDK_INT >= 17 ? marginLayoutParams.getLayoutDirection() : 0;
+        if (layoutDirection == 0 || layoutDirection == 1) {
+            return layoutDirection;
         }
         return 0;
     }
 
-    public static void setLayoutDirection(ViewGroup.MarginLayoutParams lp, int layoutDirection) {
+    public static void setLayoutDirection(ViewGroup.MarginLayoutParams marginLayoutParams, int i) {
         if (Build.VERSION.SDK_INT >= 17) {
-            lp.setLayoutDirection(layoutDirection);
+            marginLayoutParams.setLayoutDirection(i);
         }
     }
 
-    public static void resolveLayoutDirection(ViewGroup.MarginLayoutParams lp, int layoutDirection) {
+    public static void resolveLayoutDirection(ViewGroup.MarginLayoutParams marginLayoutParams, int i) {
         if (Build.VERSION.SDK_INT >= 17) {
-            lp.resolveLayoutDirection(layoutDirection);
+            marginLayoutParams.resolveLayoutDirection(i);
         }
     }
 

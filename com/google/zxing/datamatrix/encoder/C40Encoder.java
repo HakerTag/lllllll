@@ -2,93 +2,93 @@ package com.google.zxing.datamatrix.encoder;
 
 /* access modifiers changed from: package-private */
 public class C40Encoder implements Encoder {
-    C40Encoder() {
-    }
-
     @Override // com.google.zxing.datamatrix.encoder.Encoder
     public int getEncodingMode() {
         return 1;
     }
 
+    C40Encoder() {
+    }
+
     @Override // com.google.zxing.datamatrix.encoder.Encoder
-    public void encode(EncoderContext context) {
-        int newMode;
-        StringBuilder buffer = new StringBuilder();
+    public void encode(EncoderContext encoderContext) {
+        int lookAheadTest;
+        StringBuilder sb = new StringBuilder();
         while (true) {
-            if (!context.hasMoreCharacters()) {
+            if (!encoderContext.hasMoreCharacters()) {
                 break;
             }
-            char c = context.getCurrentChar();
-            context.pos++;
-            int lastCharSize = encodeChar(c, buffer);
-            int curCodewordCount = context.getCodewordCount() + ((buffer.length() / 3) * 2);
-            context.updateSymbolInfo(curCodewordCount);
-            int available = context.getSymbolInfo().getDataCapacity() - curCodewordCount;
-            if (context.hasMoreCharacters()) {
-                if (buffer.length() % 3 == 0 && (newMode = HighLevelEncoder.lookAheadTest(context.getMessage(), context.pos, getEncodingMode())) != getEncodingMode()) {
-                    context.signalEncoderChange(newMode);
+            char currentChar = encoderContext.getCurrentChar();
+            encoderContext.pos++;
+            int encodeChar = encodeChar(currentChar, sb);
+            int codewordCount = encoderContext.getCodewordCount() + ((sb.length() / 3) * 2);
+            encoderContext.updateSymbolInfo(codewordCount);
+            int dataCapacity = encoderContext.getSymbolInfo().getDataCapacity() - codewordCount;
+            if (encoderContext.hasMoreCharacters()) {
+                if (sb.length() % 3 == 0 && (lookAheadTest = HighLevelEncoder.lookAheadTest(encoderContext.getMessage(), encoderContext.pos, getEncodingMode())) != getEncodingMode()) {
+                    encoderContext.signalEncoderChange(lookAheadTest);
                     break;
                 }
             } else {
-                StringBuilder removed = new StringBuilder();
-                if (buffer.length() % 3 == 2 && (available < 2 || available > 2)) {
-                    lastCharSize = backtrackOneCharacter(context, buffer, removed, lastCharSize);
+                StringBuilder sb2 = new StringBuilder();
+                if (sb.length() % 3 == 2 && (dataCapacity < 2 || dataCapacity > 2)) {
+                    encodeChar = backtrackOneCharacter(encoderContext, sb, sb2, encodeChar);
                 }
-                while (buffer.length() % 3 == 1 && ((lastCharSize <= 3 && available != 1) || lastCharSize > 3)) {
-                    lastCharSize = backtrackOneCharacter(context, buffer, removed, lastCharSize);
+                while (sb.length() % 3 == 1 && ((encodeChar <= 3 && dataCapacity != 1) || encodeChar > 3)) {
+                    encodeChar = backtrackOneCharacter(encoderContext, sb, sb2, encodeChar);
                 }
             }
         }
-        handleEOD(context, buffer);
+        handleEOD(encoderContext, sb);
     }
 
-    private int backtrackOneCharacter(EncoderContext context, StringBuilder buffer, StringBuilder removed, int lastCharSize) {
-        int count = buffer.length();
-        buffer.delete(count - lastCharSize, count);
-        context.pos--;
-        int lastCharSize2 = encodeChar(context.getCurrentChar(), removed);
-        context.resetSymbolInfo();
-        return lastCharSize2;
+    private int backtrackOneCharacter(EncoderContext encoderContext, StringBuilder sb, StringBuilder sb2, int i) {
+        int length = sb.length();
+        sb.delete(length - i, length);
+        encoderContext.pos--;
+        int encodeChar = encodeChar(encoderContext.getCurrentChar(), sb2);
+        encoderContext.resetSymbolInfo();
+        return encodeChar;
     }
 
-    static void writeNextTriplet(EncoderContext context, StringBuilder buffer) {
-        context.writeCodewords(encodeToCodewords(buffer, 0));
-        buffer.delete(0, 3);
+    static void writeNextTriplet(EncoderContext encoderContext, StringBuilder sb) {
+        encoderContext.writeCodewords(encodeToCodewords(sb, 0));
+        sb.delete(0, 3);
     }
 
     /* access modifiers changed from: package-private */
-    public void handleEOD(EncoderContext context, StringBuilder buffer) {
-        int rest = buffer.length() % 3;
-        int curCodewordCount = context.getCodewordCount() + ((buffer.length() / 3) * 2);
-        context.updateSymbolInfo(curCodewordCount);
-        int available = context.getSymbolInfo().getDataCapacity() - curCodewordCount;
-        if (rest == 2) {
-            buffer.append((char) 0);
-            while (buffer.length() >= 3) {
-                writeNextTriplet(context, buffer);
+    public void handleEOD(EncoderContext encoderContext, StringBuilder sb) {
+        int length = sb.length() % 3;
+        int codewordCount = encoderContext.getCodewordCount() + ((sb.length() / 3) * 2);
+        encoderContext.updateSymbolInfo(codewordCount);
+        int dataCapacity = encoderContext.getSymbolInfo().getDataCapacity() - codewordCount;
+        if (length == 2) {
+            sb.append((char) 0);
+            while (sb.length() >= 3) {
+                writeNextTriplet(encoderContext, sb);
             }
-            if (context.hasMoreCharacters()) {
-                context.writeCodeword(254);
+            if (encoderContext.hasMoreCharacters()) {
+                encoderContext.writeCodeword(254);
             }
-        } else if (available == 1 && rest == 1) {
-            while (buffer.length() >= 3) {
-                writeNextTriplet(context, buffer);
+        } else if (dataCapacity == 1 && length == 1) {
+            while (sb.length() >= 3) {
+                writeNextTriplet(encoderContext, sb);
             }
-            if (context.hasMoreCharacters()) {
-                context.writeCodeword(254);
+            if (encoderContext.hasMoreCharacters()) {
+                encoderContext.writeCodeword(254);
             }
-            context.pos--;
-        } else if (rest == 0) {
-            while (buffer.length() >= 3) {
-                writeNextTriplet(context, buffer);
+            encoderContext.pos--;
+        } else if (length == 0) {
+            while (sb.length() >= 3) {
+                writeNextTriplet(encoderContext, sb);
             }
-            if (available > 0 || context.hasMoreCharacters()) {
-                context.writeCodeword(254);
+            if (dataCapacity > 0 || encoderContext.hasMoreCharacters()) {
+                encoderContext.writeCodeword(254);
             }
         } else {
             throw new IllegalStateException("Unexpected case. Please report!");
         }
-        context.signalEncoderChange(0);
+        encoderContext.signalEncoderChange(0);
     }
 
     /* access modifiers changed from: package-private */
@@ -124,14 +124,14 @@ public class C40Encoder implements Encoder {
             return 2;
         } else if (c >= 128) {
             sb.append("\u0001\u001e");
-            return 2 + encodeChar((char) (c - 128), sb);
+            return encodeChar((char) (c - 128), sb) + 2;
         } else {
             throw new IllegalArgumentException("Illegal character: " + c);
         }
     }
 
-    private static String encodeToCodewords(CharSequence sb, int startPos) {
-        int v = (sb.charAt(startPos) * 1600) + (sb.charAt(startPos + 1) * '(') + sb.charAt(startPos + 2) + 1;
-        return new String(new char[]{(char) (v / 256), (char) (v % 256)});
+    private static String encodeToCodewords(CharSequence charSequence, int i) {
+        int charAt = (charSequence.charAt(i) * 1600) + (charSequence.charAt(i + 1) * '(') + charSequence.charAt(i + 2) + 1;
+        return new String(new char[]{(char) (charAt / 256), (char) (charAt % 256)});
     }
 }

@@ -12,15 +12,15 @@ public class DragStartHelper {
     private final View.OnLongClickListener mLongClickListener = new View.OnLongClickListener() {
         /* class android.support.v13.view.DragStartHelper.AnonymousClass1 */
 
-        public boolean onLongClick(View v) {
-            return DragStartHelper.this.onLongClick(v);
+        public boolean onLongClick(View view) {
+            return DragStartHelper.this.onLongClick(view);
         }
     };
     private final View.OnTouchListener mTouchListener = new View.OnTouchListener() {
         /* class android.support.v13.view.DragStartHelper.AnonymousClass2 */
 
-        public boolean onTouch(View v, MotionEvent event) {
-            return DragStartHelper.this.onTouch(v, event);
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            return DragStartHelper.this.onTouch(view, motionEvent);
         }
     };
     private final View mView;
@@ -29,9 +29,9 @@ public class DragStartHelper {
         boolean onDragStart(View view, DragStartHelper dragStartHelper);
     }
 
-    public DragStartHelper(View view, OnDragStartListener listener) {
+    public DragStartHelper(View view, OnDragStartListener onDragStartListener) {
         this.mView = view;
-        this.mListener = listener;
+        this.mListener = onDragStartListener;
     }
 
     public void attach() {
@@ -45,7 +45,7 @@ public class DragStartHelper {
     }
 
     /* JADX WARNING: Code restructure failed: missing block: B:7:0x0018, code lost:
-        if (r2 != 3) goto L_0x004e;
+        if (r2 != 3) goto L_0x004d;
      */
     /* Code decompiled incorrectly, please refer to instructions dump. */
     public boolean onTouch(android.view.View r7, android.view.MotionEvent r8) {
@@ -62,48 +62,48 @@ public class DragStartHelper {
             if (r2 == r4) goto L_0x0046
             r5 = 2
             if (r2 == r5) goto L_0x001b
-            r4 = 3
-            if (r2 == r4) goto L_0x0046
-            goto L_0x004e
+            r7 = 3
+            if (r2 == r7) goto L_0x0046
+            goto L_0x004d
         L_0x001b:
             r2 = 8194(0x2002, float:1.1482E-41)
             boolean r2 = android.support.v4.view.MotionEventCompat.isFromSource(r8, r2)
-            if (r2 == 0) goto L_0x004e
-            int r2 = r8.getButtonState()
-            r2 = r2 & r4
-            if (r2 != 0) goto L_0x002b
-            goto L_0x004e
+            if (r2 == 0) goto L_0x004d
+            int r8 = r8.getButtonState()
+            r8 = r8 & r4
+            if (r8 != 0) goto L_0x002b
+            goto L_0x004d
         L_0x002b:
-            boolean r2 = r6.mDragging
-            if (r2 == 0) goto L_0x0030
-            goto L_0x004e
+            boolean r8 = r6.mDragging
+            if (r8 == 0) goto L_0x0030
+            goto L_0x004d
         L_0x0030:
-            int r2 = r6.mLastTouchX
-            if (r2 != r0) goto L_0x0039
-            int r2 = r6.mLastTouchY
-            if (r2 != r1) goto L_0x0039
-            goto L_0x004e
+            int r8 = r6.mLastTouchX
+            if (r8 != r0) goto L_0x0039
+            int r8 = r6.mLastTouchY
+            if (r8 != r1) goto L_0x0039
+            goto L_0x004d
         L_0x0039:
             r6.mLastTouchX = r0
             r6.mLastTouchY = r1
-            android.support.v13.view.DragStartHelper$OnDragStartListener r2 = r6.mListener
-            boolean r2 = r2.onDragStart(r7, r6)
-            r6.mDragging = r2
-            return r2
+            android.support.v13.view.DragStartHelper$OnDragStartListener r8 = r6.mListener
+            boolean r7 = r8.onDragStart(r7, r6)
+            r6.mDragging = r7
+            return r7
         L_0x0046:
             r6.mDragging = r3
-            goto L_0x004e
+            goto L_0x004d
         L_0x0049:
             r6.mLastTouchX = r0
             r6.mLastTouchY = r1
-        L_0x004e:
+        L_0x004d:
             return r3
         */
         throw new UnsupportedOperationException("Method not decompiled: android.support.v13.view.DragStartHelper.onTouch(android.view.View, android.view.MotionEvent):boolean");
     }
 
-    public boolean onLongClick(View v) {
-        return this.mListener.onDragStart(v, this);
+    public boolean onLongClick(View view) {
+        return this.mListener.onDragStart(view, this);
     }
 
     public void getTouchPosition(Point point) {

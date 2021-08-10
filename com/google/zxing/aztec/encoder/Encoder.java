@@ -12,320 +12,314 @@ public final class Encoder {
     private static final int MAX_NB_BITS_COMPACT = 4;
     private static final int[] WORD_SIZE = {4, 6, 6, 8, 8, 8, 8, 8, 8, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12};
 
+    private static int totalBitsInLayer(int i, boolean z) {
+        return ((z ? 88 : 112) + (i * 16)) * i;
+    }
+
     private Encoder() {
     }
 
-    public static AztecCode encode(byte[] data) {
-        return encode(data, 33, 0);
+    public static AztecCode encode(byte[] bArr) {
+        return encode(bArr, 33, 0);
     }
 
-    public static AztecCode encode(byte[] data, int minECCPercent, int userSpecifiedLayers) {
-        BitArray stuffedBits;
-        int layers;
-        boolean compact;
-        int wordSize;
-        int totalBitsInLayer;
-        int i;
-        int wordSize2;
-        int totalSizeBits;
-        int eccBits;
-        BitArray bits;
-        BitArray stuffedBits2;
-        int wordSize3;
-        BitArray bits2 = new HighLevelEncoder(data).encode();
-        int eccBits2 = ((bits2.getSize() * minECCPercent) / 100) + 11;
-        int totalSizeBits2 = bits2.getSize() + eccBits2;
-        int i2 = 32;
-        if (userSpecifiedLayers != 0) {
-            compact = userSpecifiedLayers < 0;
-            layers = Math.abs(userSpecifiedLayers);
-            if (compact) {
-                i2 = 4;
+    public static AztecCode encode(byte[] bArr, int i, int i2) {
+        int i3;
+        int i4;
+        int i5;
+        boolean z;
+        BitArray bitArray;
+        int i6;
+        BitArray encode = new HighLevelEncoder(bArr).encode();
+        int size = ((encode.getSize() * i) / 100) + 11;
+        int size2 = encode.getSize() + size;
+        int i7 = 32;
+        int i8 = 0;
+        if (i2 != 0) {
+            z = i2 < 0;
+            i4 = Math.abs(i2);
+            if (z) {
+                i7 = 4;
             }
-            if (layers <= i2) {
-                totalBitsInLayer = totalBitsInLayer(layers, compact);
-                wordSize = WORD_SIZE[layers];
-                int usableBitsInLayers = totalBitsInLayer - (totalBitsInLayer % wordSize);
-                stuffedBits = stuffBits(bits2, wordSize);
-                if (stuffedBits.getSize() + eccBits2 > usableBitsInLayers) {
+            if (i4 <= i7) {
+                i5 = totalBitsInLayer(i4, z);
+                i3 = WORD_SIZE[i4];
+                int i9 = i5 - (i5 % i3);
+                bitArray = stuffBits(encode, i3);
+                if (bitArray.getSize() + size > i9) {
                     throw new IllegalArgumentException("Data to large for user specified layer");
-                } else if (compact && stuffedBits.getSize() > wordSize * 64) {
+                } else if (z && bitArray.getSize() > i3 * 64) {
                     throw new IllegalArgumentException("Data to large for user specified layer");
                 }
             } else {
-                throw new IllegalArgumentException(String.format("Illegal value %s for layers", Integer.valueOf(userSpecifiedLayers)));
+                throw new IllegalArgumentException(String.format("Illegal value %s for layers", Integer.valueOf(i2)));
             }
         } else {
-            int wordSize4 = 0;
-            BitArray stuffedBits3 = null;
-            int i3 = 0;
-            while (i3 <= i2) {
-                boolean compact2 = i3 <= 3;
-                int layers2 = compact2 ? i3 + 1 : i3;
-                int totalBitsInLayer2 = totalBitsInLayer(layers2, compact2);
-                if (totalSizeBits2 > totalBitsInLayer2) {
-                    bits = bits2;
-                    eccBits = eccBits2;
-                    totalSizeBits = totalSizeBits2;
-                } else {
+            BitArray bitArray2 = null;
+            int i10 = 0;
+            int i11 = 0;
+            while (i10 <= 32) {
+                boolean z2 = i10 <= 3;
+                int i12 = z2 ? i10 + 1 : i10;
+                int i13 = totalBitsInLayer(i12, z2);
+                if (size2 <= i13) {
                     int[] iArr = WORD_SIZE;
-                    if (wordSize4 != iArr[layers2]) {
-                        wordSize3 = iArr[layers2];
-                        stuffedBits2 = stuffBits(bits2, wordSize3);
-                    } else {
-                        wordSize3 = wordSize4;
-                        stuffedBits2 = stuffedBits3;
+                    if (i11 != iArr[i12]) {
+                        int i14 = iArr[i12];
+                        i11 = i14;
+                        bitArray2 = stuffBits(encode, i14);
                     }
-                    int usableBitsInLayers2 = totalBitsInLayer2 - (totalBitsInLayer2 % wordSize3);
-                    if (compact2 && stuffedBits2.getSize() > wordSize3 * 64) {
-                        bits = bits2;
-                        eccBits = eccBits2;
-                        totalSizeBits = totalSizeBits2;
-                    } else if (stuffedBits2.getSize() + eccBits2 <= usableBitsInLayers2) {
-                        wordSize = wordSize3;
-                        layers = layers2;
-                        totalBitsInLayer = totalBitsInLayer2;
-                        stuffedBits = stuffedBits2;
-                        compact = compact2;
-                    } else {
-                        bits = bits2;
-                        eccBits = eccBits2;
-                        totalSizeBits = totalSizeBits2;
+                    int i15 = i13 - (i13 % i11);
+                    if ((!z2 || bitArray2.getSize() <= i11 * 64) && bitArray2.getSize() + size <= i15) {
+                        bitArray = bitArray2;
+                        i3 = i11;
+                        z = z2;
+                        i4 = i12;
+                        i5 = i13;
                     }
-                    stuffedBits3 = stuffedBits2;
-                    wordSize4 = wordSize3;
                 }
-                i3++;
-                bits2 = bits;
-                eccBits2 = eccBits;
-                totalSizeBits2 = totalSizeBits;
-                i2 = 32;
+                i10++;
+                i8 = 0;
             }
             throw new IllegalArgumentException("Data too large for an Aztec code");
         }
-        BitArray messageBits = generateCheckWords(stuffedBits, totalBitsInLayer, wordSize);
-        int messageSizeInWords = stuffedBits.getSize() / wordSize;
-        BitArray modeMessage = generateModeMessage(compact, layers, messageSizeInWords);
-        int baseMatrixSize = (compact ? 11 : 14) + (layers * 4);
-        int[] alignmentMap = new int[baseMatrixSize];
-        if (compact) {
-            for (int i4 = 0; i4 < alignmentMap.length; i4++) {
-                alignmentMap[i4] = i4;
+        BitArray generateCheckWords = generateCheckWords(bitArray, i5, i3);
+        int size3 = bitArray.getSize() / i3;
+        BitArray generateModeMessage = generateModeMessage(z, i4, size3);
+        int i16 = (z ? 11 : 14) + (i4 * 4);
+        int[] iArr2 = new int[i16];
+        int i17 = 2;
+        if (z) {
+            for (int i18 = 0; i18 < i16; i18++) {
+                iArr2[i18] = i18;
             }
-            i = baseMatrixSize;
+            i6 = i16;
         } else {
-            int matrixSize = baseMatrixSize + 1 + ((((baseMatrixSize / 2) - 1) / 15) * 2);
-            int origCenter = baseMatrixSize / 2;
-            int center = matrixSize / 2;
-            for (int i5 = 0; i5 < origCenter; i5++) {
-                int newOffset = i5 + (i5 / 15);
-                alignmentMap[(origCenter - i5) - 1] = (center - newOffset) - 1;
-                alignmentMap[origCenter + i5] = center + newOffset + 1;
+            int i19 = i16 / 2;
+            i6 = i16 + 1 + (((i19 - 1) / 15) * 2);
+            int i20 = i6 / 2;
+            for (int i21 = 0; i21 < i19; i21++) {
+                int i22 = (i21 / 15) + i21;
+                iArr2[(i19 - i21) - 1] = (i20 - i22) - 1;
+                iArr2[i19 + i21] = i22 + i20 + 1;
             }
-            i = matrixSize;
         }
-        BitMatrix matrix = new BitMatrix(i);
-        int i6 = 0;
-        int rowOffset = 0;
-        while (i6 < layers) {
-            int rowSize = ((layers - i6) * 4) + (compact ? 9 : 12);
-            int j = 0;
-            while (j < rowSize) {
-                int columnOffset = j * 2;
-                int k = 0;
-                while (k < 2) {
-                    if (messageBits.get(rowOffset + columnOffset + k)) {
-                        wordSize2 = wordSize;
-                        matrix.set(alignmentMap[(i6 * 2) + k], alignmentMap[(i6 * 2) + j]);
-                    } else {
-                        wordSize2 = wordSize;
+        BitMatrix bitMatrix = new BitMatrix(i6);
+        int i23 = 0;
+        int i24 = 0;
+        while (i23 < i4) {
+            int i25 = ((i4 - i23) * 4) + (z ? 9 : 12);
+            int i26 = 0;
+            while (i26 < i25) {
+                int i27 = i26 * 2;
+                while (i8 < i17) {
+                    if (generateCheckWords.get(i24 + i27 + i8)) {
+                        int i28 = i23 * 2;
+                        bitMatrix.set(iArr2[i28 + i8], iArr2[i28 + i26]);
                     }
-                    if (messageBits.get(rowOffset + (rowSize * 2) + columnOffset + k)) {
-                        matrix.set(alignmentMap[(i6 * 2) + j], alignmentMap[((baseMatrixSize - 1) - (i6 * 2)) - k]);
+                    if (generateCheckWords.get((i25 * 2) + i24 + i27 + i8)) {
+                        int i29 = i23 * 2;
+                        bitMatrix.set(iArr2[i29 + i26], iArr2[((i16 - 1) - i29) - i8]);
                     }
-                    if (messageBits.get(rowOffset + (rowSize * 4) + columnOffset + k)) {
-                        matrix.set(alignmentMap[((baseMatrixSize - 1) - (i6 * 2)) - k], alignmentMap[((baseMatrixSize - 1) - (i6 * 2)) - j]);
+                    if (generateCheckWords.get((i25 * 4) + i24 + i27 + i8)) {
+                        int i30 = (i16 - 1) - (i23 * 2);
+                        bitMatrix.set(iArr2[i30 - i8], iArr2[i30 - i26]);
                     }
-                    if (messageBits.get(rowOffset + (rowSize * 6) + columnOffset + k)) {
-                        matrix.set(alignmentMap[((baseMatrixSize - 1) - (i6 * 2)) - j], alignmentMap[(i6 * 2) + k]);
+                    if (generateCheckWords.get((i25 * 6) + i24 + i27 + i8)) {
+                        int i31 = i23 * 2;
+                        bitMatrix.set(iArr2[((i16 - 1) - i31) - i26], iArr2[i31 + i8]);
                     }
-                    k++;
-                    totalBitsInLayer = totalBitsInLayer;
-                    wordSize = wordSize2;
+                    i8++;
+                    i17 = 2;
                 }
-                j++;
-                totalBitsInLayer = totalBitsInLayer;
-                totalSizeBits2 = totalSizeBits2;
+                i26++;
+                i8 = 0;
+                i17 = 2;
             }
-            rowOffset += rowSize * 8;
-            i6++;
-            eccBits2 = eccBits2;
+            i24 += i25 * 8;
+            i23++;
+            i8 = 0;
+            i17 = 2;
         }
-        drawModeMessage(matrix, compact, i, modeMessage);
-        if (compact) {
-            drawBullsEye(matrix, i / 2, 5);
+        drawModeMessage(bitMatrix, z, i6, generateModeMessage);
+        if (z) {
+            drawBullsEye(bitMatrix, i6 / 2, 5);
         } else {
-            drawBullsEye(matrix, i / 2, 7);
-            int i7 = 0;
-            int j2 = 0;
-            while (i7 < (baseMatrixSize / 2) - 1) {
-                for (int k2 = (i / 2) & 1; k2 < i; k2 += 2) {
-                    matrix.set((i / 2) - j2, k2);
-                    matrix.set((i / 2) + j2, k2);
-                    matrix.set(k2, (i / 2) - j2);
-                    matrix.set(k2, (i / 2) + j2);
+            int i32 = i6 / 2;
+            drawBullsEye(bitMatrix, i32, 7);
+            int i33 = 0;
+            int i34 = 0;
+            while (i33 < (i16 / 2) - 1) {
+                for (int i35 = i32 & 1; i35 < i6; i35 += 2) {
+                    int i36 = i32 - i34;
+                    bitMatrix.set(i36, i35);
+                    int i37 = i32 + i34;
+                    bitMatrix.set(i37, i35);
+                    bitMatrix.set(i35, i36);
+                    bitMatrix.set(i35, i37);
                 }
-                i7 += 15;
-                j2 += 16;
+                i33 += 15;
+                i34 += 16;
             }
         }
-        AztecCode aztec = new AztecCode();
-        aztec.setCompact(compact);
-        aztec.setSize(i);
-        aztec.setLayers(layers);
-        aztec.setCodeWords(messageSizeInWords);
-        aztec.setMatrix(matrix);
-        return aztec;
+        AztecCode aztecCode = new AztecCode();
+        aztecCode.setCompact(z);
+        aztecCode.setSize(i6);
+        aztecCode.setLayers(i4);
+        aztecCode.setCodeWords(size3);
+        aztecCode.setMatrix(bitMatrix);
+        return aztecCode;
     }
 
-    private static void drawBullsEye(BitMatrix matrix, int center, int size) {
-        for (int i = 0; i < size; i += 2) {
-            for (int j = center - i; j <= center + i; j++) {
-                matrix.set(j, center - i);
-                matrix.set(j, center + i);
-                matrix.set(center - i, j);
-                matrix.set(center + i, j);
+    private static void drawBullsEye(BitMatrix bitMatrix, int i, int i2) {
+        for (int i3 = 0; i3 < i2; i3 += 2) {
+            int i4 = i - i3;
+            int i5 = i4;
+            while (true) {
+                int i6 = i + i3;
+                if (i5 > i6) {
+                    break;
+                }
+                bitMatrix.set(i5, i4);
+                bitMatrix.set(i5, i6);
+                bitMatrix.set(i4, i5);
+                bitMatrix.set(i6, i5);
+                i5++;
             }
         }
-        matrix.set(center - size, center - size);
-        matrix.set((center - size) + 1, center - size);
-        matrix.set(center - size, (center - size) + 1);
-        matrix.set(center + size, center - size);
-        matrix.set(center + size, (center - size) + 1);
-        matrix.set(center + size, (center + size) - 1);
+        int i7 = i - i2;
+        bitMatrix.set(i7, i7);
+        int i8 = i7 + 1;
+        bitMatrix.set(i8, i7);
+        bitMatrix.set(i7, i8);
+        int i9 = i + i2;
+        bitMatrix.set(i9, i7);
+        bitMatrix.set(i9, i8);
+        bitMatrix.set(i9, i9 - 1);
     }
 
-    static BitArray generateModeMessage(boolean compact, int layers, int messageSizeInWords) {
-        BitArray modeMessage = new BitArray();
-        if (compact) {
-            modeMessage.appendBits(layers - 1, 2);
-            modeMessage.appendBits(messageSizeInWords - 1, 6);
-            return generateCheckWords(modeMessage, 28, 4);
+    static BitArray generateModeMessage(boolean z, int i, int i2) {
+        BitArray bitArray = new BitArray();
+        if (z) {
+            bitArray.appendBits(i - 1, 2);
+            bitArray.appendBits(i2 - 1, 6);
+            return generateCheckWords(bitArray, 28, 4);
         }
-        modeMessage.appendBits(layers - 1, 5);
-        modeMessage.appendBits(messageSizeInWords - 1, 11);
-        return generateCheckWords(modeMessage, 40, 4);
+        bitArray.appendBits(i - 1, 5);
+        bitArray.appendBits(i2 - 1, 11);
+        return generateCheckWords(bitArray, 40, 4);
     }
 
-    private static void drawModeMessage(BitMatrix matrix, boolean compact, int matrixSize, BitArray modeMessage) {
-        int center = matrixSize / 2;
-        if (compact) {
-            for (int i = 0; i < 7; i++) {
-                int offset = (center - 3) + i;
-                if (modeMessage.get(i)) {
-                    matrix.set(offset, center - 5);
+    private static void drawModeMessage(BitMatrix bitMatrix, boolean z, int i, BitArray bitArray) {
+        int i2 = i / 2;
+        int i3 = 0;
+        if (z) {
+            while (i3 < 7) {
+                int i4 = (i2 - 3) + i3;
+                if (bitArray.get(i3)) {
+                    bitMatrix.set(i4, i2 - 5);
                 }
-                if (modeMessage.get(i + 7)) {
-                    matrix.set(center + 5, offset);
+                if (bitArray.get(i3 + 7)) {
+                    bitMatrix.set(i2 + 5, i4);
                 }
-                if (modeMessage.get(20 - i)) {
-                    matrix.set(offset, center + 5);
+                if (bitArray.get(20 - i3)) {
+                    bitMatrix.set(i4, i2 + 5);
                 }
-                if (modeMessage.get(27 - i)) {
-                    matrix.set(center - 5, offset);
+                if (bitArray.get(27 - i3)) {
+                    bitMatrix.set(i2 - 5, i4);
                 }
+                i3++;
             }
             return;
         }
-        for (int i2 = 0; i2 < 10; i2++) {
-            int offset2 = (center - 5) + i2 + (i2 / 5);
-            if (modeMessage.get(i2)) {
-                matrix.set(offset2, center - 7);
+        while (i3 < 10) {
+            int i5 = (i2 - 5) + i3 + (i3 / 5);
+            if (bitArray.get(i3)) {
+                bitMatrix.set(i5, i2 - 7);
             }
-            if (modeMessage.get(i2 + 10)) {
-                matrix.set(center + 7, offset2);
+            if (bitArray.get(i3 + 10)) {
+                bitMatrix.set(i2 + 7, i5);
             }
-            if (modeMessage.get(29 - i2)) {
-                matrix.set(offset2, center + 7);
+            if (bitArray.get(29 - i3)) {
+                bitMatrix.set(i5, i2 + 7);
             }
-            if (modeMessage.get(39 - i2)) {
-                matrix.set(center - 7, offset2);
+            if (bitArray.get(39 - i3)) {
+                bitMatrix.set(i2 - 7, i5);
             }
+            i3++;
         }
     }
 
-    private static BitArray generateCheckWords(BitArray bitArray, int totalBits, int wordSize) {
-        ReedSolomonEncoder rs = new ReedSolomonEncoder(getGF(wordSize));
-        int totalWords = totalBits / wordSize;
-        int[] messageWords = bitsToWords(bitArray, wordSize, totalWords);
-        rs.encode(messageWords, totalWords - (bitArray.getSize() / wordSize));
-        BitArray messageBits = new BitArray();
-        messageBits.appendBits(0, totalBits % wordSize);
-        for (int messageWord : messageWords) {
-            messageBits.appendBits(messageWord, wordSize);
+    private static BitArray generateCheckWords(BitArray bitArray, int i, int i2) {
+        ReedSolomonEncoder reedSolomonEncoder = new ReedSolomonEncoder(getGF(i2));
+        int i3 = i / i2;
+        int[] bitsToWords = bitsToWords(bitArray, i2, i3);
+        reedSolomonEncoder.encode(bitsToWords, i3 - (bitArray.getSize() / i2));
+        BitArray bitArray2 = new BitArray();
+        bitArray2.appendBits(0, i % i2);
+        for (int i4 : bitsToWords) {
+            bitArray2.appendBits(i4, i2);
         }
-        return messageBits;
+        return bitArray2;
     }
 
-    private static int[] bitsToWords(BitArray stuffedBits, int wordSize, int totalWords) {
-        int[] message = new int[totalWords];
-        int n = stuffedBits.getSize() / wordSize;
-        for (int i = 0; i < n; i++) {
-            int value = 0;
-            for (int j = 0; j < wordSize; j++) {
-                value |= stuffedBits.get((i * wordSize) + j) ? 1 << ((wordSize - j) - 1) : 0;
+    private static int[] bitsToWords(BitArray bitArray, int i, int i2) {
+        int[] iArr = new int[i2];
+        int size = bitArray.getSize() / i;
+        for (int i3 = 0; i3 < size; i3++) {
+            int i4 = 0;
+            for (int i5 = 0; i5 < i; i5++) {
+                i4 |= bitArray.get((i3 * i) + i5) ? 1 << ((i - i5) - 1) : 0;
             }
-            message[i] = value;
+            iArr[i3] = i4;
         }
-        return message;
+        return iArr;
     }
 
-    private static GenericGF getGF(int wordSize) {
-        if (wordSize == 4) {
+    private static GenericGF getGF(int i) {
+        if (i == 4) {
             return GenericGF.AZTEC_PARAM;
         }
-        if (wordSize == 6) {
+        if (i == 6) {
             return GenericGF.AZTEC_DATA_6;
         }
-        if (wordSize == 8) {
+        if (i == 8) {
             return GenericGF.AZTEC_DATA_8;
         }
-        if (wordSize == 10) {
+        if (i == 10) {
             return GenericGF.AZTEC_DATA_10;
         }
-        if (wordSize == 12) {
+        if (i == 12) {
             return GenericGF.AZTEC_DATA_12;
         }
-        throw new IllegalArgumentException("Unsupported word size " + wordSize);
+        throw new IllegalArgumentException("Unsupported word size " + i);
     }
 
-    static BitArray stuffBits(BitArray bits, int wordSize) {
-        BitArray out = new BitArray();
-        int n = bits.getSize();
-        int mask = (1 << wordSize) - 2;
-        int i = 0;
-        while (i < n) {
-            int word = 0;
-            for (int j = 0; j < wordSize; j++) {
-                if (i + j >= n || bits.get(i + j)) {
-                    word |= 1 << ((wordSize - 1) - j);
+    static BitArray stuffBits(BitArray bitArray, int i) {
+        BitArray bitArray2 = new BitArray();
+        int size = bitArray.getSize();
+        int i2 = (1 << i) - 2;
+        int i3 = 0;
+        while (i3 < size) {
+            int i4 = 0;
+            for (int i5 = 0; i5 < i; i5++) {
+                int i6 = i3 + i5;
+                if (i6 >= size || bitArray.get(i6)) {
+                    i4 |= 1 << ((i - 1) - i5);
                 }
             }
-            if ((word & mask) == mask) {
-                out.appendBits(word & mask, wordSize);
-                i--;
-            } else if ((word & mask) == 0) {
-                out.appendBits(word | 1, wordSize);
-                i--;
+            int i7 = i4 & i2;
+            if (i7 == i2) {
+                bitArray2.appendBits(i7, i);
+            } else if (i7 == 0) {
+                bitArray2.appendBits(i4 | 1, i);
             } else {
-                out.appendBits(word, wordSize);
+                bitArray2.appendBits(i4, i);
+                i3 += i;
             }
-            i += wordSize;
+            i3--;
+            i3 += i;
         }
-        return out;
-    }
-
-    private static int totalBitsInLayer(int layers, boolean compact) {
-        return ((compact ? 88 : 112) + (layers * 16)) * layers;
+        return bitArray2;
     }
 }

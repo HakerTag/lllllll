@@ -19,39 +19,39 @@ public final class PermissionChecker {
     private PermissionChecker() {
     }
 
-    public static int checkPermission(Context context, String permission, int pid, int uid, String packageName) {
-        if (context.checkPermission(permission, pid, uid) == -1) {
+    public static int checkPermission(Context context, String str, int i, int i2, String str2) {
+        if (context.checkPermission(str, i, i2) == -1) {
             return -1;
         }
-        String op = AppOpsManagerCompat.permissionToOp(permission);
-        if (op == null) {
+        String permissionToOp = AppOpsManagerCompat.permissionToOp(str);
+        if (permissionToOp == null) {
             return 0;
         }
-        if (packageName == null) {
-            String[] packageNames = context.getPackageManager().getPackagesForUid(uid);
-            if (packageNames == null || packageNames.length <= 0) {
+        if (str2 == null) {
+            String[] packagesForUid = context.getPackageManager().getPackagesForUid(i2);
+            if (packagesForUid == null || packagesForUid.length <= 0) {
                 return -1;
             }
-            packageName = packageNames[0];
+            str2 = packagesForUid[0];
         }
-        if (AppOpsManagerCompat.noteProxyOpNoThrow(context, op, packageName) != 0) {
+        if (AppOpsManagerCompat.noteProxyOpNoThrow(context, permissionToOp, str2) != 0) {
             return -2;
         }
         return 0;
     }
 
-    public static int checkSelfPermission(Context context, String permission) {
-        return checkPermission(context, permission, Process.myPid(), Process.myUid(), context.getPackageName());
+    public static int checkSelfPermission(Context context, String str) {
+        return checkPermission(context, str, Process.myPid(), Process.myUid(), context.getPackageName());
     }
 
-    public static int checkCallingPermission(Context context, String permission, String packageName) {
+    public static int checkCallingPermission(Context context, String str, String str2) {
         if (Binder.getCallingPid() == Process.myPid()) {
             return -1;
         }
-        return checkPermission(context, permission, Binder.getCallingPid(), Binder.getCallingUid(), packageName);
+        return checkPermission(context, str, Binder.getCallingPid(), Binder.getCallingUid(), str2);
     }
 
-    public static int checkCallingOrSelfPermission(Context context, String permission) {
-        return checkPermission(context, permission, Binder.getCallingPid(), Binder.getCallingUid(), Binder.getCallingPid() == Process.myPid() ? context.getPackageName() : null);
+    public static int checkCallingOrSelfPermission(Context context, String str) {
+        return checkPermission(context, str, Binder.getCallingPid(), Binder.getCallingUid(), Binder.getCallingPid() == Process.myPid() ? context.getPackageName() : null);
     }
 }

@@ -5,15 +5,15 @@ import com.google.zxing.Result;
 public final class URLTOResultParser extends ResultParser {
     @Override // com.google.zxing.client.result.ResultParser
     public URIParsedResult parse(Result result) {
-        int titleEnd;
-        String rawText = getMassagedText(result);
-        String title = null;
-        if ((!rawText.startsWith("urlto:") && !rawText.startsWith("URLTO:")) || (titleEnd = rawText.indexOf(58, 6)) < 0) {
+        int indexOf;
+        String massagedText = getMassagedText(result);
+        String str = null;
+        if ((!massagedText.startsWith("urlto:") && !massagedText.startsWith("URLTO:")) || (indexOf = massagedText.indexOf(58, 6)) < 0) {
             return null;
         }
-        if (titleEnd > 6) {
-            title = rawText.substring(6, titleEnd);
+        if (indexOf > 6) {
+            str = massagedText.substring(6, indexOf);
         }
-        return new URIParsedResult(rawText.substring(titleEnd + 1), title);
+        return new URIParsedResult(massagedText.substring(indexOf + 1), str);
     }
 }

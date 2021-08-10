@@ -7,11 +7,11 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.ViewCompat;
 import org.json.JSONObject;
 
@@ -22,6 +22,10 @@ public class ForegroundService extends Service {
     private static final String NOTIFICATION_TITLE = "App is running in background";
     private final IBinder binder = new ForegroundBinder();
     private PowerManager.WakeLock wakeLock;
+
+    public int onStartCommand(Intent intent, int i, int i2) {
+        return 1;
+    }
 
     public IBinder onBind(Intent intent) {
         return this.binder;
@@ -47,10 +51,6 @@ public class ForegroundService extends Service {
         sleepWell();
     }
 
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        return 1;
-    }
-
     private void keepAwake() {
         if (!BackgroundMode.getSettings().optBoolean("silent", false)) {
             startForeground(NOTIFICATION_ID, makeNotification());
@@ -74,68 +74,90 @@ public class ForegroundService extends Service {
         return makeNotification(BackgroundMode.getSettings());
     }
 
-    private Notification makeNotification(JSONObject settings) {
+    private Notification makeNotification(JSONObject jSONObject) {
         if (Build.VERSION.SDK_INT >= 26) {
-            NotificationChannel mChannel = new NotificationChannel("cordova-plugin-background-mode-id", "cordova-plugin-background-mode", 2);
-            mChannel.setDescription("cordova-plugin-background-moden notification");
-            getNotificationManager().createNotificationChannel(mChannel);
+            String optString = jSONObject.optString("channelName", "cordova-plugin-background-mode");
+            String optString2 = jSONObject.optString("channelDescription", "cordova-plugin-background-moden notification");
+            NotificationChannel notificationChannel = new NotificationChannel("cordova-plugin-background-mode-id", optString, 2);
+            notificationChannel.setDescription(optString2);
+            getNotificationManager().createNotificationChannel(notificationChannel);
         }
-        String title = settings.optString("title", NOTIFICATION_TITLE);
-        String text = settings.optString("text", NOTIFICATION_TEXT);
-        boolean bigText = settings.optBoolean("bigText", false);
-        Context context = getApplicationContext();
-        Intent intent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
-        Notification.Builder notification = new Notification.Builder(context).setContentTitle(title).setContentText(text).setOngoing(true).setSmallIcon(getIconResId(settings));
-        if (Build.VERSION.SDK_INT >= 26) {
-            notification.setChannelId("cordova-plugin-background-mode-id");
+        String optString3 = jSONObject.optString("title", NOTIFICATION_TITLE);
+        String optString4 = jSONObject.optString("text", NOTIFICATION_TEXT);
+        boolean optBoolean = jSONObject.optBoolean("bigText", false);
+        String optString5 = jSONObject.optString("subText", "");
+        String optString6 = jSONObject.optString("visibility", "");
+        Context applicationContext = getApplicationContext();
+        String packageName = applicationContext.getPackageName();
+        Intent launchIntentForPackage = applicationContext.getPackageManager().getLaunchIntentForPackage(packageName);
+        int iconResId = getIconResId(jSONObject);
+        if (iconResId == 0) {
+            iconResId = applicationContext.getApplicationInfo().icon;
         }
-        if (settings.optBoolean("hidden", true)) {
-            notification.setPriority(-2);
+        NotificationCompat.Builder showWhen = new NotificationCompat.Builder(applicationContext, "cordova-plugin-background-mode-id").setContentTitle(optString3).setContentText(optString4).setOngoing(true).setSmallIcon(iconResId).setShowWhen(jSONObject.optBoolean("showWhen", true));
+        if (!optString5.equals("")) {
+            showWhen.setSubText(optString5);
         }
-        if (bigText || text.contains("\n")) {
-            notification.setStyle(new Notification.BigTextStyle().bigText(text));
+        if (jSONObject.optBoolean("allowClose", false)) {
+            showWhen.addAction(new NotificationCompat.Action.Builder(getIconResId(jSONObject.optString("closeIcon", "power")), jSONObject.optString("closeTitle", "Close"), PendingIntent.getBroadcast(applicationContext, 1337, new Intent("com.backgroundmode.close" + packageName), 0)).build());
         }
-        setColor(notification, settings);
-        if (intent != null && settings.optBoolean("resume")) {
-            intent.addFlags(603979776);
-            notification.setContentIntent(PendingIntent.getActivity(context, NOTIFICATION_ID, intent, 134217728));
+        if (jSONObject.optBoolean("hidden", true)) {
+            showWhen.setPriority(-2);
         }
-        return notification.build();
+        if (optBoolean || optString4.contains("\n")) {
+            showWhen.setStyle(new NotificationCompat.BigTextStyle().bigText(optString4));
+        }
+        if (!optString6.equals("")) {
+            showWhen.setVisibility(getVisibility(optString6));
+        }
+        setColor(showWhen, jSONObject);
+        if (launchIntentForPackage != null && jSONObject.optBoolean("resume")) {
+            launchIntentForPackage.addFlags(603979776);
+            showWhen.setContentIntent(PendingIntent.getActivity(applicationContext, NOTIFICATION_ID, launchIntentForPackage, 134217728));
+        }
+        return showWhen.build();
     }
 
     /* access modifiers changed from: protected */
-    public void updateNotification(JSONObject settings) {
-        if (settings.optBoolean("silent", false)) {
+    public void updateNotification(JSONObject jSONObject) {
+        if (jSONObject.optBoolean("silent", false)) {
             stopForeground(true);
             return;
         }
-        getNotificationManager().notify(NOTIFICATION_ID, makeNotification(settings));
+        getNotificationManager().notify(NOTIFICATION_ID, makeNotification(jSONObject));
     }
 
-    private int getIconResId(JSONObject settings) {
-        String icon = settings.optString(NOTIFICATION_ICON, NOTIFICATION_ICON);
-        int resId = getIconResId(icon, "mipmap");
-        if (resId == 0) {
-            return getIconResId(icon, "drawable");
+    private int getIconResId(String str) {
+        int iconResId = getIconResId(str, "mipmap");
+        if (iconResId == 0) {
+            iconResId = getIconResId(str, "drawable");
         }
-        return resId;
-    }
-
-    private int getIconResId(String icon, String type) {
-        Resources res = getResources();
-        String pkgName = getPackageName();
-        int resId = res.getIdentifier(icon, type, pkgName);
-        if (resId == 0) {
-            return res.getIdentifier(NOTIFICATION_ICON, type, pkgName);
+        if (iconResId == 0) {
+            iconResId = getIconResId(NOTIFICATION_ICON, "mipmap");
         }
-        return resId;
+        return iconResId == 0 ? getIconResId(NOTIFICATION_ICON, "drawable") : iconResId;
     }
 
-    private void setColor(Notification.Builder notification, JSONObject settings) {
-        String hex = settings.optString("color", null);
-        if (Build.VERSION.SDK_INT >= 21 && hex != null) {
+    private int getIconResId(JSONObject jSONObject) {
+        return getIconResId(jSONObject.optString(NOTIFICATION_ICON, NOTIFICATION_ICON));
+    }
+
+    private int getIconResId(String str, String str2) {
+        return getResources().getIdentifier(str, str2, getPackageName());
+    }
+
+    private int getVisibility(String str) {
+        if (str.equals("public")) {
+            return 1;
+        }
+        return str.equals("secret") ? -1 : 0;
+    }
+
+    private void setColor(NotificationCompat.Builder builder, JSONObject jSONObject) {
+        String optString = jSONObject.optString("color", null);
+        if (Build.VERSION.SDK_INT >= 21 && optString != null) {
             try {
-                notification.setColor(Integer.parseInt(hex, 16) + ViewCompat.MEASURED_STATE_MASK);
+                builder.setColor(Integer.parseInt(optString, 16) + ViewCompat.MEASURED_STATE_MASK);
             } catch (Exception e) {
                 e.printStackTrace();
             }

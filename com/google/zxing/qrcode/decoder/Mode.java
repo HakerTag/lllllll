@@ -15,56 +15,48 @@ public enum Mode {
     private final int bits;
     private final int[] characterCountBitsForVersions;
 
-    private Mode(int[] characterCountBitsForVersions2, int bits2) {
-        this.characterCountBitsForVersions = characterCountBitsForVersions2;
-        this.bits = bits2;
+    private Mode(int[] iArr, int i) {
+        this.characterCountBitsForVersions = iArr;
+        this.bits = i;
     }
 
-    public static Mode forBits(int bits2) {
-        if (bits2 == 0) {
+    public static Mode forBits(int i) {
+        if (i == 0) {
             return TERMINATOR;
         }
-        if (bits2 == 1) {
+        if (i == 1) {
             return NUMERIC;
         }
-        if (bits2 == 2) {
+        if (i == 2) {
             return ALPHANUMERIC;
         }
-        if (bits2 == 3) {
+        if (i == 3) {
             return STRUCTURED_APPEND;
         }
-        if (bits2 == 4) {
+        if (i == 4) {
             return BYTE;
         }
-        if (bits2 == 5) {
+        if (i == 5) {
             return FNC1_FIRST_POSITION;
         }
-        if (bits2 == 7) {
+        if (i == 7) {
             return ECI;
         }
-        if (bits2 == 8) {
+        if (i == 8) {
             return KANJI;
         }
-        if (bits2 == 9) {
+        if (i == 9) {
             return FNC1_SECOND_POSITION;
         }
-        if (bits2 == 13) {
+        if (i == 13) {
             return HANZI;
         }
         throw new IllegalArgumentException();
     }
 
     public int getCharacterCountBits(Version version) {
-        int offset;
-        int number = version.getVersionNumber();
-        if (number <= 9) {
-            offset = 0;
-        } else if (number <= 26) {
-            offset = 1;
-        } else {
-            offset = 2;
-        }
-        return this.characterCountBitsForVersions[offset];
+        int versionNumber = version.getVersionNumber();
+        return this.characterCountBitsForVersions[versionNumber <= 9 ? 0 : versionNumber <= 26 ? (char) 1 : 2];
     }
 
     public int getBits() {

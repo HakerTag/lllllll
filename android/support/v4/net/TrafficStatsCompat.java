@@ -19,18 +19,18 @@ public final class TrafficStatsCompat {
     }
 
     @Deprecated
-    public static void incrementOperationCount(int operationCount) {
-        TrafficStats.incrementOperationCount(operationCount);
+    public static void incrementOperationCount(int i) {
+        TrafficStats.incrementOperationCount(i);
     }
 
     @Deprecated
-    public static void incrementOperationCount(int tag, int operationCount) {
-        TrafficStats.incrementOperationCount(tag, operationCount);
+    public static void incrementOperationCount(int i, int i2) {
+        TrafficStats.incrementOperationCount(i, i2);
     }
 
     @Deprecated
-    public static void setThreadStatsTag(int tag) {
-        TrafficStats.setThreadStatsTag(tag);
+    public static void setThreadStatsTag(int i) {
+        TrafficStats.setThreadStatsTag(i);
     }
 
     @Deprecated
@@ -43,24 +43,24 @@ public final class TrafficStatsCompat {
         TrafficStats.untagSocket(socket);
     }
 
-    public static void tagDatagramSocket(DatagramSocket socket) throws SocketException {
+    public static void tagDatagramSocket(DatagramSocket datagramSocket) throws SocketException {
         if (Build.VERSION.SDK_INT >= 24) {
-            TrafficStats.tagDatagramSocket(socket);
+            TrafficStats.tagDatagramSocket(datagramSocket);
             return;
         }
-        ParcelFileDescriptor pfd = ParcelFileDescriptor.fromDatagramSocket(socket);
-        TrafficStats.tagSocket(new DatagramSocketWrapper(socket, pfd.getFileDescriptor()));
-        pfd.detachFd();
+        ParcelFileDescriptor fromDatagramSocket = ParcelFileDescriptor.fromDatagramSocket(datagramSocket);
+        TrafficStats.tagSocket(new DatagramSocketWrapper(datagramSocket, fromDatagramSocket.getFileDescriptor()));
+        fromDatagramSocket.detachFd();
     }
 
-    public static void untagDatagramSocket(DatagramSocket socket) throws SocketException {
+    public static void untagDatagramSocket(DatagramSocket datagramSocket) throws SocketException {
         if (Build.VERSION.SDK_INT >= 24) {
-            TrafficStats.untagDatagramSocket(socket);
+            TrafficStats.untagDatagramSocket(datagramSocket);
             return;
         }
-        ParcelFileDescriptor pfd = ParcelFileDescriptor.fromDatagramSocket(socket);
-        TrafficStats.untagSocket(new DatagramSocketWrapper(socket, pfd.getFileDescriptor()));
-        pfd.detachFd();
+        ParcelFileDescriptor fromDatagramSocket = ParcelFileDescriptor.fromDatagramSocket(datagramSocket);
+        TrafficStats.untagSocket(new DatagramSocketWrapper(datagramSocket, fromDatagramSocket.getFileDescriptor()));
+        fromDatagramSocket.detachFd();
     }
 
     private TrafficStatsCompat() {

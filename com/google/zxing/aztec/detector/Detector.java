@@ -10,6 +10,7 @@ import com.google.zxing.common.detector.WhiteRectangleDetector;
 import com.google.zxing.common.reedsolomon.GenericGF;
 import com.google.zxing.common.reedsolomon.ReedSolomonDecoder;
 import com.google.zxing.common.reedsolomon.ReedSolomonException;
+import kotlin.text.Typography;
 
 public final class Detector {
     private static final int[] EXPECTED_CORNER_BITS = {3808, 476, 2107, 1799};
@@ -20,20 +21,20 @@ public final class Detector {
     private int nbLayers;
     private int shift;
 
-    public Detector(BitMatrix image2) {
-        this.image = image2;
+    public Detector(BitMatrix bitMatrix) {
+        this.image = bitMatrix;
     }
 
     public AztecDetectorResult detect() throws NotFoundException {
         return detect(false);
     }
 
-    public AztecDetectorResult detect(boolean isMirror) throws NotFoundException {
+    public AztecDetectorResult detect(boolean z) throws NotFoundException {
         ResultPoint[] bullsEyeCorners = getBullsEyeCorners(getMatrixCenter());
-        if (isMirror) {
-            ResultPoint temp = bullsEyeCorners[0];
+        if (z) {
+            ResultPoint resultPoint = bullsEyeCorners[0];
             bullsEyeCorners[0] = bullsEyeCorners[2];
-            bullsEyeCorners[2] = temp;
+            bullsEyeCorners[2] = resultPoint;
         }
         extractParameters(bullsEyeCorners);
         BitMatrix bitMatrix = this.image;
@@ -41,123 +42,108 @@ public final class Detector {
         return new AztecDetectorResult(sampleGrid(bitMatrix, bullsEyeCorners[i % 4], bullsEyeCorners[(i + 1) % 4], bullsEyeCorners[(i + 2) % 4], bullsEyeCorners[(i + 3) % 4]), getMatrixCornerPoints(bullsEyeCorners), this.compact, this.nbDataBlocks, this.nbLayers);
     }
 
-    private void extractParameters(ResultPoint[] bullsEyeCorners) throws NotFoundException {
-        int i;
-        long parameterData;
-        if (!isValid(bullsEyeCorners[0]) || !isValid(bullsEyeCorners[1]) || !isValid(bullsEyeCorners[2]) || !isValid(bullsEyeCorners[3])) {
+    private void extractParameters(ResultPoint[] resultPointArr) throws NotFoundException {
+        long j;
+        long j2;
+        if (!isValid(resultPointArr[0]) || !isValid(resultPointArr[1]) || !isValid(resultPointArr[2]) || !isValid(resultPointArr[3])) {
             throw NotFoundException.getNotFoundInstance();
         }
-        int length = this.nbCenterLayers * 2;
-        int[] sides = {sampleLine(bullsEyeCorners[0], bullsEyeCorners[1], length), sampleLine(bullsEyeCorners[1], bullsEyeCorners[2], length), sampleLine(bullsEyeCorners[2], bullsEyeCorners[3], length), sampleLine(bullsEyeCorners[3], bullsEyeCorners[0], length)};
-        this.shift = getRotation(sides, length);
-        long parameterData2 = 0;
+        int i = this.nbCenterLayers * 2;
+        int[] iArr = {sampleLine(resultPointArr[0], resultPointArr[1], i), sampleLine(resultPointArr[1], resultPointArr[2], i), sampleLine(resultPointArr[2], resultPointArr[3], i), sampleLine(resultPointArr[3], resultPointArr[0], i)};
+        this.shift = getRotation(iArr, i);
+        long j3 = 0;
         for (int i2 = 0; i2 < 4; i2++) {
-            int side = sides[(this.shift + i2) % 4];
+            int i3 = iArr[(this.shift + i2) % 4];
             if (this.compact) {
-                parameterData = parameterData2 << 7;
-                i = (side >> 1) & 127;
+                j2 = j3 << 7;
+                j = (long) ((i3 >> 1) & 127);
             } else {
-                parameterData = parameterData2 << 10;
-                i = ((side >> 2) & 992) + ((side >> 1) & 31);
+                j2 = j3 << 10;
+                j = (long) (((i3 >> 2) & 992) + ((i3 >> 1) & 31));
             }
-            parameterData2 = parameterData + ((long) i);
+            j3 = j2 + j;
         }
-        int correctedData = getCorrectedParameterData(parameterData2, this.compact);
+        int correctedParameterData = getCorrectedParameterData(j3, this.compact);
         if (this.compact) {
-            this.nbLayers = (correctedData >> 6) + 1;
-            this.nbDataBlocks = (correctedData & 63) + 1;
+            this.nbLayers = (correctedParameterData >> 6) + 1;
+            this.nbDataBlocks = (correctedParameterData & 63) + 1;
             return;
         }
-        this.nbLayers = (correctedData >> 11) + 1;
-        this.nbDataBlocks = (correctedData & 2047) + 1;
+        this.nbLayers = (correctedParameterData >> 11) + 1;
+        this.nbDataBlocks = (correctedParameterData & 2047) + 1;
     }
 
-    private static int getRotation(int[] sides, int length) throws NotFoundException {
-        int cornerBits = 0;
-        for (int side : sides) {
-            cornerBits = (cornerBits << 3) + ((side >> (length - 2)) << 1) + (side & 1);
+    private static int getRotation(int[] iArr, int i) throws NotFoundException {
+        int i2 = 0;
+        for (int i3 : iArr) {
+            i2 = (i2 << 3) + ((i3 >> (i - 2)) << 1) + (i3 & 1);
         }
-        int cornerBits2 = ((cornerBits & 1) << 11) + (cornerBits >> 1);
-        for (int shift2 = 0; shift2 < 4; shift2++) {
-            if (Integer.bitCount(EXPECTED_CORNER_BITS[shift2] ^ cornerBits2) <= 2) {
-                return shift2;
+        int i4 = ((i2 & 1) << 11) + (i2 >> 1);
+        for (int i5 = 0; i5 < 4; i5++) {
+            if (Integer.bitCount(EXPECTED_CORNER_BITS[i5] ^ i4) <= 2) {
+                return i5;
             }
         }
         throw NotFoundException.getNotFoundInstance();
     }
 
-    private static int getCorrectedParameterData(long parameterData, boolean compact2) throws NotFoundException {
-        int numDataCodewords;
-        int numCodewords;
-        if (compact2) {
-            numCodewords = 7;
-            numDataCodewords = 2;
+    private static int getCorrectedParameterData(long j, boolean z) throws NotFoundException {
+        int i;
+        int i2;
+        if (z) {
+            i = 7;
+            i2 = 2;
         } else {
-            numCodewords = 10;
-            numDataCodewords = 4;
+            i = 10;
+            i2 = 4;
         }
-        int numECCodewords = numCodewords - numDataCodewords;
-        int[] parameterWords = new int[numCodewords];
-        for (int i = numCodewords - 1; i >= 0; i--) {
-            parameterWords[i] = ((int) parameterData) & 15;
-            parameterData >>= 4;
+        int i3 = i - i2;
+        int[] iArr = new int[i];
+        for (int i4 = i - 1; i4 >= 0; i4--) {
+            iArr[i4] = ((int) j) & 15;
+            j >>= 4;
         }
         try {
-            new ReedSolomonDecoder(GenericGF.AZTEC_PARAM).decode(parameterWords, numECCodewords);
-            int result = 0;
-            for (int i2 = 0; i2 < numDataCodewords; i2++) {
-                result = (result << 4) + parameterWords[i2];
+            new ReedSolomonDecoder(GenericGF.AZTEC_PARAM).decode(iArr, i3);
+            int i5 = 0;
+            for (int i6 = 0; i6 < i2; i6++) {
+                i5 = (i5 << 4) + iArr[i6];
             }
-            return result;
-        } catch (ReedSolomonException e) {
+            return i5;
+        } catch (ReedSolomonException unused) {
             throw NotFoundException.getNotFoundInstance();
         }
     }
 
-    private ResultPoint[] getBullsEyeCorners(Point pCenter) throws NotFoundException {
-        Point pina = pCenter;
-        Point pinb = pCenter;
-        Point pinc = pCenter;
-        Point pind = pCenter;
-        boolean color = true;
+    private ResultPoint[] getBullsEyeCorners(Point point) throws NotFoundException {
         this.nbCenterLayers = 1;
-        while (true) {
-            boolean z = false;
-            if (this.nbCenterLayers >= 9) {
-                break;
-            }
-            Point pouta = getFirstDifferent(pina, color, 1, -1);
-            Point poutb = getFirstDifferent(pinb, color, 1, 1);
-            Point poutc = getFirstDifferent(pinc, color, -1, 1);
-            Point poutd = getFirstDifferent(pind, color, -1, -1);
+        Point point2 = point;
+        Point point3 = point2;
+        Point point4 = point3;
+        Point point5 = point4;
+        boolean z = true;
+        while (this.nbCenterLayers < 9) {
+            Point firstDifferent = getFirstDifferent(point2, z, 1, -1);
+            Point firstDifferent2 = getFirstDifferent(point3, z, 1, 1);
+            Point firstDifferent3 = getFirstDifferent(point4, z, -1, 1);
+            Point firstDifferent4 = getFirstDifferent(point5, z, -1, -1);
             if (this.nbCenterLayers > 2) {
-                float q = (distance(poutd, pouta) * ((float) this.nbCenterLayers)) / (distance(pind, pina) * ((float) (this.nbCenterLayers + 2)));
-                if (((double) q) >= 0.75d) {
-                    if (((double) q) <= 1.25d) {
-                        if (!isWhiteOrBlackRectangle(pouta, poutb, poutc, poutd)) {
-                            break;
-                        }
-                    } else {
-                        break;
-                    }
-                } else {
+                double distance = (double) ((distance(firstDifferent4, firstDifferent) * ((float) this.nbCenterLayers)) / (distance(point5, point2) * ((float) (this.nbCenterLayers + 2))));
+                if (distance < 0.75d || distance > 1.25d || !isWhiteOrBlackRectangle(firstDifferent, firstDifferent2, firstDifferent3, firstDifferent4)) {
                     break;
                 }
             }
-            pina = pouta;
-            pinb = poutb;
-            pinc = poutc;
-            pind = poutd;
-            if (!color) {
-                z = true;
-            }
-            color = z;
+            z = !z;
             this.nbCenterLayers++;
+            point5 = firstDifferent4;
+            point2 = firstDifferent;
+            point3 = firstDifferent2;
+            point4 = firstDifferent3;
         }
         int i = this.nbCenterLayers;
         if (i == 5 || i == 7) {
             this.compact = this.nbCenterLayers == 5;
-            ResultPoint[] resultPointArr = {new ResultPoint(((float) pina.getX()) + 0.5f, ((float) pina.getY()) - 0.5f), new ResultPoint(((float) pinb.getX()) + 0.5f, ((float) pinb.getY()) + 0.5f), new ResultPoint(((float) pinc.getX()) - 0.5f, ((float) pinc.getY()) + 0.5f), new ResultPoint(((float) pind.getX()) - 0.5f, ((float) pind.getY()) - 0.5f)};
+            ResultPoint[] resultPointArr = {new ResultPoint(((float) point2.getX()) + 0.5f, ((float) point2.getY()) - 0.5f), new ResultPoint(((float) point3.getX()) + 0.5f, ((float) point3.getY()) + 0.5f), new ResultPoint(((float) point4.getX()) - 0.5f, ((float) point4.getY()) + 0.5f), new ResultPoint(((float) point5.getX()) - 0.5f, ((float) point5.getY()) - 0.5f)};
             int i2 = this.nbCenterLayers;
             return expandSquare(resultPointArr, (float) ((i2 * 2) - 3), (float) (i2 * 2));
         }
@@ -165,169 +151,183 @@ public final class Detector {
     }
 
     private Point getMatrixCenter() {
-        ResultPoint pointA;
-        ResultPoint pointB;
-        ResultPoint pointA2;
-        ResultPoint pointD;
-        ResultPoint pointC;
-        ResultPoint pointB2;
-        ResultPoint pointA3;
-        ResultPoint pointD2;
+        ResultPoint resultPoint;
+        ResultPoint resultPoint2;
+        ResultPoint resultPoint3;
+        ResultPoint resultPoint4;
+        ResultPoint resultPoint5;
+        ResultPoint resultPoint6;
+        ResultPoint resultPoint7;
+        ResultPoint resultPoint8;
         try {
-            ResultPoint[] cornerPoints = new WhiteRectangleDetector(this.image).detect();
-            pointA2 = cornerPoints[0];
-            pointB = cornerPoints[1];
-            pointA = cornerPoints[2];
-            pointD = cornerPoints[3];
-        } catch (NotFoundException e) {
-            int cx = this.image.getWidth() / 2;
-            int cy = this.image.getHeight() / 2;
-            ResultPoint pointA4 = getFirstDifferent(new Point(cx + 7, cy - 7), false, 1, -1).toResultPoint();
-            ResultPoint pointB3 = getFirstDifferent(new Point(cx + 7, cy + 7), false, 1, 1).toResultPoint();
-            ResultPoint pointC2 = getFirstDifferent(new Point(cx - 7, cy + 7), false, -1, 1).toResultPoint();
-            pointA2 = pointA4;
-            pointB = pointB3;
-            pointA = pointC2;
-            pointD = getFirstDifferent(new Point(cx - 7, cy - 7), false, -1, -1).toResultPoint();
+            ResultPoint[] detect = new WhiteRectangleDetector(this.image).detect();
+            resultPoint3 = detect[0];
+            resultPoint2 = detect[1];
+            resultPoint = detect[2];
+            resultPoint4 = detect[3];
+        } catch (NotFoundException unused) {
+            int width = this.image.getWidth() / 2;
+            int height = this.image.getHeight() / 2;
+            int i = width + 7;
+            int i2 = height - 7;
+            ResultPoint resultPoint9 = getFirstDifferent(new Point(i, i2), false, 1, -1).toResultPoint();
+            int i3 = height + 7;
+            ResultPoint resultPoint10 = getFirstDifferent(new Point(i, i3), false, 1, 1).toResultPoint();
+            int i4 = width - 7;
+            ResultPoint resultPoint11 = getFirstDifferent(new Point(i4, i3), false, -1, 1).toResultPoint();
+            resultPoint4 = getFirstDifferent(new Point(i4, i2), false, -1, -1).toResultPoint();
+            resultPoint = resultPoint11;
+            resultPoint3 = resultPoint9;
+            resultPoint2 = resultPoint10;
         }
-        int cx2 = MathUtils.round((((pointA2.getX() + pointD.getX()) + pointB.getX()) + pointA.getX()) / 4.0f);
-        int cy2 = MathUtils.round((((pointA2.getY() + pointD.getY()) + pointB.getY()) + pointA.getY()) / 4.0f);
+        int round = MathUtils.round((((resultPoint3.getX() + resultPoint4.getX()) + resultPoint2.getX()) + resultPoint.getX()) / 4.0f);
+        int round2 = MathUtils.round((((resultPoint3.getY() + resultPoint4.getY()) + resultPoint2.getY()) + resultPoint.getY()) / 4.0f);
         try {
-            ResultPoint[] cornerPoints2 = new WhiteRectangleDetector(this.image, 15, cx2, cy2).detect();
-            pointA3 = cornerPoints2[0];
-            pointB2 = cornerPoints2[1];
-            pointC = cornerPoints2[2];
-            pointD2 = cornerPoints2[3];
-        } catch (NotFoundException e2) {
-            pointA3 = getFirstDifferent(new Point(cx2 + 7, cy2 - 7), false, 1, -1).toResultPoint();
-            pointB2 = getFirstDifferent(new Point(cx2 + 7, cy2 + 7), false, 1, 1).toResultPoint();
-            pointC = getFirstDifferent(new Point(cx2 - 7, cy2 + 7), false, -1, 1).toResultPoint();
-            pointD2 = getFirstDifferent(new Point(cx2 - 7, cy2 - 7), false, -1, -1).toResultPoint();
+            ResultPoint[] detect2 = new WhiteRectangleDetector(this.image, 15, round, round2).detect();
+            resultPoint6 = detect2[0];
+            resultPoint5 = detect2[1];
+            resultPoint7 = detect2[2];
+            resultPoint8 = detect2[3];
+        } catch (NotFoundException unused2) {
+            int i5 = round + 7;
+            int i6 = round2 - 7;
+            resultPoint6 = getFirstDifferent(new Point(i5, i6), false, 1, -1).toResultPoint();
+            int i7 = round2 + 7;
+            resultPoint5 = getFirstDifferent(new Point(i5, i7), false, 1, 1).toResultPoint();
+            int i8 = round - 7;
+            resultPoint7 = getFirstDifferent(new Point(i8, i7), false, -1, 1).toResultPoint();
+            resultPoint8 = getFirstDifferent(new Point(i8, i6), false, -1, -1).toResultPoint();
         }
-        return new Point(MathUtils.round((((pointA3.getX() + pointD2.getX()) + pointB2.getX()) + pointC.getX()) / 4.0f), MathUtils.round((((pointA3.getY() + pointD2.getY()) + pointB2.getY()) + pointC.getY()) / 4.0f));
+        return new Point(MathUtils.round((((resultPoint6.getX() + resultPoint8.getX()) + resultPoint5.getX()) + resultPoint7.getX()) / 4.0f), MathUtils.round((((resultPoint6.getY() + resultPoint8.getY()) + resultPoint5.getY()) + resultPoint7.getY()) / 4.0f));
     }
 
-    private ResultPoint[] getMatrixCornerPoints(ResultPoint[] bullsEyeCorners) {
-        return expandSquare(bullsEyeCorners, (float) (this.nbCenterLayers * 2), (float) getDimension());
+    private ResultPoint[] getMatrixCornerPoints(ResultPoint[] resultPointArr) {
+        return expandSquare(resultPointArr, (float) (this.nbCenterLayers * 2), (float) getDimension());
     }
 
-    private BitMatrix sampleGrid(BitMatrix image2, ResultPoint topLeft, ResultPoint topRight, ResultPoint bottomRight, ResultPoint bottomLeft) throws NotFoundException {
-        GridSampler sampler = GridSampler.getInstance();
+    private BitMatrix sampleGrid(BitMatrix bitMatrix, ResultPoint resultPoint, ResultPoint resultPoint2, ResultPoint resultPoint3, ResultPoint resultPoint4) throws NotFoundException {
+        GridSampler instance = GridSampler.getInstance();
         int dimension = getDimension();
+        float f = ((float) dimension) / 2.0f;
         int i = this.nbCenterLayers;
-        float low = (((float) dimension) / 2.0f) - ((float) i);
-        float high = (((float) dimension) / 2.0f) + ((float) i);
-        return sampler.sampleGrid(image2, dimension, dimension, low, low, high, low, high, high, low, high, topLeft.getX(), topLeft.getY(), topRight.getX(), topRight.getY(), bottomRight.getX(), bottomRight.getY(), bottomLeft.getX(), bottomLeft.getY());
+        float f2 = f - ((float) i);
+        float f3 = f + ((float) i);
+        return instance.sampleGrid(bitMatrix, dimension, dimension, f2, f2, f3, f2, f3, f3, f2, f3, resultPoint.getX(), resultPoint.getY(), resultPoint2.getX(), resultPoint2.getY(), resultPoint3.getX(), resultPoint3.getY(), resultPoint4.getX(), resultPoint4.getY());
     }
 
-    private int sampleLine(ResultPoint p1, ResultPoint p2, int size) {
-        int result = 0;
-        float d = distance(p1, p2);
-        float moduleSize = d / ((float) size);
-        float px = p1.getX();
-        float py = p1.getY();
-        float dx = ((p2.getX() - p1.getX()) * moduleSize) / d;
-        float dy = ((p2.getY() - p1.getY()) * moduleSize) / d;
-        for (int i = 0; i < size; i++) {
-            if (this.image.get(MathUtils.round((((float) i) * dx) + px), MathUtils.round((((float) i) * dy) + py))) {
-                result |= 1 << ((size - i) - 1);
+    private int sampleLine(ResultPoint resultPoint, ResultPoint resultPoint2, int i) {
+        float distance = distance(resultPoint, resultPoint2);
+        float f = distance / ((float) i);
+        float x = resultPoint.getX();
+        float y = resultPoint.getY();
+        float x2 = ((resultPoint2.getX() - resultPoint.getX()) * f) / distance;
+        float y2 = (f * (resultPoint2.getY() - resultPoint.getY())) / distance;
+        int i2 = 0;
+        for (int i3 = 0; i3 < i; i3++) {
+            float f2 = (float) i3;
+            if (this.image.get(MathUtils.round((f2 * x2) + x), MathUtils.round((f2 * y2) + y))) {
+                i2 |= 1 << ((i - i3) - 1);
             }
         }
-        return result;
+        return i2;
     }
 
-    private boolean isWhiteOrBlackRectangle(Point p1, Point p2, Point p3, Point p4) {
-        Point p12 = new Point(p1.getX() - 3, p1.getY() + 3);
-        Point p22 = new Point(p2.getX() - 3, p2.getY() - 3);
-        Point p32 = new Point(p3.getX() + 3, p3.getY() - 3);
-        Point p42 = new Point(p4.getX() + 3, p4.getY() + 3);
-        int cInit = getColor(p42, p12);
-        if (cInit != 0 && getColor(p12, p22) == cInit && getColor(p22, p32) == cInit && getColor(p32, p42) == cInit) {
+    private boolean isWhiteOrBlackRectangle(Point point, Point point2, Point point3, Point point4) {
+        Point point5 = new Point(point.getX() - 3, point.getY() + 3);
+        Point point6 = new Point(point2.getX() - 3, point2.getY() - 3);
+        Point point7 = new Point(point3.getX() + 3, point3.getY() - 3);
+        Point point8 = new Point(point4.getX() + 3, point4.getY() + 3);
+        int color = getColor(point8, point5);
+        if (color != 0 && getColor(point5, point6) == color && getColor(point6, point7) == color && getColor(point7, point8) == color) {
             return true;
         }
         return false;
     }
 
-    private int getColor(Point p1, Point p2) {
-        float d = distance(p1, p2);
-        float dx = ((float) (p2.getX() - p1.getX())) / d;
-        float dy = ((float) (p2.getY() - p1.getY())) / d;
-        int error = 0;
-        float px = (float) p1.getX();
-        float py = (float) p1.getY();
-        boolean colorModel = this.image.get(p1.getX(), p1.getY());
-        int iMax = (int) Math.ceil((double) d);
-        for (int i = 0; i < iMax; i++) {
-            px += dx;
-            py += dy;
-            if (this.image.get(MathUtils.round(px), MathUtils.round(py)) != colorModel) {
-                error++;
+    private int getColor(Point point, Point point2) {
+        float distance = distance(point, point2);
+        float x = ((float) (point2.getX() - point.getX())) / distance;
+        float y = ((float) (point2.getY() - point.getY())) / distance;
+        float x2 = (float) point.getX();
+        float y2 = (float) point.getY();
+        boolean z = this.image.get(point.getX(), point.getY());
+        int ceil = (int) Math.ceil((double) distance);
+        boolean z2 = false;
+        int i = 0;
+        for (int i2 = 0; i2 < ceil; i2++) {
+            x2 += x;
+            y2 += y;
+            if (this.image.get(MathUtils.round(x2), MathUtils.round(y2)) != z) {
+                i++;
             }
         }
-        float errRatio = ((float) error) / d;
-        boolean z = false;
-        if (errRatio > 0.1f && errRatio < 0.9f) {
+        float f = ((float) i) / distance;
+        if (f > 0.1f && f < 0.9f) {
             return 0;
         }
-        if (errRatio <= 0.1f) {
-            z = true;
+        if (f <= 0.1f) {
+            z2 = true;
         }
-        return z == colorModel ? 1 : -1;
+        return z2 == z ? 1 : -1;
     }
 
-    private Point getFirstDifferent(Point init, boolean color, int dx, int dy) {
-        int x = init.getX() + dx;
-        int y = init.getY();
+    private Point getFirstDifferent(Point point, boolean z, int i, int i2) {
+        int x = point.getX() + i;
+        int y = point.getY();
         while (true) {
-            y += dy;
-            if (!isValid(x, y) || this.image.get(x, y) != color) {
-                int x2 = x - dx;
-                int y2 = y - dy;
+            y += i2;
+            if (!isValid(x, y) || this.image.get(x, y) != z) {
+                int i3 = x - i;
+                int i4 = y - i2;
             } else {
-                x += dx;
+                x += i;
             }
         }
-        int x22 = x - dx;
-        int y22 = y - dy;
-        while (isValid(x22, y22) && this.image.get(x22, y22) == color) {
-            x22 += dx;
+        int i32 = x - i;
+        int i42 = y - i2;
+        while (isValid(i32, i42) && this.image.get(i32, i42) == z) {
+            i32 += i;
         }
-        int x3 = x22 - dx;
-        while (isValid(x3, y22) && this.image.get(x3, y22) == color) {
-            y22 += dy;
+        int i5 = i32 - i;
+        while (isValid(i5, i42) && this.image.get(i5, i42) == z) {
+            i42 += i2;
         }
-        return new Point(x3, y22 - dy);
+        return new Point(i5, i42 - i2);
     }
 
-    private static ResultPoint[] expandSquare(ResultPoint[] cornerPoints, float oldSide, float newSide) {
-        float ratio = newSide / (oldSide * 2.0f);
-        float dx = cornerPoints[0].getX() - cornerPoints[2].getX();
-        float dy = cornerPoints[0].getY() - cornerPoints[2].getY();
-        float centerx = (cornerPoints[0].getX() + cornerPoints[2].getX()) / 2.0f;
-        float centery = (cornerPoints[0].getY() + cornerPoints[2].getY()) / 2.0f;
-        ResultPoint result0 = new ResultPoint((ratio * dx) + centerx, (ratio * dy) + centery);
-        ResultPoint result2 = new ResultPoint(centerx - (ratio * dx), centery - (ratio * dy));
-        float dx2 = cornerPoints[1].getX() - cornerPoints[3].getX();
-        float dy2 = cornerPoints[1].getY() - cornerPoints[3].getY();
-        float centerx2 = (cornerPoints[1].getX() + cornerPoints[3].getX()) / 2.0f;
-        float centery2 = (cornerPoints[1].getY() + cornerPoints[3].getY()) / 2.0f;
-        return new ResultPoint[]{result0, new ResultPoint((ratio * dx2) + centerx2, (ratio * dy2) + centery2), result2, new ResultPoint(centerx2 - (ratio * dx2), centery2 - (ratio * dy2))};
+    private static ResultPoint[] expandSquare(ResultPoint[] resultPointArr, float f, float f2) {
+        float f3 = f2 / (f * 2.0f);
+        float x = resultPointArr[0].getX() - resultPointArr[2].getX();
+        float y = resultPointArr[0].getY() - resultPointArr[2].getY();
+        float x2 = (resultPointArr[0].getX() + resultPointArr[2].getX()) / 2.0f;
+        float y2 = (resultPointArr[0].getY() + resultPointArr[2].getY()) / 2.0f;
+        float f4 = x * f3;
+        float f5 = y * f3;
+        ResultPoint resultPoint = new ResultPoint(x2 + f4, y2 + f5);
+        ResultPoint resultPoint2 = new ResultPoint(x2 - f4, y2 - f5);
+        float x3 = resultPointArr[1].getX() - resultPointArr[3].getX();
+        float y3 = resultPointArr[1].getY() - resultPointArr[3].getY();
+        float x4 = (resultPointArr[1].getX() + resultPointArr[3].getX()) / 2.0f;
+        float y4 = (resultPointArr[1].getY() + resultPointArr[3].getY()) / 2.0f;
+        float f6 = x3 * f3;
+        float f7 = f3 * y3;
+        return new ResultPoint[]{resultPoint, new ResultPoint(x4 + f6, y4 + f7), resultPoint2, new ResultPoint(x4 - f6, y4 - f7)};
     }
 
-    private boolean isValid(int x, int y) {
-        return x >= 0 && x < this.image.getWidth() && y > 0 && y < this.image.getHeight();
+    private boolean isValid(int i, int i2) {
+        return i >= 0 && i < this.image.getWidth() && i2 > 0 && i2 < this.image.getHeight();
     }
 
-    private boolean isValid(ResultPoint point) {
-        return isValid(MathUtils.round(point.getX()), MathUtils.round(point.getY()));
+    private boolean isValid(ResultPoint resultPoint) {
+        return isValid(MathUtils.round(resultPoint.getX()), MathUtils.round(resultPoint.getY()));
     }
 
-    private static float distance(Point a, Point b) {
-        return MathUtils.distance(a.getX(), a.getY(), b.getX(), b.getY());
+    private static float distance(Point point, Point point2) {
+        return MathUtils.distance(point.getX(), point.getY(), point2.getX(), point2.getY());
     }
 
-    private static float distance(ResultPoint a, ResultPoint b) {
-        return MathUtils.distance(a.getX(), a.getY(), b.getX(), b.getY());
+    private static float distance(ResultPoint resultPoint, ResultPoint resultPoint2) {
+        return MathUtils.distance(resultPoint.getX(), resultPoint.getY(), resultPoint2.getX(), resultPoint2.getY());
     }
 
     private int getDimension() {
@@ -351,9 +351,9 @@ public final class Detector {
             return new ResultPoint((float) getX(), (float) getY());
         }
 
-        Point(int x2, int y2) {
-            this.x = x2;
-            this.y = y2;
+        Point(int i, int i2) {
+            this.x = i;
+            this.y = i2;
         }
 
         /* access modifiers changed from: package-private */
@@ -367,7 +367,7 @@ public final class Detector {
         }
 
         public String toString() {
-            return "<" + this.x + ' ' + this.y + '>';
+            return "<" + this.x + ' ' + this.y + Typography.greater;
         }
     }
 }

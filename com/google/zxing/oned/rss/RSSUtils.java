@@ -4,63 +4,75 @@ public final class RSSUtils {
     private RSSUtils() {
     }
 
-    public static int getRSSvalue(int[] widths, int maxWidth, boolean noNarrow) {
-        int n = 0;
-        for (int width : widths) {
-            n += width;
+    public static int getRSSvalue(int[] iArr, int i, boolean z) {
+        int[] iArr2 = iArr;
+        int i2 = 0;
+        for (int i3 : iArr2) {
+            i2 += i3;
         }
-        int val = 0;
-        int narrowMask = 0;
-        int elements = widths.length;
-        for (int bar = 0; bar < elements - 1; bar++) {
-            int elmWidth = 1;
-            narrowMask |= 1 << bar;
-            while (elmWidth < widths[bar]) {
-                int subVal = combins((n - elmWidth) - 1, (elements - bar) - 2);
-                if (noNarrow && narrowMask == 0 && (n - elmWidth) - ((elements - bar) - 1) >= (elements - bar) - 1) {
-                    subVal -= combins((n - elmWidth) - (elements - bar), (elements - bar) - 2);
-                }
-                if ((elements - bar) - 1 > 1) {
-                    int lessVal = 0;
-                    for (int mxwElement = (n - elmWidth) - ((elements - bar) - 2); mxwElement > maxWidth; mxwElement--) {
-                        lessVal += combins(((n - elmWidth) - mxwElement) - 1, (elements - bar) - 3);
-                    }
-                    subVal -= ((elements - 1) - bar) * lessVal;
-                } else if (n - elmWidth > maxWidth) {
-                    subVal--;
-                }
-                val += subVal;
-                elmWidth++;
-                narrowMask &= ~(1 << bar);
+        int length = iArr2.length;
+        int i4 = 0;
+        int i5 = 0;
+        int i6 = 0;
+        while (true) {
+            int i7 = length - 1;
+            if (i4 >= i7) {
+                return i5;
             }
-            n -= elmWidth;
+            int i8 = 1 << i4;
+            i6 |= i8;
+            int i9 = 1;
+            while (i9 < iArr2[i4]) {
+                int i10 = i2 - i9;
+                int i11 = length - i4;
+                int i12 = i11 - 2;
+                int combins = combins(i10 - 1, i12);
+                if (z && i6 == 0) {
+                    int i13 = i11 - 1;
+                    if (i10 - i13 >= i13) {
+                        combins -= combins(i10 - i11, i12);
+                    }
+                }
+                if (i11 - 1 > 1) {
+                    int i14 = 0;
+                    for (int i15 = i10 - i12; i15 > i; i15--) {
+                        i14 += combins((i10 - i15) - 1, i11 - 3);
+                    }
+                    combins -= i14 * (i7 - i4);
+                } else if (i10 > i) {
+                    combins--;
+                }
+                i5 += combins;
+                i9++;
+                i6 &= ~i8;
+                iArr2 = iArr;
+            }
+            i2 -= i9;
+            i4++;
+            iArr2 = iArr;
         }
-        return val;
     }
 
-    private static int combins(int n, int r) {
-        int maxDenom;
-        int minDenom;
-        if (n - r > r) {
-            minDenom = r;
-            maxDenom = n - r;
-        } else {
-            minDenom = n - r;
-            maxDenom = r;
+    private static int combins(int i, int i2) {
+        int i3 = i - i2;
+        if (i3 > i2) {
+            i3 = i2;
+            i2 = i3;
         }
-        int val = 1;
-        int j = 1;
-        for (int i = n; i > maxDenom; i--) {
-            val *= i;
-            if (j <= minDenom) {
-                val /= j;
-                j++;
+        int i4 = 1;
+        int i5 = 1;
+        while (i > i2) {
+            i4 *= i;
+            if (i5 <= i3) {
+                i4 /= i5;
+                i5++;
             }
+            i--;
         }
-        while (j <= minDenom) {
-            val /= j;
-            j++;
+        while (i5 <= i3) {
+            i4 /= i5;
+            i5++;
         }
-        return val;
+        return i4;
     }
 }

@@ -1,12 +1,16 @@
 package de.appplant.cordova.plugin.background;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.Process;
 import de.appplant.cordova.plugin.background.ForegroundService;
+import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
 import org.json.JSONObject;
@@ -17,17 +21,24 @@ public class BackgroundMode extends CordovaPlugin {
     private final ServiceConnection connection = new ServiceConnection() {
         /* class de.appplant.cordova.plugin.background.BackgroundMode.AnonymousClass1 */
 
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            BackgroundMode.this.service = ((ForegroundService.ForegroundBinder) service).getService();
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            BackgroundMode.this.service = ((ForegroundService.ForegroundBinder) iBinder).getService();
         }
 
-        public void onServiceDisconnected(ComponentName name) {
+        public void onServiceDisconnected(ComponentName componentName) {
             BackgroundMode.this.fireEvent(Event.FAILURE, "'service disconnected'");
         }
     };
     private boolean inBackground = false;
     private boolean isBind = false;
     private boolean isDisabled = true;
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        /* class de.appplant.cordova.plugin.background.BackgroundMode.AnonymousClass2 */
+
+        public void onReceive(Context context, Intent intent) {
+            BackgroundMode.this.cordova.getActivity().finish();
+        }
+    };
     private ForegroundService service;
 
     /* access modifiers changed from: private */
@@ -37,84 +48,91 @@ public class BackgroundMode extends CordovaPlugin {
         FAILURE
     }
 
-    /* JADX WARNING: Removed duplicated region for block: B:17:0x0039  */
-    /* JADX WARNING: Removed duplicated region for block: B:22:0x0047  */
-    /* JADX WARNING: Removed duplicated region for block: B:24:0x0055  */
-    /* JADX WARNING: Removed duplicated region for block: B:25:0x0059  */
+    @Override // org.apache.cordova.CordovaPlugin
+    public void initialize(CordovaInterface cordovaInterface, CordovaWebView cordovaWebView) {
+        super.initialize(cordovaInterface, cordovaWebView);
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("com.backgroundmode.close" + cordovaInterface.getContext().getPackageName());
+        cordovaInterface.getActivity().registerReceiver(this.receiver, intentFilter);
+    }
+
+    /* JADX WARNING: Removed duplicated region for block: B:17:0x0038  */
+    /* JADX WARNING: Removed duplicated region for block: B:21:0x0045  */
+    /* JADX WARNING: Removed duplicated region for block: B:24:0x0053  */
+    /* JADX WARNING: Removed duplicated region for block: B:25:0x0057  */
     @Override // org.apache.cordova.CordovaPlugin
     /* Code decompiled incorrectly, please refer to instructions dump. */
-    public boolean execute(java.lang.String r7, org.json.JSONArray r8, org.apache.cordova.CallbackContext r9) {
+    public boolean execute(java.lang.String r6, org.json.JSONArray r7, org.apache.cordova.CallbackContext r8) {
         /*
-            r6 = this;
-            r0 = 1
-            int r1 = r7.hashCode()
-            r2 = -1298848381(0xffffffffb2952583, float:-1.7362941E-8)
+            r5 = this;
+            int r0 = r6.hashCode()
+            r1 = -1298848381(0xffffffffb2952583, float:-1.7362941E-8)
+            r2 = 2
             r3 = 0
-            r4 = 2
-            r5 = 1
-            if (r1 == r2) goto L_0x002c
-            r2 = -804429082(0xffffffffd00d62e6, float:-9.4882755E9)
-            if (r1 == r2) goto L_0x0022
-            r2 = 1671308008(0x639e22e8, float:5.8342016E21)
-            if (r1 == r2) goto L_0x0018
+            r4 = 1
+            if (r0 == r1) goto L_0x002b
+            r1 = -804429082(0xffffffffd00d62e6, float:-9.4882755E9)
+            if (r0 == r1) goto L_0x0021
+            r1 = 1671308008(0x639e22e8, float:5.8342016E21)
+            if (r0 == r1) goto L_0x0017
+            goto L_0x0035
         L_0x0017:
+            java.lang.String r0 = "disable"
+            boolean r0 = r6.equals(r0)
+            if (r0 == 0) goto L_0x0035
+            r0 = 2
             goto L_0x0036
-        L_0x0018:
-            java.lang.String r1 = "disable"
-            boolean r1 = r7.equals(r1)
-            if (r1 == 0) goto L_0x0017
-            r1 = 2
-            goto L_0x0037
-        L_0x0022:
-            java.lang.String r1 = "configure"
-            boolean r1 = r7.equals(r1)
-            if (r1 == 0) goto L_0x0017
-            r1 = 0
-            goto L_0x0037
-        L_0x002c:
-            java.lang.String r1 = "enable"
-            boolean r1 = r7.equals(r1)
-            if (r1 == 0) goto L_0x0017
-            r1 = 1
-            goto L_0x0037
-        L_0x0036:
-            r1 = -1
-        L_0x0037:
-            if (r1 == 0) goto L_0x0047
-            if (r1 == r5) goto L_0x0043
-            if (r1 == r4) goto L_0x003f
+        L_0x0021:
+            java.lang.String r0 = "configure"
+            boolean r0 = r6.equals(r0)
+            if (r0 == 0) goto L_0x0035
             r0 = 0
-            goto L_0x0053
-        L_0x003f:
-            r6.disableMode()
-            goto L_0x0053
-        L_0x0043:
-            r6.enableMode()
-            goto L_0x0053
-        L_0x0047:
-            org.json.JSONObject r1 = r8.optJSONObject(r3)
-            boolean r2 = r8.optBoolean(r5)
-            r6.configure(r1, r2)
-        L_0x0053:
-            if (r0 == 0) goto L_0x0059
-            r9.success()
-            goto L_0x006d
-        L_0x0059:
-            java.lang.StringBuilder r1 = new java.lang.StringBuilder
-            r1.<init>()
-            java.lang.String r2 = "Invalid action: "
-            r1.append(r2)
-            r1.append(r7)
-            java.lang.String r1 = r1.toString()
-            r9.error(r1)
-        L_0x006d:
-            return r0
+            goto L_0x0036
+        L_0x002b:
+            java.lang.String r0 = "enable"
+            boolean r0 = r6.equals(r0)
+            if (r0 == 0) goto L_0x0035
+            r0 = 1
+            goto L_0x0036
+        L_0x0035:
+            r0 = -1
+        L_0x0036:
+            if (r0 == 0) goto L_0x0045
+            if (r0 == r4) goto L_0x0041
+            if (r0 == r2) goto L_0x003d
+            goto L_0x0051
+        L_0x003d:
+            r5.disableMode()
+            goto L_0x0050
+        L_0x0041:
+            r5.enableMode()
+            goto L_0x0050
+        L_0x0045:
+            org.json.JSONObject r0 = r7.optJSONObject(r3)
+            boolean r7 = r7.optBoolean(r4)
+            r5.configure(r0, r7)
+        L_0x0050:
+            r3 = 1
+        L_0x0051:
+            if (r3 == 0) goto L_0x0057
+            r8.success()
+            goto L_0x006b
+        L_0x0057:
+            java.lang.StringBuilder r7 = new java.lang.StringBuilder
+            r7.<init>()
+            java.lang.String r0 = "Invalid action: "
+            r7.append(r0)
+            r7.append(r6)
+            java.lang.String r6 = r7.toString()
+            r8.error(r6)
+        L_0x006b:
+            return r3
         */
         throw new UnsupportedOperationException("Method not decompiled: de.appplant.cordova.plugin.background.BackgroundMode.execute(java.lang.String, org.json.JSONArray, org.apache.cordova.CallbackContext):boolean");
     }
 
     @Override // org.apache.cordova.CordovaPlugin
-    public void onPause(boolean multitasking) {
+    public void onPause(boolean z) {
         try {
             this.inBackground = true;
             startService();
@@ -129,7 +147,7 @@ public class BackgroundMode extends CordovaPlugin {
     }
 
     @Override // org.apache.cordova.CordovaPlugin
-    public void onResume(boolean multitasking) {
+    public void onResume(boolean z) {
         this.inBackground = false;
         stopService();
     }
@@ -152,36 +170,36 @@ public class BackgroundMode extends CordovaPlugin {
         this.isDisabled = true;
     }
 
-    private void configure(JSONObject settings, boolean update) {
-        if (update) {
-            updateNotification(settings);
+    private void configure(JSONObject jSONObject, boolean z) {
+        if (z) {
+            updateNotification(jSONObject);
         } else {
-            setDefaultSettings(settings);
+            setDefaultSettings(jSONObject);
         }
     }
 
-    private void setDefaultSettings(JSONObject settings) {
-        defaultSettings = settings;
+    private void setDefaultSettings(JSONObject jSONObject) {
+        defaultSettings = jSONObject;
     }
 
     static JSONObject getSettings() {
         return defaultSettings;
     }
 
-    private void updateNotification(JSONObject settings) {
+    private void updateNotification(JSONObject jSONObject) {
         if (this.isBind) {
-            this.service.updateNotification(settings);
+            this.service.updateNotification(jSONObject);
         }
     }
 
     private void startService() {
-        Activity context = this.cordova.getActivity();
+        Activity activity = this.cordova.getActivity();
         if (!this.isDisabled && !this.isBind) {
-            Intent intent = new Intent(context, ForegroundService.class);
+            Intent intent = new Intent(activity, ForegroundService.class);
             try {
-                context.bindService(intent, this.connection, 1);
+                activity.bindService(intent, this.connection, 1);
                 fireEvent(Event.ACTIVATE, null);
-                context.startService(intent);
+                activity.startService(intent);
             } catch (Exception e) {
                 fireEvent(Event.FAILURE, String.format("'%s'", e.getMessage()));
             }
@@ -190,21 +208,21 @@ public class BackgroundMode extends CordovaPlugin {
     }
 
     private void stopService() {
-        Activity context = this.cordova.getActivity();
-        Intent intent = new Intent(context, ForegroundService.class);
+        Activity activity = this.cordova.getActivity();
+        Intent intent = new Intent(activity, ForegroundService.class);
         if (this.isBind) {
             fireEvent(Event.DEACTIVATE, null);
-            context.unbindService(this.connection);
-            context.stopService(intent);
+            activity.unbindService(this.connection);
+            activity.stopService(intent);
             this.isBind = false;
         }
     }
 
     /* access modifiers changed from: private */
     /* access modifiers changed from: public */
-    private void fireEvent(Event event, String params) {
-        String eventName = event.name().toLowerCase();
-        this.cordova.getActivity().runOnUiThread(new Runnable(String.format("%s;%s.fireEvent('%s',%s);", String.format("%s;%s.on('%s', %s)", String.format("%s._setActive(%b)", JS_NAMESPACE, Boolean.valueOf(event == Event.ACTIVATE)), JS_NAMESPACE, eventName, params), JS_NAMESPACE, eventName, params)) {
+    private void fireEvent(Event event, String str) {
+        String lowerCase = event.name().toLowerCase();
+        this.cordova.getActivity().runOnUiThread(new Runnable(String.format("%s;%s.fireEvent('%s',%s);", String.format("%s;%s.on('%s', %s)", String.format("%s._setActive(%b)", JS_NAMESPACE, Boolean.valueOf(event == Event.ACTIVATE)), JS_NAMESPACE, lowerCase, str), JS_NAMESPACE, lowerCase, str)) {
             /* class de.appplant.cordova.plugin.background.$$Lambda$BackgroundMode$K6y_lRKzoGM6t6fzblSCZ0XuQ */
             public final /* synthetic */ String f$1;
 
@@ -218,8 +236,8 @@ public class BackgroundMode extends CordovaPlugin {
         });
     }
 
-    public /* synthetic */ void lambda$fireEvent$0$BackgroundMode(String js) {
+    public /* synthetic */ void lambda$fireEvent$0$BackgroundMode(String str) {
         CordovaWebView cordovaWebView = this.webView;
-        cordovaWebView.loadUrl("javascript:" + js);
+        cordovaWebView.loadUrl("javascript:" + str);
     }
 }

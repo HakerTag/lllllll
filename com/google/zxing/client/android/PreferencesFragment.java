@@ -12,45 +12,44 @@ import barcodescanner.xservices.nl.barcodescanner.R;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Collection;
 
 public final class PreferencesFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     private CheckBoxPreference[] checkBoxPrefs;
 
-    public void onCreate(Bundle icicle) {
-        super.onCreate(icicle);
+    public void onCreate(Bundle bundle) {
+        super.onCreate(bundle);
         addPreferencesFromResource(R.xml.preferences);
-        PreferenceScreen preferences = getPreferenceScreen();
-        preferences.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
-        this.checkBoxPrefs = findDecodePrefs(preferences, PreferencesActivity.KEY_DECODE_1D_PRODUCT, PreferencesActivity.KEY_DECODE_1D_INDUSTRIAL, PreferencesActivity.KEY_DECODE_QR, PreferencesActivity.KEY_DECODE_DATA_MATRIX, PreferencesActivity.KEY_DECODE_AZTEC, PreferencesActivity.KEY_DECODE_PDF417);
+        PreferenceScreen preferenceScreen = getPreferenceScreen();
+        preferenceScreen.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+        this.checkBoxPrefs = findDecodePrefs(preferenceScreen, PreferencesActivity.KEY_DECODE_1D_PRODUCT, PreferencesActivity.KEY_DECODE_1D_INDUSTRIAL, PreferencesActivity.KEY_DECODE_QR, PreferencesActivity.KEY_DECODE_DATA_MATRIX, PreferencesActivity.KEY_DECODE_AZTEC, PreferencesActivity.KEY_DECODE_PDF417);
         disableLastCheckedPref();
-        ((EditTextPreference) preferences.findPreference(PreferencesActivity.KEY_CUSTOM_PRODUCT_SEARCH)).setOnPreferenceChangeListener(new CustomSearchURLValidator());
+        ((EditTextPreference) preferenceScreen.findPreference(PreferencesActivity.KEY_CUSTOM_PRODUCT_SEARCH)).setOnPreferenceChangeListener(new CustomSearchURLValidator());
     }
 
-    private static CheckBoxPreference[] findDecodePrefs(PreferenceScreen preferences, String... keys) {
-        CheckBoxPreference[] prefs = new CheckBoxPreference[keys.length];
-        for (int i = 0; i < keys.length; i++) {
-            prefs[i] = (CheckBoxPreference) preferences.findPreference(keys[i]);
+    private static CheckBoxPreference[] findDecodePrefs(PreferenceScreen preferenceScreen, String... strArr) {
+        CheckBoxPreference[] checkBoxPreferenceArr = new CheckBoxPreference[strArr.length];
+        for (int i = 0; i < strArr.length; i++) {
+            checkBoxPreferenceArr[i] = (CheckBoxPreference) preferenceScreen.findPreference(strArr[i]);
         }
-        return prefs;
+        return checkBoxPreferenceArr;
     }
 
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String str) {
         disableLastCheckedPref();
     }
 
     private void disableLastCheckedPref() {
-        Collection<CheckBoxPreference> checked = new ArrayList<>(this.checkBoxPrefs.length);
+        ArrayList arrayList = new ArrayList(this.checkBoxPrefs.length);
         CheckBoxPreference[] checkBoxPreferenceArr = this.checkBoxPrefs;
-        for (CheckBoxPreference pref : checkBoxPreferenceArr) {
-            if (pref.isChecked()) {
-                checked.add(pref);
+        for (CheckBoxPreference checkBoxPreference : checkBoxPreferenceArr) {
+            if (checkBoxPreference.isChecked()) {
+                arrayList.add(checkBoxPreference);
             }
         }
-        boolean disable = checked.size() <= 1;
+        boolean z = arrayList.size() <= 1;
         CheckBoxPreference[] checkBoxPreferenceArr2 = this.checkBoxPrefs;
-        for (CheckBoxPreference pref2 : checkBoxPreferenceArr2) {
-            pref2.setEnabled(!disable || !checked.contains(pref2));
+        for (CheckBoxPreference checkBoxPreference2 : checkBoxPreferenceArr2) {
+            checkBoxPreference2.setEnabled(!z || !arrayList.contains(checkBoxPreference2));
         }
     }
 
@@ -58,8 +57,8 @@ public final class PreferencesFragment extends PreferenceFragment implements Sha
         private CustomSearchURLValidator() {
         }
 
-        public boolean onPreferenceChange(Preference preference, Object newValue) {
-            if (isValid(newValue)) {
+        public boolean onPreferenceChange(Preference preference, Object obj) {
+            if (isValid(obj)) {
                 return true;
             }
             AlertDialog.Builder builder = new AlertDialog.Builder(PreferencesFragment.this.getActivity());
@@ -70,20 +69,20 @@ public final class PreferencesFragment extends PreferenceFragment implements Sha
             return false;
         }
 
-        private boolean isValid(Object newValue) {
-            if (newValue == null) {
+        private boolean isValid(Object obj) {
+            if (obj == null) {
                 return true;
             }
-            String valueString = newValue.toString();
-            if (valueString.isEmpty()) {
+            String obj2 = obj.toString();
+            if (obj2.isEmpty()) {
                 return true;
             }
             try {
-                if (new URI(valueString.replaceAll("%[st]", "").replaceAll("%f(?![0-9a-f])", "")).getScheme() != null) {
+                if (new URI(obj2.replaceAll("%[st]", "").replaceAll("%f(?![0-9a-f])", "")).getScheme() != null) {
                     return true;
                 }
                 return false;
-            } catch (URISyntaxException e) {
+            } catch (URISyntaxException unused) {
                 return false;
             }
         }

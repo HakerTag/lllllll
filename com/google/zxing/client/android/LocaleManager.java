@@ -82,13 +82,16 @@ public final class LocaleManager {
         return doGetTLD(GOOGLE_BOOK_SEARCH_COUNTRY_TLD, context);
     }
 
-    public static boolean isBookSearchUrl(String url) {
-        return url.startsWith("http://google.com/books") || url.startsWith("http://books.google.");
+    public static boolean isBookSearchUrl(String str) {
+        return str.startsWith("http://google.com/books") || str.startsWith("http://books.google.");
     }
 
     private static String getSystemCountry() {
         Locale locale = Locale.getDefault();
-        return locale == null ? DEFAULT_COUNTRY : locale.getCountry();
+        if (locale == null) {
+            return DEFAULT_COUNTRY;
+        }
+        return locale.getCountry();
     }
 
     private static String getSystemLanguage() {
@@ -104,20 +107,20 @@ public final class LocaleManager {
     }
 
     static String getTranslatedAssetLanguage() {
-        String language = getSystemLanguage();
-        return TRANSLATED_HELP_ASSET_LANGUAGES.contains(language) ? language : DEFAULT_LANGUAGE;
+        String systemLanguage = getSystemLanguage();
+        return TRANSLATED_HELP_ASSET_LANGUAGES.contains(systemLanguage) ? systemLanguage : DEFAULT_LANGUAGE;
     }
 
     private static String doGetTLD(Map<String, String> map, Context context) {
-        String tld = map.get(getCountry(context));
-        return tld == null ? DEFAULT_TLD : tld;
+        String str = map.get(getCountry(context));
+        return str == null ? DEFAULT_TLD : str;
     }
 
     private static String getCountry(Context context) {
-        String countryOverride = PreferenceManager.getDefaultSharedPreferences(context).getString(PreferencesActivity.KEY_SEARCH_COUNTRY, "-");
-        if (countryOverride == null || countryOverride.isEmpty() || "-".equals(countryOverride)) {
+        String string = PreferenceManager.getDefaultSharedPreferences(context).getString(PreferencesActivity.KEY_SEARCH_COUNTRY, "-");
+        if (string == null || string.isEmpty() || "-".equals(string)) {
             return getSystemCountry();
         }
-        return countryOverride;
+        return string;
     }
 }

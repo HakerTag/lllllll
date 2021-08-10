@@ -23,79 +23,80 @@ public final class DataMatrixReader implements Reader {
     private final Decoder decoder = new Decoder();
 
     @Override // com.google.zxing.Reader
-    public Result decode(BinaryBitmap image) throws NotFoundException, ChecksumException, FormatException {
-        return decode(image, null);
+    public void reset() {
     }
 
     @Override // com.google.zxing.Reader
-    public Result decode(BinaryBitmap image, Map<DecodeHintType, ?> hints) throws NotFoundException, ChecksumException, FormatException {
+    public Result decode(BinaryBitmap binaryBitmap) throws NotFoundException, ChecksumException, FormatException {
+        return decode(binaryBitmap, null);
+    }
+
+    @Override // com.google.zxing.Reader
+    public Result decode(BinaryBitmap binaryBitmap, Map<DecodeHintType, ?> map) throws NotFoundException, ChecksumException, FormatException {
+        ResultPoint[] resultPointArr;
         DecoderResult decoderResult;
-        ResultPoint[] points;
-        if (hints == null || !hints.containsKey(DecodeHintType.PURE_BARCODE)) {
-            DetectorResult detectorResult = new Detector(image.getBlackMatrix()).detect();
-            decoderResult = this.decoder.decode(detectorResult.getBits());
-            points = detectorResult.getPoints();
+        if (map == null || !map.containsKey(DecodeHintType.PURE_BARCODE)) {
+            DetectorResult detect = new Detector(binaryBitmap.getBlackMatrix()).detect();
+            DecoderResult decode = this.decoder.decode(detect.getBits());
+            resultPointArr = detect.getPoints();
+            decoderResult = decode;
         } else {
-            decoderResult = this.decoder.decode(extractPureBits(image.getBlackMatrix()));
-            points = NO_POINTS;
+            decoderResult = this.decoder.decode(extractPureBits(binaryBitmap.getBlackMatrix()));
+            resultPointArr = NO_POINTS;
         }
-        Result result = new Result(decoderResult.getText(), decoderResult.getRawBytes(), points, BarcodeFormat.DATA_MATRIX);
+        Result result = new Result(decoderResult.getText(), decoderResult.getRawBytes(), resultPointArr, BarcodeFormat.DATA_MATRIX);
         List<byte[]> byteSegments = decoderResult.getByteSegments();
         if (byteSegments != null) {
             result.putMetadata(ResultMetadataType.BYTE_SEGMENTS, byteSegments);
         }
-        String ecLevel = decoderResult.getECLevel();
-        if (ecLevel != null) {
-            result.putMetadata(ResultMetadataType.ERROR_CORRECTION_LEVEL, ecLevel);
+        String eCLevel = decoderResult.getECLevel();
+        if (eCLevel != null) {
+            result.putMetadata(ResultMetadataType.ERROR_CORRECTION_LEVEL, eCLevel);
         }
         return result;
     }
 
-    @Override // com.google.zxing.Reader
-    public void reset() {
-    }
-
-    private static BitMatrix extractPureBits(BitMatrix image) throws NotFoundException {
-        int[] leftTopBlack = image.getTopLeftOnBit();
-        int[] rightBottomBlack = image.getBottomRightOnBit();
-        if (leftTopBlack == null || rightBottomBlack == null) {
+    private static BitMatrix extractPureBits(BitMatrix bitMatrix) throws NotFoundException {
+        int[] topLeftOnBit = bitMatrix.getTopLeftOnBit();
+        int[] bottomRightOnBit = bitMatrix.getBottomRightOnBit();
+        if (topLeftOnBit == null || bottomRightOnBit == null) {
             throw NotFoundException.getNotFoundInstance();
         }
-        int moduleSize = moduleSize(leftTopBlack, image);
-        int top = leftTopBlack[1];
-        int bottom = rightBottomBlack[1];
-        int left = leftTopBlack[0];
-        int matrixWidth = ((rightBottomBlack[0] - left) + 1) / moduleSize;
-        int matrixHeight = ((bottom - top) + 1) / moduleSize;
-        if (matrixWidth <= 0 || matrixHeight <= 0) {
+        int moduleSize = moduleSize(topLeftOnBit, bitMatrix);
+        int i = topLeftOnBit[1];
+        int i2 = bottomRightOnBit[1];
+        int i3 = topLeftOnBit[0];
+        int i4 = ((bottomRightOnBit[0] - i3) + 1) / moduleSize;
+        int i5 = ((i2 - i) + 1) / moduleSize;
+        if (i4 <= 0 || i5 <= 0) {
             throw NotFoundException.getNotFoundInstance();
         }
-        int nudge = moduleSize / 2;
-        int top2 = top + nudge;
-        int left2 = left + nudge;
-        BitMatrix bits = new BitMatrix(matrixWidth, matrixHeight);
-        for (int y = 0; y < matrixHeight; y++) {
-            int iOffset = (y * moduleSize) + top2;
-            for (int x = 0; x < matrixWidth; x++) {
-                if (image.get((x * moduleSize) + left2, iOffset)) {
-                    bits.set(x, y);
+        int i6 = moduleSize / 2;
+        int i7 = i + i6;
+        int i8 = i3 + i6;
+        BitMatrix bitMatrix2 = new BitMatrix(i4, i5);
+        for (int i9 = 0; i9 < i5; i9++) {
+            int i10 = (i9 * moduleSize) + i7;
+            for (int i11 = 0; i11 < i4; i11++) {
+                if (bitMatrix.get((i11 * moduleSize) + i8, i10)) {
+                    bitMatrix2.set(i11, i9);
                 }
             }
         }
-        return bits;
+        return bitMatrix2;
     }
 
-    private static int moduleSize(int[] leftTopBlack, BitMatrix image) throws NotFoundException {
-        int width = image.getWidth();
-        int x = leftTopBlack[0];
-        int y = leftTopBlack[1];
-        while (x < width && image.get(x, y)) {
-            x++;
+    private static int moduleSize(int[] iArr, BitMatrix bitMatrix) throws NotFoundException {
+        int width = bitMatrix.getWidth();
+        int i = iArr[0];
+        int i2 = iArr[1];
+        while (i < width && bitMatrix.get(i, i2)) {
+            i++;
         }
-        if (x != width) {
-            int moduleSize = x - leftTopBlack[0];
-            if (moduleSize != 0) {
-                return moduleSize;
+        if (i != width) {
+            int i3 = i - iArr[0];
+            if (i3 != 0) {
+                return i3;
             }
             throw NotFoundException.getNotFoundInstance();
         }

@@ -15,25 +15,25 @@ public final class WifiResultHandler extends ResultHandler {
     private static final String TAG = WifiResultHandler.class.getSimpleName();
     private final CaptureActivity parent;
 
-    public WifiResultHandler(CaptureActivity activity, ParsedResult result) {
-        super(activity, result);
-        this.parent = activity;
-    }
-
     @Override // com.google.zxing.client.android.result.ResultHandler
     public int getButtonCount() {
         return 1;
     }
 
+    public WifiResultHandler(CaptureActivity captureActivity, ParsedResult parsedResult) {
+        super(captureActivity, parsedResult);
+        this.parent = captureActivity;
+    }
+
     @Override // com.google.zxing.client.android.result.ResultHandler
-    public int getButtonText(int index) {
+    public int getButtonText(int i) {
         return R.string.button_wifi;
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler
-    public void handleButtonPress(int index) {
-        if (index == 0) {
-            WifiParsedResult wifiResult = (WifiParsedResult) getResult();
+    public void handleButtonPress(int i) {
+        if (i == 0) {
+            WifiParsedResult wifiParsedResult = (WifiParsedResult) getResult();
             WifiManager wifiManager = (WifiManager) getActivity().getSystemService("wifi");
             if (wifiManager == null) {
                 Log.w(TAG, "No WifiManager available from device");
@@ -47,15 +47,15 @@ public final class WifiResultHandler extends ResultHandler {
                     Toast.makeText(activity.getApplicationContext(), R.string.wifi_changing_network, 0).show();
                 }
             });
-            new WifiConfigManager(wifiManager).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, wifiResult);
+            new WifiConfigManager(wifiManager).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, wifiParsedResult);
             this.parent.restartPreviewAfterDelay(0);
         }
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler
     public CharSequence getDisplayContents() {
-        WifiParsedResult wifiResult = (WifiParsedResult) getResult();
-        return wifiResult.getSsid() + " (" + wifiResult.getNetworkEncryption() + ')';
+        WifiParsedResult wifiParsedResult = (WifiParsedResult) getResult();
+        return wifiParsedResult.getSsid() + " (" + wifiParsedResult.getNetworkEncryption() + ')';
     }
 
     @Override // com.google.zxing.client.android.result.ResultHandler

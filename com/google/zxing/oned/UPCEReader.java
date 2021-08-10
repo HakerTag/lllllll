@@ -13,47 +13,47 @@ public final class UPCEReader extends UPCEANReader {
 
     /* access modifiers changed from: protected */
     @Override // com.google.zxing.oned.UPCEANReader
-    public int decodeMiddle(BitArray row, int[] startRange, StringBuilder result) throws NotFoundException {
-        int[] counters = this.decodeMiddleCounters;
-        counters[0] = 0;
-        counters[1] = 0;
-        counters[2] = 0;
-        counters[3] = 0;
-        int end = row.getSize();
-        int rowOffset = startRange[1];
-        int lgPatternFound = 0;
-        for (int x = 0; x < 6 && rowOffset < end; x++) {
-            int bestMatch = decodeDigit(row, counters, rowOffset, L_AND_G_PATTERNS);
-            result.append((char) ((bestMatch % 10) + 48));
-            for (int counter : counters) {
-                rowOffset += counter;
+    public int decodeMiddle(BitArray bitArray, int[] iArr, StringBuilder sb) throws NotFoundException {
+        int[] iArr2 = this.decodeMiddleCounters;
+        iArr2[0] = 0;
+        iArr2[1] = 0;
+        iArr2[2] = 0;
+        iArr2[3] = 0;
+        int size = bitArray.getSize();
+        int i = iArr[1];
+        int i2 = 0;
+        for (int i3 = 0; i3 < 6 && i < size; i3++) {
+            int decodeDigit = decodeDigit(bitArray, iArr2, i, L_AND_G_PATTERNS);
+            sb.append((char) ((decodeDigit % 10) + 48));
+            for (int i4 : iArr2) {
+                i += i4;
             }
-            if (bestMatch >= 10) {
-                lgPatternFound |= 1 << (5 - x);
+            if (decodeDigit >= 10) {
+                i2 |= 1 << (5 - i3);
             }
         }
-        determineNumSysAndCheckDigit(result, lgPatternFound);
-        return rowOffset;
+        determineNumSysAndCheckDigit(sb, i2);
+        return i;
     }
 
     /* access modifiers changed from: protected */
     @Override // com.google.zxing.oned.UPCEANReader
-    public int[] decodeEnd(BitArray row, int endStart) throws NotFoundException {
-        return findGuardPattern(row, endStart, true, MIDDLE_END_PATTERN);
+    public int[] decodeEnd(BitArray bitArray, int i) throws NotFoundException {
+        return findGuardPattern(bitArray, i, true, MIDDLE_END_PATTERN);
     }
 
     /* access modifiers changed from: protected */
     @Override // com.google.zxing.oned.UPCEANReader
-    public boolean checkChecksum(String s) throws FormatException {
-        return super.checkChecksum(convertUPCEtoUPCA(s));
+    public boolean checkChecksum(String str) throws FormatException {
+        return super.checkChecksum(convertUPCEtoUPCA(str));
     }
 
-    private static void determineNumSysAndCheckDigit(StringBuilder resultString, int lgPatternFound) throws NotFoundException {
-        for (int numSys = 0; numSys <= 1; numSys++) {
-            for (int d = 0; d < 10; d++) {
-                if (lgPatternFound == NUMSYS_AND_CHECK_DIGIT_PATTERNS[numSys][d]) {
-                    resultString.insert(0, (char) (numSys + 48));
-                    resultString.append((char) (d + 48));
+    private static void determineNumSysAndCheckDigit(StringBuilder sb, int i) throws NotFoundException {
+        for (int i2 = 0; i2 <= 1; i2++) {
+            for (int i3 = 0; i3 < 10; i3++) {
+                if (i == NUMSYS_AND_CHECK_DIGIT_PATTERNS[i2][i3]) {
+                    sb.insert(0, (char) (i2 + 48));
+                    sb.append((char) (i3 + 48));
                     return;
                 }
             }
@@ -67,38 +67,38 @@ public final class UPCEReader extends UPCEANReader {
         return BarcodeFormat.UPC_E;
     }
 
-    public static String convertUPCEtoUPCA(String upce) {
-        char[] upceChars = new char[6];
-        upce.getChars(1, 7, upceChars, 0);
-        StringBuilder result = new StringBuilder(12);
-        result.append(upce.charAt(0));
-        char lastChar = upceChars[5];
-        switch (lastChar) {
+    public static String convertUPCEtoUPCA(String str) {
+        char[] cArr = new char[6];
+        str.getChars(1, 7, cArr, 0);
+        StringBuilder sb = new StringBuilder(12);
+        sb.append(str.charAt(0));
+        char c = cArr[5];
+        switch (c) {
             case '0':
             case '1':
             case '2':
-                result.append(upceChars, 0, 2);
-                result.append(lastChar);
-                result.append("0000");
-                result.append(upceChars, 2, 3);
+                sb.append(cArr, 0, 2);
+                sb.append(c);
+                sb.append("0000");
+                sb.append(cArr, 2, 3);
                 break;
             case '3':
-                result.append(upceChars, 0, 3);
-                result.append("00000");
-                result.append(upceChars, 3, 2);
+                sb.append(cArr, 0, 3);
+                sb.append("00000");
+                sb.append(cArr, 3, 2);
                 break;
             case '4':
-                result.append(upceChars, 0, 4);
-                result.append("00000");
-                result.append(upceChars[4]);
+                sb.append(cArr, 0, 4);
+                sb.append("00000");
+                sb.append(cArr[4]);
                 break;
             default:
-                result.append(upceChars, 0, 5);
-                result.append("0000");
-                result.append(lastChar);
+                sb.append(cArr, 0, 5);
+                sb.append("0000");
+                sb.append(c);
                 break;
         }
-        result.append(upce.charAt(7));
-        return result.toString();
+        sb.append(str.charAt(7));
+        return sb.toString();
     }
 }

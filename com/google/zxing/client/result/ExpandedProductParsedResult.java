@@ -21,52 +21,52 @@ public final class ExpandedProductParsedResult extends ParsedResult {
     private final String weightIncrement;
     private final String weightType;
 
-    public ExpandedProductParsedResult(String rawText2, String productID2, String sscc2, String lotNumber2, String productionDate2, String packagingDate2, String bestBeforeDate2, String expirationDate2, String weight2, String weightType2, String weightIncrement2, String price2, String priceIncrement2, String priceCurrency2, Map<String, String> uncommonAIs2) {
+    public ExpandedProductParsedResult(String str, String str2, String str3, String str4, String str5, String str6, String str7, String str8, String str9, String str10, String str11, String str12, String str13, String str14, Map<String, String> map) {
         super(ParsedResultType.PRODUCT);
-        this.rawText = rawText2;
-        this.productID = productID2;
-        this.sscc = sscc2;
-        this.lotNumber = lotNumber2;
-        this.productionDate = productionDate2;
-        this.packagingDate = packagingDate2;
-        this.bestBeforeDate = bestBeforeDate2;
-        this.expirationDate = expirationDate2;
-        this.weight = weight2;
-        this.weightType = weightType2;
-        this.weightIncrement = weightIncrement2;
-        this.price = price2;
-        this.priceIncrement = priceIncrement2;
-        this.priceCurrency = priceCurrency2;
-        this.uncommonAIs = uncommonAIs2;
+        this.rawText = str;
+        this.productID = str2;
+        this.sscc = str3;
+        this.lotNumber = str4;
+        this.productionDate = str5;
+        this.packagingDate = str6;
+        this.bestBeforeDate = str7;
+        this.expirationDate = str8;
+        this.weight = str9;
+        this.weightType = str10;
+        this.weightIncrement = str11;
+        this.price = str12;
+        this.priceIncrement = str13;
+        this.priceCurrency = str14;
+        this.uncommonAIs = map;
     }
 
-    public boolean equals(Object o) {
-        if (!(o instanceof ExpandedProductParsedResult)) {
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ExpandedProductParsedResult)) {
             return false;
         }
-        ExpandedProductParsedResult other = (ExpandedProductParsedResult) o;
-        if (!equalsOrNull(this.productID, other.productID) || !equalsOrNull(this.sscc, other.sscc) || !equalsOrNull(this.lotNumber, other.lotNumber) || !equalsOrNull(this.productionDate, other.productionDate) || !equalsOrNull(this.bestBeforeDate, other.bestBeforeDate) || !equalsOrNull(this.expirationDate, other.expirationDate) || !equalsOrNull(this.weight, other.weight) || !equalsOrNull(this.weightType, other.weightType) || !equalsOrNull(this.weightIncrement, other.weightIncrement) || !equalsOrNull(this.price, other.price) || !equalsOrNull(this.priceIncrement, other.priceIncrement) || !equalsOrNull(this.priceCurrency, other.priceCurrency) || !equalsOrNull(this.uncommonAIs, other.uncommonAIs)) {
+        ExpandedProductParsedResult expandedProductParsedResult = (ExpandedProductParsedResult) obj;
+        if (!equalsOrNull(this.productID, expandedProductParsedResult.productID) || !equalsOrNull(this.sscc, expandedProductParsedResult.sscc) || !equalsOrNull(this.lotNumber, expandedProductParsedResult.lotNumber) || !equalsOrNull(this.productionDate, expandedProductParsedResult.productionDate) || !equalsOrNull(this.bestBeforeDate, expandedProductParsedResult.bestBeforeDate) || !equalsOrNull(this.expirationDate, expandedProductParsedResult.expirationDate) || !equalsOrNull(this.weight, expandedProductParsedResult.weight) || !equalsOrNull(this.weightType, expandedProductParsedResult.weightType) || !equalsOrNull(this.weightIncrement, expandedProductParsedResult.weightIncrement) || !equalsOrNull(this.price, expandedProductParsedResult.price) || !equalsOrNull(this.priceIncrement, expandedProductParsedResult.priceIncrement) || !equalsOrNull(this.priceCurrency, expandedProductParsedResult.priceCurrency) || !equalsOrNull(this.uncommonAIs, expandedProductParsedResult.uncommonAIs)) {
             return false;
         }
         return true;
     }
 
-    private static boolean equalsOrNull(Object o1, Object o2) {
-        if (o1 == null) {
-            return o2 == null;
+    private static boolean equalsOrNull(Object obj, Object obj2) {
+        if (obj == null) {
+            return obj2 == null;
         }
-        return o1.equals(o2);
+        return obj.equals(obj2);
     }
 
     public int hashCode() {
-        return ((((((((((((0 ^ hashNotNull(this.productID)) ^ hashNotNull(this.sscc)) ^ hashNotNull(this.lotNumber)) ^ hashNotNull(this.productionDate)) ^ hashNotNull(this.bestBeforeDate)) ^ hashNotNull(this.expirationDate)) ^ hashNotNull(this.weight)) ^ hashNotNull(this.weightType)) ^ hashNotNull(this.weightIncrement)) ^ hashNotNull(this.price)) ^ hashNotNull(this.priceIncrement)) ^ hashNotNull(this.priceCurrency)) ^ hashNotNull(this.uncommonAIs);
+        return ((((((((((((hashNotNull(this.productID) ^ 0) ^ hashNotNull(this.sscc)) ^ hashNotNull(this.lotNumber)) ^ hashNotNull(this.productionDate)) ^ hashNotNull(this.bestBeforeDate)) ^ hashNotNull(this.expirationDate)) ^ hashNotNull(this.weight)) ^ hashNotNull(this.weightType)) ^ hashNotNull(this.weightIncrement)) ^ hashNotNull(this.price)) ^ hashNotNull(this.priceIncrement)) ^ hashNotNull(this.priceCurrency)) ^ hashNotNull(this.uncommonAIs);
     }
 
-    private static int hashNotNull(Object o) {
-        if (o == null) {
+    private static int hashNotNull(Object obj) {
+        if (obj == null) {
             return 0;
         }
-        return o.hashCode();
+        return obj.hashCode();
     }
 
     public String getRawText() {

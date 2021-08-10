@@ -17,122 +17,118 @@ public final class GenericMultipleBarcodeReader implements MultipleBarcodeReader
     private static final int MIN_DIMENSION_TO_RECUR = 100;
     private final Reader delegate;
 
-    public GenericMultipleBarcodeReader(Reader delegate2) {
-        this.delegate = delegate2;
+    public GenericMultipleBarcodeReader(Reader reader) {
+        this.delegate = reader;
     }
 
     @Override // com.google.zxing.multi.MultipleBarcodeReader
-    public Result[] decodeMultiple(BinaryBitmap image) throws NotFoundException {
-        return decodeMultiple(image, null);
+    public Result[] decodeMultiple(BinaryBitmap binaryBitmap) throws NotFoundException {
+        return decodeMultiple(binaryBitmap, null);
     }
 
     @Override // com.google.zxing.multi.MultipleBarcodeReader
-    public Result[] decodeMultiple(BinaryBitmap image, Map<DecodeHintType, ?> hints) throws NotFoundException {
-        List<Result> results = new ArrayList<>();
-        doDecodeMultiple(image, hints, results, 0, 0, 0);
-        if (!results.isEmpty()) {
-            return (Result[]) results.toArray(new Result[results.size()]);
+    public Result[] decodeMultiple(BinaryBitmap binaryBitmap, Map<DecodeHintType, ?> map) throws NotFoundException {
+        ArrayList arrayList = new ArrayList();
+        doDecodeMultiple(binaryBitmap, map, arrayList, 0, 0, 0);
+        if (!arrayList.isEmpty()) {
+            return (Result[]) arrayList.toArray(new Result[arrayList.size()]);
         }
         throw NotFoundException.getNotFoundInstance();
     }
 
-    private void doDecodeMultiple(BinaryBitmap image, Map<DecodeHintType, ?> hints, List<Result> results, int xOffset, int yOffset, int currentDepth) {
-        boolean alreadyFound;
-        int height;
-        float maxX;
-        float maxY;
-        float minY;
-        int width;
-        if (currentDepth <= 4) {
+    private void doDecodeMultiple(BinaryBitmap binaryBitmap, Map<DecodeHintType, ?> map, List<Result> list, int i, int i2, int i3) {
+        boolean z;
+        float f;
+        float f2;
+        int i4;
+        int i5;
+        if (i3 <= 4) {
             try {
-                Result result = this.delegate.decode(image, hints);
-                Iterator<Result> it = results.iterator();
+                Result decode = this.delegate.decode(binaryBitmap, map);
+                Iterator<Result> it = list.iterator();
                 while (true) {
                     if (it.hasNext()) {
-                        if (it.next().getText().equals(result.getText())) {
-                            alreadyFound = true;
+                        if (it.next().getText().equals(decode.getText())) {
+                            z = true;
                             break;
                         }
                     } else {
-                        alreadyFound = false;
+                        z = false;
                         break;
                     }
                 }
-                if (!alreadyFound) {
-                    results.add(translateResultPoints(result, xOffset, yOffset));
+                if (!z) {
+                    list.add(translateResultPoints(decode, i, i2));
                 }
-                ResultPoint[] resultPoints = result.getResultPoints();
-                if (resultPoints == null) {
-                    return;
-                }
-                if (resultPoints.length != 0) {
-                    int width2 = image.getWidth();
-                    int height2 = image.getHeight();
-                    float minX = (float) width2;
-                    float maxY2 = 0.0f;
-                    float minY2 = (float) height2;
-                    float maxX2 = 0.0f;
-                    for (ResultPoint point : resultPoints) {
-                        if (point != null) {
-                            float x = point.getX();
-                            float y = point.getY();
-                            if (x < minX) {
-                                minX = x;
+                ResultPoint[] resultPoints = decode.getResultPoints();
+                if (!(resultPoints == null || resultPoints.length == 0)) {
+                    int width = binaryBitmap.getWidth();
+                    int height = binaryBitmap.getHeight();
+                    float f3 = (float) width;
+                    float f4 = (float) height;
+                    float f5 = 0.0f;
+                    float f6 = 0.0f;
+                    for (ResultPoint resultPoint : resultPoints) {
+                        if (resultPoint != null) {
+                            float x = resultPoint.getX();
+                            float y = resultPoint.getY();
+                            if (x < f3) {
+                                f3 = x;
                             }
-                            if (y < minY2) {
-                                minY2 = y;
+                            if (y < f4) {
+                                f4 = y;
                             }
-                            if (x > maxX2) {
-                                maxX2 = x;
+                            if (x > f5) {
+                                f5 = x;
                             }
-                            if (y > maxY2) {
-                                maxY2 = y;
+                            if (y > f6) {
+                                f6 = y;
                             }
                         }
                     }
-                    if (minX > 100.0f) {
-                        maxY = maxY2;
-                        maxX = maxX2;
-                        minY = minY2;
-                        height = height2;
-                        width = width2;
-                        doDecodeMultiple(image.crop(0, 0, (int) minX, height2), hints, results, xOffset, yOffset, currentDepth + 1);
+                    if (f3 > 100.0f) {
+                        f = f5;
+                        f2 = f4;
+                        i5 = height;
+                        i4 = width;
+                        doDecodeMultiple(binaryBitmap.crop(0, 0, (int) f3, height), map, list, i, i2, i3 + 1);
                     } else {
-                        maxY = maxY2;
-                        minY = minY2;
-                        height = height2;
-                        width = width2;
-                        maxX = maxX2;
+                        f = f5;
+                        f2 = f4;
+                        i5 = height;
+                        i4 = width;
                     }
-                    if (minY > 100.0f) {
-                        doDecodeMultiple(image.crop(0, 0, width, (int) minY), hints, results, xOffset, yOffset, currentDepth + 1);
+                    if (f2 > 100.0f) {
+                        doDecodeMultiple(binaryBitmap.crop(0, 0, i4, (int) f2), map, list, i, i2, i3 + 1);
                     }
-                    if (maxX < ((float) (width - 100))) {
-                        doDecodeMultiple(image.crop((int) maxX, 0, width - ((int) maxX), height), hints, results, xOffset + ((int) maxX), yOffset, currentDepth + 1);
+                    if (f < ((float) (i4 - 100))) {
+                        int i6 = (int) f;
+                        doDecodeMultiple(binaryBitmap.crop(i6, 0, i4 - i6, i5), map, list, i + i6, i2, i3 + 1);
                     }
-                    if (maxY < ((float) (height - 100))) {
-                        doDecodeMultiple(image.crop(0, (int) maxY, width, height - ((int) maxY)), hints, results, xOffset, yOffset + ((int) maxY), currentDepth + 1);
+                    if (f6 < ((float) (i5 - 100))) {
+                        int i7 = (int) f6;
+                        doDecodeMultiple(binaryBitmap.crop(0, i7, i4, i5 - i7), map, list, i, i2 + i7, i3 + 1);
                     }
                 }
-            } catch (ReaderException e) {
+            } catch (ReaderException unused) {
             }
         }
     }
 
-    private static Result translateResultPoints(Result result, int xOffset, int yOffset) {
-        ResultPoint[] oldResultPoints = result.getResultPoints();
-        if (oldResultPoints == null) {
+    private static Result translateResultPoints(Result result, int i, int i2) {
+        ResultPoint[] resultPoints = result.getResultPoints();
+        if (resultPoints == null) {
             return result;
         }
-        ResultPoint[] newResultPoints = new ResultPoint[oldResultPoints.length];
-        for (int i = 0; i < oldResultPoints.length; i++) {
-            ResultPoint oldPoint = oldResultPoints[i];
-            if (oldPoint != null) {
-                newResultPoints[i] = new ResultPoint(oldPoint.getX() + ((float) xOffset), oldPoint.getY() + ((float) yOffset));
+        ResultPoint[] resultPointArr = new ResultPoint[resultPoints.length];
+        for (int i3 = 0; i3 < resultPoints.length; i3++) {
+            ResultPoint resultPoint = resultPoints[i3];
+            if (resultPoint != null) {
+                resultPointArr[i3] = new ResultPoint(resultPoint.getX() + ((float) i), resultPoint.getY() + ((float) i2));
             }
         }
-        Result newResult = new Result(result.getText(), result.getRawBytes(), result.getNumBits(), newResultPoints, result.getBarcodeFormat(), result.getTimestamp());
-        newResult.putAllMetadata(result.getResultMetadata());
-        return newResult;
+        Result result2 = new Result(result.getText(), result.getRawBytes(), result.getNumBits(), resultPointArr, result.getBarcodeFormat(), result.getTimestamp());
+        result2.putAllMetadata(result.getResultMetadata());
+        return result2;
     }
 }

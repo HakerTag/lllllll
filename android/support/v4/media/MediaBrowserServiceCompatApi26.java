@@ -32,16 +32,16 @@ class MediaBrowserServiceCompatApi26 {
         }
     }
 
-    public static Object createService(Context context, ServiceCompatProxy serviceProxy) {
-        return new MediaBrowserServiceAdaptor(context, serviceProxy);
+    public static Object createService(Context context, ServiceCompatProxy serviceCompatProxy) {
+        return new MediaBrowserServiceAdaptor(context, serviceCompatProxy);
     }
 
-    public static void notifyChildrenChanged(Object serviceObj, String parentId, Bundle options) {
-        ((MediaBrowserService) serviceObj).notifyChildrenChanged(parentId, options);
+    public static void notifyChildrenChanged(Object obj, String str, Bundle bundle) {
+        ((MediaBrowserService) obj).notifyChildrenChanged(str, bundle);
     }
 
-    public static Bundle getBrowserRootHints(Object serviceObj) {
-        return ((MediaBrowserService) serviceObj).getBrowserRootHints();
+    public static Bundle getBrowserRootHints(Object obj) {
+        return ((MediaBrowserService) obj).getBrowserRootHints();
     }
 
     static class ResultWrapper {
@@ -51,13 +51,13 @@ class MediaBrowserServiceCompatApi26 {
             this.mResultObj = result;
         }
 
-        public void sendResult(List<Parcel> result, int flags) {
+        public void sendResult(List<Parcel> list, int i) {
             try {
-                MediaBrowserServiceCompatApi26.sResultFlags.setInt(this.mResultObj, flags);
+                MediaBrowserServiceCompatApi26.sResultFlags.setInt(this.mResultObj, i);
             } catch (IllegalAccessException e) {
                 Log.w(MediaBrowserServiceCompatApi26.TAG, e);
             }
-            this.mResultObj.sendResult(parcelListToItemList(result));
+            this.mResultObj.sendResult(parcelListToItemList(list));
         }
 
         public void detach() {
@@ -65,12 +65,12 @@ class MediaBrowserServiceCompatApi26 {
         }
 
         /* access modifiers changed from: package-private */
-        public List<MediaBrowser.MediaItem> parcelListToItemList(List<Parcel> parcelList) {
-            if (parcelList == null) {
+        public List<MediaBrowser.MediaItem> parcelListToItemList(List<Parcel> list) {
+            if (list == null) {
                 return null;
             }
             ArrayList arrayList = new ArrayList();
-            for (Parcel parcel : parcelList) {
+            for (Parcel parcel : list) {
                 parcel.setDataPosition(0);
                 arrayList.add(MediaBrowser.MediaItem.CREATOR.createFromParcel(parcel));
                 parcel.recycle();
@@ -80,13 +80,13 @@ class MediaBrowserServiceCompatApi26 {
     }
 
     static class MediaBrowserServiceAdaptor extends MediaBrowserServiceCompatApi23.MediaBrowserServiceAdaptor {
-        MediaBrowserServiceAdaptor(Context context, ServiceCompatProxy serviceWrapper) {
-            super(context, serviceWrapper);
+        MediaBrowserServiceAdaptor(Context context, ServiceCompatProxy serviceCompatProxy) {
+            super(context, serviceCompatProxy);
         }
 
         @Override // android.service.media.MediaBrowserService
-        public void onLoadChildren(String parentId, MediaBrowserService.Result<List<MediaBrowser.MediaItem>> result, Bundle options) {
-            ((ServiceCompatProxy) this.mServiceProxy).onLoadChildren(parentId, new ResultWrapper(result), options);
+        public void onLoadChildren(String str, MediaBrowserService.Result<List<MediaBrowser.MediaItem>> result, Bundle bundle) {
+            ((ServiceCompatProxy) this.mServiceProxy).onLoadChildren(str, new ResultWrapper(result), bundle);
         }
     }
 }

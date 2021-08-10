@@ -19,9 +19,9 @@ class ParceledListSliceAdapterApi21 {
         }
     }
 
-    static Object newInstance(List<MediaBrowser.MediaItem> itemList) {
+    static Object newInstance(List<MediaBrowser.MediaItem> list) {
         try {
-            return sConstructor.newInstance(itemList);
+            return sConstructor.newInstance(list);
         } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
             e.printStackTrace();
             return null;

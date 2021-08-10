@@ -12,249 +12,202 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public final class Detector {
     private final BitMatrix image;
     private final WhiteRectangleDetector rectangleDetector;
 
-    public Detector(BitMatrix image2) throws NotFoundException {
-        this.image = image2;
-        this.rectangleDetector = new WhiteRectangleDetector(image2);
+    public Detector(BitMatrix bitMatrix) throws NotFoundException {
+        this.image = bitMatrix;
+        this.rectangleDetector = new WhiteRectangleDetector(bitMatrix);
     }
 
     public DetectorResult detect() throws NotFoundException {
-        ResultPoint topRight;
-        ResultPoint bottomRight;
-        ResultPoint topLeft;
-        int i;
-        BitMatrix bits;
-        ResultPoint correctedTopRight;
-        ResultPoint topRight2;
-        int dimensionRight;
-        ResultPoint bottomRight2;
-        int dimensionTop;
-        ResultPoint[] cornerPoints = this.rectangleDetector.detect();
-        ResultPoint pointA = cornerPoints[0];
-        ResultPoint pointB = cornerPoints[1];
-        ResultPoint pointC = cornerPoints[2];
-        ResultPoint pointD = cornerPoints[3];
-        List<ResultPointsAndTransitions> transitions = new ArrayList<>(4);
-        transitions.add(transitionsBetween(pointA, pointB));
-        transitions.add(transitionsBetween(pointA, pointC));
-        transitions.add(transitionsBetween(pointB, pointD));
-        transitions.add(transitionsBetween(pointC, pointD));
-        Collections.sort(transitions, new ResultPointsAndTransitionsComparator());
-        ResultPointsAndTransitions lSideOne = transitions.get(0);
-        ResultPointsAndTransitions lSideTwo = transitions.get(1);
-        Map<ResultPoint, Integer> pointCount = new HashMap<>();
-        increment(pointCount, lSideOne.getFrom());
-        increment(pointCount, lSideOne.getTo());
-        increment(pointCount, lSideTwo.getFrom());
-        increment(pointCount, lSideTwo.getTo());
-        ResultPoint bottomLeft = null;
-        ResultPoint maybeTopLeft = null;
-        ResultPoint maybeBottomRight = null;
-        for (Map.Entry<ResultPoint, Integer> entry : pointCount.entrySet()) {
-            ResultPoint point = entry.getKey();
-            if (entry.getValue().intValue() == 2) {
-                bottomLeft = point;
-            } else if (maybeTopLeft == null) {
-                maybeTopLeft = point;
+        ResultPoint resultPoint;
+        ResultPoint resultPoint2;
+        BitMatrix bitMatrix;
+        ResultPoint[] detect = this.rectangleDetector.detect();
+        ResultPoint resultPoint3 = detect[0];
+        ResultPoint resultPoint4 = detect[1];
+        ResultPoint resultPoint5 = detect[2];
+        ResultPoint resultPoint6 = detect[3];
+        ArrayList arrayList = new ArrayList(4);
+        arrayList.add(transitionsBetween(resultPoint3, resultPoint4));
+        arrayList.add(transitionsBetween(resultPoint3, resultPoint5));
+        arrayList.add(transitionsBetween(resultPoint4, resultPoint6));
+        arrayList.add(transitionsBetween(resultPoint5, resultPoint6));
+        ResultPoint resultPoint7 = null;
+        Collections.sort(arrayList, new ResultPointsAndTransitionsComparator());
+        ResultPointsAndTransitions resultPointsAndTransitions = (ResultPointsAndTransitions) arrayList.get(0);
+        ResultPointsAndTransitions resultPointsAndTransitions2 = (ResultPointsAndTransitions) arrayList.get(1);
+        HashMap hashMap = new HashMap();
+        increment(hashMap, resultPointsAndTransitions.getFrom());
+        increment(hashMap, resultPointsAndTransitions.getTo());
+        increment(hashMap, resultPointsAndTransitions2.getFrom());
+        increment(hashMap, resultPointsAndTransitions2.getTo());
+        ResultPoint resultPoint8 = null;
+        ResultPoint resultPoint9 = null;
+        for (Map.Entry entry : hashMap.entrySet()) {
+            ResultPoint resultPoint10 = (ResultPoint) entry.getKey();
+            if (((Integer) entry.getValue()).intValue() == 2) {
+                resultPoint8 = resultPoint10;
+            } else if (resultPoint7 == null) {
+                resultPoint7 = resultPoint10;
             } else {
-                maybeBottomRight = point;
+                resultPoint9 = resultPoint10;
             }
         }
-        if (maybeTopLeft == null || bottomLeft == null || maybeBottomRight == null) {
+        if (resultPoint7 == null || resultPoint8 == null || resultPoint9 == null) {
             throw NotFoundException.getNotFoundInstance();
         }
-        ResultPoint[] corners = {maybeTopLeft, bottomLeft, maybeBottomRight};
-        ResultPoint.orderBestPatterns(corners);
-        ResultPoint bottomRight3 = corners[0];
-        ResultPoint bottomLeft2 = corners[1];
-        ResultPoint topLeft2 = corners[2];
-        if (!pointCount.containsKey(pointA)) {
-            topRight = pointA;
-        } else if (!pointCount.containsKey(pointB)) {
-            topRight = pointB;
-        } else if (!pointCount.containsKey(pointC)) {
-            topRight = pointC;
+        ResultPoint[] resultPointArr = {resultPoint7, resultPoint8, resultPoint9};
+        ResultPoint.orderBestPatterns(resultPointArr);
+        ResultPoint resultPoint11 = resultPointArr[0];
+        ResultPoint resultPoint12 = resultPointArr[1];
+        ResultPoint resultPoint13 = resultPointArr[2];
+        if (!hashMap.containsKey(resultPoint3)) {
+            resultPoint = resultPoint3;
+        } else if (!hashMap.containsKey(resultPoint4)) {
+            resultPoint = resultPoint4;
         } else {
-            topRight = pointD;
+            resultPoint = !hashMap.containsKey(resultPoint5) ? resultPoint5 : resultPoint6;
         }
-        int dimensionTop2 = transitionsBetween(topLeft2, topRight).getTransitions();
-        int dimensionRight2 = transitionsBetween(bottomRight3, topRight).getTransitions();
-        if ((dimensionTop2 & 1) == 1) {
-            dimensionTop2++;
+        int transitions = transitionsBetween(resultPoint13, resultPoint).getTransitions();
+        int transitions2 = transitionsBetween(resultPoint11, resultPoint).getTransitions();
+        if ((transitions & 1) == 1) {
+            transitions++;
         }
-        int dimensionTop3 = dimensionTop2 + 2;
-        if ((dimensionRight2 & 1) == 1) {
-            dimensionRight2++;
+        int i = transitions + 2;
+        if ((transitions2 & 1) == 1) {
+            transitions2++;
         }
-        int dimensionRight3 = dimensionRight2 + 2;
-        if (dimensionTop3 * 4 >= dimensionRight3 * 7) {
-            dimensionRight = dimensionRight3;
-            topRight2 = topRight;
-            bottomRight = bottomRight3;
-            i = 4;
-            bottomRight2 = topLeft2;
-        } else if (dimensionRight3 * 4 >= dimensionTop3 * 7) {
-            dimensionRight = dimensionRight3;
-            topRight2 = topRight;
-            bottomRight = bottomRight3;
-            i = 4;
-            bottomRight2 = topLeft2;
-        } else {
-            bottomRight = bottomRight3;
-            i = 4;
-            correctedTopRight = correctTopRight(bottomLeft2, bottomRight3, topLeft2, topRight, Math.min(dimensionRight3, dimensionTop3));
-            if (correctedTopRight == null) {
-                correctedTopRight = topRight;
+        int i2 = transitions2 + 2;
+        if (i * 4 >= i2 * 7 || i2 * 4 >= i * 7) {
+            resultPoint2 = resultPoint13;
+            ResultPoint correctTopRightRectangular = correctTopRightRectangular(resultPoint12, resultPoint11, resultPoint13, resultPoint, i, i2);
+            if (correctTopRightRectangular != null) {
+                resultPoint = correctTopRightRectangular;
             }
-            int dimensionCorrected = Math.max(transitionsBetween(topLeft2, correctedTopRight).getTransitions(), transitionsBetween(bottomRight, correctedTopRight).getTransitions()) + 1;
-            if ((dimensionCorrected & 1) == 1) {
-                dimensionCorrected++;
+            int transitions3 = transitionsBetween(resultPoint2, resultPoint).getTransitions();
+            int transitions4 = transitionsBetween(resultPoint11, resultPoint).getTransitions();
+            if ((transitions3 & 1) == 1) {
+                transitions3++;
             }
-            bits = sampleGrid(this.image, topLeft2, bottomLeft2, bottomRight, correctedTopRight, dimensionCorrected, dimensionCorrected);
-            topLeft = topLeft2;
-            ResultPoint[] resultPointArr = new ResultPoint[i];
-            resultPointArr[0] = topLeft;
-            resultPointArr[1] = bottomLeft2;
-            resultPointArr[2] = bottomRight;
-            resultPointArr[3] = correctedTopRight;
-            return new DetectorResult(bits, resultPointArr);
-        }
-        topLeft = bottomRight2;
-        ResultPoint correctedTopRight2 = correctTopRightRectangular(bottomLeft2, bottomRight, bottomRight2, topRight2, dimensionTop3, dimensionRight);
-        if (correctedTopRight2 == null) {
-            correctedTopRight2 = topRight2;
-        }
-        int dimensionTop4 = transitionsBetween(topLeft, correctedTopRight).getTransitions();
-        int dimensionRight4 = transitionsBetween(bottomRight, correctedTopRight).getTransitions();
-        if ((dimensionTop4 & 1) == 1) {
-            dimensionTop = dimensionTop4 + 1;
-        } else {
-            dimensionTop = dimensionTop4;
-        }
-        if ((dimensionRight4 & 1) == 1) {
-            dimensionRight4++;
-        }
-        bits = sampleGrid(this.image, topLeft, bottomLeft2, bottomRight, correctedTopRight, dimensionTop, dimensionRight4);
-        ResultPoint[] resultPointArr2 = new ResultPoint[i];
-        resultPointArr2[0] = topLeft;
-        resultPointArr2[1] = bottomLeft2;
-        resultPointArr2[2] = bottomRight;
-        resultPointArr2[3] = correctedTopRight;
-        return new DetectorResult(bits, resultPointArr2);
-    }
-
-    private ResultPoint correctTopRightRectangular(ResultPoint bottomLeft, ResultPoint bottomRight, ResultPoint topLeft, ResultPoint topRight, int dimensionTop, int dimensionRight) {
-        float corr = ((float) distance(bottomLeft, bottomRight)) / ((float) dimensionTop);
-        int norm = distance(topLeft, topRight);
-        ResultPoint c1 = new ResultPoint(topRight.getX() + (corr * ((topRight.getX() - topLeft.getX()) / ((float) norm))), topRight.getY() + (corr * ((topRight.getY() - topLeft.getY()) / ((float) norm))));
-        float corr2 = ((float) distance(bottomLeft, topLeft)) / ((float) dimensionRight);
-        int norm2 = distance(bottomRight, topRight);
-        ResultPoint c2 = new ResultPoint(topRight.getX() + (corr2 * ((topRight.getX() - bottomRight.getX()) / ((float) norm2))), topRight.getY() + (corr2 * ((topRight.getY() - bottomRight.getY()) / ((float) norm2))));
-        if (!isValid(c1)) {
-            if (isValid(c2)) {
-                return c2;
+            if ((transitions4 & 1) == 1) {
+                transitions4++;
             }
-            return null;
-        } else if (isValid(c2) && Math.abs(dimensionTop - transitionsBetween(topLeft, c1).getTransitions()) + Math.abs(dimensionRight - transitionsBetween(bottomRight, c1).getTransitions()) > Math.abs(dimensionTop - transitionsBetween(topLeft, c2).getTransitions()) + Math.abs(dimensionRight - transitionsBetween(bottomRight, c2).getTransitions())) {
-            return c2;
+            bitMatrix = sampleGrid(this.image, resultPoint2, resultPoint12, resultPoint11, resultPoint, transitions3, transitions4);
         } else {
-            return c1;
-        }
-    }
-
-    private ResultPoint correctTopRight(ResultPoint bottomLeft, ResultPoint bottomRight, ResultPoint topLeft, ResultPoint topRight, int dimension) {
-        float corr = ((float) distance(bottomLeft, bottomRight)) / ((float) dimension);
-        int norm = distance(topLeft, topRight);
-        ResultPoint c1 = new ResultPoint(topRight.getX() + (corr * ((topRight.getX() - topLeft.getX()) / ((float) norm))), topRight.getY() + (corr * ((topRight.getY() - topLeft.getY()) / ((float) norm))));
-        float corr2 = ((float) distance(bottomLeft, topLeft)) / ((float) dimension);
-        int norm2 = distance(bottomRight, topRight);
-        ResultPoint c2 = new ResultPoint(topRight.getX() + (corr2 * ((topRight.getX() - bottomRight.getX()) / ((float) norm2))), topRight.getY() + (corr2 * ((topRight.getY() - bottomRight.getY()) / ((float) norm2))));
-        if (!isValid(c1)) {
-            if (isValid(c2)) {
-                return c2;
+            ResultPoint correctTopRight = correctTopRight(resultPoint12, resultPoint11, resultPoint13, resultPoint, Math.min(i2, i));
+            if (correctTopRight != null) {
+                resultPoint = correctTopRight;
             }
-            return null;
-        } else if (!isValid(c2)) {
-            return c1;
-        } else {
-            return Math.abs(transitionsBetween(topLeft, c1).getTransitions() - transitionsBetween(bottomRight, c1).getTransitions()) <= Math.abs(transitionsBetween(topLeft, c2).getTransitions() - transitionsBetween(bottomRight, c2).getTransitions()) ? c1 : c2;
+            int max = Math.max(transitionsBetween(resultPoint13, resultPoint).getTransitions(), transitionsBetween(resultPoint11, resultPoint).getTransitions()) + 1;
+            if ((max & 1) == 1) {
+                max++;
+            }
+            bitMatrix = sampleGrid(this.image, resultPoint13, resultPoint12, resultPoint11, resultPoint, max, max);
+            resultPoint2 = resultPoint13;
         }
+        return new DetectorResult(bitMatrix, new ResultPoint[]{resultPoint2, resultPoint12, resultPoint11, resultPoint});
     }
 
-    private boolean isValid(ResultPoint p) {
-        return p.getX() >= 0.0f && p.getX() < ((float) this.image.getWidth()) && p.getY() > 0.0f && p.getY() < ((float) this.image.getHeight());
+    private ResultPoint correctTopRightRectangular(ResultPoint resultPoint, ResultPoint resultPoint2, ResultPoint resultPoint3, ResultPoint resultPoint4, int i, int i2) {
+        float distance = ((float) distance(resultPoint, resultPoint2)) / ((float) i);
+        float distance2 = (float) distance(resultPoint3, resultPoint4);
+        ResultPoint resultPoint5 = new ResultPoint(resultPoint4.getX() + (((resultPoint4.getX() - resultPoint3.getX()) / distance2) * distance), resultPoint4.getY() + (distance * ((resultPoint4.getY() - resultPoint3.getY()) / distance2)));
+        float distance3 = ((float) distance(resultPoint, resultPoint3)) / ((float) i2);
+        float distance4 = (float) distance(resultPoint2, resultPoint4);
+        ResultPoint resultPoint6 = new ResultPoint(resultPoint4.getX() + (((resultPoint4.getX() - resultPoint2.getX()) / distance4) * distance3), resultPoint4.getY() + (distance3 * ((resultPoint4.getY() - resultPoint2.getY()) / distance4)));
+        if (isValid(resultPoint5)) {
+            return (isValid(resultPoint6) && Math.abs(i - transitionsBetween(resultPoint3, resultPoint5).getTransitions()) + Math.abs(i2 - transitionsBetween(resultPoint2, resultPoint5).getTransitions()) > Math.abs(i - transitionsBetween(resultPoint3, resultPoint6).getTransitions()) + Math.abs(i2 - transitionsBetween(resultPoint2, resultPoint6).getTransitions())) ? resultPoint6 : resultPoint5;
+        }
+        if (isValid(resultPoint6)) {
+            return resultPoint6;
+        }
+        return null;
     }
 
-    private static int distance(ResultPoint a, ResultPoint b) {
-        return MathUtils.round(ResultPoint.distance(a, b));
+    private ResultPoint correctTopRight(ResultPoint resultPoint, ResultPoint resultPoint2, ResultPoint resultPoint3, ResultPoint resultPoint4, int i) {
+        float f = (float) i;
+        float distance = ((float) distance(resultPoint, resultPoint2)) / f;
+        float distance2 = (float) distance(resultPoint3, resultPoint4);
+        ResultPoint resultPoint5 = new ResultPoint(resultPoint4.getX() + (((resultPoint4.getX() - resultPoint3.getX()) / distance2) * distance), resultPoint4.getY() + (distance * ((resultPoint4.getY() - resultPoint3.getY()) / distance2)));
+        float distance3 = ((float) distance(resultPoint, resultPoint3)) / f;
+        float distance4 = (float) distance(resultPoint2, resultPoint4);
+        ResultPoint resultPoint6 = new ResultPoint(resultPoint4.getX() + (((resultPoint4.getX() - resultPoint2.getX()) / distance4) * distance3), resultPoint4.getY() + (distance3 * ((resultPoint4.getY() - resultPoint2.getY()) / distance4)));
+        if (isValid(resultPoint5)) {
+            return (isValid(resultPoint6) && Math.abs(transitionsBetween(resultPoint3, resultPoint5).getTransitions() - transitionsBetween(resultPoint2, resultPoint5).getTransitions()) > Math.abs(transitionsBetween(resultPoint3, resultPoint6).getTransitions() - transitionsBetween(resultPoint2, resultPoint6).getTransitions())) ? resultPoint6 : resultPoint5;
+        }
+        if (isValid(resultPoint6)) {
+            return resultPoint6;
+        }
+        return null;
     }
 
-    private static void increment(Map<ResultPoint, Integer> table, ResultPoint key) {
-        Integer value = table.get(key);
+    private boolean isValid(ResultPoint resultPoint) {
+        return resultPoint.getX() >= 0.0f && resultPoint.getX() < ((float) this.image.getWidth()) && resultPoint.getY() > 0.0f && resultPoint.getY() < ((float) this.image.getHeight());
+    }
+
+    private static int distance(ResultPoint resultPoint, ResultPoint resultPoint2) {
+        return MathUtils.round(ResultPoint.distance(resultPoint, resultPoint2));
+    }
+
+    private static void increment(Map<ResultPoint, Integer> map, ResultPoint resultPoint) {
+        Integer num = map.get(resultPoint);
         int i = 1;
-        if (value != null) {
-            i = 1 + value.intValue();
+        if (num != null) {
+            i = 1 + num.intValue();
         }
-        table.put(key, Integer.valueOf(i));
+        map.put(resultPoint, Integer.valueOf(i));
     }
 
-    private static BitMatrix sampleGrid(BitMatrix image2, ResultPoint topLeft, ResultPoint bottomLeft, ResultPoint bottomRight, ResultPoint topRight, int dimensionX, int dimensionY) throws NotFoundException {
-        return GridSampler.getInstance().sampleGrid(image2, dimensionX, dimensionY, 0.5f, 0.5f, ((float) dimensionX) - 0.5f, 0.5f, ((float) dimensionX) - 0.5f, ((float) dimensionY) - 0.5f, 0.5f, ((float) dimensionY) - 0.5f, topLeft.getX(), topLeft.getY(), topRight.getX(), topRight.getY(), bottomRight.getX(), bottomRight.getY(), bottomLeft.getX(), bottomLeft.getY());
+    private static BitMatrix sampleGrid(BitMatrix bitMatrix, ResultPoint resultPoint, ResultPoint resultPoint2, ResultPoint resultPoint3, ResultPoint resultPoint4, int i, int i2) throws NotFoundException {
+        float f = ((float) i) - 0.5f;
+        float f2 = ((float) i2) - 0.5f;
+        return GridSampler.getInstance().sampleGrid(bitMatrix, i, i2, 0.5f, 0.5f, f, 0.5f, f, f2, 0.5f, f2, resultPoint.getX(), resultPoint.getY(), resultPoint4.getX(), resultPoint4.getY(), resultPoint3.getX(), resultPoint3.getY(), resultPoint2.getX(), resultPoint2.getY());
     }
 
-    private ResultPointsAndTransitions transitionsBetween(ResultPoint from, ResultPoint to) {
-        Detector detector = this;
-        int fromX = (int) from.getX();
-        int fromY = (int) from.getY();
-        int toX = (int) to.getX();
-        int toY = (int) to.getY();
-        int xstep = 1;
-        boolean steep = Math.abs(toY - fromY) > Math.abs(toX - fromX);
-        if (steep) {
-            fromX = fromY;
-            fromY = fromX;
-            toX = toY;
-            toY = toX;
+    private ResultPointsAndTransitions transitionsBetween(ResultPoint resultPoint, ResultPoint resultPoint2) {
+        int x = (int) resultPoint.getX();
+        int y = (int) resultPoint.getY();
+        int x2 = (int) resultPoint2.getX();
+        int y2 = (int) resultPoint2.getY();
+        int i = 0;
+        int i2 = 1;
+        boolean z = Math.abs(y2 - y) > Math.abs(x2 - x);
+        if (z) {
+            y = x;
+            x = y;
+            y2 = x2;
+            x2 = y2;
         }
-        int dx = Math.abs(toX - fromX);
-        int dy = Math.abs(toY - fromY);
-        int error = (-dx) / 2;
-        int ystep = fromY < toY ? 1 : -1;
-        if (fromX >= toX) {
-            xstep = -1;
+        int abs = Math.abs(x2 - x);
+        int abs2 = Math.abs(y2 - y);
+        int i3 = (-abs) / 2;
+        int i4 = y < y2 ? 1 : -1;
+        if (x >= x2) {
+            i2 = -1;
         }
-        int transitions = 0;
-        boolean inBlack = detector.image.get(steep ? fromY : fromX, steep ? fromX : fromY);
-        int x = fromX;
-        int y = fromY;
-        while (true) {
-            if (x == toX) {
-                break;
+        boolean z2 = this.image.get(z ? y : x, z ? x : y);
+        while (x != x2) {
+            boolean z3 = this.image.get(z ? y : x, z ? x : y);
+            if (z3 != z2) {
+                i++;
+                z2 = z3;
             }
-            boolean isBlack = detector.image.get(steep ? y : x, steep ? x : y);
-            if (isBlack != inBlack) {
-                transitions++;
-                inBlack = isBlack;
-            }
-            error += dy;
-            if (error > 0) {
-                if (y == toY) {
+            i3 += abs2;
+            if (i3 > 0) {
+                if (y == y2) {
                     break;
                 }
-                y += ystep;
-                error -= dx;
+                y += i4;
+                i3 -= abs;
             }
-            x += xstep;
-            detector = this;
-            fromX = fromX;
+            x += i2;
         }
-        return new ResultPointsAndTransitions(from, to, transitions);
+        return new ResultPointsAndTransitions(resultPoint, resultPoint2, i);
     }
 
     /* access modifiers changed from: private */
@@ -263,10 +216,10 @@ public final class Detector {
         private final ResultPoint to;
         private final int transitions;
 
-        private ResultPointsAndTransitions(ResultPoint from2, ResultPoint to2, int transitions2) {
-            this.from = from2;
-            this.to = to2;
-            this.transitions = transitions2;
+        private ResultPointsAndTransitions(ResultPoint resultPoint, ResultPoint resultPoint2, int i) {
+            this.from = resultPoint;
+            this.to = resultPoint2;
+            this.transitions = i;
         }
 
         /* access modifiers changed from: package-private */
@@ -294,8 +247,8 @@ public final class Detector {
         private ResultPointsAndTransitionsComparator() {
         }
 
-        public int compare(ResultPointsAndTransitions o1, ResultPointsAndTransitions o2) {
-            return o1.getTransitions() - o2.getTransitions();
+        public int compare(ResultPointsAndTransitions resultPointsAndTransitions, ResultPointsAndTransitions resultPointsAndTransitions2) {
+            return resultPointsAndTransitions.getTransitions() - resultPointsAndTransitions2.getTransitions();
         }
     }
 }

@@ -17,28 +17,32 @@ public final class GenericGF {
     private final int size;
     private final GenericGFPoly zero;
 
+    static int addOrSubtract(int i, int i2) {
+        return i ^ i2;
+    }
+
     static {
         GenericGF genericGF = new GenericGF(301, 256, 1);
         DATA_MATRIX_FIELD_256 = genericGF;
         AZTEC_DATA_8 = genericGF;
     }
 
-    public GenericGF(int primitive2, int size2, int b) {
-        this.primitive = primitive2;
-        this.size = size2;
-        this.generatorBase = b;
-        this.expTable = new int[size2];
-        this.logTable = new int[size2];
-        int x = 1;
-        for (int i = 0; i < size2; i++) {
-            this.expTable[i] = x;
-            x *= 2;
-            if (x >= size2) {
-                x = (x ^ primitive2) & (size2 - 1);
+    public GenericGF(int i, int i2, int i3) {
+        this.primitive = i;
+        this.size = i2;
+        this.generatorBase = i3;
+        this.expTable = new int[i2];
+        this.logTable = new int[i2];
+        int i4 = 1;
+        for (int i5 = 0; i5 < i2; i5++) {
+            this.expTable[i5] = i4;
+            i4 *= 2;
+            if (i4 >= i2) {
+                i4 = (i4 ^ i) & (i2 - 1);
             }
         }
-        for (int i2 = 0; i2 < size2 - 1; i2++) {
-            this.logTable[this.expTable[i2]] = i2;
+        for (int i6 = 0; i6 < i2 - 1; i6++) {
+            this.logTable[this.expTable[i6]] = i6;
         }
         this.zero = new GenericGFPoly(this, new int[]{0});
         this.one = new GenericGFPoly(this, new int[]{1});
@@ -55,51 +59,47 @@ public final class GenericGF {
     }
 
     /* access modifiers changed from: package-private */
-    public GenericGFPoly buildMonomial(int degree, int coefficient) {
-        if (degree < 0) {
+    public GenericGFPoly buildMonomial(int i, int i2) {
+        if (i < 0) {
             throw new IllegalArgumentException();
-        } else if (coefficient == 0) {
+        } else if (i2 == 0) {
             return this.zero;
         } else {
-            int[] coefficients = new int[(degree + 1)];
-            coefficients[0] = coefficient;
-            return new GenericGFPoly(this, coefficients);
+            int[] iArr = new int[(i + 1)];
+            iArr[0] = i2;
+            return new GenericGFPoly(this, iArr);
         }
     }
 
-    static int addOrSubtract(int a, int b) {
-        return a ^ b;
+    /* access modifiers changed from: package-private */
+    public int exp(int i) {
+        return this.expTable[i];
     }
 
     /* access modifiers changed from: package-private */
-    public int exp(int a) {
-        return this.expTable[a];
-    }
-
-    /* access modifiers changed from: package-private */
-    public int log(int a) {
-        if (a != 0) {
-            return this.logTable[a];
+    public int log(int i) {
+        if (i != 0) {
+            return this.logTable[i];
         }
         throw new IllegalArgumentException();
     }
 
     /* access modifiers changed from: package-private */
-    public int inverse(int a) {
-        if (a != 0) {
-            return this.expTable[(this.size - this.logTable[a]) - 1];
+    public int inverse(int i) {
+        if (i != 0) {
+            return this.expTable[(this.size - this.logTable[i]) - 1];
         }
         throw new ArithmeticException();
     }
 
     /* access modifiers changed from: package-private */
-    public int multiply(int a, int b) {
-        if (a == 0 || b == 0) {
+    public int multiply(int i, int i2) {
+        if (i == 0 || i2 == 0) {
             return 0;
         }
         int[] iArr = this.expTable;
         int[] iArr2 = this.logTable;
-        return iArr[(iArr2[a] + iArr2[b]) % (this.size - 1)];
+        return iArr[(iArr2[i] + iArr2[i2]) % (this.size - 1)];
     }
 
     public int getSize() {

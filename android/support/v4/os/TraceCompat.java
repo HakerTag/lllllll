@@ -4,9 +4,9 @@ import android.os.Build;
 import android.os.Trace;
 
 public final class TraceCompat {
-    public static void beginSection(String sectionName) {
+    public static void beginSection(String str) {
         if (Build.VERSION.SDK_INT >= 18) {
-            Trace.beginSection(sectionName);
+            Trace.beginSection(str);
         }
     }
 

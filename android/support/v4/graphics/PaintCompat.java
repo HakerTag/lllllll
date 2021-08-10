@@ -10,54 +10,54 @@ public final class PaintCompat {
     private static final String TOFU_STRING = "󟿽";
     private static final ThreadLocal<Pair<Rect, Rect>> sRectThreadLocal = new ThreadLocal<>();
 
-    public static boolean hasGlyph(Paint paint, String string) {
+    public static boolean hasGlyph(Paint paint, String str) {
         if (Build.VERSION.SDK_INT >= 23) {
-            return paint.hasGlyph(string);
+            return paint.hasGlyph(str);
         }
-        int length = string.length();
-        if (length == 1 && Character.isWhitespace(string.charAt(0))) {
+        int length = str.length();
+        if (length == 1 && Character.isWhitespace(str.charAt(0))) {
             return true;
         }
-        float missingGlyphWidth = paint.measureText(TOFU_STRING);
-        float emGlyphWidth = paint.measureText(EM_STRING);
-        float width = paint.measureText(string);
-        if (width == 0.0f) {
+        float measureText = paint.measureText(TOFU_STRING);
+        float measureText2 = paint.measureText(EM_STRING);
+        float measureText3 = paint.measureText(str);
+        float f = 0.0f;
+        if (measureText3 == 0.0f) {
             return false;
         }
-        if (string.codePointCount(0, string.length()) > 1) {
-            if (width > 2.0f * emGlyphWidth) {
+        if (str.codePointCount(0, str.length()) > 1) {
+            if (measureText3 > measureText2 * 2.0f) {
                 return false;
             }
-            float sumWidth = 0.0f;
             int i = 0;
             while (i < length) {
-                int charCount = Character.charCount(string.codePointAt(i));
-                sumWidth += paint.measureText(string, i, i + charCount);
-                i += charCount;
+                int charCount = Character.charCount(str.codePointAt(i)) + i;
+                f += paint.measureText(str, i, charCount);
+                i = charCount;
             }
-            if (width >= sumWidth) {
+            if (measureText3 >= f) {
                 return false;
             }
         }
-        if (width != missingGlyphWidth) {
+        if (measureText3 != measureText) {
             return true;
         }
-        Pair<Rect, Rect> rects = obtainEmptyRects();
-        paint.getTextBounds(TOFU_STRING, 0, TOFU_STRING.length(), (Rect) rects.first);
-        paint.getTextBounds(string, 0, length, (Rect) rects.second);
-        return true ^ rects.first.equals(rects.second);
+        Pair<Rect, Rect> obtainEmptyRects = obtainEmptyRects();
+        paint.getTextBounds(TOFU_STRING, 0, 2, (Rect) obtainEmptyRects.first);
+        paint.getTextBounds(str, 0, length, (Rect) obtainEmptyRects.second);
+        return !obtainEmptyRects.first.equals(obtainEmptyRects.second);
     }
 
     private static Pair<Rect, Rect> obtainEmptyRects() {
-        Pair<Rect, Rect> rects = sRectThreadLocal.get();
-        if (rects == null) {
-            Pair<Rect, Rect> rects2 = new Pair<>(new Rect(), new Rect());
-            sRectThreadLocal.set(rects2);
-            return rects2;
+        Pair<Rect, Rect> pair = sRectThreadLocal.get();
+        if (pair == null) {
+            Pair<Rect, Rect> pair2 = new Pair<>(new Rect(), new Rect());
+            sRectThreadLocal.set(pair2);
+            return pair2;
         }
-        rects.first.setEmpty();
-        rects.second.setEmpty();
-        return rects;
+        pair.first.setEmpty();
+        pair.second.setEmpty();
+        return pair;
     }
 
     private PaintCompat() {

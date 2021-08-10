@@ -2,56 +2,56 @@ package com.google.zxing.datamatrix.encoder;
 
 /* access modifiers changed from: package-private */
 public final class ASCIIEncoder implements Encoder {
-    ASCIIEncoder() {
-    }
-
     @Override // com.google.zxing.datamatrix.encoder.Encoder
     public int getEncodingMode() {
         return 0;
     }
 
+    ASCIIEncoder() {
+    }
+
     @Override // com.google.zxing.datamatrix.encoder.Encoder
-    public void encode(EncoderContext context) {
-        if (HighLevelEncoder.determineConsecutiveDigitCount(context.getMessage(), context.pos) >= 2) {
-            context.writeCodeword(encodeASCIIDigits(context.getMessage().charAt(context.pos), context.getMessage().charAt(context.pos + 1)));
-            context.pos += 2;
+    public void encode(EncoderContext encoderContext) {
+        if (HighLevelEncoder.determineConsecutiveDigitCount(encoderContext.getMessage(), encoderContext.pos) >= 2) {
+            encoderContext.writeCodeword(encodeASCIIDigits(encoderContext.getMessage().charAt(encoderContext.pos), encoderContext.getMessage().charAt(encoderContext.pos + 1)));
+            encoderContext.pos += 2;
             return;
         }
-        char c = context.getCurrentChar();
-        int newMode = HighLevelEncoder.lookAheadTest(context.getMessage(), context.pos, getEncodingMode());
-        if (newMode != getEncodingMode()) {
-            if (newMode == 1) {
-                context.writeCodeword(230);
-                context.signalEncoderChange(1);
-            } else if (newMode == 2) {
-                context.writeCodeword(239);
-                context.signalEncoderChange(2);
-            } else if (newMode == 3) {
-                context.writeCodeword(238);
-                context.signalEncoderChange(3);
-            } else if (newMode == 4) {
-                context.writeCodeword(240);
-                context.signalEncoderChange(4);
-            } else if (newMode == 5) {
-                context.writeCodeword(231);
-                context.signalEncoderChange(5);
+        char currentChar = encoderContext.getCurrentChar();
+        int lookAheadTest = HighLevelEncoder.lookAheadTest(encoderContext.getMessage(), encoderContext.pos, getEncodingMode());
+        if (lookAheadTest != getEncodingMode()) {
+            if (lookAheadTest == 1) {
+                encoderContext.writeCodeword(230);
+                encoderContext.signalEncoderChange(1);
+            } else if (lookAheadTest == 2) {
+                encoderContext.writeCodeword(239);
+                encoderContext.signalEncoderChange(2);
+            } else if (lookAheadTest == 3) {
+                encoderContext.writeCodeword(238);
+                encoderContext.signalEncoderChange(3);
+            } else if (lookAheadTest == 4) {
+                encoderContext.writeCodeword(240);
+                encoderContext.signalEncoderChange(4);
+            } else if (lookAheadTest == 5) {
+                encoderContext.writeCodeword(231);
+                encoderContext.signalEncoderChange(5);
             } else {
-                throw new IllegalStateException("Illegal mode: " + newMode);
+                throw new IllegalStateException("Illegal mode: " + lookAheadTest);
             }
-        } else if (HighLevelEncoder.isExtendedASCII(c)) {
-            context.writeCodeword(235);
-            context.writeCodeword((char) ((c - 128) + 1));
-            context.pos++;
+        } else if (HighLevelEncoder.isExtendedASCII(currentChar)) {
+            encoderContext.writeCodeword(235);
+            encoderContext.writeCodeword((char) ((currentChar - 128) + 1));
+            encoderContext.pos++;
         } else {
-            context.writeCodeword((char) (c + 1));
-            context.pos++;
+            encoderContext.writeCodeword((char) (currentChar + 1));
+            encoderContext.pos++;
         }
     }
 
-    private static char encodeASCIIDigits(char digit1, char digit2) {
-        if (HighLevelEncoder.isDigit(digit1) && HighLevelEncoder.isDigit(digit2)) {
-            return (char) (((digit1 - '0') * 10) + (digit2 - '0') + 130);
+    private static char encodeASCIIDigits(char c, char c2) {
+        if (HighLevelEncoder.isDigit(c) && HighLevelEncoder.isDigit(c2)) {
+            return (char) (((c - '0') * 10) + (c2 - '0') + 130);
         }
-        throw new IllegalArgumentException("not digits: " + digit1 + digit2);
+        throw new IllegalArgumentException("not digits: " + c + c2);
     }
 }

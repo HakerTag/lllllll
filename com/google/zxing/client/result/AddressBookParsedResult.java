@@ -13,35 +13,35 @@ public final class AddressBookParsedResult extends ParsedResult {
     private final String note;
 
     /* renamed from: org  reason: collision with root package name */
-    private final String f0org;
+    private final String f3org;
     private final String[] phoneNumbers;
     private final String[] phoneTypes;
     private final String pronunciation;
     private final String title;
     private final String[] urls;
 
-    public AddressBookParsedResult(String[] names2, String[] phoneNumbers2, String[] phoneTypes2, String[] emails2, String[] emailTypes2, String[] addresses2, String[] addressTypes2) {
-        this(names2, null, null, phoneNumbers2, phoneTypes2, emails2, emailTypes2, null, null, addresses2, addressTypes2, null, null, null, null, null);
+    public AddressBookParsedResult(String[] strArr, String[] strArr2, String[] strArr3, String[] strArr4, String[] strArr5, String[] strArr6, String[] strArr7) {
+        this(strArr, null, null, strArr2, strArr3, strArr4, strArr5, null, null, strArr6, strArr7, null, null, null, null, null);
     }
 
-    public AddressBookParsedResult(String[] names2, String[] nicknames2, String pronunciation2, String[] phoneNumbers2, String[] phoneTypes2, String[] emails2, String[] emailTypes2, String instantMessenger2, String note2, String[] addresses2, String[] addressTypes2, String org2, String birthday2, String title2, String[] urls2, String[] geo2) {
+    public AddressBookParsedResult(String[] strArr, String[] strArr2, String str, String[] strArr3, String[] strArr4, String[] strArr5, String[] strArr6, String str2, String str3, String[] strArr7, String[] strArr8, String str4, String str5, String str6, String[] strArr9, String[] strArr10) {
         super(ParsedResultType.ADDRESSBOOK);
-        this.names = names2;
-        this.nicknames = nicknames2;
-        this.pronunciation = pronunciation2;
-        this.phoneNumbers = phoneNumbers2;
-        this.phoneTypes = phoneTypes2;
-        this.emails = emails2;
-        this.emailTypes = emailTypes2;
-        this.instantMessenger = instantMessenger2;
-        this.note = note2;
-        this.addresses = addresses2;
-        this.addressTypes = addressTypes2;
-        this.f0org = org2;
-        this.birthday = birthday2;
-        this.title = title2;
-        this.urls = urls2;
-        this.geo = geo2;
+        this.names = strArr;
+        this.nicknames = strArr2;
+        this.pronunciation = str;
+        this.phoneNumbers = strArr3;
+        this.phoneTypes = strArr4;
+        this.emails = strArr5;
+        this.emailTypes = strArr6;
+        this.instantMessenger = str2;
+        this.note = str3;
+        this.addresses = strArr7;
+        this.addressTypes = strArr8;
+        this.f3org = str4;
+        this.birthday = str5;
+        this.title = str6;
+        this.urls = strArr9;
+        this.geo = strArr10;
     }
 
     public String[] getNames() {
@@ -93,7 +93,7 @@ public final class AddressBookParsedResult extends ParsedResult {
     }
 
     public String getOrg() {
-        return this.f0org;
+        return this.f3org;
     }
 
     public String[] getURLs() {
@@ -110,20 +110,20 @@ public final class AddressBookParsedResult extends ParsedResult {
 
     @Override // com.google.zxing.client.result.ParsedResult
     public String getDisplayResult() {
-        StringBuilder result = new StringBuilder(100);
-        maybeAppend(this.names, result);
-        maybeAppend(this.nicknames, result);
-        maybeAppend(this.pronunciation, result);
-        maybeAppend(this.title, result);
-        maybeAppend(this.f0org, result);
-        maybeAppend(this.addresses, result);
-        maybeAppend(this.phoneNumbers, result);
-        maybeAppend(this.emails, result);
-        maybeAppend(this.instantMessenger, result);
-        maybeAppend(this.urls, result);
-        maybeAppend(this.birthday, result);
-        maybeAppend(this.geo, result);
-        maybeAppend(this.note, result);
-        return result.toString();
+        StringBuilder sb = new StringBuilder(100);
+        maybeAppend(this.names, sb);
+        maybeAppend(this.nicknames, sb);
+        maybeAppend(this.pronunciation, sb);
+        maybeAppend(this.title, sb);
+        maybeAppend(this.f3org, sb);
+        maybeAppend(this.addresses, sb);
+        maybeAppend(this.phoneNumbers, sb);
+        maybeAppend(this.emails, sb);
+        maybeAppend(this.instantMessenger, sb);
+        maybeAppend(this.urls, sb);
+        maybeAppend(this.birthday, sb);
+        maybeAppend(this.geo, sb);
+        maybeAppend(this.note, sb);
+        return sb.toString();
     }
 }

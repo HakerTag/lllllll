@@ -27,111 +27,108 @@ public class SystemWebViewClient extends WebViewClient {
     boolean isCurrentlyLoading;
     protected final SystemWebViewEngine parentEngine;
 
-    public SystemWebViewClient(SystemWebViewEngine parentEngine2) {
-        this.parentEngine = parentEngine2;
+    public SystemWebViewClient(SystemWebViewEngine systemWebViewEngine) {
+        this.parentEngine = systemWebViewEngine;
     }
 
     @Override // android.webkit.WebViewClient
-    public boolean shouldOverrideUrlLoading(WebView view, String url) {
-        return this.parentEngine.client.onNavigationAttempt(url);
+    public boolean shouldOverrideUrlLoading(WebView webView, String str) {
+        return this.parentEngine.client.onNavigationAttempt(str);
     }
 
-    public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
-        AuthenticationToken token = getAuthenticationToken(host, realm);
-        if (token != null) {
-            handler.proceed(token.getUserName(), token.getPassword());
+    public void onReceivedHttpAuthRequest(WebView webView, HttpAuthHandler httpAuthHandler, String str, String str2) {
+        AuthenticationToken authenticationToken = getAuthenticationToken(str, str2);
+        if (authenticationToken != null) {
+            httpAuthHandler.proceed(authenticationToken.getUserName(), authenticationToken.getPassword());
             return;
         }
         PluginManager pluginManager = this.parentEngine.pluginManager;
-        if (pluginManager == null || !pluginManager.onReceivedHttpAuthRequest(null, new CordovaHttpAuthHandler(handler), host, realm)) {
-            super.onReceivedHttpAuthRequest(view, handler, host, realm);
+        if (pluginManager == null || !pluginManager.onReceivedHttpAuthRequest(null, new CordovaHttpAuthHandler(httpAuthHandler), str, str2)) {
+            super.onReceivedHttpAuthRequest(webView, httpAuthHandler, str, str2);
         } else {
             this.parentEngine.client.clearLoadTimeoutTimer();
         }
     }
 
-    public void onReceivedClientCertRequest(WebView view, ClientCertRequest request) {
+    public void onReceivedClientCertRequest(WebView webView, ClientCertRequest clientCertRequest) {
         PluginManager pluginManager = this.parentEngine.pluginManager;
-        if (pluginManager == null || !pluginManager.onReceivedClientCertRequest(null, new CordovaClientCertRequest(request))) {
-            super.onReceivedClientCertRequest(view, request);
+        if (pluginManager == null || !pluginManager.onReceivedClientCertRequest(null, new CordovaClientCertRequest(clientCertRequest))) {
+            super.onReceivedClientCertRequest(webView, clientCertRequest);
         } else {
             this.parentEngine.client.clearLoadTimeoutTimer();
         }
     }
 
-    public void onPageStarted(WebView view, String url, Bitmap favicon) {
-        super.onPageStarted(view, url, favicon);
+    public void onPageStarted(WebView webView, String str, Bitmap bitmap) {
+        super.onPageStarted(webView, str, bitmap);
         this.isCurrentlyLoading = true;
         this.parentEngine.bridge.reset();
-        this.parentEngine.client.onPageStarted(url);
+        this.parentEngine.client.onPageStarted(str);
     }
 
-    public void onPageFinished(WebView view, String url) {
-        super.onPageFinished(view, url);
-        if (this.isCurrentlyLoading || url.startsWith("about:")) {
+    public void onPageFinished(WebView webView, String str) {
+        super.onPageFinished(webView, str);
+        if (this.isCurrentlyLoading || str.startsWith("about:")) {
             this.isCurrentlyLoading = false;
             if (this.doClearHistory) {
-                view.clearHistory();
+                webView.clearHistory();
                 this.doClearHistory = false;
             }
-            this.parentEngine.client.onPageFinishedLoading(url);
+            this.parentEngine.client.onPageFinishedLoading(str);
         }
     }
 
-    public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+    public void onReceivedError(WebView webView, int i, String str, String str2) {
         if (this.isCurrentlyLoading) {
-            LOG.d(TAG, "CordovaWebViewClient.onReceivedError: Error code=%s Description=%s URL=%s", Integer.valueOf(errorCode), description, failingUrl);
-            if (errorCode == -10) {
+            LOG.d(TAG, "CordovaWebViewClient.onReceivedError: Error code=%s Description=%s URL=%s", Integer.valueOf(i), str, str2);
+            if (i == -10) {
                 this.parentEngine.client.clearLoadTimeoutTimer();
-                if (view.canGoBack()) {
-                    view.goBack();
+                if (webView.canGoBack()) {
+                    webView.goBack();
                     return;
                 }
-                super.onReceivedError(view, errorCode, description, failingUrl);
+                super.onReceivedError(webView, i, str, str2);
             }
-            this.parentEngine.client.onReceivedError(errorCode, description, failingUrl);
+            this.parentEngine.client.onReceivedError(i, str, str2);
         }
     }
 
-    public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+    public void onReceivedSslError(WebView webView, SslErrorHandler sslErrorHandler, SslError sslError) {
         try {
             if ((this.parentEngine.cordova.getActivity().getPackageManager().getApplicationInfo(this.parentEngine.cordova.getActivity().getPackageName(), 128).flags & 2) != 0) {
-                handler.proceed();
+                sslErrorHandler.proceed();
             } else {
-                super.onReceivedSslError(view, handler, error);
+                super.onReceivedSslError(webView, sslErrorHandler, sslError);
             }
-        } catch (PackageManager.NameNotFoundException e) {
-            super.onReceivedSslError(view, handler, error);
+        } catch (PackageManager.NameNotFoundException unused) {
+            super.onReceivedSslError(webView, sslErrorHandler, sslError);
         }
     }
 
-    public void setAuthenticationToken(AuthenticationToken authenticationToken, String host, String realm) {
-        if (host == null) {
-            host = "";
+    public void setAuthenticationToken(AuthenticationToken authenticationToken, String str, String str2) {
+        if (str == null) {
+            str = "";
         }
-        if (realm == null) {
-            realm = "";
+        if (str2 == null) {
+            str2 = "";
         }
-        this.authenticationTokens.put(host.concat(realm), authenticationToken);
+        this.authenticationTokens.put(str.concat(str2), authenticationToken);
     }
 
-    public AuthenticationToken removeAuthenticationToken(String host, String realm) {
-        return this.authenticationTokens.remove(host.concat(realm));
+    public AuthenticationToken removeAuthenticationToken(String str, String str2) {
+        return this.authenticationTokens.remove(str.concat(str2));
     }
 
-    public AuthenticationToken getAuthenticationToken(String host, String realm) {
-        AuthenticationToken token = this.authenticationTokens.get(host.concat(realm));
-        if (token != null) {
-            return token;
+    public AuthenticationToken getAuthenticationToken(String str, String str2) {
+        AuthenticationToken authenticationToken = this.authenticationTokens.get(str.concat(str2));
+        if (authenticationToken != null) {
+            return authenticationToken;
         }
-        AuthenticationToken token2 = this.authenticationTokens.get(host);
-        if (token2 == null) {
-            token2 = this.authenticationTokens.get(realm);
+        AuthenticationToken authenticationToken2 = this.authenticationTokens.get(str);
+        if (authenticationToken2 == null) {
+            authenticationToken2 = this.authenticationTokens.get(str2);
         }
-        if (token2 == null) {
-            return this.authenticationTokens.get("");
-        }
-        return token2;
+        return authenticationToken2 == null ? this.authenticationTokens.get("") : authenticationToken2;
     }
 
     public void clearAuthenticationTokens() {
@@ -139,22 +136,22 @@ public class SystemWebViewClient extends WebViewClient {
     }
 
     @Override // android.webkit.WebViewClient
-    public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+    public WebResourceResponse shouldInterceptRequest(WebView webView, String str) {
         try {
-            if (!this.parentEngine.pluginManager.shouldAllowRequest(url)) {
-                LOG.w(TAG, "URL blocked by whitelist: " + url);
+            if (!this.parentEngine.pluginManager.shouldAllowRequest(str)) {
+                LOG.w(TAG, "URL blocked by whitelist: " + str);
                 return new WebResourceResponse("text/plain", "UTF-8", null);
             }
-            CordovaResourceApi resourceApi = this.parentEngine.resourceApi;
-            Uri origUri = Uri.parse(url);
-            Uri remappedUri = resourceApi.remapUri(origUri);
-            if (origUri.equals(remappedUri) && !needsSpecialsInAssetUrlFix(origUri)) {
-                if (!needsContentUrlFix(origUri)) {
+            CordovaResourceApi cordovaResourceApi = this.parentEngine.resourceApi;
+            Uri parse = Uri.parse(str);
+            Uri remapUri = cordovaResourceApi.remapUri(parse);
+            if (parse.equals(remapUri) && !needsSpecialsInAssetUrlFix(parse)) {
+                if (!needsContentUrlFix(parse)) {
                     return null;
                 }
             }
-            CordovaResourceApi.OpenForReadResult result = resourceApi.openForRead(remappedUri, true);
-            return new WebResourceResponse(result.mimeType, "UTF-8", result.inputStream);
+            CordovaResourceApi.OpenForReadResult openForRead = cordovaResourceApi.openForRead(remapUri, true);
+            return new WebResourceResponse(openForRead.mimeType, "UTF-8", openForRead.inputStream);
         } catch (IOException e) {
             if (!(e instanceof FileNotFoundException)) {
                 LOG.e(TAG, "Error occurred while loading a file (returning a 404).", e);
@@ -171,9 +168,11 @@ public class SystemWebViewClient extends WebViewClient {
         if (CordovaResourceApi.getUriType(uri) != 1) {
             return false;
         }
-        if (uri.getQuery() == null && uri.getFragment() == null) {
-            return !uri.toString().contains("%") ? false : false;
+        if (uri.getQuery() != null || uri.getFragment() != null) {
+            return true;
         }
-        return true;
+        if (!uri.toString().contains("%")) {
+        }
+        return false;
     }
 }

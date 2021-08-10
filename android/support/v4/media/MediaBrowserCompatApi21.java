@@ -26,59 +26,59 @@ class MediaBrowserCompatApi21 {
     MediaBrowserCompatApi21() {
     }
 
-    public static Object createConnectionCallback(ConnectionCallback callback) {
-        return new ConnectionCallbackProxy(callback);
+    public static Object createConnectionCallback(ConnectionCallback connectionCallback) {
+        return new ConnectionCallbackProxy(connectionCallback);
     }
 
-    public static Object createBrowser(Context context, ComponentName serviceComponent, Object callback, Bundle rootHints) {
-        return new MediaBrowser(context, serviceComponent, (MediaBrowser.ConnectionCallback) callback, rootHints);
+    public static Object createBrowser(Context context, ComponentName componentName, Object obj, Bundle bundle) {
+        return new MediaBrowser(context, componentName, (MediaBrowser.ConnectionCallback) obj, bundle);
     }
 
-    public static void connect(Object browserObj) {
-        ((MediaBrowser) browserObj).connect();
+    public static void connect(Object obj) {
+        ((MediaBrowser) obj).connect();
     }
 
-    public static void disconnect(Object browserObj) {
-        ((MediaBrowser) browserObj).disconnect();
+    public static void disconnect(Object obj) {
+        ((MediaBrowser) obj).disconnect();
     }
 
-    public static boolean isConnected(Object browserObj) {
-        return ((MediaBrowser) browserObj).isConnected();
+    public static boolean isConnected(Object obj) {
+        return ((MediaBrowser) obj).isConnected();
     }
 
-    public static ComponentName getServiceComponent(Object browserObj) {
-        return ((MediaBrowser) browserObj).getServiceComponent();
+    public static ComponentName getServiceComponent(Object obj) {
+        return ((MediaBrowser) obj).getServiceComponent();
     }
 
-    public static String getRoot(Object browserObj) {
-        return ((MediaBrowser) browserObj).getRoot();
+    public static String getRoot(Object obj) {
+        return ((MediaBrowser) obj).getRoot();
     }
 
-    public static Bundle getExtras(Object browserObj) {
-        return ((MediaBrowser) browserObj).getExtras();
+    public static Bundle getExtras(Object obj) {
+        return ((MediaBrowser) obj).getExtras();
     }
 
-    public static Object getSessionToken(Object browserObj) {
-        return ((MediaBrowser) browserObj).getSessionToken();
+    public static Object getSessionToken(Object obj) {
+        return ((MediaBrowser) obj).getSessionToken();
     }
 
-    public static Object createSubscriptionCallback(SubscriptionCallback callback) {
-        return new SubscriptionCallbackProxy(callback);
+    public static Object createSubscriptionCallback(SubscriptionCallback subscriptionCallback) {
+        return new SubscriptionCallbackProxy(subscriptionCallback);
     }
 
-    public static void subscribe(Object browserObj, String parentId, Object subscriptionCallbackObj) {
-        ((MediaBrowser) browserObj).subscribe(parentId, (MediaBrowser.SubscriptionCallback) subscriptionCallbackObj);
+    public static void subscribe(Object obj, String str, Object obj2) {
+        ((MediaBrowser) obj).subscribe(str, (MediaBrowser.SubscriptionCallback) obj2);
     }
 
-    public static void unsubscribe(Object browserObj, String parentId) {
-        ((MediaBrowser) browserObj).unsubscribe(parentId);
+    public static void unsubscribe(Object obj, String str) {
+        ((MediaBrowser) obj).unsubscribe(str);
     }
 
     static class ConnectionCallbackProxy<T extends ConnectionCallback> extends MediaBrowser.ConnectionCallback {
         protected final T mConnectionCallback;
 
-        public ConnectionCallbackProxy(T connectionCallback) {
-            this.mConnectionCallback = connectionCallback;
+        public ConnectionCallbackProxy(T t) {
+            this.mConnectionCallback = t;
         }
 
         public void onConnected() {
@@ -97,17 +97,17 @@ class MediaBrowserCompatApi21 {
     static class SubscriptionCallbackProxy<T extends SubscriptionCallback> extends MediaBrowser.SubscriptionCallback {
         protected final T mSubscriptionCallback;
 
-        public SubscriptionCallbackProxy(T callback) {
-            this.mSubscriptionCallback = callback;
+        public SubscriptionCallbackProxy(T t) {
+            this.mSubscriptionCallback = t;
         }
 
         @Override // android.media.browse.MediaBrowser.SubscriptionCallback
-        public void onChildrenLoaded(String parentId, List<MediaBrowser.MediaItem> children) {
-            this.mSubscriptionCallback.onChildrenLoaded(parentId, children);
+        public void onChildrenLoaded(String str, List<MediaBrowser.MediaItem> list) {
+            this.mSubscriptionCallback.onChildrenLoaded(str, list);
         }
 
-        public void onError(String parentId) {
-            this.mSubscriptionCallback.onError(parentId);
+        public void onError(String str) {
+            this.mSubscriptionCallback.onError(str);
         }
     }
 
@@ -115,12 +115,12 @@ class MediaBrowserCompatApi21 {
         MediaItem() {
         }
 
-        public static int getFlags(Object itemObj) {
-            return ((MediaBrowser.MediaItem) itemObj).getFlags();
+        public static int getFlags(Object obj) {
+            return ((MediaBrowser.MediaItem) obj).getFlags();
         }
 
-        public static Object getDescription(Object itemObj) {
-            return ((MediaBrowser.MediaItem) itemObj).getDescription();
+        public static Object getDescription(Object obj) {
+            return ((MediaBrowser.MediaItem) obj).getDescription();
         }
     }
 }

@@ -12,49 +12,51 @@ public final class PDF417ErrorCorrection {
     private PDF417ErrorCorrection() {
     }
 
-    static int getErrorCorrectionCodewordCount(int errorCorrectionLevel) {
-        if (errorCorrectionLevel >= 0 && errorCorrectionLevel <= 8) {
-            return 1 << (errorCorrectionLevel + 1);
+    static int getErrorCorrectionCodewordCount(int i) {
+        if (i >= 0 && i <= 8) {
+            return 1 << (i + 1);
         }
         throw new IllegalArgumentException("Error correction level must be between 0 and 8!");
     }
 
-    static int getRecommendedMinimumErrorCorrectionLevel(int n) throws WriterException {
-        if (n <= 0) {
+    static int getRecommendedMinimumErrorCorrectionLevel(int i) throws WriterException {
+        if (i <= 0) {
             throw new IllegalArgumentException("n must be > 0");
-        } else if (n <= 40) {
+        } else if (i <= 40) {
             return 2;
         } else {
-            if (n <= 160) {
+            if (i <= 160) {
                 return 3;
             }
-            if (n <= 320) {
+            if (i <= 320) {
                 return 4;
             }
-            if (n <= 863) {
+            if (i <= 863) {
                 return 5;
             }
             throw new WriterException("No recommendation possible");
         }
     }
 
-    static String generateErrorCorrection(CharSequence dataCodewords, int errorCorrectionLevel) {
-        int k = getErrorCorrectionCodewordCount(errorCorrectionLevel);
-        char[] e = new char[k];
-        int sld = dataCodewords.length();
-        for (int i = 0; i < sld; i++) {
-            int t1 = (dataCodewords.charAt(i) + e[e.length - 1]) % PDF417Common.NUMBER_OF_CODEWORDS;
-            for (int j = k - 1; j >= 1; j--) {
-                e[j] = (char) ((e[j - 1] + (929 - ((EC_COEFFICIENTS[errorCorrectionLevel][j] * t1) % PDF417Common.NUMBER_OF_CODEWORDS))) % PDF417Common.NUMBER_OF_CODEWORDS);
+    static String generateErrorCorrection(CharSequence charSequence, int i) {
+        int errorCorrectionCodewordCount = getErrorCorrectionCodewordCount(i);
+        char[] cArr = new char[errorCorrectionCodewordCount];
+        int length = charSequence.length();
+        for (int i2 = 0; i2 < length; i2++) {
+            int i3 = errorCorrectionCodewordCount - 1;
+            int charAt = (charSequence.charAt(i2) + cArr[i3]) % PDF417Common.NUMBER_OF_CODEWORDS;
+            while (i3 >= 1) {
+                cArr[i3] = (char) ((cArr[i3 - 1] + (929 - ((EC_COEFFICIENTS[i][i3] * charAt) % PDF417Common.NUMBER_OF_CODEWORDS))) % PDF417Common.NUMBER_OF_CODEWORDS);
+                i3--;
             }
-            e[0] = (char) ((929 - ((EC_COEFFICIENTS[errorCorrectionLevel][0] * t1) % PDF417Common.NUMBER_OF_CODEWORDS)) % PDF417Common.NUMBER_OF_CODEWORDS);
+            cArr[0] = (char) ((929 - ((charAt * EC_COEFFICIENTS[i][0]) % PDF417Common.NUMBER_OF_CODEWORDS)) % PDF417Common.NUMBER_OF_CODEWORDS);
         }
-        StringBuilder sb = new StringBuilder(k);
-        for (int j2 = k - 1; j2 >= 0; j2--) {
-            if (e[j2] != 0) {
-                e[j2] = (char) (929 - e[j2]);
+        StringBuilder sb = new StringBuilder(errorCorrectionCodewordCount);
+        for (int i4 = errorCorrectionCodewordCount - 1; i4 >= 0; i4--) {
+            if (cArr[i4] != 0) {
+                cArr[i4] = (char) (929 - cArr[i4]);
             }
-            sb.append(e[j2]);
+            sb.append(cArr[i4]);
         }
         return sb.toString();
     }

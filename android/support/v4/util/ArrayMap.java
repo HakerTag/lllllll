@@ -10,12 +10,12 @@ public class ArrayMap<K, V> extends SimpleArrayMap<K, V> implements Map<K, V> {
     public ArrayMap() {
     }
 
-    public ArrayMap(int capacity) {
-        super(capacity);
+    public ArrayMap(int i) {
+        super(i);
     }
 
-    public ArrayMap(SimpleArrayMap map) {
-        super(map);
+    public ArrayMap(SimpleArrayMap simpleArrayMap) {
+        super(simpleArrayMap);
     }
 
     private MapCollections<K, V> getCollection() {
@@ -31,20 +31,20 @@ public class ArrayMap<K, V> extends SimpleArrayMap<K, V> implements Map<K, V> {
 
                 /* access modifiers changed from: protected */
                 @Override // android.support.v4.util.MapCollections
-                public Object colGetEntry(int index, int offset) {
-                    return ArrayMap.this.mArray[(index << 1) + offset];
+                public Object colGetEntry(int i, int i2) {
+                    return ArrayMap.this.mArray[(i << 1) + i2];
                 }
 
                 /* access modifiers changed from: protected */
                 @Override // android.support.v4.util.MapCollections
-                public int colIndexOfKey(Object key) {
-                    return ArrayMap.this.indexOfKey(key);
+                public int colIndexOfKey(Object obj) {
+                    return ArrayMap.this.indexOfKey(obj);
                 }
 
                 /* access modifiers changed from: protected */
                 @Override // android.support.v4.util.MapCollections
-                public int colIndexOfValue(Object value) {
-                    return ArrayMap.this.indexOfValue(value);
+                public int colIndexOfValue(Object obj) {
+                    return ArrayMap.this.indexOfValue(obj);
                 }
 
                 /* access modifiers changed from: protected */
@@ -55,20 +55,20 @@ public class ArrayMap<K, V> extends SimpleArrayMap<K, V> implements Map<K, V> {
 
                 /* access modifiers changed from: protected */
                 @Override // android.support.v4.util.MapCollections
-                public void colPut(K key, V value) {
-                    ArrayMap.this.put(key, value);
+                public void colPut(K k, V v) {
+                    ArrayMap.this.put(k, v);
                 }
 
                 /* access modifiers changed from: protected */
                 @Override // android.support.v4.util.MapCollections
-                public V colSetValue(int index, V value) {
-                    return (V) ArrayMap.this.setValueAt(index, value);
+                public V colSetValue(int i, V v) {
+                    return (V) ArrayMap.this.setValueAt(i, v);
                 }
 
                 /* access modifiers changed from: protected */
                 @Override // android.support.v4.util.MapCollections
-                public void colRemoveAt(int index) {
-                    ArrayMap.this.removeAt(index);
+                public void colRemoveAt(int i) {
+                    ArrayMap.this.removeAt(i);
                 }
 
                 /* access modifiers changed from: protected */
@@ -85,9 +85,9 @@ public class ArrayMap<K, V> extends SimpleArrayMap<K, V> implements Map<K, V> {
         return MapCollections.containsAllHelper(this, collection);
     }
 
-    /* JADX DEBUG: Multi-variable search result rejected for r4v0, resolved type: android.support.v4.util.ArrayMap<K, V> */
-    /* JADX DEBUG: Multi-variable search result rejected for r2v0, resolved type: java.lang.Object */
-    /* JADX DEBUG: Multi-variable search result rejected for r3v0, resolved type: java.lang.Object */
+    /* JADX DEBUG: Multi-variable search result rejected for r2v0, resolved type: android.support.v4.util.ArrayMap<K, V> */
+    /* JADX DEBUG: Multi-variable search result rejected for r1v1, resolved type: java.lang.Object */
+    /* JADX DEBUG: Multi-variable search result rejected for r0v5, resolved type: java.lang.Object */
     /* JADX WARN: Multi-variable type inference failed */
     @Override // java.util.Map
     public void putAll(Map<? extends K, ? extends V> map) {

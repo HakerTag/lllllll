@@ -25,46 +25,46 @@ public class ShortcutInfoCompat {
     }
 
     public ShortcutInfo toShortcutInfo() {
-        ShortcutInfo.Builder builder = new ShortcutInfo.Builder(this.mContext, this.mId).setShortLabel(this.mLabel).setIntents(this.mIntents);
+        ShortcutInfo.Builder intents = new ShortcutInfo.Builder(this.mContext, this.mId).setShortLabel(this.mLabel).setIntents(this.mIntents);
         IconCompat iconCompat = this.mIcon;
         if (iconCompat != null) {
-            builder.setIcon(iconCompat.toIcon());
+            intents.setIcon(iconCompat.toIcon());
         }
         if (!TextUtils.isEmpty(this.mLongLabel)) {
-            builder.setLongLabel(this.mLongLabel);
+            intents.setLongLabel(this.mLongLabel);
         }
         if (!TextUtils.isEmpty(this.mDisabledMessage)) {
-            builder.setDisabledMessage(this.mDisabledMessage);
+            intents.setDisabledMessage(this.mDisabledMessage);
         }
         ComponentName componentName = this.mActivity;
         if (componentName != null) {
-            builder.setActivity(componentName);
+            intents.setActivity(componentName);
         }
-        return builder.build();
+        return intents.build();
     }
 
     /* access modifiers changed from: package-private */
-    public Intent addToIntent(Intent outIntent) {
+    public Intent addToIntent(Intent intent) {
         Intent[] intentArr = this.mIntents;
-        outIntent.putExtra("android.intent.extra.shortcut.INTENT", intentArr[intentArr.length - 1]).putExtra("android.intent.extra.shortcut.NAME", this.mLabel.toString());
+        intent.putExtra("android.intent.extra.shortcut.INTENT", intentArr[intentArr.length - 1]).putExtra("android.intent.extra.shortcut.NAME", this.mLabel.toString());
         if (this.mIcon != null) {
-            Drawable badge = null;
+            Drawable drawable = null;
             if (this.mIsAlwaysBadged) {
-                PackageManager pm = this.mContext.getPackageManager();
+                PackageManager packageManager = this.mContext.getPackageManager();
                 ComponentName componentName = this.mActivity;
                 if (componentName != null) {
                     try {
-                        badge = pm.getActivityIcon(componentName);
-                    } catch (PackageManager.NameNotFoundException e) {
+                        drawable = packageManager.getActivityIcon(componentName);
+                    } catch (PackageManager.NameNotFoundException unused) {
                     }
                 }
-                if (badge == null) {
-                    badge = this.mContext.getApplicationInfo().loadIcon(pm);
+                if (drawable == null) {
+                    drawable = this.mContext.getApplicationInfo().loadIcon(packageManager);
                 }
             }
-            this.mIcon.addToShortcutIntent(outIntent, badge);
+            this.mIcon.addToShortcutIntent(intent, drawable);
         }
-        return outIntent;
+        return intent;
     }
 
     public String getId() {
@@ -100,25 +100,25 @@ public class ShortcutInfoCompat {
     public static class Builder {
         private final ShortcutInfoCompat mInfo;
 
-        public Builder(Context context, String id) {
+        public Builder(Context context, String str) {
             ShortcutInfoCompat shortcutInfoCompat = new ShortcutInfoCompat();
             this.mInfo = shortcutInfoCompat;
             shortcutInfoCompat.mContext = context;
-            this.mInfo.mId = id;
+            this.mInfo.mId = str;
         }
 
-        public Builder setShortLabel(CharSequence shortLabel) {
-            this.mInfo.mLabel = shortLabel;
+        public Builder setShortLabel(CharSequence charSequence) {
+            this.mInfo.mLabel = charSequence;
             return this;
         }
 
-        public Builder setLongLabel(CharSequence longLabel) {
-            this.mInfo.mLongLabel = longLabel;
+        public Builder setLongLabel(CharSequence charSequence) {
+            this.mInfo.mLongLabel = charSequence;
             return this;
         }
 
-        public Builder setDisabledMessage(CharSequence disabledMessage) {
-            this.mInfo.mDisabledMessage = disabledMessage;
+        public Builder setDisabledMessage(CharSequence charSequence) {
+            this.mInfo.mDisabledMessage = charSequence;
             return this;
         }
 
@@ -126,18 +126,18 @@ public class ShortcutInfoCompat {
             return setIntents(new Intent[]{intent});
         }
 
-        public Builder setIntents(Intent[] intents) {
-            this.mInfo.mIntents = intents;
+        public Builder setIntents(Intent[] intentArr) {
+            this.mInfo.mIntents = intentArr;
             return this;
         }
 
-        public Builder setIcon(IconCompat icon) {
-            this.mInfo.mIcon = icon;
+        public Builder setIcon(IconCompat iconCompat) {
+            this.mInfo.mIcon = iconCompat;
             return this;
         }
 
-        public Builder setActivity(ComponentName activity) {
-            this.mInfo.mActivity = activity;
+        public Builder setActivity(ComponentName componentName) {
+            this.mInfo.mActivity = componentName;
             return this;
         }
 

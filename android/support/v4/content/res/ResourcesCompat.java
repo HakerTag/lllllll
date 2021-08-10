@@ -14,42 +14,42 @@ import android.util.TypedValue;
 public final class ResourcesCompat {
     private static final String TAG = "ResourcesCompat";
 
-    public static Drawable getDrawable(Resources res, int id, Resources.Theme theme) throws Resources.NotFoundException {
+    public static Drawable getDrawable(Resources resources, int i, Resources.Theme theme) throws Resources.NotFoundException {
         if (Build.VERSION.SDK_INT >= 21) {
-            return res.getDrawable(id, theme);
+            return resources.getDrawable(i, theme);
         }
-        return res.getDrawable(id);
+        return resources.getDrawable(i);
     }
 
-    public static Drawable getDrawableForDensity(Resources res, int id, int density, Resources.Theme theme) throws Resources.NotFoundException {
+    public static Drawable getDrawableForDensity(Resources resources, int i, int i2, Resources.Theme theme) throws Resources.NotFoundException {
         if (Build.VERSION.SDK_INT >= 21) {
-            return res.getDrawableForDensity(id, density, theme);
+            return resources.getDrawableForDensity(i, i2, theme);
         }
         if (Build.VERSION.SDK_INT >= 15) {
-            return res.getDrawableForDensity(id, density);
+            return resources.getDrawableForDensity(i, i2);
         }
-        return res.getDrawable(id);
+        return resources.getDrawable(i);
     }
 
-    public static int getColor(Resources res, int id, Resources.Theme theme) throws Resources.NotFoundException {
+    public static int getColor(Resources resources, int i, Resources.Theme theme) throws Resources.NotFoundException {
         if (Build.VERSION.SDK_INT >= 23) {
-            return res.getColor(id, theme);
+            return resources.getColor(i, theme);
         }
-        return res.getColor(id);
+        return resources.getColor(i);
     }
 
-    public static ColorStateList getColorStateList(Resources res, int id, Resources.Theme theme) throws Resources.NotFoundException {
+    public static ColorStateList getColorStateList(Resources resources, int i, Resources.Theme theme) throws Resources.NotFoundException {
         if (Build.VERSION.SDK_INT >= 23) {
-            return res.getColorStateList(id, theme);
+            return resources.getColorStateList(i, theme);
         }
-        return res.getColorStateList(id);
+        return resources.getColorStateList(i);
     }
 
-    public static Typeface getFont(Context context, int id) throws Resources.NotFoundException {
+    public static Typeface getFont(Context context, int i) throws Resources.NotFoundException {
         if (context.isRestricted()) {
             return null;
         }
-        return loadFont(context, id, new TypedValue(), 0, null, null, false);
+        return loadFont(context, i, new TypedValue(), 0, null, null, false);
     }
 
     public static abstract class FontCallback {
@@ -70,7 +70,7 @@ public final class ResourcesCompat {
             });
         }
 
-        public final void callbackFailAsync(final int reason, Handler handler) {
+        public final void callbackFailAsync(final int i, Handler handler) {
             if (handler == null) {
                 handler = new Handler(Looper.getMainLooper());
             }
@@ -78,213 +78,146 @@ public final class ResourcesCompat {
                 /* class android.support.v4.content.res.ResourcesCompat.FontCallback.AnonymousClass2 */
 
                 public void run() {
-                    FontCallback.this.onFontRetrievalFailed(reason);
+                    FontCallback.this.onFontRetrievalFailed(i);
                 }
             });
         }
     }
 
-    public static void getFont(Context context, int id, FontCallback fontCallback, Handler handler) throws Resources.NotFoundException {
+    public static void getFont(Context context, int i, FontCallback fontCallback, Handler handler) throws Resources.NotFoundException {
         Preconditions.checkNotNull(fontCallback);
         if (context.isRestricted()) {
             fontCallback.callbackFailAsync(-4, handler);
         } else {
-            loadFont(context, id, new TypedValue(), 0, fontCallback, handler, false);
+            loadFont(context, i, new TypedValue(), 0, fontCallback, handler, false);
         }
     }
 
-    public static Typeface getFont(Context context, int id, TypedValue value, int style, FontCallback fontCallback) throws Resources.NotFoundException {
+    public static Typeface getFont(Context context, int i, TypedValue typedValue, int i2, FontCallback fontCallback) throws Resources.NotFoundException {
         if (context.isRestricted()) {
             return null;
         }
-        return loadFont(context, id, value, style, fontCallback, null, true);
+        return loadFont(context, i, typedValue, i2, fontCallback, null, true);
     }
 
-    private static Typeface loadFont(Context context, int id, TypedValue value, int style, FontCallback fontCallback, Handler handler, boolean isRequestFromLayoutInflator) {
+    private static Typeface loadFont(Context context, int i, TypedValue typedValue, int i2, FontCallback fontCallback, Handler handler, boolean z) {
         Resources resources = context.getResources();
-        resources.getValue(id, value, true);
-        Typeface typeface = loadFont(context, resources, value, id, style, fontCallback, handler, isRequestFromLayoutInflator);
-        if (typeface != null || fontCallback != null) {
-            return typeface;
+        resources.getValue(i, typedValue, true);
+        Typeface loadFont = loadFont(context, resources, typedValue, i, i2, fontCallback, handler, z);
+        if (loadFont != null || fontCallback != null) {
+            return loadFont;
         }
-        throw new Resources.NotFoundException("Font resource ID #0x" + Integer.toHexString(id) + " could not be retrieved.");
+        throw new Resources.NotFoundException("Font resource ID #0x" + Integer.toHexString(i) + " could not be retrieved.");
     }
 
-    /* JADX WARNING: Removed duplicated region for block: B:64:0x00f0  */
+    /* JADX WARNING: Removed duplicated region for block: B:34:0x00a5  */
     /* Code decompiled incorrectly, please refer to instructions dump. */
-    private static android.graphics.Typeface loadFont(android.content.Context r19, android.content.res.Resources r20, android.util.TypedValue r21, int r22, int r23, android.support.v4.content.res.ResourcesCompat.FontCallback r24, android.os.Handler r25, boolean r26) {
+    private static android.graphics.Typeface loadFont(android.content.Context r15, android.content.res.Resources r16, android.util.TypedValue r17, int r18, int r19, android.support.v4.content.res.ResourcesCompat.FontCallback r20, android.os.Handler r21, boolean r22) {
         /*
+            r0 = r16
+            r1 = r17
+            r4 = r18
+            r5 = r19
             r9 = r20
             r10 = r21
-            r11 = r22
-            r12 = r23
-            r13 = r24
-            r14 = r25
-            java.lang.String r15 = "ResourcesCompat"
-            java.lang.CharSequence r0 = r10.string
-            if (r0 == 0) goto L_0x00f5
-            java.lang.CharSequence r0 = r10.string
-            java.lang.String r8 = r0.toString()
-            java.lang.String r0 = "res/"
-            boolean r0 = r8.startsWith(r0)
-            r16 = 0
-            r7 = -3
-            if (r0 != 0) goto L_0x0029
-            if (r13 == 0) goto L_0x0028
-            r13.callbackFailAsync(r7, r14)
+            java.lang.String r11 = "ResourcesCompat"
+            java.lang.CharSequence r2 = r1.string
+            if (r2 == 0) goto L_0x00a9
+            java.lang.CharSequence r1 = r1.string
+            java.lang.String r12 = r1.toString()
+            java.lang.String r1 = "res/"
+            boolean r1 = r12.startsWith(r1)
+            r13 = 0
+            r14 = -3
+            if (r1 != 0) goto L_0x0028
+            if (r9 == 0) goto L_0x0027
+            r9.callbackFailAsync(r14, r10)
+        L_0x0027:
+            return r13
         L_0x0028:
-            return r16
-        L_0x0029:
-            android.graphics.Typeface r6 = android.support.v4.graphics.TypefaceCompat.findFromCache(r9, r11, r12)
-            if (r6 == 0) goto L_0x0035
-            if (r13 == 0) goto L_0x0034
-            r13.callbackSuccessAsync(r6, r14)
-        L_0x0034:
-            return r6
-        L_0x0035:
-            java.lang.String r0 = r8.toLowerCase()     // Catch:{ XmlPullParserException -> 0x00d3, IOException -> 0x00b8 }
-            java.lang.String r1 = ".xml"
-            boolean r0 = r0.endsWith(r1)     // Catch:{ XmlPullParserException -> 0x00d3, IOException -> 0x00b8 }
-            if (r0 == 0) goto L_0x0094
-            android.content.res.XmlResourceParser r0 = r9.getXml(r11)     // Catch:{ XmlPullParserException -> 0x008d, IOException -> 0x0086 }
-            android.support.v4.content.res.FontResourcesParserCompat$FamilyResourceEntry r1 = android.support.v4.content.res.FontResourcesParserCompat.parse(r0, r9)     // Catch:{ XmlPullParserException -> 0x008d, IOException -> 0x0086 }
-            r17 = r1
-            if (r17 != 0) goto L_0x0065
-            java.lang.String r1 = "Failed to find font-family tag"
-            android.util.Log.e(r15, r1)     // Catch:{ XmlPullParserException -> 0x005f, IOException -> 0x0059 }
-            if (r13 == 0) goto L_0x0058
-            r13.callbackFailAsync(r7, r14)     // Catch:{ XmlPullParserException -> 0x005f, IOException -> 0x0059 }
-        L_0x0058:
-            return r16
-        L_0x0059:
-            r0 = move-exception
-            r1 = r19
-            r10 = r8
-            goto L_0x00be
-        L_0x005f:
-            r0 = move-exception
-            r1 = r19
-            r10 = r8
-            goto L_0x00d9
-        L_0x0065:
-            r1 = r19
-            r2 = r17
-            r3 = r20
-            r4 = r22
-            r5 = r23
-            r18 = r6
-            r6 = r24
-            r10 = -3
-            r7 = r25
-            r10 = r8
-            r8 = r26
-            android.graphics.Typeface r1 = android.support.v4.graphics.TypefaceCompat.createFromResourcesFamilyXml(r1, r2, r3, r4, r5, r6, r7, r8)     // Catch:{ XmlPullParserException -> 0x0082, IOException -> 0x007e }
+            android.graphics.Typeface r1 = android.support.v4.graphics.TypefaceCompat.findFromCache(r0, r4, r5)
+            if (r1 == 0) goto L_0x0034
+            if (r9 == 0) goto L_0x0033
+            r9.callbackSuccessAsync(r1, r10)
+        L_0x0033:
             return r1
-        L_0x007e:
+        L_0x0034:
+            java.lang.String r1 = r12.toLowerCase()     // Catch:{ XmlPullParserException -> 0x008e, IOException -> 0x0078 }
+            java.lang.String r2 = ".xml"
+            boolean r1 = r1.endsWith(r2)     // Catch:{ XmlPullParserException -> 0x008e, IOException -> 0x0078 }
+            if (r1 == 0) goto L_0x0067
+            android.content.res.XmlResourceParser r1 = r0.getXml(r4)     // Catch:{ XmlPullParserException -> 0x008e, IOException -> 0x0078 }
+            android.support.v4.content.res.FontResourcesParserCompat$FamilyResourceEntry r2 = android.support.v4.content.res.FontResourcesParserCompat.parse(r1, r0)     // Catch:{ XmlPullParserException -> 0x008e, IOException -> 0x0078 }
+            if (r2 != 0) goto L_0x0055
+            java.lang.String r0 = "Failed to find font-family tag"
+            android.util.Log.e(r11, r0)     // Catch:{ XmlPullParserException -> 0x008e, IOException -> 0x0078 }
+            if (r9 == 0) goto L_0x0054
+            r9.callbackFailAsync(r14, r10)     // Catch:{ XmlPullParserException -> 0x008e, IOException -> 0x0078 }
+        L_0x0054:
+            return r13
+        L_0x0055:
+            r1 = r15
+            r3 = r16
+            r4 = r18
+            r5 = r19
+            r6 = r20
+            r7 = r21
+            r8 = r22
+            android.graphics.Typeface r0 = android.support.v4.graphics.TypefaceCompat.createFromResourcesFamilyXml(r1, r2, r3, r4, r5, r6, r7, r8)     // Catch:{ XmlPullParserException -> 0x008e, IOException -> 0x0078 }
+            return r0
+        L_0x0067:
+            r1 = r15
+            android.graphics.Typeface r0 = android.support.v4.graphics.TypefaceCompat.createFromResourcesFontFile(r15, r0, r4, r12, r5)     // Catch:{ XmlPullParserException -> 0x008e, IOException -> 0x0078 }
+            if (r9 == 0) goto L_0x0077
+            if (r0 == 0) goto L_0x0074
+            r9.callbackSuccessAsync(r0, r10)     // Catch:{ XmlPullParserException -> 0x008e, IOException -> 0x0078 }
+            goto L_0x0077
+        L_0x0074:
+            r9.callbackFailAsync(r14, r10)     // Catch:{ XmlPullParserException -> 0x008e, IOException -> 0x0078 }
+        L_0x0077:
+            return r0
+        L_0x0078:
             r0 = move-exception
-            r1 = r19
-            goto L_0x00b1
-        L_0x0082:
+            java.lang.StringBuilder r1 = new java.lang.StringBuilder
+            r1.<init>()
+            java.lang.String r2 = "Failed to read xml resource "
+            r1.append(r2)
+            r1.append(r12)
+            java.lang.String r1 = r1.toString()
+            android.util.Log.e(r11, r1, r0)
+            goto L_0x00a3
+        L_0x008e:
             r0 = move-exception
-            r1 = r19
-            goto L_0x00b5
-        L_0x0086:
-            r0 = move-exception
-            r18 = r6
-            r10 = r8
-            r1 = r19
-            goto L_0x00be
-        L_0x008d:
-            r0 = move-exception
-            r18 = r6
-            r10 = r8
-            r1 = r19
-            goto L_0x00d9
-        L_0x0094:
-            r18 = r6
-            r10 = r8
-            r1 = r19
-            android.graphics.Typeface r0 = android.support.v4.graphics.TypefaceCompat.createFromResourcesFontFile(r1, r9, r11, r10, r12)     // Catch:{ XmlPullParserException -> 0x00b4, IOException -> 0x00b0 }
-            r6 = r0
-            if (r13 == 0) goto L_0x00af
-            if (r6 == 0) goto L_0x00a6
-            r13.callbackSuccessAsync(r6, r14)     // Catch:{ XmlPullParserException -> 0x00ad, IOException -> 0x00ab }
-            goto L_0x00af
-        L_0x00a6:
-            r2 = -3
-            r13.callbackFailAsync(r2, r14)     // Catch:{ XmlPullParserException -> 0x00ad, IOException -> 0x00ab }
-            goto L_0x00af
-        L_0x00ab:
-            r0 = move-exception
-            goto L_0x00be
-        L_0x00ad:
-            r0 = move-exception
-            goto L_0x00d9
-        L_0x00af:
-            return r6
-        L_0x00b0:
-            r0 = move-exception
-        L_0x00b1:
-            r6 = r18
-            goto L_0x00be
-        L_0x00b4:
-            r0 = move-exception
-        L_0x00b5:
-            r6 = r18
-            goto L_0x00d9
-        L_0x00b8:
-            r0 = move-exception
-            r1 = r19
-            r18 = r6
-            r10 = r8
-        L_0x00be:
-            java.lang.StringBuilder r2 = new java.lang.StringBuilder
-            r2.<init>()
-            java.lang.String r3 = "Failed to read xml resource "
-            r2.append(r3)
-            r2.append(r10)
-            java.lang.String r2 = r2.toString()
-            android.util.Log.e(r15, r2, r0)
-            goto L_0x00ee
-        L_0x00d3:
-            r0 = move-exception
-            r1 = r19
-            r18 = r6
-            r10 = r8
-        L_0x00d9:
-            java.lang.StringBuilder r2 = new java.lang.StringBuilder
-            r2.<init>()
-            java.lang.String r3 = "Failed to parse xml resource "
-            r2.append(r3)
-            r2.append(r10)
-            java.lang.String r2 = r2.toString()
-            android.util.Log.e(r15, r2, r0)
-        L_0x00ee:
-            if (r13 == 0) goto L_0x00f4
-            r2 = -3
-            r13.callbackFailAsync(r2, r14)
-        L_0x00f4:
-            return r16
-        L_0x00f5:
-            r1 = r19
-            android.content.res.Resources$NotFoundException r0 = new android.content.res.Resources$NotFoundException
-            java.lang.StringBuilder r2 = new java.lang.StringBuilder
-            r2.<init>()
-            java.lang.String r3 = "Resource \""
-            r2.append(r3)
-            java.lang.String r3 = r9.getResourceName(r11)
-            r2.append(r3)
-            java.lang.String r3 = "\" ("
-            r2.append(r3)
-            java.lang.String r3 = java.lang.Integer.toHexString(r22)
-            r2.append(r3)
-            java.lang.String r3 = ") is not a Font: "
-            r2.append(r3)
-            r3 = r21
-            r2.append(r3)
-            java.lang.String r2 = r2.toString()
-            r0.<init>(r2)
-            throw r0
+            java.lang.StringBuilder r1 = new java.lang.StringBuilder
+            r1.<init>()
+            java.lang.String r2 = "Failed to parse xml resource "
+            r1.append(r2)
+            r1.append(r12)
+            java.lang.String r1 = r1.toString()
+            android.util.Log.e(r11, r1, r0)
+        L_0x00a3:
+            if (r9 == 0) goto L_0x00a8
+            r9.callbackFailAsync(r14, r10)
+        L_0x00a8:
+            return r13
+        L_0x00a9:
+            android.content.res.Resources$NotFoundException r2 = new android.content.res.Resources$NotFoundException
+            java.lang.StringBuilder r3 = new java.lang.StringBuilder
+            r3.<init>()
+            java.lang.String r5 = "Resource \""
+            r3.append(r5)
+            java.lang.String r0 = r0.getResourceName(r4)
+            r3.append(r0)
+            java.lang.String r0 = "\" ("
+            r3.append(r0)
+            java.lang.String r0 = java.lang.Integer.toHexString(r18)
+            r3.append(r0)
+            java.lang.String r0 = ") is not a Font: "
+            r3.append(r0)
+            r3.append(r1)
+            java.lang.String r0 = r3.toString()
+            r2.<init>(r0)
+            throw r2
         */
         throw new UnsupportedOperationException("Method not decompiled: android.support.v4.content.res.ResourcesCompat.loadFont(android.content.Context, android.content.res.Resources, android.util.TypedValue, int, int, android.support.v4.content.res.ResourcesCompat$FontCallback, android.os.Handler, boolean):android.graphics.Typeface");
     }

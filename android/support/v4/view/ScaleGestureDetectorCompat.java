@@ -8,19 +8,19 @@ public final class ScaleGestureDetectorCompat {
     }
 
     @Deprecated
-    public static void setQuickScaleEnabled(Object scaleGestureDetector, boolean enabled) {
-        setQuickScaleEnabled((ScaleGestureDetector) scaleGestureDetector, enabled);
+    public static void setQuickScaleEnabled(Object obj, boolean z) {
+        setQuickScaleEnabled((ScaleGestureDetector) obj, z);
     }
 
-    public static void setQuickScaleEnabled(ScaleGestureDetector scaleGestureDetector, boolean enabled) {
+    public static void setQuickScaleEnabled(ScaleGestureDetector scaleGestureDetector, boolean z) {
         if (Build.VERSION.SDK_INT >= 19) {
-            scaleGestureDetector.setQuickScaleEnabled(enabled);
+            scaleGestureDetector.setQuickScaleEnabled(z);
         }
     }
 
     @Deprecated
-    public static boolean isQuickScaleEnabled(Object scaleGestureDetector) {
-        return isQuickScaleEnabled((ScaleGestureDetector) scaleGestureDetector);
+    public static boolean isQuickScaleEnabled(Object obj) {
+        return isQuickScaleEnabled((ScaleGestureDetector) obj);
     }
 
     public static boolean isQuickScaleEnabled(ScaleGestureDetector scaleGestureDetector) {

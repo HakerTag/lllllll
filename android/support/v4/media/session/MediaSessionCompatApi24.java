@@ -28,10 +28,10 @@ public class MediaSessionCompatApi24 {
         return new CallbackProxy(callback);
     }
 
-    public static String getCallingPackage(Object sessionObj) {
-        MediaSession session = (MediaSession) sessionObj;
+    public static String getCallingPackage(Object obj) {
+        MediaSession mediaSession = (MediaSession) obj;
         try {
-            return (String) session.getClass().getMethod("getCallingPackage", new Class[0]).invoke(session, new Object[0]);
+            return (String) mediaSession.getClass().getMethod("getCallingPackage", new Class[0]).invoke(mediaSession, new Object[0]);
         } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             Log.e(TAG, "Cannot execute MediaSession.getCallingPackage()", e);
             return null;
@@ -40,24 +40,24 @@ public class MediaSessionCompatApi24 {
 
     /* access modifiers changed from: package-private */
     public static class CallbackProxy<T extends Callback> extends MediaSessionCompatApi23.CallbackProxy<T> {
-        public CallbackProxy(T callback) {
-            super(callback);
+        public CallbackProxy(T t) {
+            super(t);
         }
 
         public void onPrepare() {
             ((Callback) this.mCallback).onPrepare();
         }
 
-        public void onPrepareFromMediaId(String mediaId, Bundle extras) {
-            ((Callback) this.mCallback).onPrepareFromMediaId(mediaId, extras);
+        public void onPrepareFromMediaId(String str, Bundle bundle) {
+            ((Callback) this.mCallback).onPrepareFromMediaId(str, bundle);
         }
 
-        public void onPrepareFromSearch(String query, Bundle extras) {
-            ((Callback) this.mCallback).onPrepareFromSearch(query, extras);
+        public void onPrepareFromSearch(String str, Bundle bundle) {
+            ((Callback) this.mCallback).onPrepareFromSearch(str, bundle);
         }
 
-        public void onPrepareFromUri(Uri uri, Bundle extras) {
-            ((Callback) this.mCallback).onPrepareFromUri(uri, extras);
+        public void onPrepareFromUri(Uri uri, Bundle bundle) {
+            ((Callback) this.mCallback).onPrepareFromUri(uri, bundle);
         }
     }
 }

@@ -18,38 +18,38 @@ public final class PopupWindowCompat {
         private static Method sSetWindowLayoutTypeMethod;
         private static boolean sSetWindowLayoutTypeMethodAttempted;
 
-        PopupWindowCompatBaseImpl() {
-        }
-
-        public void showAsDropDown(PopupWindow popup, View anchor, int xoff, int yoff, int gravity) {
-            if ((GravityCompat.getAbsoluteGravity(gravity, ViewCompat.getLayoutDirection(anchor)) & 7) == 5) {
-                xoff -= popup.getWidth() - anchor.getWidth();
-            }
-            popup.showAsDropDown(anchor, xoff, yoff);
-        }
-
-        public void setOverlapAnchor(PopupWindow popupWindow, boolean overlapAnchor) {
-        }
-
         public boolean getOverlapAnchor(PopupWindow popupWindow) {
             return false;
         }
 
-        public void setWindowLayoutType(PopupWindow popupWindow, int layoutType) {
+        public void setOverlapAnchor(PopupWindow popupWindow, boolean z) {
+        }
+
+        PopupWindowCompatBaseImpl() {
+        }
+
+        public void showAsDropDown(PopupWindow popupWindow, View view, int i, int i2, int i3) {
+            if ((GravityCompat.getAbsoluteGravity(i3, ViewCompat.getLayoutDirection(view)) & 7) == 5) {
+                i -= popupWindow.getWidth() - view.getWidth();
+            }
+            popupWindow.showAsDropDown(view, i, i2);
+        }
+
+        public void setWindowLayoutType(PopupWindow popupWindow, int i) {
             if (!sSetWindowLayoutTypeMethodAttempted) {
                 try {
                     Method declaredMethod = PopupWindow.class.getDeclaredMethod("setWindowLayoutType", Integer.TYPE);
                     sSetWindowLayoutTypeMethod = declaredMethod;
                     declaredMethod.setAccessible(true);
-                } catch (Exception e) {
+                } catch (Exception unused) {
                 }
                 sSetWindowLayoutTypeMethodAttempted = true;
             }
             Method method = sSetWindowLayoutTypeMethod;
             if (method != null) {
                 try {
-                    method.invoke(popupWindow, Integer.valueOf(layoutType));
-                } catch (Exception e2) {
+                    method.invoke(popupWindow, Integer.valueOf(i));
+                } catch (Exception unused2) {
                 }
             }
         }
@@ -60,7 +60,7 @@ public final class PopupWindowCompat {
                     Method declaredMethod = PopupWindow.class.getDeclaredMethod("getWindowLayoutType", new Class[0]);
                     sGetWindowLayoutTypeMethod = declaredMethod;
                     declaredMethod.setAccessible(true);
-                } catch (Exception e) {
+                } catch (Exception unused) {
                 }
                 sGetWindowLayoutTypeMethodAttempted = true;
             }
@@ -68,7 +68,7 @@ public final class PopupWindowCompat {
             if (method != null) {
                 try {
                     return ((Integer) method.invoke(popupWindow, new Object[0])).intValue();
-                } catch (Exception e2) {
+                } catch (Exception unused2) {
                 }
             }
             return 0;
@@ -80,8 +80,8 @@ public final class PopupWindowCompat {
         }
 
         @Override // android.support.v4.widget.PopupWindowCompat.PopupWindowCompatBaseImpl
-        public void showAsDropDown(PopupWindow popup, View anchor, int xoff, int yoff, int gravity) {
-            popup.showAsDropDown(anchor, xoff, yoff, gravity);
+        public void showAsDropDown(PopupWindow popupWindow, View view, int i, int i2, int i3) {
+            popupWindow.showAsDropDown(view, i, i2, i3);
         }
     }
 
@@ -103,11 +103,11 @@ public final class PopupWindowCompat {
         }
 
         @Override // android.support.v4.widget.PopupWindowCompat.PopupWindowCompatBaseImpl
-        public void setOverlapAnchor(PopupWindow popupWindow, boolean overlapAnchor) {
+        public void setOverlapAnchor(PopupWindow popupWindow, boolean z) {
             Field field = sOverlapAnchorField;
             if (field != null) {
                 try {
-                    field.set(popupWindow, Boolean.valueOf(overlapAnchor));
+                    field.set(popupWindow, Boolean.valueOf(z));
                 } catch (IllegalAccessException e) {
                     Log.i(TAG, "Could not set overlap anchor field in PopupWindow", e);
                 }
@@ -134,8 +134,8 @@ public final class PopupWindowCompat {
         }
 
         @Override // android.support.v4.widget.PopupWindowCompat.PopupWindowCompatBaseImpl, android.support.v4.widget.PopupWindowCompat.PopupWindowCompatApi21Impl
-        public void setOverlapAnchor(PopupWindow popupWindow, boolean overlapAnchor) {
-            popupWindow.setOverlapAnchor(overlapAnchor);
+        public void setOverlapAnchor(PopupWindow popupWindow, boolean z) {
+            popupWindow.setOverlapAnchor(z);
         }
 
         @Override // android.support.v4.widget.PopupWindowCompat.PopupWindowCompatBaseImpl, android.support.v4.widget.PopupWindowCompat.PopupWindowCompatApi21Impl
@@ -144,8 +144,8 @@ public final class PopupWindowCompat {
         }
 
         @Override // android.support.v4.widget.PopupWindowCompat.PopupWindowCompatBaseImpl
-        public void setWindowLayoutType(PopupWindow popupWindow, int layoutType) {
-            popupWindow.setWindowLayoutType(layoutType);
+        public void setWindowLayoutType(PopupWindow popupWindow, int i) {
+            popupWindow.setWindowLayoutType(i);
         }
 
         @Override // android.support.v4.widget.PopupWindowCompat.PopupWindowCompatBaseImpl
@@ -169,20 +169,20 @@ public final class PopupWindowCompat {
     private PopupWindowCompat() {
     }
 
-    public static void showAsDropDown(PopupWindow popup, View anchor, int xoff, int yoff, int gravity) {
-        IMPL.showAsDropDown(popup, anchor, xoff, yoff, gravity);
+    public static void showAsDropDown(PopupWindow popupWindow, View view, int i, int i2, int i3) {
+        IMPL.showAsDropDown(popupWindow, view, i, i2, i3);
     }
 
-    public static void setOverlapAnchor(PopupWindow popupWindow, boolean overlapAnchor) {
-        IMPL.setOverlapAnchor(popupWindow, overlapAnchor);
+    public static void setOverlapAnchor(PopupWindow popupWindow, boolean z) {
+        IMPL.setOverlapAnchor(popupWindow, z);
     }
 
     public static boolean getOverlapAnchor(PopupWindow popupWindow) {
         return IMPL.getOverlapAnchor(popupWindow);
     }
 
-    public static void setWindowLayoutType(PopupWindow popupWindow, int layoutType) {
-        IMPL.setWindowLayoutType(popupWindow, layoutType);
+    public static void setWindowLayoutType(PopupWindow popupWindow, int i) {
+        IMPL.setWindowLayoutType(popupWindow, i);
     }
 
     public static int getWindowLayoutType(PopupWindow popupWindow) {

@@ -4,14 +4,14 @@ public final class ProductParsedResult extends ParsedResult {
     private final String normalizedProductID;
     private final String productID;
 
-    ProductParsedResult(String productID2) {
-        this(productID2, productID2);
+    ProductParsedResult(String str) {
+        this(str, str);
     }
 
-    ProductParsedResult(String productID2, String normalizedProductID2) {
+    ProductParsedResult(String str, String str2) {
         super(ParsedResultType.PRODUCT);
-        this.productID = productID2;
-        this.normalizedProductID = normalizedProductID2;
+        this.productID = str;
+        this.normalizedProductID = str2;
     }
 
     public String getProductID() {

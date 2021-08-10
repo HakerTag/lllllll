@@ -26,7 +26,7 @@ public class BrightnessPlugin extends CordovaPlugin {
             this.lp = null;
         }
 
-        /* synthetic */ SetTask(BrightnessPlugin x0, AnonymousClass1 x1) {
+        /* synthetic */ SetTask(BrightnessPlugin brightnessPlugin, AnonymousClass1 r2) {
             this();
         }
 
@@ -34,9 +34,9 @@ public class BrightnessPlugin extends CordovaPlugin {
             this.target.getWindow().setAttributes(this.lp);
         }
 
-        public void setParams(Activity act, WindowManager.LayoutParams params) {
-            this.target = act;
-            this.lp = params;
+        public void setParams(Activity activity, WindowManager.LayoutParams layoutParams) {
+            this.target = activity;
+            this.lp = layoutParams;
         }
     }
 
@@ -50,7 +50,7 @@ public class BrightnessPlugin extends CordovaPlugin {
             this.state = false;
         }
 
-        /* synthetic */ KeepOnTask(BrightnessPlugin x0, AnonymousClass1 x1) {
+        /* synthetic */ KeepOnTask(BrightnessPlugin brightnessPlugin, AnonymousClass1 r2) {
             this();
         }
 
@@ -62,26 +62,26 @@ public class BrightnessPlugin extends CordovaPlugin {
             }
         }
 
-        public void setParams(Window win2, boolean state2) {
-            this.win = win2;
-            this.state = state2;
+        public void setParams(Window window, boolean z) {
+            this.win = window;
+            this.state = z;
         }
     }
 
     @Override // org.apache.cordova.CordovaPlugin
-    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
+    public boolean execute(String str, JSONArray jSONArray, CallbackContext callbackContext) throws JSONException {
         System.out.println("plugin has been started");
-        int i = AnonymousClass1.$SwitchMap$org$apache$cordova$plugin$Brightness$BrightnessPlugin$Action[Action.valueOf(action).ordinal()];
+        int i = AnonymousClass1.$SwitchMap$org$apache$cordova$plugin$Brightness$BrightnessPlugin$Action[Action.valueOf(str).ordinal()];
         if (i == 1) {
-            setBrightness(args, callbackContext);
+            setBrightness(jSONArray, callbackContext);
             return true;
         } else if (i == 2) {
-            getBrightness(args, callbackContext);
+            getBrightness(jSONArray, callbackContext);
             return true;
         } else if (i != 3) {
             return false;
         } else {
-            setKeepScreenOn(args, callbackContext);
+            setKeepScreenOn(jSONArray, callbackContext);
             return true;
         }
     }
@@ -91,32 +91,47 @@ public class BrightnessPlugin extends CordovaPlugin {
     public static /* synthetic */ class AnonymousClass1 {
         static final /* synthetic */ int[] $SwitchMap$org$apache$cordova$plugin$Brightness$BrightnessPlugin$Action;
 
+        /* JADX WARNING: Can't wrap try/catch for region: R(6:0|1|2|3|4|(3:5|6|8)) */
+        /* JADX WARNING: Failed to process nested try/catch */
+        /* JADX WARNING: Missing exception handler attribute for start block: B:3:0x0012 */
+        /* JADX WARNING: Missing exception handler attribute for start block: B:5:0x001d */
         static {
-            int[] iArr = new int[Action.values().length];
-            $SwitchMap$org$apache$cordova$plugin$Brightness$BrightnessPlugin$Action = iArr;
-            try {
-                iArr[Action.setBrightness.ordinal()] = 1;
-            } catch (NoSuchFieldError e) {
-            }
-            try {
-                $SwitchMap$org$apache$cordova$plugin$Brightness$BrightnessPlugin$Action[Action.getBrightness.ordinal()] = 2;
-            } catch (NoSuchFieldError e2) {
-            }
-            try {
-                $SwitchMap$org$apache$cordova$plugin$Brightness$BrightnessPlugin$Action[Action.setKeepScreenOn.ordinal()] = 3;
-            } catch (NoSuchFieldError e3) {
-            }
+            /*
+                org.apache.cordova.plugin.Brightness.BrightnessPlugin$Action[] r0 = org.apache.cordova.plugin.Brightness.BrightnessPlugin.Action.values()
+                int r0 = r0.length
+                int[] r0 = new int[r0]
+                org.apache.cordova.plugin.Brightness.BrightnessPlugin.AnonymousClass1.$SwitchMap$org$apache$cordova$plugin$Brightness$BrightnessPlugin$Action = r0
+                org.apache.cordova.plugin.Brightness.BrightnessPlugin$Action r1 = org.apache.cordova.plugin.Brightness.BrightnessPlugin.Action.setBrightness     // Catch:{ NoSuchFieldError -> 0x0012 }
+                int r1 = r1.ordinal()     // Catch:{ NoSuchFieldError -> 0x0012 }
+                r2 = 1
+                r0[r1] = r2     // Catch:{ NoSuchFieldError -> 0x0012 }
+            L_0x0012:
+                int[] r0 = org.apache.cordova.plugin.Brightness.BrightnessPlugin.AnonymousClass1.$SwitchMap$org$apache$cordova$plugin$Brightness$BrightnessPlugin$Action     // Catch:{ NoSuchFieldError -> 0x001d }
+                org.apache.cordova.plugin.Brightness.BrightnessPlugin$Action r1 = org.apache.cordova.plugin.Brightness.BrightnessPlugin.Action.getBrightness     // Catch:{ NoSuchFieldError -> 0x001d }
+                int r1 = r1.ordinal()     // Catch:{ NoSuchFieldError -> 0x001d }
+                r2 = 2
+                r0[r1] = r2     // Catch:{ NoSuchFieldError -> 0x001d }
+            L_0x001d:
+                int[] r0 = org.apache.cordova.plugin.Brightness.BrightnessPlugin.AnonymousClass1.$SwitchMap$org$apache$cordova$plugin$Brightness$BrightnessPlugin$Action     // Catch:{ NoSuchFieldError -> 0x0028 }
+                org.apache.cordova.plugin.Brightness.BrightnessPlugin$Action r1 = org.apache.cordova.plugin.Brightness.BrightnessPlugin.Action.setKeepScreenOn     // Catch:{ NoSuchFieldError -> 0x0028 }
+                int r1 = r1.ordinal()     // Catch:{ NoSuchFieldError -> 0x0028 }
+                r2 = 3
+                r0[r1] = r2     // Catch:{ NoSuchFieldError -> 0x0028 }
+            L_0x0028:
+                return
+            */
+            throw new UnsupportedOperationException("Method not decompiled: org.apache.cordova.plugin.Brightness.BrightnessPlugin.AnonymousClass1.<clinit>():void");
         }
     }
 
-    private boolean setBrightness(JSONArray args, CallbackContext callbackContext) {
+    private boolean setBrightness(JSONArray jSONArray, CallbackContext callbackContext) {
         try {
             Activity activity = this.cordova.getActivity();
-            WindowManager.LayoutParams layoutParams = activity.getWindow().getAttributes();
-            layoutParams.screenBrightness = (float) Double.parseDouble(args.getString(0));
-            SetTask task = new SetTask(this, null);
-            task.setParams(activity, layoutParams);
-            activity.runOnUiThread(task);
+            WindowManager.LayoutParams attributes = activity.getWindow().getAttributes();
+            attributes.screenBrightness = (float) Double.parseDouble(jSONArray.getString(0));
+            SetTask setTask = new SetTask(this, null);
+            setTask.setParams(activity, attributes);
+            activity.runOnUiThread(setTask);
             callbackContext.success("OK");
             System.out.println("All went fine.");
             return true;
@@ -133,7 +148,7 @@ public class BrightnessPlugin extends CordovaPlugin {
         }
     }
 
-    private boolean getBrightness(JSONArray args, CallbackContext callbackContext) {
+    private boolean getBrightness(JSONArray jSONArray, CallbackContext callbackContext) {
         try {
             callbackContext.success(Double.valueOf((double) this.cordova.getActivity().getWindow().getAttributes().screenBrightness).toString());
             System.out.println("All went fine.");
@@ -146,13 +161,13 @@ public class BrightnessPlugin extends CordovaPlugin {
         }
     }
 
-    private boolean setKeepScreenOn(JSONArray args, CallbackContext callbackContext) {
+    private boolean setKeepScreenOn(JSONArray jSONArray, CallbackContext callbackContext) {
         try {
-            boolean value = args.getBoolean(0);
+            boolean z = jSONArray.getBoolean(0);
             Activity activity = this.cordova.getActivity();
-            KeepOnTask task = new KeepOnTask(this, null);
-            task.setParams(activity.getWindow(), value);
-            activity.runOnUiThread(task);
+            KeepOnTask keepOnTask = new KeepOnTask(this, null);
+            keepOnTask.setParams(activity.getWindow(), z);
+            activity.runOnUiThread(keepOnTask);
             callbackContext.success("OK");
             System.out.println("All went fine.");
             return true;

@@ -6,16 +6,16 @@ public class ArchTaskExecutor extends TaskExecutor {
     private static final Executor sIOThreadExecutor = new Executor() {
         /* class android.arch.core.executor.ArchTaskExecutor.AnonymousClass2 */
 
-        public void execute(Runnable command) {
-            ArchTaskExecutor.getInstance().executeOnDiskIO(command);
+        public void execute(Runnable runnable) {
+            ArchTaskExecutor.getInstance().executeOnDiskIO(runnable);
         }
     };
     private static volatile ArchTaskExecutor sInstance;
     private static final Executor sMainThreadExecutor = new Executor() {
         /* class android.arch.core.executor.ArchTaskExecutor.AnonymousClass1 */
 
-        public void execute(Runnable command) {
-            ArchTaskExecutor.getInstance().postToMainThread(command);
+        public void execute(Runnable runnable) {
+            ArchTaskExecutor.getInstance().postToMainThread(runnable);
         }
     };
     private TaskExecutor mDefaultTaskExecutor;
@@ -40,7 +40,10 @@ public class ArchTaskExecutor extends TaskExecutor {
     }
 
     public void setDelegate(TaskExecutor taskExecutor) {
-        this.mDelegate = taskExecutor == null ? this.mDefaultTaskExecutor : taskExecutor;
+        if (taskExecutor == null) {
+            taskExecutor = this.mDefaultTaskExecutor;
+        }
+        this.mDelegate = taskExecutor;
     }
 
     @Override // android.arch.core.executor.TaskExecutor

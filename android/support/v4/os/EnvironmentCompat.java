@@ -10,12 +10,12 @@ public final class EnvironmentCompat {
     public static final String MEDIA_UNKNOWN = "unknown";
     private static final String TAG = "EnvironmentCompat";
 
-    public static String getStorageState(File path) {
+    public static String getStorageState(File file) {
         if (Build.VERSION.SDK_INT >= 19) {
-            return Environment.getStorageState(path);
+            return Environment.getStorageState(file);
         }
         try {
-            if (path.getCanonicalPath().startsWith(Environment.getExternalStorageDirectory().getCanonicalPath())) {
+            if (file.getCanonicalPath().startsWith(Environment.getExternalStorageDirectory().getCanonicalPath())) {
                 return Environment.getExternalStorageState();
             }
             return MEDIA_UNKNOWN;

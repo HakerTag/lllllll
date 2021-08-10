@@ -31,28 +31,28 @@ public final class AutoFocusManager implements Camera.AutoFocusCallback {
 
     AutoFocusManager(Context context, Camera camera2) {
         this.camera = camera2;
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String currentFocusMode = camera2.getParameters().getFocusMode();
+        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String focusMode = camera2.getParameters().getFocusMode();
         boolean z = true;
-        this.useAutoFocus = (!sharedPrefs.getBoolean(PreferencesActivity.KEY_AUTO_FOCUS, true) || !FOCUS_MODES_CALLING_AF.contains(currentFocusMode)) ? false : z;
+        this.useAutoFocus = (!defaultSharedPreferences.getBoolean(PreferencesActivity.KEY_AUTO_FOCUS, true) || !FOCUS_MODES_CALLING_AF.contains(focusMode)) ? false : z;
         String str = TAG;
-        Log.i(str, "Current focus mode '" + currentFocusMode + "'; use auto focus? " + this.useAutoFocus);
+        Log.i(str, "Current focus mode '" + focusMode + "'; use auto focus? " + this.useAutoFocus);
         start();
     }
 
-    public synchronized void onAutoFocus(boolean success, Camera theCamera) {
+    public synchronized void onAutoFocus(boolean z, Camera camera2) {
         this.focusing = false;
         autoFocusAgainLater();
     }
 
     private synchronized void autoFocusAgainLater() {
         if (!this.stopped && this.outstandingTask == null) {
-            AutoFocusTask newTask = new AutoFocusTask();
+            AutoFocusTask autoFocusTask = new AutoFocusTask();
             try {
-                newTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Object[0]);
-                this.outstandingTask = newTask;
-            } catch (RejectedExecutionException ree) {
-                Log.w(TAG, "Could not request auto focus", ree);
+                autoFocusTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Object[0]);
+                this.outstandingTask = autoFocusTask;
+            } catch (RejectedExecutionException e) {
+                Log.w(TAG, "Could not request auto focus", e);
             }
         }
     }
@@ -65,8 +65,8 @@ public final class AutoFocusManager implements Camera.AutoFocusCallback {
                 try {
                     this.camera.autoFocus(this);
                     this.focusing = true;
-                } catch (RuntimeException re) {
-                    Log.w(TAG, "Unexpected exception while focusing", re);
+                } catch (RuntimeException e) {
+                    Log.w(TAG, "Unexpected exception while focusing", e);
                     autoFocusAgainLater();
                 }
             }
@@ -89,8 +89,8 @@ public final class AutoFocusManager implements Camera.AutoFocusCallback {
             cancelOutstandingTask();
             try {
                 this.camera.cancelAutoFocus();
-            } catch (RuntimeException re) {
-                Log.w(TAG, "Unexpected exception while cancelling focusing", re);
+            } catch (RuntimeException e) {
+                Log.w(TAG, "Unexpected exception while cancelling focusing", e);
             }
         }
     }
@@ -102,10 +102,10 @@ public final class AutoFocusManager implements Camera.AutoFocusCallback {
 
         /* access modifiers changed from: protected */
         @Override // android.os.AsyncTask
-        public Object doInBackground(Object... voids) {
+        public Object doInBackground(Object... objArr) {
             try {
                 Thread.sleep(AutoFocusManager.AUTO_FOCUS_INTERVAL_MS);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException unused) {
             }
             AutoFocusManager.this.start();
             return null;

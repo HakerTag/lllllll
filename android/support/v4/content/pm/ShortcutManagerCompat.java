@@ -16,85 +16,79 @@ public class ShortcutManagerCompat {
 
     /* JADX WARNING: Removed duplicated region for block: B:10:0x0036  */
     /* Code decompiled incorrectly, please refer to instructions dump. */
-    public static boolean isRequestPinShortcutSupported(android.content.Context r6) {
+    public static boolean isRequestPinShortcutSupported(android.content.Context r4) {
         /*
             int r0 = android.os.Build.VERSION.SDK_INT
             r1 = 26
             if (r0 < r1) goto L_0x0013
             java.lang.Class<android.content.pm.ShortcutManager> r0 = android.content.pm.ShortcutManager.class
-            java.lang.Object r0 = r6.getSystemService(r0)
-            android.content.pm.ShortcutManager r0 = (android.content.pm.ShortcutManager) r0
-            boolean r0 = r0.isRequestPinShortcutSupported()
-            return r0
+            java.lang.Object r4 = r4.getSystemService(r0)
+            android.content.pm.ShortcutManager r4 = (android.content.pm.ShortcutManager) r4
+            boolean r4 = r4.isRequestPinShortcutSupported()
+            return r4
         L_0x0013:
             java.lang.String r0 = "com.android.launcher.permission.INSTALL_SHORTCUT"
-            int r1 = android.support.v4.content.ContextCompat.checkSelfPermission(r6, r0)
+            int r1 = android.support.v4.content.ContextCompat.checkSelfPermission(r4, r0)
             r2 = 0
             if (r1 == 0) goto L_0x001d
             return r2
         L_0x001d:
-            android.content.pm.PackageManager r1 = r6.getPackageManager()
-            android.content.Intent r3 = new android.content.Intent
-            java.lang.String r4 = "com.android.launcher.action.INSTALL_SHORTCUT"
-            r3.<init>(r4)
-            java.util.List r1 = r1.queryBroadcastReceivers(r3, r2)
-            java.util.Iterator r1 = r1.iterator()
+            android.content.pm.PackageManager r4 = r4.getPackageManager()
+            android.content.Intent r1 = new android.content.Intent
+            java.lang.String r3 = "com.android.launcher.action.INSTALL_SHORTCUT"
+            r1.<init>(r3)
+            java.util.List r4 = r4.queryBroadcastReceivers(r1, r2)
+            java.util.Iterator r4 = r4.iterator()
         L_0x0030:
-            boolean r3 = r1.hasNext()
-            if (r3 == 0) goto L_0x0050
-            java.lang.Object r3 = r1.next()
-            android.content.pm.ResolveInfo r3 = (android.content.pm.ResolveInfo) r3
-            android.content.pm.ActivityInfo r4 = r3.activityInfo
-            java.lang.String r4 = r4.permission
-            boolean r5 = android.text.TextUtils.isEmpty(r4)
-            if (r5 != 0) goto L_0x004e
-            boolean r5 = r0.equals(r4)
-            if (r5 == 0) goto L_0x004d
-            goto L_0x004e
-        L_0x004d:
-            goto L_0x0030
+            boolean r1 = r4.hasNext()
+            if (r1 == 0) goto L_0x004e
+            java.lang.Object r1 = r4.next()
+            android.content.pm.ResolveInfo r1 = (android.content.pm.ResolveInfo) r1
+            android.content.pm.ActivityInfo r1 = r1.activityInfo
+            java.lang.String r1 = r1.permission
+            boolean r3 = android.text.TextUtils.isEmpty(r1)
+            if (r3 != 0) goto L_0x004c
+            boolean r1 = r0.equals(r1)
+            if (r1 == 0) goto L_0x0030
+        L_0x004c:
+            r4 = 1
+            return r4
         L_0x004e:
-            r0 = 1
-            return r0
-        L_0x0050:
             return r2
         */
         throw new UnsupportedOperationException("Method not decompiled: android.support.v4.content.pm.ShortcutManagerCompat.isRequestPinShortcutSupported(android.content.Context):boolean");
     }
 
-    public static boolean requestPinShortcut(Context context, ShortcutInfoCompat shortcut, final IntentSender callback) {
+    public static boolean requestPinShortcut(Context context, ShortcutInfoCompat shortcutInfoCompat, final IntentSender intentSender) {
         if (Build.VERSION.SDK_INT >= 26) {
-            return ((ShortcutManager) context.getSystemService(ShortcutManager.class)).requestPinShortcut(shortcut.toShortcutInfo(), callback);
+            return ((ShortcutManager) context.getSystemService(ShortcutManager.class)).requestPinShortcut(shortcutInfoCompat.toShortcutInfo(), intentSender);
         }
         if (!isRequestPinShortcutSupported(context)) {
             return false;
         }
-        Intent intent = shortcut.addToIntent(new Intent(ACTION_INSTALL_SHORTCUT));
-        if (callback == null) {
-            context.sendBroadcast(intent);
+        Intent addToIntent = shortcutInfoCompat.addToIntent(new Intent(ACTION_INSTALL_SHORTCUT));
+        if (intentSender == null) {
+            context.sendBroadcast(addToIntent);
             return true;
         }
-        context.sendOrderedBroadcast(intent, null, new BroadcastReceiver() {
+        context.sendOrderedBroadcast(addToIntent, null, new BroadcastReceiver() {
             /* class android.support.v4.content.pm.ShortcutManagerCompat.AnonymousClass1 */
 
             public void onReceive(Context context, Intent intent) {
                 try {
-                    callback.sendIntent(context, 0, null, null, null);
-                } catch (IntentSender.SendIntentException e) {
+                    intentSender.sendIntent(context, 0, null, null, null);
+                } catch (IntentSender.SendIntentException unused) {
                 }
             }
         }, null, -1, null, null);
         return true;
     }
 
-    public static Intent createShortcutResultIntent(Context context, ShortcutInfoCompat shortcut) {
-        Intent result = null;
-        if (Build.VERSION.SDK_INT >= 26) {
-            result = ((ShortcutManager) context.getSystemService(ShortcutManager.class)).createShortcutResultIntent(shortcut.toShortcutInfo());
+    public static Intent createShortcutResultIntent(Context context, ShortcutInfoCompat shortcutInfoCompat) {
+        Intent createShortcutResultIntent = Build.VERSION.SDK_INT >= 26 ? ((ShortcutManager) context.getSystemService(ShortcutManager.class)).createShortcutResultIntent(shortcutInfoCompat.toShortcutInfo()) : null;
+        if (createShortcutResultIntent == null) {
+            createShortcutResultIntent = new Intent();
         }
-        if (result == null) {
-            result = new Intent();
-        }
-        return shortcut.addToIntent(result);
+        return shortcutInfoCompat.addToIntent(createShortcutResultIntent);
     }
 }

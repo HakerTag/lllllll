@@ -1,6 +1,7 @@
 package org.apache.cordova;
 
 import java.security.SecureRandom;
+import kotlin.jvm.internal.IntCompanionObject;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -10,53 +11,54 @@ public class CordovaBridge {
     private NativeToJsMessageQueue jsMessageQueue;
     private PluginManager pluginManager;
 
-    public CordovaBridge(PluginManager pluginManager2, NativeToJsMessageQueue jsMessageQueue2) {
+    public CordovaBridge(PluginManager pluginManager2, NativeToJsMessageQueue nativeToJsMessageQueue) {
         this.pluginManager = pluginManager2;
-        this.jsMessageQueue = jsMessageQueue2;
+        this.jsMessageQueue = nativeToJsMessageQueue;
     }
 
-    public String jsExec(int bridgeSecret, String service, String action, String callbackId, String arguments) throws JSONException, IllegalAccessException {
-        if (!verifySecret("exec()", bridgeSecret)) {
+    public String jsExec(int i, String str, String str2, String str3, String str4) throws JSONException, IllegalAccessException {
+        String str5;
+        if (!verifySecret("exec()", i)) {
             return null;
         }
-        if (arguments == null) {
+        if (str4 == null) {
             return "@Null arguments.";
         }
         this.jsMessageQueue.setPaused(true);
         try {
             CordovaResourceApi.jsThread = Thread.currentThread();
-            this.pluginManager.exec(service, action, callbackId, arguments);
-            return this.jsMessageQueue.popAndEncode(false);
-        } catch (Throwable e) {
-            e.printStackTrace();
-            return "";
-        } finally {
+            this.pluginManager.exec(str, str2, str3, str4);
+            str5 = this.jsMessageQueue.popAndEncode(false);
+        } catch (Throwable th) {
             this.jsMessageQueue.setPaused(false);
+            throw th;
+        }
+        this.jsMessageQueue.setPaused(false);
+        return str5;
+    }
+
+    public void jsSetNativeToJsBridgeMode(int i, int i2) throws IllegalAccessException {
+        if (verifySecret("setNativeToJsBridgeMode()", i)) {
+            this.jsMessageQueue.setBridgeMode(i2);
         }
     }
 
-    public void jsSetNativeToJsBridgeMode(int bridgeSecret, int value) throws IllegalAccessException {
-        if (verifySecret("setNativeToJsBridgeMode()", bridgeSecret)) {
-            this.jsMessageQueue.setBridgeMode(value);
-        }
-    }
-
-    public String jsRetrieveJsMessages(int bridgeSecret, boolean fromOnlineEvent) throws IllegalAccessException {
-        if (!verifySecret("retrieveJsMessages()", bridgeSecret)) {
+    public String jsRetrieveJsMessages(int i, boolean z) throws IllegalAccessException {
+        if (!verifySecret("retrieveJsMessages()", i)) {
             return null;
         }
-        return this.jsMessageQueue.popAndEncode(fromOnlineEvent);
+        return this.jsMessageQueue.popAndEncode(z);
     }
 
-    private boolean verifySecret(String action, int bridgeSecret) throws IllegalAccessException {
+    private boolean verifySecret(String str, int i) throws IllegalAccessException {
         if (!this.jsMessageQueue.isBridgeEnabled()) {
-            if (bridgeSecret == -1) {
-                LOG.d(LOG_TAG, action + " call made before bridge was enabled.");
+            if (i == -1) {
+                LOG.d(LOG_TAG, str + " call made before bridge was enabled.");
                 return false;
             }
-            LOG.d(LOG_TAG, "Ignoring " + action + " from previous page load.");
+            LOG.d(LOG_TAG, "Ignoring " + str + " from previous page load.");
             return false;
-        } else if (this.expectedBridgeSecret >= 0 && bridgeSecret == this.expectedBridgeSecret) {
+        } else if (this.expectedBridgeSecret >= 0 && i == this.expectedBridgeSecret) {
             return true;
         } else {
             LOG.e(LOG_TAG, "Bridge access attempt with wrong secret token, possibly from malicious code. Disabling exec() bridge!");
@@ -76,7 +78,7 @@ public class CordovaBridge {
 
     /* access modifiers changed from: package-private */
     public int generateBridgeSecret() {
-        this.expectedBridgeSecret = new SecureRandom().nextInt(Integer.MAX_VALUE);
+        this.expectedBridgeSecret = new SecureRandom().nextInt(IntCompanionObject.MAX_VALUE);
         return this.expectedBridgeSecret;
     }
 
@@ -85,15 +87,15 @@ public class CordovaBridge {
         clearBridgeSecret();
     }
 
-    public String promptOnJsPrompt(String origin, String message, String defaultValue) {
-        if (defaultValue != null && defaultValue.startsWith("gap:")) {
+    public String promptOnJsPrompt(String str, String str2, String str3) {
+        if (str3 != null && str3.startsWith("gap:")) {
             try {
-                JSONArray array = new JSONArray(defaultValue.substring(4));
-                String r = jsExec(array.getInt(0), array.getString(1), array.getString(2), array.getString(3), message);
-                if (r == null) {
+                JSONArray jSONArray = new JSONArray(str3.substring(4));
+                String jsExec = jsExec(jSONArray.getInt(0), jSONArray.getString(1), jSONArray.getString(2), jSONArray.getString(3), str2);
+                if (jsExec == null) {
                     return "";
                 }
-                return r;
+                return jsExec;
             } catch (JSONException e) {
                 e.printStackTrace();
                 return "";
@@ -101,35 +103,35 @@ public class CordovaBridge {
                 e2.printStackTrace();
                 return "";
             }
-        } else if (defaultValue != null && defaultValue.startsWith("gap_bridge_mode:")) {
+        } else if (str3 != null && str3.startsWith("gap_bridge_mode:")) {
             try {
-                jsSetNativeToJsBridgeMode(Integer.parseInt(defaultValue.substring(16)), Integer.parseInt(message));
+                jsSetNativeToJsBridgeMode(Integer.parseInt(str3.substring(16)), Integer.parseInt(str2));
             } catch (NumberFormatException e3) {
                 e3.printStackTrace();
             } catch (IllegalAccessException e4) {
                 e4.printStackTrace();
             }
             return "";
-        } else if (defaultValue != null && defaultValue.startsWith("gap_poll:")) {
+        } else if (str3 != null && str3.startsWith("gap_poll:")) {
             try {
-                String r2 = jsRetrieveJsMessages(Integer.parseInt(defaultValue.substring(9)), "1".equals(message));
-                if (r2 == null) {
+                String jsRetrieveJsMessages = jsRetrieveJsMessages(Integer.parseInt(str3.substring(9)), "1".equals(str2));
+                if (jsRetrieveJsMessages == null) {
                     return "";
                 }
-                return r2;
+                return jsRetrieveJsMessages;
             } catch (IllegalAccessException e5) {
                 e5.printStackTrace();
                 return "";
             }
-        } else if (defaultValue == null || !defaultValue.startsWith("gap_init:")) {
+        } else if (str3 == null || !str3.startsWith("gap_init:")) {
             return null;
         } else {
-            if (this.pluginManager.shouldAllowBridgeAccess(origin)) {
-                this.jsMessageQueue.setBridgeMode(Integer.parseInt(defaultValue.substring(9)));
-                int secret = generateBridgeSecret();
-                return "" + secret;
+            if (this.pluginManager.shouldAllowBridgeAccess(str)) {
+                this.jsMessageQueue.setBridgeMode(Integer.parseInt(str3.substring(9)));
+                int generateBridgeSecret = generateBridgeSecret();
+                return "" + generateBridgeSecret;
             }
-            LOG.e(LOG_TAG, "gap_init called from restricted origin: " + origin);
+            LOG.e(LOG_TAG, "gap_init called from restricted origin: " + str);
             return "";
         }
     }
